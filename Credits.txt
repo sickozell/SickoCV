@@ -1,0 +1,4 @@
+## Credits
+The Component Library graphics for these modules are copyright © 2016-2021 VCV and licensed under CC BY-NC 4.0
+
+Thanks to Omri Cohen for support. (https://omricohen-music.com/)
