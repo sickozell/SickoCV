@@ -61,6 +61,6 @@ A trigger on RESET input will reset the toggle state.
 The same of toggle mode, but the signals will be routed only when TRG/GTE input receives a high gate.
 
 ## Credits
-The Component Library graphics for these modules are copyright © 2016-2021 VCV and licensed under CC BY-NC 4.0
+The Component Library graphics for these modules are copyright © 2016-2021 VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
 
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support.
