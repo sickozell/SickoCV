@@ -1,0 +1,54 @@
+{
+  "slug": "SickoCV",
+  "name": "SickoCV",
+  "version": "2.0.0",
+  "license": "GPL-3.0",
+  "brand": "Sickozell",
+  "author": "Sickozell",
+  "authorEmail": "sickozell@sickozell.org",
+  "authorUrl": "http://www.sickozell.org",
+  "pluginUrl": "https://github.com/sickozell/SickoCV",
+  "manualUrl": "https://github.com/sickozell/SickoCV",
+  "sourceUrl": "https://github.com/sickozell/SickoCV",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "Btoggler",
+      "name": "bToggler",
+      "description": "8 buffered toggle switches (flip flop) with gate output and signal routing",
+      "tags": [
+        "utility",
+        "logic"
+      ]
+    },
+    {
+      "slug": "BtogglerPlus",
+      "name": "bTogglerPlus",
+      "description": "8 buffered toggle switches (flip flop) with signal routing and warnings to use with led midi controllers",
+      "tags": [
+        "utility",
+        "logic"
+      ]
+    },
+    {
+      "slug": "Calcs",
+      "name": "Calcs",
+      "description": "Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs",
+      "tags": [
+        "utility"
+      ]
+    },
+    {
+      "slug": "Toggler",
+      "name": "Toggler",
+      "description": "Stereo signal toggle switches (flip flop) router, ASR envelope with VCA",
+      "tags": [
+        "utility",
+        "logic",
+        "envelope generator",
+	"Voltage-controlled amplifier"
+      ]
+    }
+  ]
+}
