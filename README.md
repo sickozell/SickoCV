@@ -24,7 +24,7 @@ Triggering RESETALL input will immediately stops the 8 routings.
 ##### 8 buffered toggle switches (flip flop) with signal routing and warnings to use with led midi controllers
 It's almost the same of previous one.
 
-When armed or unarmed, the WRN (warning) output will provide a sequence of pulses until clock is detected. Then it will act as the OUT output if the FADE knob is set to 0ms, else it will act as the GATE output.
+When armed or unarmed, the WRN (warning) output will provide a sequence of pulses until clock is detected. Then it will act as the OUT output (routing) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).
 
 WA and WR knobs set the attack (arm) and release (unarm) pulserate up to 200 ms of the warning pulses.
 
