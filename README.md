@@ -46,7 +46,7 @@ U/B (Unipolar/Bipolar) switch will set the range of the outputs from 0/10V or -5
 ##### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA
 - TOGGLE mode
 
-on receiving a trigger on TRG/GATE input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) output and set the GATE output to low.
+on receiving a trigger on TRG/GTE input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) output and set the GATE output to low.
 
 Attack, sustain and release knob set the envelope of the routed signal when triggered.
 
