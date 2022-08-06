@@ -59,3 +59,6 @@ A trigger on RESET input will reset the toggle state.
 - GATE MODE
 
 The same of toggle mode, but the signals will be routed only when TRG/GTE input receives a high gate.
+
+## Credits
+The Component Library graphics for these modules are copyright © 2016-2021 VCV and licensed under CC BY-NC 4.0
