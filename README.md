@@ -40,6 +40,7 @@ For example: "MIDI TO GATE" module wired to ARM input and WRN output wired to "G
 ##### calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
 
 A, B and C are the inputs. The output tables provide simple math calculation and averages between these inputs.
+
 U/B (Unipolar/Bipolar) switch will set the range of the outputs from 0/10V or -5/+5v.
 
 ### Toggler
