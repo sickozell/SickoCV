@@ -1,5 +1,8 @@
 # SickoCV
 VCV Rack plugin modules
+
+![Sickozell VCV modules](https://user-images.githubusercontent.com/80784296/183235533-d43b116f-6071-40e5-8d67-5d8cc384cab2.JPG)
+
 ### Btoggler
 ##### 8 buffered toggle switches (or flip flop) with gate output and signal routing with a fade knob to transfer also audio signals
 
