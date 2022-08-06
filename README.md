@@ -32,7 +32,7 @@ If set to 0ms  it will output a low gate during warning time and if set to to ma
 
 For example, if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output. Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
-Actually WRN  it's meant to be used connected to a led programmable midi controller.
+Actually WRN outputs are meant to be used connected to a led programmable midi controller.
 
 For example: "MIDI TO GATE" module wired to ARM input and WRN output wired to "GATE TO MIDI". With a configuration like this, sequencers or audio can be clock-sync launched from controller having a visual led feedback.
 
