@@ -34,7 +34,7 @@ For example: if WA is set to 0 and WR is set to max(200), WRN output will act li
 
 Actually WRN outputs are meant to be used connected to a led programmable midi controller.
 
-For example: "MIDI TO GATE" module wired to ARM input and WRN output wired to "GATE TO MIDI". With a configuration like this, sequencers or audio can be clock-sync launched from controller having a visual led feedback.
+For example: "MIDI TO GATE" module wired to ARM input and WRN output wired to "GATE TO MIDI". With a configuration like this, you can press a led button on your midi controller and launch clock-synced sequencers or audio, having a visual led feedback.
 
 ### Calcs
 ##### calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
