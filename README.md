@@ -51,7 +51,7 @@ on receiving a trigger on TRG/GTE input, it will send the L+(R) inputs to L+(R) 
 
 Attack, sustain and release knob set the envelope of the routed signal when triggered.
 
-A, S, R CVinputs are added to respective knobs values.
+A, S, R CVinputs are added to respective knob values.
 
 If L or (R) inputs are not connected L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
