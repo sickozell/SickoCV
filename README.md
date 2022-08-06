@@ -36,7 +36,7 @@ For example: "MIDI TO GATE" module wired to ARM input and WRN output wired to "G
 ### Calcs
 ##### calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
 
-a, b and c are the inputs. The output tables provide simple math calculation between these inputs.
+a, b and c are the inputs. The output tables provide simple math calculation and averages between these inputs.
 
 ### Toggler
 ##### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA
