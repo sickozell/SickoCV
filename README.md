@@ -30,7 +30,7 @@ WA and WR knobs set the attack (arm) and release (unarm) pulserate up to 200 ms 
 
 If set to 0ms  it will output a low gate during warning time and if set to to max (200ms) it will output a high gate.
 
-For example, if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output. Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
+For example: if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output. Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
 Actually WRN outputs are meant to be used connected to a led programmable midi controller.
 
