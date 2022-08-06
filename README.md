@@ -28,7 +28,7 @@ When armed or unarmed, the WRN (warning) output will provide a sequence of pulse
 
 WA and WR knobs set the attack (arm) and release (unarm) pulserate up to 200 ms of the warning pulses.
 
-If set to 0ms  it will output a low gate during warning time and if set to to max (200ms) it will output a high gate.
+If set to 0ms WRN will output a low gate during warning time and if set to to max (200ms) it will output a high gate.
 
 For example: if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output. Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
