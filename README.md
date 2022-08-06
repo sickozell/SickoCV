@@ -31,16 +31,17 @@ For example, if WA is set to 0 and WR is set to max(200), WRN output will act li
 
 Actually WRN  it's meant to be used connected to a led programmable midi controller.
 
-For example: "MIDI TO GATE" module wired to ARM input and WRN output wired to "GATE TO MIDI". With a configuration like this, sequencers or audio can be launched from controller having a visual led feedback, everything clock-synced.
+For example: "MIDI TO GATE" module wired to ARM input and WRN output wired to "GATE TO MIDI". With a configuration like this, sequencers or audio can be clock-sync launched from controller having a visual led feedback.
 
 ### Calcs
 ##### calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
 
-a, b and c are the inputs. The output tables provide simple math calculation and averages between these inputs.
+A, B and C are the inputs. The output tables provide simple math calculation and averages between these inputs.
+U/B (Unipolar/Bipolar) switch will set the range of the outputs from 0/10V or -5/+5v.
 
 ### Toggler
 ##### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA
-TOGGLE mode:
+- TOGGLE mode
 
 on receiving a trigger on TRG/GATE input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) output and set the GATE output to low.
 
@@ -52,6 +53,6 @@ If L or (R) inputs are not connected L and (R) outputs will provide just the env
 
 A trigger on RESET input will reset the toggle state.
 
-GATE MODE:
+- GATE MODE
 
 The same of toggle mode, but the signals will be routed only when TRG/GTE input receives a high gate.
