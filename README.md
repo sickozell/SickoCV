@@ -4,7 +4,7 @@ VCV Rack plugin modules
 ![SickoCV modules](https://user-images.githubusercontent.com/80784296/183292218-2263acd5-1d1c-41ca-849e-f020b2ab2c7b.JPG)
 
 ### Btoggler
-##### 8 buffered toggle switches (or flip flop) with gate output and signal routing with a fade knob to transfer also audio signals
+##### 8 buffered toggle switches (flip flop) with gate output and signal routing with a fade knob to transfer also audio signals
 
 Connect a clock source.
 
@@ -12,42 +12,42 @@ When ARM input is triggered the IN input will start to be routed to OUT on next 
 
 With another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
 
-FADE knob can be used to avoid attack or release clicking when audio signals are connected to IN input.
+FADE knob can be used to avoid attack or release clicks when audio signals are connected to IN input.
 
 If ARM is triggered again before clock detection it will abort arming or unarming.
 
 Triggering RESET input will immediately stops the routing.
 
-Triggering RESETALL input will immediately stops the 8 routings.
+Triggering RESETALL input will immediately stops all the 8 routings.
  
 ### Btoggler+
 ##### 8 buffered toggle switches (flip flop) with signal routing and warnings to use with led midi controllers
 It's almost the same of previous one.
 
-When armed or unarmed, the WRN (warning) output will provide a sequence of pulses until clock is detected. Then it will act as the OUT output (routing) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).
+When armed or unarmed, the WRN (warning) output will provide a sequence of pulses until next clock pulse is detected. Then it will act as the OUT output (routing) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).
 
 WA and WR knobs set the attack (arm) and release (unarm) pulserate up to 200 ms of the warning pulses.
 
-If set to 0ms WRN will output a low gate during warning time and if set to to max (200ms) it will output a high gate.
+If set to 0ms, WRN will output a low gate during warning time and if set to to max (200ms) it will output a high gate.
 
 For example: if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output. Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
 Actually WRN outputs are meant to be used connected to a led programmable midi controller.
 
-For example: "MIDI TO GATE" module wired to ARM input and WRN output wired to "GATE TO MIDI". With a configuration like this, you can press a led button on your midi controller and launch clock-synced sequencers or audio, having a visual led feedback.
+For example: a "MIDI TO GATE" module wired to ARM inputs and WRN outpust wired to a "GATE TO MIDI" module. With a configuration like this, you can press a led button on the midi controller and launch clock-synced sequencers or audio, having a visual led feedback.
 
 ### Calcs
 ##### calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
 
-A, B and C are the inputs. The output tables provide simple math calculation and averages between these inputs.
+A, B and C are the inputs. The output tables provide simple math calculations and averages between these inputs.
 
-U/B (Unipolar/Bipolar) switch will set the range of the outputs from 0/10V or -5/+5v.
+U/B (Unipolar/Bipolar) switch will set the range of the outputs with 0/10V or -5/+5v.
 
 ### Toggler / Toggler Compact
 ##### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA, in regular and compact form factor
 TOGGLE mode:
 
-on receiving a trigger on TRG/GTE input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) output and set the GATE output to low.
+on receiving a trigger on TRG/GTE input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
 
 Attack, sustain and release knob set the envelope of the routed signal when triggered.
 
@@ -59,7 +59,7 @@ A trigger on RESET input will reset the toggle state.
 
 GATE MODE:
 
-The same of toggle mode, but the signals will be routed only when TRG/GTE input receives a high gate.
+The same of toggle mode, but the signals will be routed only while TRG/GTE input is in a high gate.
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
