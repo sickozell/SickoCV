@@ -1,7 +1,7 @@
 # SickoCV
 VCV Rack plugin modules
 
-![Sickozell VCV modules](https://user-images.githubusercontent.com/80784296/183235533-d43b116f-6071-40e5-8d67-5d8cc384cab2.JPG)
+![Sickozell VCV modules](https://user-images.githubusercontent.com/80784296/183282072-de6f7dc8-0c4c-4646-bcdf-65c7b5742fa1.JPG)
 
 ### Btoggler
 ##### 8 buffered toggle switches (or flip flop) with gate output and signal routing with a fade knob to transfer also audio signals
@@ -43,8 +43,8 @@ A, B and C are the inputs. The output tables provide simple math calculation and
 
 U/B (Unipolar/Bipolar) switch will set the range of the outputs from 0/10V or -5/+5v.
 
-### Toggler
-##### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA
+### Toggler / Toggler Compact
+##### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA, in regular and compact form factor
 TOGGLE mode:
 
 on receiving a trigger on TRG/GTE input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) output and set the GATE output to low.
