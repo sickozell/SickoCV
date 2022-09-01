@@ -4,8 +4,10 @@ VCV Rack plugin modules
 ![SickoCV modules](https://user-images.githubusercontent.com/80784296/183292218-2263acd5-1d1c-41ca-849e-f020b2ab2c7b.JPG)
 
 ### Btoggler
-##### 8 buffered toggle switches (flip flop) with gate output and signal routing with a fade knob to transfer also audio signals
-
+#### 8 buffered toggle switches (flip flop) with gate output and signal routing with a fade knob to route also audio signals with any clicks
+##### - Purpose:
+'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals synced to a tempo clock source.
+##### - Usage:
 Connect a clock source.
 
 When ARM input is triggered the IN input will start to be routed to OUT on next clock detection and GATE output will provide a high state.
@@ -21,9 +23,10 @@ Triggering RESET input will immediately stops the routing.
 Triggering RESETALL input will immediately stops all the 8 routings.
  
 ### Btoggler+
-##### 8 buffered toggle switches (flip flop) with signal routing and warnings to use with led midi controllers
-It's almost the same of previous one.
-
+#### 8 buffered toggle switches (flip flop) with signal routing and warnings to use with led midi controllers
+##### - Purpose:
+'Btoggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
+##### - Usage:
 When armed or unarmed, the WRN (warning) output will provide a sequence of pulses until next clock pulse is detected. Then it will act as the OUT output (routing) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).
 
 WA and WR knobs set the attack (arm) and release (unarm) pulserate up to 200 ms of the warning pulses.
@@ -37,14 +40,17 @@ Actually WRN outputs are meant to be used connected to a led programmable midi c
 For example: a "MIDI TO GATE" module wired to ARM inputs and WRN outpust wired to a "GATE TO MIDI" module. With a configuration like this, you can press a led button on the midi controller and launch clock-synced sequencers or audio, having a visual led feedback.
 
 ### Calcs
-##### calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
-
+#### calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
+##### - Usage:
 A, B and C are the inputs. The output tables provide simple math calculations and averages between these inputs.
 
-U/B (Unipolar/Bipolar) switch will set the range of the outputs with 0/10V or -5/+5v.
+U/B (Unipolar/Bipolar) switch will set the range of the outputs to 0/10V or -5/+5v.
 
 ### Toggler / Toggler Compact
-##### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA, in regular and compact form factor
+#### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA, in regular and compact form factor
+##### - Purpose:
+mute/unmute CV or mono/stereo AUDIO signals, it's basically an ASR envelope generator with bultin VCA activated by a GATE or Toggle Triggers
+##### - Usage:
 TOGGLE mode:
 
 on receiving a trigger on TRG/GTE input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
