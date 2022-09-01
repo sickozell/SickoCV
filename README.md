@@ -6,7 +6,7 @@ VCV Rack plugin modules
 ### Btoggler
 #### 8 buffered toggle switches (flip flop) with gate output and signal routing with a fade knob to route also audio signals with any clicks
 ##### - Purpose:
-'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals synced to a tempo clock source.
+'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source.
 ##### - Usage:
 Connect a clock source.
 
@@ -14,7 +14,7 @@ When ARM input is triggered the IN input will start to be routed to OUT on next 
 
 With another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
 
-FADE knob can be used to avoid attack or release clicks when audio signals are connected to IN input.
+FADE knob (up to 50ms) can be used to avoid attack or release clicks when audio signals are connected to IN input.
 
 If ARM is triggered again before clock detection it will abort arming or unarming.
 
