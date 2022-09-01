@@ -25,7 +25,7 @@ Triggering RESETALL input will immediately stops all the 8 routings.
 ### Btoggler+
 #### 8 buffered toggle switches (flip flop) with signal routing and warnings to use with led midi controllers
 ##### - Purpose:
-'Btoggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
+'btoggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
 ##### - Usage:
 When armed or unarmed, the WRN (warning) output will provide a sequence of pulses until next clock pulse is detected. Then it will act as the OUT output (routing) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).
 
