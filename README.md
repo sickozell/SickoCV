@@ -53,6 +53,7 @@ U/B (Unipolar/Bipolar) switch will set the range of the outputs to 0/10V or -5/+
 ### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA, in regular and compact form factor
 #### - Purposes:
 - mute/unmute CV or mono/stereo AUDIO signals according to an ASR envelope activated by a GATE or Toggle Triggers
+- ASR envelope generator
 - ASR envelope generator with builtin VCA
 #### - Usage:
 **TOGGLE MODE:**
