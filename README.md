@@ -5,7 +5,7 @@ VCV Rack plugin modules
 
 ## Btoggler
 ### 8 buffered toggle switches (flip flop) with gate output and signal routing with a fade knob to route also audio signals with any clicks
-#### - Purpose:
+#### - Simple purpose:
 - 'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source.
 #### - Usage:
 Connect a clock source.
@@ -24,7 +24,7 @@ Triggering RESETALL input will immediately stops all the 8 routings.
  
 ## Btoggler+
 ### 8 buffered toggle switches (flip flop) with signal routing and warnings to use with led midi controllers
-#### - Purpose:
+#### - Simple purpose:
 - 'btoggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
 #### - Usage:
 
@@ -51,14 +51,14 @@ U/B (Unipolar/Bipolar) switch will set the range of the outputs to 0/10V or -5/+
 
 ## Toggler / Toggler Compact
 ### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA, in regular and compact form factor
-#### - Purposes:
+#### - Simple purposes:
 - mute/unmute CV or mono/stereo AUDIO signals according to an ASR envelope activated by a GATE or Toggle Triggers
 - ASR envelope generator
 - ASR envelope generator with builtin VCA
 #### - Usage:
 **TOGGLE MODE:**
 
-on receiving a trigger on TRG/GTE input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
+on receiving a trigger on TRIG input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
 
 Attack, sustain and release knob set the envelope of the routed signal when triggered.
 
@@ -70,7 +70,7 @@ A trigger on RESET input will reset the toggle state.
 
 **GATE MODE:**
 
-The same of toggle mode, but the signals will be routed only while TRG/GTE input is in a high gate.
+The same of toggle mode, but the signals will be routed only while GATE input is in a high state.
 
 **SPECIAL BEHAVIOURS:**
 
