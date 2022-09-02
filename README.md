@@ -6,7 +6,7 @@ VCV Rack plugin modules
 ## Btoggler
 ### 8 buffered toggle switches (flip flop) with gate output and signal routing with a fade knob to route also audio signals with any clicks
 #### - Purpose:
-'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source. For example it can be used connected to a "MIDI>GATE" module which receives controls from a midi controller, so btoggler will make start/stop sequencers or audio parts on next beat.
+'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source. For example it can be used connected to a "MIDI>GATE" module which receives controls from a midi controller, so 'btoggler' will make start/stop sequencers or audio parts on next beat.
 #### - Detailed instructions:
 Connect a clock source.
 
