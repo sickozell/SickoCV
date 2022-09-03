@@ -86,7 +86,7 @@ If Attack is set to 0 (and release is set greater than 0) and a new GATE or Togg
 If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
 ## BtogglerSt / BtogglerSt Compact
-### buffered stereo signal toggle switch (flip flop) with gate output and signal routing with ASR envelope generator and builtin VCA
+### Buffered stereo signal toggle switch (flip flop) with gate output and signal routing with ASR envelope generator and builtin VCA
 This module is just a mixture of 'Toggler' and 'Btoggler', refer to previous instructions for details.
 
 ## Credits
