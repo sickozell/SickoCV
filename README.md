@@ -1,7 +1,7 @@
 # SickoCV
 VCV Rack plugin modules
 
-![SickoCV modules](https://user-images.githubusercontent.com/80784296/183292218-2263acd5-1d1c-41ca-849e-f020b2ab2c7b.JPG)
+![SickoCV modules 2 1 0](https://user-images.githubusercontent.com/80784296/188273907-105a8dce-a983-49e8-b4b5-30bd3282cc35.JPG)
 
 ## Btoggler
 ### 8 buffered toggle switches (flip flop) with gate output and signal routing with a fade knob to route also audio signals with any clicks
@@ -84,6 +84,10 @@ If a new GATE or Toggle TRIGGER is detected on Attack or Release phases, the env
 If Attack is set to 0 (and release is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
 
 If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
+
+## BtogglerSt / BtogglerSt Compact
+### buffered stereo signal toggle switch (flip flop) with gate output and signal routing with ASR envelope generator and builtin VCA
+This module is just a mixture of 'Toggler' and 'Btoggler', refer to previous instructions for details.
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
