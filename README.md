@@ -12,7 +12,7 @@ Connect a clock source.
 
 When ARM input is triggered the IN input will start to be routed to OUT on next clock detection and GATE output will provide a high state.
 
-Then, another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
+Then, with another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
 
 FADE knob (up to 50ms) can be used to avoid attack or release clicks when audio signals are connected to IN input.
 
@@ -96,7 +96,7 @@ Connect a clock source.
 
 When ARM input is triggered, the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
 
-Then, another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
+Then, with another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
 
 If ARM is triggered again before clock detection it will abort arming or unarming.
 
