@@ -4,7 +4,7 @@ VCV Rack plugin modules
 ![SickoCV modules 2 1 0](https://user-images.githubusercontent.com/80784296/188273907-105a8dce-a983-49e8-b4b5-30bd3282cc35.JPG)
 
 ## Btoggler
-### 8 buffered toggle switches (flip flop) with gate output and signal routing with a fade knob to route also audio signals with any clicks
+### 8 buffered toggle switch signal router
 #### - Purpose:
 'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source. For example it can be used connected to a "MIDI>GATE" module which receives controls from a midi controller, so 'btoggler' will make start/stop sequencers or audio parts on next beat.
 #### - Detailed instructions:
@@ -12,20 +12,20 @@ Connect a clock source.
 
 When ARM input is triggered the IN input will start to be routed to OUT on next clock detection and GATE output will provide a high state.
 
-With another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
+Then, another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
 
 FADE knob (up to 50ms) can be used to avoid attack or release clicks when audio signals are connected to IN input.
 
 If ARM is triggered again before clock detection it will abort arming or unarming.
 
-Triggering RESET input will immediately stops the routing.
+Triggering RESET input will immediately stop the routing.
 
-Triggering RESETALL input will immediately stops all the 8 routings.
+Triggering RESETALL input will immediately stop all the 8 routings.
 
 NOTE: input triggers are considered high when greater than 0v.
  
 ## Btoggler+
-### 8 buffered toggle switches (flip flop) with signal routing and warnings to use with led midi controllers
+### 8 buffered toggle switch router, plus warnings to use with led midi controllers
 #### - Purpose:
 'btoggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
 #### - Detailed instructions:
@@ -53,21 +53,21 @@ A, B and C are the inputs. The output tables provide simple math calculations an
 U/B (Unipolar/Bipolar) switch will set the range of the outputs to 0/10V or -5/+5v.
 
 ## Toggler / Toggler Compact
-### Stereo signal toggle switch (flip flop) router, ASR envelope with VCA, in regular and compact form factor
+### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
 #### - Purposes:
-- ASR envelope generator with builtin VCA
-- ASR envelope generator
+- Toggled VCA with builtin ASR envelope generator
+- Toggled ASR envelope generator
 - mute/unmute CV or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
 #### - Detailed instructions:
 **TOGGLE MODE**
 
 On receiving a trigger on TRIG input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
 
-Attack, sustain and release knob set the envelope of the routed signal.
+Attack, Sustain and Release knobs set the envelope of the routed signal.
 
 A, S, R CVinputs are added to respective knob values.
 
-If L or (R) inputs are not connected L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
+If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
 A trigger on RESET input will reset the toggle state.
 
@@ -86,8 +86,29 @@ If Attack is set to 0 (and release is set greater than 0) and a new GATE or Togg
 If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
 ## BtogglerSt / BtogglerSt Compact
-### Buffered stereo signal toggle switch (flip flop) with gate output and signal routing with ASR envelope generator and builtin VCA
-This module is just a mixture of 'Toggler' and 'Btoggler', refer to previous instructions for details.
+### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
+#### - Purposes:
+- Buffered VCA with builtin ASR envelope generator
+- Buffered ASR envelope generator
+- Buffer mute/unmute CV or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
+#### - Detailed instructions:
+Connect a clock source.
+
+When ARM input is triggered, the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
+
+Then, another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
+
+If ARM is triggered again before clock detection it will abort arming or unarming.
+
+Attack, Sustain and Release knobs set the envelope of the routed signals.
+
+A, S, R CVinputs are added to respective knob values.
+
+If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
+
+A trigger on RESET input will reset the toggle state.
+
+NOTE: input triggers are considered high when greater than 0v.
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
