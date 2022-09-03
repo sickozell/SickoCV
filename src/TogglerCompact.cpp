@@ -376,7 +376,6 @@ struct TogglerCompact : Module {
 
 										lastFade = -(currentFadeSample / maxFadeSample) + startFade;
 
-										//if (currentFadeSample > maxFadeSample) {
 										if (lastFade < 0) {
 											fading = false;
 											currentFadeSample = 0;

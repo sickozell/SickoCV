@@ -17,4 +17,6 @@ void init(Plugin* p) {
 	p->addModel(modelCalcs);
 	p->addModel(modelToggler);
 	p->addModel(modelTogglerCompact);
+	p->addModel(modelBtogglerSt);
+	p->addModel(modelBtogglerStCompact);
 }

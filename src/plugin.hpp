@@ -14,3 +14,5 @@ extern Model* modelBtogglerPlus;
 extern Model* modelCalcs;
 extern Model* modelToggler;
 extern Model* modelTogglerCompact;
+extern Model* modelBtogglerSt;
+extern Model* modelBtogglerStCompact;
