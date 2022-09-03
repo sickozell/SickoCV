@@ -88,8 +88,8 @@ If Release is set to 0 (and attack is set greater than 0) and a new GATE or Togg
 ## BtogglerSt / BtogglerSt Compact
 ### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
 #### - Purposes:
-- Buffered VCA with builtin ASR envelope generator
-- Buffered ASR envelope generator
+- Buffered Toggled VCA with builtin ASR envelope generator
+- Buffered Toggled ASR envelope generator
 - Buffer mute/unmute CV or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 #### - Detailed instructions:
 Connect a clock source.
