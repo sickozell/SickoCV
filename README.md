@@ -50,7 +50,7 @@ NOTE: input triggers are considered high when greater than 0v.
 #### - Instructions:
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
-U/B (Unipolar/Bipolar) switch will clamp the outputs to 0/10V or -5/+5v.
+U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or -5/+5v.
 
 ## Toggler / Toggler Compact
 ### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
