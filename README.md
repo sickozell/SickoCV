@@ -6,7 +6,18 @@ VCV Rack plugin modules
 ## bToggler
 ### 8 buffered toggle switch signal router
 #### - Description:
-'bToggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source. For example it can be used connected to a "MIDI>GATE" module which receives controls from a midi controller, so 'bToggler' will make start/stop sequencers or audio parts on next beat.
+'bToggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source.  
+For example it can be used to play/stop drumkit parts independently (kick, snare, hats, etc):
+- connect an appropriate clock source to CLOCK 
+- connect the ARMs to a "MIDI>GATE" module which receives controls from a midi controller
+- connect the INs to single sequencers outs, one for kick, one for snare, etc.
+- connect the OUTs to the trigger inputs of the single drum modules
+
+Then, by pressing buttons on the controller, 'bToggler' will actually play/stop the single drum parts on the next received clock pulse.
+
+Otherwise bToggler OUTs can be connected to envelope generators. In that case the GATE output should be connected to the IN input to activate the envelope.
+
+'bToggler' can also be used to play audio signals directly. Connect IN to the audio source and OUT to mixer: the FADE knob will avoid clicks.
 #### - Detailed instructions:
 Connect a clock source.
 
@@ -27,21 +38,24 @@ NOTE: input triggers are considered high when greater than 0v.
 ## bToggler+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
 #### - Description:
-'bToggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
+'bToggler+' is almost the same of previous one, but it has a further feature (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
+
+Some midi controllers can light up or turn off their button leds by receiving the same commands they send.  
+Taking advantage of this functionality, connect the WRN outs to a "GATE>MIDI" module connected to the same controller of the ARM inputs.  
+So when pressing buttons on controller, 'bToggler+' will actually play/stop the sequencers or audio, and simultaneously give a visual feedback on the controller.
 #### - Detailed instructions:
 The same of the previous one, plus:
 
-When armed or unarmed, the WRN (warning) output will provide a sequence of pulses until next clock pulse is detected. Then it will act as the OUT output (routing) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).
+When armed or unarmed, the WRN (warning) output will provide a sequence of pulses until next clock pulse is detected.  
+Then it will act as the OUT output (the routed signal) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).  
+This is because if 'bToggler+' is receiving signals from sequencers, the FADE knob will be set to 0 and the led will light up the same as sequencers trigs.  
+Otherwise, if fade knob is set different from 0, it is supposed that an audio signal is routed, so you'll see a fixed led light.
 
 WA and WR knobs set the attack (arm) and release (unarm) pulserate up to 200 ms of the warning pulses.
 
 If set to 0ms, WRN will output a low gate during warning time and if set to to max (200ms) it will output a high gate.  
 As to say: if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output.  
 Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
-
-As mentioned before, WRN outputs are meant to be used connected to a led programmable midi controller.  
-The idea is to connect a "MIDI>GATE" module to ARM inputs and WRN outputs to a "GATE>MIDI" module.  
-With a configuration like this, you can press buttons on the midi controller and start/stop beat-synced sequencers or audio, having a visual led feedback on the controller.
 
 NOTE: input triggers are considered high when greater than 0v.
 
@@ -91,6 +105,8 @@ If Release is set to 0 (and attack is set greater than 0) and a new GATE or Togg
 - Buffered Toggled VCA with builtin ASR envelope generator
 - Buffered Toggled ASR envelope generator
 - Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
+
+bTogglerSt is actually a mixture of Toggler and bToggler, the purposes remain the same.
 #### - Detailed instructions:
 Connect a clock source.
 
