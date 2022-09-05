@@ -5,7 +5,7 @@ VCV Rack plugin modules
 
 ## Btoggler
 ### 8 buffered toggle switch signal router
-#### - Purpose:
+#### - Description:
 'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source. For example it can be used connected to a "MIDI>GATE" module which receives controls from a midi controller, so 'btoggler' will make start/stop sequencers or audio parts on next beat.
 #### - Detailed instructions:
 Connect a clock source.
@@ -26,7 +26,7 @@ NOTE: input triggers are considered high when greater than 0v.
  
 ## Btoggler+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
-#### - Purpose:
+#### - Description:
 'btoggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
 #### - Detailed instructions:
 The same of the previous one, plus:
@@ -46,18 +46,18 @@ With a configuration like this, you can press buttons on the midi controller and
 NOTE: input triggers are considered high when greater than 0v.
 
 ## Calcs
-### calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
-#### - Usage:
+### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
+#### - Instructions:
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch will set the range of the outputs to 0/10V or -5/+5v.
 
 ## Toggler / Toggler Compact
 ### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
-#### - Purposes:
+#### - Description:
 - Toggled VCA with builtin ASR envelope generator
 - Toggled ASR envelope generator
-- mute/unmute CV or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
+- mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
 #### - Detailed instructions:
 **TOGGLE MODE**
 
@@ -87,10 +87,10 @@ If Release is set to 0 (and attack is set greater than 0) and a new GATE or Togg
 
 ## BtogglerSt / BtogglerSt Compact
 ### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
-#### - Purposes:
+#### - Description:
 - Buffered Toggled VCA with builtin ASR envelope generator
 - Buffered Toggled ASR envelope generator
-- Buffer mute/unmute CV or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
+- Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 #### - Detailed instructions:
 Connect a clock source.
 
