@@ -27,7 +27,7 @@ Then, with another ARM triggering (arm off) the routing will stop on next clock 
 
 FADE knob (up to 50ms) can be used to avoid attack or release clicks when audio signals are connected to IN input.
 
-If ARM is triggered again before clock detection it will abort arming.
+If ARM is triggered again before clock detection it will abort arming (unarm).
 
 Triggering RESET input will immediately stop the routing.
 
@@ -99,7 +99,7 @@ If Attack is set to 0 (and release is set greater than 0) and a new GATE or Togg
 
 If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
-These behaviors are more understandable connecting a scope on the out.
+These behaviors are more understandable connecting a scope on the output.
 
 ## bTogglerSt / bTogglerSt Compact
 ### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
@@ -112,11 +112,11 @@ bTogglerSt is actually a mixture of Toggler and bToggler, the purposes remain th
 #### - Detailed instructions:
 Connect a clock source.
 
-When ARM input is triggered, the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
+When ARM input is triggered (arm on), the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
 
-Then, with another ARM triggering (unarm) the routing will stop on next clock detection and GATE output will go low.
+Then, with another ARM triggering (arm off) the routing will stop on next clock detection and GATE output will go low.
 
-If ARM is triggered again before clock detection it will abort arming or unarming.
+If ARM is triggered again before clock detection it will abort arming (unarm).
 
 Attack, Sustain and Release knobs set the envelope of the routed signals.
 
@@ -127,6 +127,7 @@ If L or (R) inputs are not connected, L and (R) outputs will provide just the en
 A trigger on RESET input will reset the toggle state.
 
 NOTE: input triggers are considered high when greater than 0v.
+
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
