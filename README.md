@@ -10,7 +10,7 @@ VCV Rack plugin modules
 For example it can be used to play/stop drumkit parts independently (kick, snare, hats, etc):
 - connect an appropriate clock source to CLOCK 
 - connect the ARMs to a "MIDI>GATE" module which receives controls from a midi controller
-- connect the INs to single sequencers outs, one for kick, one for snare, etc.
+- connect the INs to the single sequencers outs, one for kick, one for snare, etc.
 - connect the OUTs to the trigger inputs of the single drum modules
 
 Then, by pressing buttons on the controller, 'bToggler' will actually play/stop the single drum parts on the next received clock pulse.
