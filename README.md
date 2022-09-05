@@ -3,10 +3,10 @@ VCV Rack plugin modules
 
 ![SickoCV modules 2 1 0](https://user-images.githubusercontent.com/80784296/188273907-105a8dce-a983-49e8-b4b5-30bd3282cc35.JPG)
 
-## Btoggler
+## bToggler
 ### 8 buffered toggle switch signal router
 #### - Description:
-'btoggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source. For example it can be used connected to a "MIDI>GATE" module which receives controls from a midi controller, so 'btoggler' will make start/stop sequencers or audio parts on next beat.
+'bToggler' can be used to mute/unmute up to 8 CV or AUDIO signals, in sync to a tempo clock source. For example it can be used connected to a "MIDI>GATE" module which receives controls from a midi controller, so 'bToggler' will make start/stop sequencers or audio parts on next beat.
 #### - Detailed instructions:
 Connect a clock source.
 
@@ -24,10 +24,10 @@ Triggering RESETALL input will immediately stop all the 8 routings.
 
 NOTE: input triggers are considered high when greater than 0v.
  
-## Btoggler+
+## bToggler+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
 #### - Description:
-'btoggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
+'bToggler+' it's almost the same of previous one, but it has a further functionality (WRN outs) to be used with programmable led midi controllers to have a visual feedback on controller.
 #### - Detailed instructions:
 The same of the previous one, plus:
 
@@ -85,7 +85,7 @@ If Attack is set to 0 (and release is set greater than 0) and a new GATE or Togg
 
 If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
-## BtogglerSt / BtogglerSt Compact
+## bTogglerSt / bTogglerSt Compact
 ### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
 #### - Description:
 - Buffered Toggled VCA with builtin ASR envelope generator
