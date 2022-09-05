@@ -10,7 +10,7 @@ VCV Rack plugin modules
 For example it can be used to play/stop drumkit parts independently (kick, snare, hats, etc):
 - connect an appropriate clock source to CLOCK 
 - connect the ARMs to a "MIDI>GATE" module which receives controls from a midi controller
-- connect the INs to the single sequencers outs, one for kick, one for snare, etc.
+- connect the INs to the sequencer outs, one for kick, one for snare, etc.
 - connect the OUTs to the trigger inputs of the single drum modules
 
 Then, by pressing buttons on the controller, 'bToggler' will actually start/stop the single drum parts on the next received clock pulse.
@@ -38,7 +38,7 @@ NOTE: input triggers are considered high when greater than 0v.
 ## bToggler+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
 #### - Description:
-'bToggler+' is almost the same of previous one, but it has a further feature (WRN outs) to be used with programmable led midi controllers to have a visual feedback on the controller.
+'bToggler+' is almost the same of the previous one, but it has a further feature (WRN outs) to be used with programmable led midi controllers to have a visual feedback on the controller.
 
 Some midi controllers can light up or turn off their button leds by receiving the same commands they send.  
 Taking advantage of this functionality, connect the WRN outs to a "GATE>MIDI" module connected to the same controller of the ARM inputs.  
