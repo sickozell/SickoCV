@@ -3,16 +3,16 @@ VCV Rack plugin modules
 
 ![SickoCV modules 2 2 0](https://user-images.githubusercontent.com/80784296/189968083-8210fc21-ee15-4acd-a6a5-6177bd106d5a.JPG)
 
-## blender
+## Blender
 ### Stereo crossfade mixer with double modulation
 #### - Description:
-'blender' is a crossfade mixer between two mono or stereo signals.  
+'blender' is a crossfade mixer between mono or stereo signals.  
 It can be used either with cv signals or audio sources.  
 Mix can be modulated by uni/bipolar signal.  
 Modulation can be further modulated by another signal.  
 Audio rate modulations are allowed to create new waveforms.
 
-## blender8
+## Blender8
 ### 8 single crossfade mixers with modulation
 #### - Description:
 'blender8' is a set of 8 crossfade mixers between two signals.  
