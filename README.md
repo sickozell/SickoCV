@@ -1,23 +1,68 @@
-# SickoCV 2.1.0
+# SickoCV 2.2.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 1 0](https://user-images.githubusercontent.com/80784296/188273907-105a8dce-a983-49e8-b4b5-30bd3282cc35.JPG)
+![SickoCV modules 2 2 0](https://user-images.githubusercontent.com/80784296/189968083-8210fc21-ee15-4acd-a6a5-6177bd106d5a.JPG)
 
-## bToggler
+## blender
+### Stereo crossfade mixer with double modulation
+#### - Description:
+'blender' is a crossfade mixer between two mono or stereo signals.  
+It can be used either with cv signals or audio sources.  
+Mix can be modulated by uni/bipolar signal.  
+Modulation can be further modulated by another signal.  
+Audio rate modulations are allowed to create new waveforms.
+
+## blender8
+### 8 single crossfade mixers with modulation
+#### - Description:
+'blender8' is a set of 8 crossfade mixers between two signals.  
+As the previous one it can be used either with cv signals or audio sources.  
+Mix can be modulated by uni/bipolar signal.  
+Audio rate modulations are allowed.
+
+## bToggler / bToggler Compact
+### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
+#### - Description:
+- Buffered Toggled VCA with builtin ASR envelope generator
+- Buffered Toggled ASR envelope generator
+- Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
+
+bToggler is actually a mixture of Toggler and bToggler8, the purposes remain the same.
+#### - Detailed instructions:
+Connect a clock source.
+
+When ARM input is triggered (arm on), the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
+
+Then, with another ARM triggering (arm off) the routing will stop on next clock detection and GATE output will go low.
+
+If ARM is triggered again before clock detection it will abort arming (unarm).
+
+Attack, Sustain and Release knobs set the envelope of the routed signals.
+
+A, S, R CVinputs are added to respective knob values.
+
+If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
+
+A trigger on RESET input will reset the toggle state.
+
+NOTE: input triggers are considered high when greater than 0v.
+
+
+## bToggler8
 ### 8 buffered toggle switch signal router
 #### - Description:
-'bToggler' can be used to mute/unmute up to 8 CVs or AUDIO signals, in sync to a tempo clock source.  
+'bToggler8' can be used to mute/unmute up to 8 CVs or AUDIO signals, in sync to a tempo clock source.  
 For example it can be used to play/stop drumkit parts independently (kick, snare, hats, etc):
 - connect an appropriate clock source to CLOCK 
 - connect the ARMs to a "MIDI>GATE" module which receives controls from a midi controller
 - connect the INs to the sequencer outs, one for kick, one for snare, etc.
 - connect the OUTs to the trigger inputs of the single drum modules
 
-Then, by pressing buttons on the controller, 'bToggler' will actually start/stop the single drum parts on the next received clock pulse.
+Then, by pressing buttons on the controller, 'bToggler8' will actually start/stop the single drum parts on the next received clock pulse.
 
 Otherwise bToggler OUTs can be connected to envelope generators. In that case the GATE output should be connected to the IN input to activate the envelope.
 
-'bToggler' can also be used to play audio signals directly. Connect IN to the audio source and OUT to mixer: the FADE knob will avoid clicks.
+'bToggler8' can also be used to play audio signals directly. Connect IN to the audio source and OUT to mixer: the FADE knob will avoid clicks.
 #### - Detailed instructions:
 Connect a clock source.
 
@@ -35,20 +80,20 @@ Triggering RESETALL input will immediately stop all the 8 routings.
 
 NOTE: input triggers are considered high when greater than 0v.
  
-## bToggler+
+## bToggler8+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
 #### - Description:
-'bToggler+' is almost the same of the previous one, but it has a further feature (WRN outs) to be used with programmable led midi controllers to have a visual feedback on the controller.
+'bToggler8+' is almost the same of the previous one, but it has a further feature (WRN outs) to be used with programmable led midi controllers to have a visual feedback on the controller.
 
 Some midi controllers can light up or turn off their button leds by receiving the same commands they send.  
 Taking advantage of this functionality, connect the WRN outs to a "GATE>MIDI" module connected to the same controller of the ARM inputs.  
-So when pressing buttons on controller, 'bToggler+' will actually play/stop the sequencers or audio, and simultaneously give a visual feedback on the controller.
+So when pressing buttons on controller, 'bToggler8+' will actually play/stop the sequencers or audio, and simultaneously give a visual feedback on the controller.
 #### - Detailed instructions:
 The same of the previous one, plus:
 
 When 'armed on' or 'armed off', the WRN (warning) output will provide a sequence of pulses until next clock is detected.  
 Then it will act as the OUT output (the routed signal) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).  
-This is because if 'bToggler+' is receiving signals from sequencers, the FADE knob will be set to 0 and the led will light up the same as sequencers trigs.  
+This is because if 'bToggler8+' is receiving signals from sequencers, the FADE knob will be set to 0 and the led will light up the same as sequencers trigs.  
 Otherwise, if fade knob is set different from 0, it is supposed that an audio signal is routed, so you'll see a fixed led light on the controller.
 
 WA and WR knobs set the attack (arm on) and release (arm off) pulserate up to 200 ms of the warning pulses. These are two independent settings because you would like to notice if the routing is going to start or stop.
@@ -100,34 +145,6 @@ If Attack is set to 0 (and release is set greater than 0) and a new GATE or Togg
 If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
 These behaviors are more understandable connecting a scope on the output.
-
-## bTogglerSt / bTogglerSt Compact
-### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
-#### - Description:
-- Buffered Toggled VCA with builtin ASR envelope generator
-- Buffered Toggled ASR envelope generator
-- Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
-
-bTogglerSt is actually a mixture of Toggler and bToggler, the purposes remain the same.
-#### - Detailed instructions:
-Connect a clock source.
-
-When ARM input is triggered (arm on), the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
-
-Then, with another ARM triggering (arm off) the routing will stop on next clock detection and GATE output will go low.
-
-If ARM is triggered again before clock detection it will abort arming (unarm).
-
-Attack, Sustain and Release knobs set the envelope of the routed signals.
-
-A, S, R CVinputs are added to respective knob values.
-
-If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
-
-A trigger on RESET input will reset the toggle state.
-
-NOTE: input triggers are considered high when greater than 0v.
-
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
