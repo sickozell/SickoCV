@@ -1,6 +1,6 @@
 #include "plugin.hpp"
 
-struct Btoggler : Module {
+struct BtogglerCompact : Module {
 	float clock = 0;
 	float prevClock = 0;
 	bool clockState = false;
@@ -46,7 +46,7 @@ struct Btoggler : Module {
 		LIGHTS_LEN
 	};
 
-	Btoggler() {
+	BtogglerCompact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configParam(ATTACK_PARAMS, 0.f, 10.f, 0.f, "Attack (s)");
 		configParam(SUSTAIN_PARAMS, 0.f, 1.f, 1.f, "Level", "%", 0, 100);
@@ -548,38 +548,34 @@ struct Btoggler : Module {
 	}
 };
 
-
-struct BtogglerWidget : ModuleWidget {
-	BtogglerWidget(Btoggler* module) {
+struct BtogglerCompactWidget : ModuleWidget {
+	BtogglerCompactWidget(BtogglerCompact* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/Btoggler.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/BtogglerCompact.svg")));
 
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32, 18.68)), module, Btoggler::CLOCK_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 11.1)), module, BtogglerCompact::CLOCK_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.5, 47)), module, Btoggler::ARM_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33, 47)), module, Btoggler::RST_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 24.5)), module, BtogglerCompact::ARM_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 36.2)), module, BtogglerCompact::RST_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.2, 52.8)), module, BtogglerCompact::IN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 52.8)), module, BtogglerCompact::IN_INPUT+1));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.48, 65)), module, Btoggler::ATTACK_PARAMS));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.48, 80.5)), module, Btoggler::ATTACK_INPUT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.32, 62)), module, BtogglerCompact::ATTACK_PARAMS));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.32, 69)), module, BtogglerCompact::ATTACK_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(22.8, 65)), module, Btoggler::SUSTAIN_PARAMS));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(22.8, 80.5)), module, Btoggler::SUSTAIN_INPUT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(14.32, 73)), module, BtogglerCompact::SUSTAIN_PARAMS));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.32, 80)), module, BtogglerCompact::SUSTAIN_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(37.32, 65)), module, Btoggler::RELEASE_PARAMS));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(37.32, 80.5)), module, Btoggler::RELEASE_INPUT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.32, 84)), module, BtogglerCompact::RELEASE_PARAMS));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.32, 91)), module, BtogglerCompact::RELEASE_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7, 108.8)), module, Btoggler::IN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.5, 108.8)), module, Btoggler::IN_INPUT+1));
-
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(29, 103.2)), module, Btoggler::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.2, 103.2)), module, Btoggler::OUT_OUTPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(34, 116.5)), module, Btoggler::GATE_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.2, 107.5)), module, BtogglerCompact::OUT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.5, 107.5)), module, BtogglerCompact::OUT_OUTPUT+1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 119)), module, BtogglerCompact::GATE_OUTPUT));
 	}
 };
 
-Model* modelBtoggler = createModel<Btoggler, BtogglerWidget>("Btoggler");
+Model* modelBtogglerCompact = createModel<BtogglerCompact, BtogglerCompactWidget>("BtogglerCompact");

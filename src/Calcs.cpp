@@ -50,7 +50,7 @@ struct Calcs : Module {
 		configInput(B_INPUT, "b");
 		configInput(C_INPUT, "c");
 
-		configParam(RANGE_SWITCH, 0.f, 1.f, 1.f, "Unipolar/Bipolar");
+		configSwitch(RANGE_SWITCH, 0.f, 1.f, 1.f, "Input range", {"Bipolar", "Unipolar"});
 
 		configOutput(BPLUSA_OUTPUT, "b+a");
 		configOutput(CPLUSA_OUTPUT, "c+a");

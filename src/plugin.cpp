@@ -12,11 +12,13 @@ void init(Plugin* p) {
 
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
+	p->addModel(modelBlender);
+	p->addModel(modelBlender8);
 	p->addModel(modelBtoggler);
-	p->addModel(modelBtogglerPlus);
+	p->addModel(modelBtogglerCompact);
+	p->addModel(modelBtoggler8);
+	p->addModel(modelBtoggler8Plus);
 	p->addModel(modelCalcs);
 	p->addModel(modelToggler);
 	p->addModel(modelTogglerCompact);
-	p->addModel(modelBtogglerSt);
-	p->addModel(modelBtogglerStCompact);
 }
