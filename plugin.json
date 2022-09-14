@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -11,19 +11,55 @@
   "manualUrl": "https://github.com/sickozell/SickoCV",
   "sourceUrl": "https://github.com/sickozell/SickoCV",
   "donateUrl": "",
-  "changelogUrl": "",
+  "changelogUrl": "https://github.com/sickozell/SickoCV/blob/main/changelog.md",
   "modules": [
+    {
+      "slug": "Blender",
+      "name": "Blender",
+      "description": "Stereo crossfade mixer with double modulation",
+      "tags": [
+        "Mixer"
+      ]
+    },
+    {
+      "slug": "Blender8",
+      "name": "Blender8",
+      "description": "8 single crossfade mixers",
+      "tags": [
+        "Mixer"
+      ]
+    },
     {
       "slug": "Btoggler",
       "name": "bToggler",
+      "description": "Buffered stereo signal toggle switch router, with VCA and ASR envelope generator",
+      "tags": [
+        "Logic",
+        "Envelope generator",
+	"Voltage-controlled amplifier"
+      ]
+    },
+    {
+      "slug": "BtogglerCompact",
+      "name": "bToggler Compact",
+      "description": "Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in a compact form factor",
+      "tags": [
+        "Logic",
+        "Envelope generator",
+	"Voltage-controlled amplifier"
+      ]
+    },
+    {
+      "slug": "Btoggler8",
+      "name": "bToggler8",
       "description": "8 buffered toggle switch signal router",
       "tags": [
         "Logic"
       ]
     },
     {
-      "slug": "BtogglerPlus",
-      "name": "bTogglerPlus",
+      "slug": "Btoggler8Plus",
+      "name": "bToggler8Plus",
       "description": "8 buffered toggle switch router, plus warnings to use with led midi controllers",
       "tags": [
         "Logic",
@@ -51,27 +87,7 @@
     {
       "slug": "TogglerCompact",
       "name": "Toggler Compact",
-      "description": "Stereo signal toggle switch router, with VCA and ASR envelope generator, in compact form factor",
-      "tags": [
-        "Logic",
-        "Envelope generator",
-	"Voltage-controlled amplifier"
-      ]
-    },
-    {
-      "slug": "BtogglerSt",
-      "name": "bTogglerSt",
-      "description": "Buffered stereo signal toggle switch router, with VCA and ASR envelope generator",
-      "tags": [
-        "Logic",
-        "Envelope generator",
-	"Voltage-controlled amplifier"
-      ]
-    },
-    {
-      "slug": "BtogglerStCompact",
-      "name": "bTogglerSt Compact",
-      "description": "Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in compact form factor",
+      "description": "Stereo signal toggle switch router, with VCA and ASR envelope generator, in a compact form factor",
       "tags": [
         "Logic",
         "Envelope generator",
