@@ -8,6 +8,7 @@ renamed "bTogglerSt compact" to "bToggler compact"
 renamed "bToggler" to "bToggler8"  
 renamed "bToggler+" to "bToggler8+"  
 fixed right channel issue input/output on "bToggler" and "toggler"  
+minor graphic adjustments
 
 ### 2.1.0 (2022-09-03)
 added following modules
