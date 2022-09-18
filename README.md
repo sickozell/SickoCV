@@ -1,7 +1,7 @@
 # SickoCV 2.2.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 2 0](https://user-images.githubusercontent.com/80784296/190122849-a234d9d9-60ed-495a-886c-b3b30fbb5f8d.JPG)
+![SickoCV modules 2 2 0](https://user-images.githubusercontent.com/80784296/190889306-a40a6650-59a2-4ae0-b90c-23a31b594a17.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
