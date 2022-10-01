@@ -1,3 +1,10 @@
+### 2.3.0 (2022-10-02)
+added following modules:
+- switcher
+- switcherSt
+
+new graphic design
+
 ### 2.2.0 (2022-09-14)
 added following modules:
 - blender
