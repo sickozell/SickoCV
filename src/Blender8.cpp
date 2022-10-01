@@ -134,18 +134,18 @@ struct Blender8Widget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Blender8.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH * 2, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH * 2, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		float y = 13;
 		float ys = 22;
 		for (int i=0;i<8;i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.7, ys+(i*y))), module, Blender8::IN1_INPUT+i));
 			
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(15.8, ys+(i*y))), module, Blender8::IN2_INPUT+i));
-			addParam(createParamCentered<CKSS>(mm2px(Vec(23.1, ys+(i*y))), module, Blender8::PHASE_SWITCH+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.1, ys+(i*y))), module, Blender8::IN2_INPUT+i));
+			addParam(createParamCentered<CKSS>(mm2px(Vec(23.4, ys+(i*y))), module, Blender8::PHASE_SWITCH+i));
 			
 			addParam(createParamCentered<Trimpot>(mm2px(Vec(33, ys+(i*y))), module, Blender8::MIX_PARAMS+i));
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42, ys+(i*y))), module, Blender8::MODMIXCV_INPUT+i));

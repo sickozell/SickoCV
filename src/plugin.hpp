@@ -18,3 +18,5 @@ extern Model* modelBtogglerSt;
 extern Model* modelBtogglerStCompact;
 extern Model* modelBlender;
 extern Model* modelBlender8;
+extern Model* modelSwitcher;
+extern Model* modelSwitcherSt;

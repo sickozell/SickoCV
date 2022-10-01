@@ -236,9 +236,9 @@ struct BtogglerWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7, 21)), module, Btoggler::CLOCK_INPUT));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23, 21)), module, Btoggler::FADE_PARAMS));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.7, 21)), module, Btoggler::RSTALL_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7, 21.6)), module, Btoggler::CLOCK_INPUT));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23, 21.6)), module, Btoggler::FADE_PARAMS));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.7, 21.6)), module, Btoggler::RSTALL_INPUT));
 		
 		float x = 8.9;
 		float y = 10.8;

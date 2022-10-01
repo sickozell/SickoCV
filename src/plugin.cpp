@@ -21,4 +21,6 @@ void init(Plugin* p) {
 	p->addModel(modelBtogglerStCompact);
 	p->addModel(modelBlender);
 	p->addModel(modelBlender8);
+	p->addModel(modelSwitcher);
+	p->addModel(modelSwitcherSt);
 }

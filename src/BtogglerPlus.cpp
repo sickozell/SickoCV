@@ -289,16 +289,16 @@ struct BtogglerPlusWidget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/BtogglerPlus.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH * 2, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH * 2, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.7, 21)), module, BtogglerPlus::CLOCK_INPUT));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(20.8, 21)), module, BtogglerPlus::FADE_PARAMS));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.2, 17)), module, BtogglerPlus::WARNIN_PARAMS));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.2, 25)), module, BtogglerPlus::WARNOUT_PARAMS));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(49.2, 21)), module, BtogglerPlus::RSTALL_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.7, 21.3)), module, BtogglerPlus::CLOCK_INPUT));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(20.8, 21.3)), module, BtogglerPlus::FADE_PARAMS));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.2, 17.3)), module, BtogglerPlus::WARNIN_PARAMS));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.2, 25.3)), module, BtogglerPlus::WARNOUT_PARAMS));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(49.2, 21.3)), module, BtogglerPlus::RSTALL_INPUT));
 
 		float x = 8.9f;
 		float y = 10.8f;
