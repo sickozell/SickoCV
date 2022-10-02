@@ -1,7 +1,7 @@
-# SickoCV v2.2.0
+# SickoCV v2.3.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 2 0](https://user-images.githubusercontent.com/80784296/190889306-a40a6650-59a2-4ae0-b90c-23a31b594a17.JPG)
+![SickoCV modules 2 3 0](https://user-images.githubusercontent.com/80784296/193430425-339ee68f-bb08-4f5e-a9d5-dd7705afb4ac.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -160,6 +160,56 @@ If Attack is set to 0 (and release is set greater than 0) and a new GATE or Togg
 If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
 These behaviors are more understandable connecting a scope on the output.
+
+## Switcher / SwitcherSt
+### 2>1 or 1<2 signal switch/router/swapper with crossfade, flip flop, toggle gate
+#### - Description:
+- Function autodetection
+- Signal switch (2 inputs, 1 output)
+- Signal router (1 inputs, 2 outputs)
+- Signal swapper (2 inputs, 2 outputs)
+- Adjustable time crossfade between switched/routed/swapped signals
+- Flip flop
+- Toggle gate
+
+#### - Detailed instructions:
+Switcher or SwitcherSt (used for stereo signals) are multifunction modules that can be used as follows. The versatility of the module is offered thanks to the automatic detection of the function.
+
+**TOGGLE/GATE modes**  
+When the MODE switch is in 'TOGGLE' position functions are activated by triggers in a toggle style.  
+When in 'GATE' position functions stay active until 'T/G' input receives a high gate.  
+Functions will be activated by Trigger/Gates with voltages above 0v.
+
+**Functions**  
+Functions are automatically detected depending on connected cables.  
+
+Switch: connect 2 inputs and 1 output  
+Router: connect 1 input and 2 outputs  
+Swapper: connect both two inputs and two outputs  
+FlipFlop: connect 2 outputs only  
+ToggleGate: connect 1 output only ('TOGGLE' mode only)  
+
+A trigger on RST input will reset the toggle to its default state.  
+
+**Defaults**  
+Default states depend on which input or output sockets are connected.  
+
+Switch: if OUT1 is connected, the default signal will be the IN1. If OUT2 is connected instead, the default signal will be the IN2  
+Router: if IN1 is connected, the signal will be routed to OUT1 by default. If IN2 is connected, the default destination will be OUT2  
+Swapper: the default is always the normal routing  
+FlipFlop: default is always OUT1  
+ToggleGate: if OUT1 is connected the default is a HIGH GATE. If OUT2 is connected instead, the default is a LOW GATE  
+
+**Leds**  
+Green leds close to the in/out sockets show which input signal is switched or to which destination is routed.  
+When used as a swapper the OUT1 led on shows that signals are normally routed, otherwise the OUT2 led on shows when signals are swapped.  
+
+**Fader**  
+Fader knob set the crossfade time up to 10s between the switched/routed/swapped signals.  
+CV input is added to Fade knob and the sum will be clamped in the range of 0-10v.  
+
+NOTE: In FlipFLop and ToggleGate functions the output will be a 'fixed' AR envelope.  
+NOTE2: When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during fading, the function will restart immediately (not like a function generator).
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
