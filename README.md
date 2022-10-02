@@ -209,9 +209,9 @@ Fader knob set the crossfade time up to 10s between the switched/routed/swapped 
 CV input is added to Fade knob value and the sum will be clamped in the range of 0-10v.  
 
 **NOTES**  
-- In FlipFLop and ToggleGate function modes the output will consist in a 'fixed' AR envelope
+- In FlipFLop and ToggleGate function types the output will consist in a 'fixed' AR envelope
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
-- On SwitcherSt module the function mode is detected on Left channel sockets, so don't use Right channels without Left ones.
+- On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones.
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
