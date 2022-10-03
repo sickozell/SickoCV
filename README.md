@@ -205,7 +205,7 @@ Green leds close to the in/out sockets show which input signal is switched or to
 When used as a swapper the OUT1 led on shows that signals are normally routed, otherwise the OUT2 led on shows when signals are swapped.  
 
 **Fader**  
-Fader knob set the crossfade time up to 10s between the switched/routed/swapped signals.  
+Fader knob sets the crossfade time up to 10s between the switched/routed/swapped signals.  
 CV input is added to Fade knob value and the sum will be clamped in the range of 0-10v.  
 
 **NOTES**  
