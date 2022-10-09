@@ -1,6 +1,5 @@
 #include "plugin.hpp"
 
-
 struct Calcs : Module {
 	enum ParamId {
 		RANGE_SWITCH,

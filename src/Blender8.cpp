@@ -1,6 +1,5 @@
 #include "plugin.hpp"
 
-
 struct Blender8 : Module {
 	float mixedOut = 0;
 	float mix = 0;
@@ -90,7 +89,6 @@ struct Blender8 : Module {
 
 	}
 
-
 	void process(const ProcessArgs& args) override {
 		for (int i=0; i<8;i++){
 			if (outputs[OUT_OUTPUT+i].isConnected()){
@@ -111,9 +109,6 @@ struct Blender8 : Module {
 				} else {
 					mix = (params[MIX_PARAMS+i].getValue() + 1)/2;
 				}
-				
-				
-				
 				input2 = inputs[IN2_INPUT+i].getVoltage();
 				if (params[PHASE_SWITCH+i].getValue() == 1){
 					input2 = -input2;
@@ -123,11 +118,9 @@ struct Blender8 : Module {
 				mixedOut = 0;
 			}
 			outputs[OUT_OUTPUT+i].setVoltage(mixedOut);
-
 		}
 	}		
 };
-
 
 struct Blender8Widget : ModuleWidget {
 	Blender8Widget(Blender8* module) {
@@ -155,6 +148,5 @@ struct Blender8Widget : ModuleWidget {
 		}
 	}
 };
-
 
 Model* modelBlender8 = createModel<Blender8, Blender8Widget>("Blender8");

@@ -1,3 +1,13 @@
+### 2.3.1
+changed trigger and gate input threshold from 0v to +1v on every module  
+added modules state storage and context menu  
+added leds on 'toggler' and 'bToggler' family modules  
+added no-clock feature on 'bToggler' family modules  
+fixed bug on 'bToggler8' when only a gate output is connected  
+fixed bug on 'bToggler' when release time not working if reset is connected  
+changed behaviour of some function types on 'switcher' family modules  
+fixed bug on 'switcherSt' in swapper function  
+
 ### 2.3.0 (2022-10-02)
 added following modules:
 - switcher
@@ -6,7 +16,7 @@ added following modules:
 new graphic design
 
 ### 2.2.0 (2022-09-14)
-added following modules:
+added following modules
 - blender
 - blender8
 
@@ -18,12 +28,12 @@ fixed right channel issue input/output on "bToggler" and "toggler"
 minor graphic adjustments
 
 ### 2.1.0 (2022-09-03)
-added following modules:
+added following modules
 - bTogglerSt
 - bTogglerSt compact
 
 ### 2.0.0 (2022-08-07)
-First release with following modules:
+First release with following modules
 - bToggler
 - bToggler+
 - calcs

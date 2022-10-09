@@ -1,6 +1,5 @@
 #include "plugin.hpp"
 
-
 struct Blender : Module {
 	float mixedOut[2] = {0,0};
 	float mix = 0;
@@ -56,11 +55,9 @@ struct Blender : Module {
 		configOutput(OUT_OUTPUT+1, "R");
 	}
 
-
 	void process(const ProcessArgs& args) override {
 		if (outputs[OUT_OUTPUT].isConnected() || outputs[OUT_OUTPUT+1].isConnected()){
-			if (inputs[MODMIXCV_INPUT].isConnected()){
-				
+			if (inputs[MODMIXCV_INPUT].isConnected()){				
 				if (inputs[MODATTENCV_INPUT].isConnected()){ 
 					if (params[RANGEMODATTEN_SWITCH].getValue() == 1) {
 						modAtten = params[MODATTEN_PARAMS].getValue() * inputs[MODATTENCV_INPUT].getVoltage() / 10;
@@ -70,13 +67,11 @@ struct Blender : Module {
 				} else {
 					modAtten = 0;
 				}
-
 				if (modAtten > 1) {
 					modAtten = 1;
 				} else if (modAtten < -1) {
 					modAtten = -1;
 				}
-
 				if (params[RANGEMODMIX_SWITCH].getValue() == 1) {
 					mix = params[MIX_PARAMS].getValue() + ( (params[MODMIX_PARAMS].getValue() * inputs[MODMIXCV_INPUT].getVoltage() / 10) + modAtten);
 				} else {
@@ -90,7 +85,6 @@ struct Blender : Module {
 						mix = -1;
 					}
 				}
-
 			} else {
 				mix = params[MIX_PARAMS].getValue();
 			}
@@ -101,7 +95,6 @@ struct Blender : Module {
 					if (params[PHASE_SWITCH].getValue() == 1){
 						input1[i] = -input1[i];
 					}
-
 					input2[i] = inputs[IN2_INPUT+i].getVoltage();
 					if (params[PHASE_SWITCH+1].getValue() == 1){
 						input2[i] = -input2[i];
@@ -110,8 +103,7 @@ struct Blender : Module {
 				} else {
 					mixedOut[i] = 0;
 				}
-			}
-			
+			}			
 		} else {
 			mixedOut[0] = 0;
 			mixedOut[1] = 0;
@@ -120,7 +112,6 @@ struct Blender : Module {
 		outputs[OUT_OUTPUT+1].setVoltage(mixedOut[1]);
 	}		
 };
-
 
 struct BlenderWidget : ModuleWidget {
 	BlenderWidget(Blender* module) {
@@ -153,6 +144,5 @@ struct BlenderWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.2, 115.2)), module, Blender::OUT_OUTPUT+1));
 	}
 };
-
 
 Model* modelBlender = createModel<Blender, BlenderWidget>("Blender");

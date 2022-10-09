@@ -1,15 +1,15 @@
 #include "plugin.hpp"
 
-
 struct TogglerCompact : Module {
+	bool stateRestore = true;
 	int mode = 1;
-	int gateState = 0;
-	int trigState = 0;
+	int internalState = 0;
+	bool trigState = false;
+	float trigValue = 0;
+	float prevTrigValue = 0;
+	
 	float rst = 0;
 	float prevRst = 0;
-
-	bool currentTrigState = false;
-	float prevTrigState = 0;
 
 	float arSum = 0;
 	float maxFadeSample = 0;
@@ -41,6 +41,7 @@ struct TogglerCompact : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
+		OUT_LIGHT,
 		LIGHTS_LEN
 	};
 
@@ -62,25 +63,52 @@ struct TogglerCompact : Module {
 		configOutput(GATE_OUTPUT, "Gate");
 	}
 
+	void onReset() override {
+		stateRestore = true;
+	}
+
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "StateRestore", json_boolean(stateRestore));
+		json_object_set_new(rootJ, "State", json_integer(internalState));
+		return rootJ;
+	}
+	
+	void dataFromJson(json_t* rootJ) override {
+		json_t* jsonStateRestore = json_object_get(rootJ, "StateRestore");
+		if (jsonStateRestore)
+			stateRestore = json_boolean_value(jsonStateRestore);
+
+		if (stateRestore) {
+			json_t* jsonState = json_object_get(rootJ, "State");
+			if (jsonState) {
+				internalState = json_integer_value(jsonState);
+				if (internalState)
+					lights[OUT_LIGHT].setBrightness(1.f);
+			}
+		}
+	}
+	
 	void process(const ProcessArgs& args) override {
 		mode = params[MODE_SWITCH].getValue();
 		switch (mode) {
 			// ************************************** GATE MODE **********
 			case 0:
 				if (inputs[TRIG_INPUT].isConnected()){
-					trigState = inputs[TRIG_INPUT].getVoltage();
-					if (trigState > 0 && prevTrigState <= 0){
-						currentTrigState = true;
-					} else if (trigState <= 0 && prevTrigState > 0){
-						currentTrigState = false;
+					trigValue = inputs[TRIG_INPUT].getVoltage();
+					if (trigValue >= 1 && prevTrigValue < 1){
+						trigState = true;
+					} else if (trigValue < 1 && prevTrigValue >= 1){
+						trigState = false;
 					}
-					prevTrigState = trigState;
+					prevTrigValue = trigValue;
 
-					switch (gateState) {
+					switch (internalState) {
 						case 0: 									// waiting for TRIG
-							if (currentTrigState){					// if GATE goes HIGH
+							if (trigState){					// if GATE goes HIGH
 								outputs[GATE_OUTPUT].setVoltage(10);
-								gateState = 1;
+								lights[OUT_LIGHT].setBrightness(1.f);
+								internalState = 1;
 								if (params[ATTACK_PARAMS].getValue() != 0 || inputs[ATTACK_INPUT].getVoltage() != 0) {
 									if (fading) {
 										startFade = lastFade;
@@ -168,11 +196,14 @@ struct TogglerCompact : Module {
 								outputs[OUT_OUTPUT].setVoltage(0);
 								outputs[OUT_OUTPUT+1].setVoltage(0);
 							}
-							break;
+						break;
+
 						case 1: 									// gating
-							if (!currentTrigState) { 					// if GATE goes LOW
+							outputs[GATE_OUTPUT].setVoltage(10);
+							if (!trigState) { 					// if GATE goes LOW
 								outputs[GATE_OUTPUT].setVoltage(0);
-								gateState = 0;
+								lights[OUT_LIGHT].setBrightness(0.f);
+								internalState = 0;
 								if (params[RELEASE_PARAMS].getValue() != 0 || inputs[RELEASE_INPUT].getVoltage() != 0){
 									if (fading) {
 										startFade = lastFade;
@@ -297,20 +328,27 @@ struct TogglerCompact : Module {
 								outputs[OUT_OUTPUT].setVoltage(10 * sustain); // send envelope on left and right channel
 								outputs[OUT_OUTPUT+1].setVoltage(10 * sustain);
 							}
-							break;
+						break;
 					}
+				} else {
+					internalState = 0;
+					outputs[OUT_OUTPUT].setVoltage(0);
+					outputs[OUT_OUTPUT+1].setVoltage(0);
+					outputs[GATE_OUTPUT].setVoltage(0);
+					lights[OUT_LIGHT].setBrightness(0.f);
 				}
 			break;
-			// ********************************** TOGGLER MODE *******
+			// ********************************** TOGGLER MODE ***************************************************
 			case 1:		
 				if (inputs[RST_INPUT].isConnected()){
 					rst = inputs[RST_INPUT].getVoltage();
-					if (rst > 0 && prevRst <= 0) {
+					if (rst >= 1 && prevRst < 1) {
 						// next lines are duplicated from case 1
 						outputs[GATE_OUTPUT].setVoltage(0.f);
-						// below is different from original: if gateState is 0 or 1
+						lights[OUT_LIGHT].setBrightness(0.f);
+						// below is different from original: if internalState is 0 or 1
 						// it will not do the fade 
-						if ((params[RELEASE_PARAMS].getValue() != 0 || inputs[RELEASE_INPUT].getVoltage() != 0) && gateState == 1){
+						if ((params[RELEASE_PARAMS].getValue() != 0 || inputs[RELEASE_INPUT].getVoltage() != 0) && internalState == 1){
 							if (fading) {
 								startFade = lastFade;
 							} else {
@@ -319,26 +357,27 @@ struct TogglerCompact : Module {
 							}
 							currentFadeSample = 0;
 						}
-						gateState = 0;
+						internalState = 0;
 						// end of duplicated lines
 					}
 					prevRst = rst; 
 				}
 				
 				if (inputs[TRIG_INPUT].isConnected()){
-					trigState = inputs[TRIG_INPUT].getVoltage();
-					if (trigState > 0 && prevTrigState <= 0){
-						currentTrigState = true;
+					trigValue = inputs[TRIG_INPUT].getVoltage();
+					if (trigValue >= 1 && prevTrigValue < 1){
+						trigState = true;
 					} else {
-						currentTrigState = false;
+						trigState = false;
 					}
-					prevTrigState = trigState;
+					prevTrigValue = trigValue;
 
-					switch (gateState) {
+					switch (internalState) {
 						case 0: 									// waiting for TRIG
-							if (currentTrigState){					// if TRIG occurs
+							if (trigState){					// if TRIG occurs
 								outputs[GATE_OUTPUT].setVoltage(10);
-								gateState = 1;
+								lights[OUT_LIGHT].setBrightness(1.f);
+								internalState = 1;
 								if (params[ATTACK_PARAMS].getValue() != 0 || inputs[ATTACK_INPUT].getVoltage() != 0) {
 									if (fading) {
 										startFade = lastFade;
@@ -426,11 +465,14 @@ struct TogglerCompact : Module {
 								outputs[OUT_OUTPUT].setVoltage(0);
 								outputs[OUT_OUTPUT+1].setVoltage(0);
 							}
-							break;
+						break;
+
 						case 1: 									// gating
-							if (currentTrigState) { 					// if TRIG occurs
+							outputs[GATE_OUTPUT].setVoltage(10);
+							if (trigState) { 					// if TRIG occurs
 								outputs[GATE_OUTPUT].setVoltage(0);
-								gateState = 0;
+								lights[OUT_LIGHT].setBrightness(0.f);
+								internalState = 0;
 								if (params[RELEASE_PARAMS].getValue() != 0 || inputs[RELEASE_INPUT].getVoltage() != 0){
 									if (fading) {
 										startFade = lastFade;
@@ -553,13 +595,20 @@ struct TogglerCompact : Module {
 								outputs[OUT_OUTPUT].setVoltage(10 * sustain); // send envelope on left and right channel
 								outputs[OUT_OUTPUT+1].setVoltage(10 * sustain);
 							}
-							break;
+						break;
 					}
+				} else {
+					internalState = 0;
+					outputs[OUT_OUTPUT].setVoltage(0);
+					outputs[OUT_OUTPUT+1].setVoltage(0);
+					outputs[GATE_OUTPUT].setVoltage(0);
+					lights[OUT_LIGHT].setBrightness(0.f);
 				}
 			break;
 		}
 	}
 };
+
 
 struct TogglerCompactWidget : ModuleWidget {
 	TogglerCompactWidget(TogglerCompact* module) {
@@ -588,6 +637,15 @@ struct TogglerCompactWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.2, 107.5)), module, TogglerCompact::OUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.5, 107.5)), module, TogglerCompact::OUT_OUTPUT+1));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 119)), module, TogglerCompact::GATE_OUTPUT));
+
+		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(16.5, 121)), module, TogglerCompact::OUT_LIGHT));
+	}
+
+	void appendContextMenu(Menu* menu) override {
+		TogglerCompact* module = dynamic_cast<TogglerCompact*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Restore State on Load", "", &module->stateRestore));
 	}
 };
 
