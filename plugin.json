@@ -99,7 +99,8 @@
       "name": "Switcher",
       "description": "2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate",
       "tags": [
-        "Switch"
+        "Switch",
+        "Utility"
       ]
     },
     {
@@ -107,7 +108,8 @@
       "name": "SwitcherSt",
       "description": "Stereo 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate",
       "tags": [
-        "Switch"
+        "Switch",
+        "Utility"
       ]
     }
   ]
