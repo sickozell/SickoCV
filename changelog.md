@@ -1,4 +1,4 @@
-### 2.3.1
+### 2.3.1 (2022-10-09)
 changed trigger and gate input threshold from 0v to +1v on every module  
 added modules state storage and context menu  
 added leds on 'toggler' and 'bToggler' family modules  
