@@ -1,7 +1,7 @@
-# SickoCV v2.3.0
+# SickoCV v2.3.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 3 0](https://user-images.githubusercontent.com/80784296/193430425-339ee68f-bb08-4f5e-a9d5-dd7705afb4ac.JPG)
+://user-images.githubusercontent.com/80784296/193430425-339ee68f-bb08-4f5e-a9d5-dd7705afb4ac.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -34,7 +34,7 @@ Audio rate modulations are allowed.
 #### - Detailed instructions:
 'blender8' provides 8 mono crossfade mixers and differs from 'blender' module in the following things.  
 Only the IN2 input signal can be phase inverted.  
-If a CV input is connected for modulation the MIX knob becomes the modulation attenuverter.
+If a CV input is connected for modulation, CV sets the mix percentage and the MIX knob becomes the CVn attenuverter.
 
 ## bToggler / bToggler Compact
 ### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
@@ -44,7 +44,7 @@ If a CV input is connected for modulation the MIX knob becomes the modulation at
 - Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 
 #### - Detailed instructions:
-Connect a clock source.
+Connect a clock source. If no clock is connected 'bToggler' will act with no buffer feature, and becomes like 'Toggler' module in toggle mode.
 
 When ARM input is triggered (arm on), the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
 
@@ -60,7 +60,7 @@ If L or (R) inputs are not connected, L and (R) outputs will provide just the en
 
 A trigger on RESET input will reset the toggle state.
 
-NOTE: input triggers are considered high when greater than 0v.
+NOTE: input trigger threshold is +1v.
 
 
 ## bToggler8
@@ -93,8 +93,10 @@ Triggering RESET input will immediately stop the routing.
 
 Triggering RESETALL input will immediately stop all the 8 routings.
 
-NOTE: input triggers are considered high when greater than 0v.
+NOTE: input trigger threshold is +1v.  
+NOTE2: if no clock is connected 'bToggler8' will act with no buffer feature, and becomes like 8 'Toggler' modules in toggle mode.
  
+
 ## bToggler8+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
 #### - Description:
@@ -117,7 +119,9 @@ If WA or WR are set to 0ms, WRN will output a low gate during warning time and i
 As to say: if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output.  
 Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
-NOTE: input triggers are considered high when greater than 0v.
+NOTE: input trigger threshold is +1v.  
+NOTE2: if no clock is connected 'bToggler8' will act with no buffer feature, and becomes like 8 'Toggler' modules in toggle mode.
+
 
 ## Calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
@@ -125,6 +129,7 @@ NOTE: input triggers are considered high when greater than 0v.
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or -5/+5v.
+
 
 ## Toggler / Toggler Compact
 ### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
@@ -149,9 +154,8 @@ A trigger on RESET input will reset the toggle state.
 
 The same of toggle mode, but the signals will be routed only while GATE input is in a high state.
 
-NOTE: input triggers or gates are considered high when greater than 0v.
-
-NOTE: If a new GATE or Toggle TRIGGER is detected on Attack or Release phases, the envelope ramp will immediately restart from the reached point, as a regular envelope generator and not like a function generator.
+NOTE: If a new GATE or Toggle TRIGGER is detected on Attack or Release phases, the envelope ramp will immediately restart from the reached point, as a regular envelope generator and not like a function generator.  
+NOTE2: input trigger and gate threshold is +1v.
 
 **SPECIAL BEHAVIORS**
 
@@ -161,13 +165,15 @@ If Release is set to 0 (and attack is set greater than 0) and a new GATE or Togg
 
 These behaviors are more understandable connecting a scope on the output.
 
+
 ## Switcher / SwitcherSt
-### 2>1 switch, 1>2 router, 2 signal swapper, flip flop, toggle gate
+### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - Description:
 - Function type (switch, route, swap, flipflop, toggle gate) autodetection
 - Signal switch (2 inputs, 1 output)
-- Signal router (1 inputs, 2 outputs)
+- Signal router (1 input, 2 outputs)
 - Signal swapper (2 inputs, 2 outputs)
+- Mute (1 input, 1 output)
 - Flip flop
 - Toggle gate
 - Adjustable time crossfade between switched/routed/swapped signals
@@ -178,7 +184,7 @@ Switcher or SwitcherSt (used for stereo signals) are multifunction modules that 
 **TOGGLE/GATE modes**  
 When the MODE switch is in 'TOGGLE' position functions are activated by triggers in a toggle style.  
 When in 'GATE' position functions are gate sensitive, so they stay active until 'T/G' input receives a high gate.  
-Functions will be activated by Trigger/Gates with voltages above 0v.
+Functions will be activated by Trigger/Gates with voltages above +1v.
 
 **Function types**  
 The function type is automatically detected depending on connected cables.  
@@ -186,32 +192,35 @@ The function type is automatically detected depending on connected cables.
 Switch: connect 2 inputs and 1 output  
 Router: connect 1 input and 2 outputs  
 Swapper: connect both two inputs and two outputs  
+Mute: connect 1 input and 1 output  
 FlipFlop: connect 2 outputs only  
 ToggleGate: connect 1 output only ('TOGGLE' mode only)  
 
 A trigger on RST input will reset the toggle to its default state.  
 
 **Defaults**  
-Default states depend on which input or output sockets are connected.  
+Default states depend on function type and which input or output sockets are connected.  
 
 Switch: if OUT1 is connected, the default signal will be the IN1 input. If OUT2 is connected instead, the default signal will be the IN2 input  
 Router: if IN1 is connected, the signal will be routed to OUT1 output by default. If IN2 is connected, the default destination will be OUT2 output  
 Swapper: the default is always IN1>OUT1 and IN2>OUT2
+Mute: if IN1 and OUT1 (or IN2 and OUT2) the defualt is mute. If IN1 and OUT2 (or IN2 and OUT1) are connected the default is signal unmute  
 FlipFlop: default is always OUT1  
-ToggleGate: if OUT1 is connected the default is a HIGH GATE. If OUT2 is connected instead, the default is a LOW GATE  
+ToggleGate: if OUT1 is connected the default is a LOW GATE. If OUT2 is connected instead, the default is a HIGH GATE  
 
 **Leds**  
 Green leds close to the in/out sockets show which input signal is switched or to which output destination is routed.  
 When used as a swapper the OUT1 led on shows that signals are normally routed, otherwise the OUT2 led on shows when signals are swapped.  
 
 **Fader**  
-Fader knob sets the crossfade time up to 10s between the switched/routed/swapped signals.  
+Fader knob sets the crossfade time (up to 10s) between the switched/routed/swapped signals.  
 CV input is added to Fade knob value and the sum will be clamped in the range of 0-10v.  
 
 **NOTES**  
 - In FlipFLop and ToggleGate function types the output will consist in a 'fixed' AR envelope
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
 - On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones.
+
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
