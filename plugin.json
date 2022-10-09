@@ -97,7 +97,7 @@
     {
       "slug": "Switcher",
       "name": "Switcher",
-      "description": "2>1 switch, 1>2 router, 2 signal swapper, flip flop, toggle gate",
+      "description": "2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate",
       "tags": [
         "Switch"
       ]
@@ -105,7 +105,7 @@
     {
       "slug": "SwitcherSt",
       "name": "SwitcherSt",
-      "description": "Stereo 2>1 switch, 1>2 router, 2 signal swapper, flip flop, toggle gate",
+      "description": "Stereo 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate",
       "tags": [
         "Switch"
       ]
