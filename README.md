@@ -203,7 +203,7 @@ Default states depend on function type and which input or output sockets are con
 
 Switch: if OUT1 is connected, the default signal will be the IN1 input. If OUT2 is connected instead, the default signal will be the IN2 input  
 Router: if IN1 is connected, the signal will be routed to OUT1 output by default. If IN2 is connected, the default destination will be OUT2 output  
-Swapper: the default is always IN1>OUT1 and IN2>OUT2
+Swapper: the default is always IN1>OUT1 and IN2>OUT2. 
 Mute: if IN1 and OUT1 (or IN2 and OUT2) the defualt is mute. If IN1 and OUT2 (or IN2 and OUT1) are connected the default is signal unmute  
 FlipFlop: default is always OUT1  
 ToggleGate: if OUT1 is connected the default is a LOW GATE. If OUT2 is connected instead, the default is a HIGH GATE  
