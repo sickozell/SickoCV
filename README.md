@@ -169,7 +169,7 @@ These behaviors are more understandable connecting a scope on the output.
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - Description:
-- Function type (switch, route, swap, flipflop, toggle gate) autodetection
+- Function type (switch, route, swap, mute, flipflop, toggle gate) autodetection
 - Signal switch (2 inputs, 1 output)
 - Signal router (1 input, 2 outputs)
 - Signal swapper (2 inputs, 2 outputs)
