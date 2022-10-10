@@ -6,7 +6,7 @@ VCV Rack plugin modules
 ## Blender
 ### Stereo crossfade mixer with double modulation
 #### - Description:
-'blender' is a crossfade mixer between mono or stereo signals.  
+'blender' is a crossfade mixer of mono or stereo signals.  
 It can be used either with cv signals or audio sources.  
 Mix can be modulated by uni/bipolar signals.  
 Modulation can be further modulated by another signal.  
@@ -14,7 +14,7 @@ Audio rate modulations are allowed.
 #### - Detailed instructions:
 Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used.  
 PHASE switches invert the sign of input signals.  
-MIX knob sets the crossfade level between the inputs.
+MIX knob sets the crossfade level of the inputs.
 
 **MIX MOD section**  
 Connecting MIX MOD CV input enables mix modulation. ATNV knob attenuverts CV input.  
@@ -27,14 +27,14 @@ ATNV MD can be used to add modulation to the ATNV knob in MIXMOD section, the ru
 ## Blender8
 ### 8 single crossfade mixers with modulation
 #### - Description:
-'blender8' is a set of 8 crossfade mixers between two signals.  
+'blender8' is a set of 8 crossfade mixers of two signals.  
 As the previous one it can be used either with cv signals or audio sources.  
 Mix can be modulated by uni/bipolar signals.  
 Audio rate modulations are allowed.
 #### - Detailed instructions:
 'blender8' provides 8 mono crossfade mixers and differs from 'blender' module in the following things.  
 Only the IN2 input signal can be phase inverted.  
-If a CV input is connected for modulation, CV sets the mix percentage and the MIX knob becomes the CVn attenuverter.
+If a CV input is connected for modulation, CV sets the mix percentage and the MIX knob becomes the CV attenuverter.
 
 ## bToggler / bToggler Compact
 ### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
