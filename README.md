@@ -77,7 +77,7 @@ Then, by pressing buttons on the controller, 'bToggler8' will actually start/sto
 
 Otherwise bToggler OUTs can be connected to envelope generators. In that case the GATE output should be connected to the IN input to activate the envelope.
 
-'bToggler8' can also be used to play audio signals directly. Connect IN to the audio source and OUT to mixer: the FADE knob will avoid clicks.
+'bToggler8' can also be used to route audio signals. Connect IN to the audio source and OUT to the mixer: the FADE knob will avoid clicks.
 #### - Detailed instructions:
 Connect a clock source.
 
