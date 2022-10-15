@@ -1,26 +1,6 @@
 #include "plugin.hpp"
 
 struct Btoggler : Module {
-	bool stateRestore = true;
-	int clockConection = 0;
-	bool clockState = false;
-	float clock = 0;
-	float prevClock = 0;
-
-	int internalState[8] = {0,0,0,0,0,0,0,0};
-	bool trigState[8] = {false,false,false,false,false,false,false,false};
-	float trigValue[8] = {0,0,0,0,0,0,0,0};
-	float prevTrigValue[8] = {0,0,0,0,0,0,0,0};
-	
-	float rst[8] = {0,0,0,0,0,0,0,0};
-	float prevRst[8] = {0,0,0,0,0,0,0,0};
-	float rstAll = 0;
-	float prevRstAll = 0;
-	
-	float maxFadeSample = 0;
-	float currentFadeSample[8] = {0,0,0,0,0,0,0,0};
-	bool fading[8] = {false,false,false,false,false,false,false,false};
-
 	enum ParamId {
 		FADE_PARAMS,
 		PARAMS_LEN
@@ -43,6 +23,27 @@ struct Btoggler : Module {
 		ENUMS(OUT_LIGHT,8),
 		LIGHTS_LEN
 	};
+
+	bool initStart = false;
+	bool clockConnection = false;
+	bool prevClockConnection = false;
+	bool clockState = false;
+	float clock = 0;
+	float prevClock = 0;
+
+	int internalState[8] = {0,0,0,0,0,0,0,0};
+	bool trigState[8] = {false,false,false,false,false,false,false,false};
+	float trigValue[8] = {0,0,0,0,0,0,0,0};
+	float prevTrigValue[8] = {0,0,0,0,0,0,0,0};
+	
+	float rst[8] = {0,0,0,0,0,0,0,0};
+	float prevRst[8] = {0,0,0,0,0,0,0,0};
+	float rstAll = 0;
+	float prevRstAll = 0;
+	
+	float maxFadeSample = 0;
+	float currentFadeSample[8] = {0,0,0,0,0,0,0,0};
+	bool fading[8] = {false,false,false,false,false,false,false,false};
 
 	Btoggler() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -91,13 +92,37 @@ struct Btoggler : Module {
 		configInput(RST_INPUT+7, "Reset #8");
 	}
 	
-	void onReset() override {
-		stateRestore = true;
+	void onReset(const ResetEvent &e) override {
+		initStart = false;
+		clockConnection = false;
+		prevClockConnection = false;
+		clockState = false;
+		clock = 0;
+		prevClock = 0;
+		maxFadeSample = 0;
+		rstAll = 0;
+		prevRstAll = 0;
+
+		for (int i=0; i<8; i++) {
+			internalState[i] = 0;
+			trigState[i] = false;
+			trigValue[i] = 0;
+			prevTrigValue[i] = 0;
+			rst[i] = 0;
+			prevRst[i] = 0;
+			currentFadeSample[i] = 0;
+			fading[i] = false;
+			outputs[GATE_OUTPUT+i].setVoltage(0);
+			outputs[OUT_OUTPUT+i].setVoltage(0);
+			lights[WRN_LIGHT+i].setBrightness(0.f);
+			lights[OUT_LIGHT+i].setBrightness(0.f);
+		}
+		Module::onReset(e);
 	}
 
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
-		json_object_set_new(rootJ, "StateRestore", json_boolean(stateRestore));
+		json_object_set_new(rootJ, "InitStart", json_boolean(initStart));
 		json_object_set_new(rootJ, "State1", json_integer(internalState[0]));
 		json_object_set_new(rootJ, "State2", json_integer(internalState[1]));
 		json_object_set_new(rootJ, "State3", json_integer(internalState[2]));
@@ -110,11 +135,11 @@ struct Btoggler : Module {
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
-		json_t* jsonStateRestore = json_object_get(rootJ, "StateRestore");
-		if (jsonStateRestore)
-			stateRestore = json_boolean_value(jsonStateRestore);
+		json_t* initStartJ = json_object_get(rootJ, "InitStart");
+		if (initStartJ)
+			initStart = json_boolean_value(initStartJ);
 
-		if (stateRestore) {
+		if (!initStart) {
 			json_t* jsonState1 = json_object_get(rootJ, "State1");
 			if (jsonState1) {
 				internalState[0] = json_integer_value(jsonState1);
@@ -174,296 +199,174 @@ struct Btoggler : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		if (inputs[CLOCK_INPUT].isConnected()){
-			clockConection = 1;
-		} else {
-			clockConection = 0;
-		}
 
-		switch (clockConection) {
-			case 1:
-				clock = inputs[CLOCK_INPUT].getVoltage();
-				if (clock >= 1 && prevClock < 1) {
-					clockState = true;
-				} else {
-					clockState = false;
-				}
-				prevClock = clock;
-			
-				if (inputs[RSTALL_INPUT].isConnected()){
-					rstAll = inputs[RSTALL_INPUT].getVoltage();
-					if (rstAll >= 1 && prevRstAll < 1) {
-						for (int i=0; i<8;i++){
-							// next lines are duplicated from case 3
-							outputs[GATE_OUTPUT+i].setVoltage(0);
-							lights[OUT_LIGHT+i].setBrightness(0.f);
-							lights[WRN_LIGHT+i].setBrightness(0.f);
-							// below is different from original: if internalState is 0 or 1
-							// it will not do the fade 
-							if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
-								fading[i] = true;
-								currentFadeSample[i] = 0;
-								maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
-							}
-							internalState[i] = 0;
-							// end of duplicated lines
-						}
-					}
-					prevRstAll = rstAll; 
-				}
+		clockConnection = inputs[CLOCK_INPUT].isConnected();
 
-				for (int i=0; i<8;i++){
-					if (inputs[RST_INPUT+i].isConnected()){
-						rst[i] = inputs[RST_INPUT+i].getVoltage();
-						if (rst[i] >= 1 && prevRst[i] < 1) {
-							// next lines are duplicated from case 3
-							outputs[GATE_OUTPUT+i].setVoltage(0);
-							lights[OUT_LIGHT+i].setBrightness(0.f);
-							lights[WRN_LIGHT+i].setBrightness(0.f);
-							// below is different from original: if internalState is 0 or 1
-							// it will not do the fade 
-							if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
-								fading[i] = true;
-								currentFadeSample[i] = 0;
-								maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
-							}
-							internalState[i] = 0;
-							// end of duplicated lines
-						}
-						prevRst[i] = rst[i]; 
-					}
-
-					if (inputs[ARM_INPUT+i].isConnected()){
-						trigValue[i] = inputs[ARM_INPUT+i].getVoltage();
-						if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
-							trigState[i] = true;
-						} else {
-							trigState[i] = false;
-						}
-						prevTrigValue[i] = trigValue[i];
-
-						switch (internalState[i]) {
-							case 0: 									// waiting for ARM
-								if (trigState[i]){					// if occurs
-									internalState[i] = 1;
-									lights[WRN_LIGHT+i].setBrightness(1.f);
-								} else if (params[FADE_PARAMS].getValue() != 0){
-									if (fading[i] == true) {
-										if (currentFadeSample[i] > maxFadeSample) {
-											fading[i] = false;
-											currentFadeSample[i] = 0;
-											outputs[OUT_OUTPUT+i].setVoltage(0);
-									
-										} else {
-											outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * (1-(currentFadeSample[i] / maxFadeSample)));
-										}
-										currentFadeSample[i]++;
-									} else {									// if FADING has ended
-										outputs[OUT_OUTPUT+i].setVoltage(0);
-									}
-								} else {  // if FADE has not set
-									outputs[OUT_OUTPUT+i].setVoltage(0);
-								}
-							break;
-
-							case 1: 									// triggered waiting for next clock
-								if (trigState[i]){						// if another trigger occurs, then abort
-									lights[WRN_LIGHT+i].setBrightness(0.f);
-									internalState[i] = 0;
-								} else if (clockState) { 							// if clock occurs
-									outputs[GATE_OUTPUT+i].setVoltage(10);
-									lights[OUT_LIGHT+i].setBrightness(1.f);
-									lights[WRN_LIGHT+i].setBrightness(0.f);
-									internalState[i] = 2;
-									if (params[FADE_PARAMS].getValue() != 0){
-										fading[i] = true;
-										currentFadeSample[i] = 0;
-										maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
-									}
-								}
-							break;
-
-							case 2: 									// gating
-								if (trigState[i]) { 					// if ARM occurs
-									internalState[i] = 3;
-									lights[WRN_LIGHT+i].setBrightness(1.f);
-								} else if (params[FADE_PARAMS].getValue() != 0){
-									if (fading[i] == true) {
-										outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * currentFadeSample[i] / maxFadeSample);
-										currentFadeSample[i]++;
-										if (currentFadeSample[i] > maxFadeSample) {
-											fading[i] = false;
-											currentFadeSample[i] = 0;
-										}
-									} else {
-										outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
-										outputs[GATE_OUTPUT+i].setVoltage(10);
-									}
-								} else {
-									outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
-									outputs[GATE_OUTPUT+i].setVoltage(10);
-								}
-							break;
-
-							case 3: 									// gating and triggered, waiting for next clock
-								if (trigState[i]){					// if another trigger occurs, then abort
-									internalState[i] = 2;
-									lights[WRN_LIGHT+i].setBrightness(0.f);
-								} else if (clockState) {
-									outputs[GATE_OUTPUT+i].setVoltage(0);
-									internalState[i] = 0;
-									lights[OUT_LIGHT+i].setBrightness(0.f);
-									lights[WRN_LIGHT+i].setBrightness(0.f);
-									if (params[FADE_PARAMS].getValue() != 0){
-										fading[i] = true;
-										currentFadeSample[i] = 0;
-										maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
-									}
-								} else {
-									outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
-									outputs[GATE_OUTPUT+i].setVoltage(10);
-								}
-							break;
-						}
-					} else {	// if ARM INPUT is not connected
-						internalState[i] = 0;
-						outputs[OUT_OUTPUT+i].setVoltage(0);
+		if (clockConnection) {
+			clock = inputs[CLOCK_INPUT].getVoltage();
+			if (clock >= 1 && prevClock < 1) {
+				clockState = true;
+			} else {
+				clockState = false;
+			}
+			prevClock = clock;
+		
+			if (inputs[RSTALL_INPUT].isConnected()){
+				rstAll = inputs[RSTALL_INPUT].getVoltage();
+				if (rstAll >= 1 && prevRstAll < 1) {
+					for (int i=0; i<8;i++){
+						// next lines are duplicated from case 3
 						outputs[GATE_OUTPUT+i].setVoltage(0);
 						lights[OUT_LIGHT+i].setBrightness(0.f);
 						lights[WRN_LIGHT+i].setBrightness(0.f);
+						// below is different from original: if internalState is 0 or 1
+						// it will not do the fade 
+						if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
+							fading[i] = true;
+							currentFadeSample[i] = 0;
+							maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
+						}
+						internalState[i] = 0;
+						// end of duplicated lines
 					}
 				}
-				clockState = false;
-			break;
+				prevRstAll = rstAll; 
+			}
 
-			default: // ******************* if clock is not connected
-
-				if (inputs[RSTALL_INPUT].isConnected()){
-					rstAll = inputs[RSTALL_INPUT].getVoltage();
-					if (rstAll >= 1 && prevRstAll < 1) {
-						for (int i=0; i<8;i++){
-							// next lines are duplicated from case 3
-							outputs[GATE_OUTPUT+i].setVoltage(0);
-							lights[OUT_LIGHT+i].setBrightness(0.f);
-							lights[WRN_LIGHT+i].setBrightness(0.f);
-							// below is different from original: if internalState is 0 or 1
-							// it will not do the fade 
-							if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
-								fading[i] = true;
-								currentFadeSample[i] = 0;
-								maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
-							}
-							internalState[i] = 0;
-							// end of duplicated lines
+			for (int i=0; i<8; i++){
+				if (inputs[RST_INPUT+i].isConnected()){
+					rst[i] = inputs[RST_INPUT+i].getVoltage();
+					if (rst[i] >= 1 && prevRst[i] < 1) {
+						// next lines are duplicated from case 3
+						outputs[GATE_OUTPUT+i].setVoltage(0);
+						lights[OUT_LIGHT+i].setBrightness(0.f);
+						lights[WRN_LIGHT+i].setBrightness(0.f);
+						// below is different from original: if internalState is 0 or 1
+						// it will not do the fade 
+						if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
+							fading[i] = true;
+							currentFadeSample[i] = 0;
+							maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
 						}
+						internalState[i] = 0;
+						// end of duplicated lines
 					}
-					prevRstAll = rstAll; 
+					prevRst[i] = rst[i]; 
 				}
 
-				for (int i=0; i<8;i++){
-					if (inputs[RST_INPUT+i].isConnected()){
-						rst[i] = inputs[RST_INPUT+i].getVoltage();
-						if (rst[i] >= 1 && prevRst[i] < 1) {
-							// next lines are duplicated from case 3
-							outputs[GATE_OUTPUT+i].setVoltage(0);
-							lights[OUT_LIGHT+i].setBrightness(0.f);
-							lights[WRN_LIGHT+i].setBrightness(0.f);
-							// below is different from original: if internalState is 0 or 1
-							// it will not do the fade 
-							if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
-								fading[i] = true;
-								currentFadeSample[i] = 0;
-								maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
-							}
-							internalState[i] = 0;
-							// end of duplicated lines
-						}
-						prevRst[i] = rst[i]; 
+				if (inputs[ARM_INPUT+i].isConnected()){
+					trigValue[i] = inputs[ARM_INPUT+i].getVoltage();
+					if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
+						trigState[i] = true;
+					} else {
+						trigState[i] = false;
 					}
+					prevTrigValue[i] = trigValue[i];
 
-					if (inputs[ARM_INPUT+i].isConnected()){
-						trigValue[i] = inputs[ARM_INPUT+i].getVoltage();
-						if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
-							trigState[i] = true;
-						} else {
-							trigState[i] = false;
-						}
-						prevTrigValue[i] = trigValue[i];
-
-						switch (internalState[i]) {
-							case 0: 									// waiting for ARM
-								if (trigState[i]){					// if occurs
-									outputs[GATE_OUTPUT+i].setVoltage(10);
-									lights[OUT_LIGHT+i].setBrightness(1.f);
-									lights[WRN_LIGHT+i].setBrightness(0.f);
-									internalState[i] = 2;
-									if (params[FADE_PARAMS].getValue() != 0){
-										fading[i] = true;
+					switch (internalState[i]) {
+						case 0: 									// waiting for ARM
+							if (trigState[i]){					// if occurs
+								internalState[i] = 1;
+								lights[WRN_LIGHT+i].setBrightness(1.f);
+							} else if (params[FADE_PARAMS].getValue() != 0){
+								if (fading[i] == true) {
+									if (currentFadeSample[i] > maxFadeSample) {
+										fading[i] = false;
 										currentFadeSample[i] = 0;
-										maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
-									}
-								} else if (params[FADE_PARAMS].getValue() != 0){
-									if (fading[i] == true) {
-										if (currentFadeSample[i] > maxFadeSample) {
-											fading[i] = false;
-											currentFadeSample[i] = 0;
-											outputs[OUT_OUTPUT+i].setVoltage(0);
-									
-										} else {
-											outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * (1-(currentFadeSample[i] / maxFadeSample)));
-										}
-										currentFadeSample[i]++;
-									} else {									// if FADING has ended
 										outputs[OUT_OUTPUT+i].setVoltage(0);
+								
+									} else {
+										outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * (1-(currentFadeSample[i] / maxFadeSample)));
 									}
-								} else {  // if FADE has not set
+									currentFadeSample[i]++;
+								} else {									// if FADING has ended
 									outputs[OUT_OUTPUT+i].setVoltage(0);
 								}
-							break;
+							} else {  // if FADE has not set
+								outputs[OUT_OUTPUT+i].setVoltage(0);
+							}
+						break;
 
-							case 2: 									// gating
-								if (trigState[i]) { 					// if ARM occurs
-									internalState[i] = 0;
-									outputs[GATE_OUTPUT+i].setVoltage(0);
-									lights[OUT_LIGHT+i].setBrightness(0.f);
-									lights[WRN_LIGHT+i].setBrightness(0.f);
-									if (params[FADE_PARAMS].getValue() != 0){
-										fading[i] = true;
+						case 1: 									// triggered waiting for next clock
+							if (trigState[i]){						// if another trigger occurs, then abort
+								lights[WRN_LIGHT+i].setBrightness(0.f);
+								internalState[i] = 0;
+							} else if (clockState) { 							// if clock occurs
+								outputs[GATE_OUTPUT+i].setVoltage(10);
+								lights[OUT_LIGHT+i].setBrightness(1.f);
+								lights[WRN_LIGHT+i].setBrightness(0.f);
+								internalState[i] = 2;
+								if (params[FADE_PARAMS].getValue() != 0){
+									fading[i] = true;
+									currentFadeSample[i] = 0;
+									maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
+								}
+							}
+						break;
+
+						case 2: 									// gating
+							if (trigState[i]) { 					// if ARM occurs
+								internalState[i] = 3;
+								lights[WRN_LIGHT+i].setBrightness(1.f);
+							} else if (params[FADE_PARAMS].getValue() != 0){
+								if (fading[i] == true) {
+									outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * currentFadeSample[i] / maxFadeSample);
+									currentFadeSample[i]++;
+									if (currentFadeSample[i] > maxFadeSample) {
+										fading[i] = false;
 										currentFadeSample[i] = 0;
-										maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
-									}
-								} else if (params[FADE_PARAMS].getValue() != 0){
-									if (fading[i] == true) {
-										outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * currentFadeSample[i] / maxFadeSample);
-										currentFadeSample[i]++;
-										if (currentFadeSample[i] > maxFadeSample) {
-											fading[i] = false;
-											currentFadeSample[i] = 0;
-										}
-									} else {
-										outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
-										outputs[GATE_OUTPUT+i].setVoltage(10);
 									}
 								} else {
 									outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
 									outputs[GATE_OUTPUT+i].setVoltage(10);
 								}
-							break;
+							} else {
+								outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
+								outputs[GATE_OUTPUT+i].setVoltage(10);
+							}
+						break;
 
-							default: 
+						case 3: 									// gating and triggered, waiting for next clock
+							if (trigState[i]){					// if another trigger occurs, then abort
+								internalState[i] = 2;
+								lights[WRN_LIGHT+i].setBrightness(0.f);
+							} else if (clockState) {
+								outputs[GATE_OUTPUT+i].setVoltage(0);
 								internalState[i] = 0;
 								lights[OUT_LIGHT+i].setBrightness(0.f);
 								lights[WRN_LIGHT+i].setBrightness(0.f);
-						}
-					} else {	// if ARM INPUT is not connected
-						internalState[i] = 0;
-						outputs[OUT_OUTPUT+i].setVoltage(0);
-						outputs[GATE_OUTPUT+i].setVoltage(0);
-						lights[OUT_LIGHT+i].setBrightness(0.f);
-						lights[WRN_LIGHT+i].setBrightness(0.f);
+								if (params[FADE_PARAMS].getValue() != 0){
+									fading[i] = true;
+									currentFadeSample[i] = 0;
+									maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
+								}
+							} else {
+								outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
+								outputs[GATE_OUTPUT+i].setVoltage(10);
+							}
+						break;
 					}
+				} else {	// if ARM INPUT is not connected
+					internalState[i] = 0;
+					outputs[OUT_OUTPUT+i].setVoltage(0);
+					outputs[GATE_OUTPUT+i].setVoltage(0);
+					lights[OUT_LIGHT+i].setBrightness(0.f);
+					lights[WRN_LIGHT+i].setBrightness(0.f);
 				}
+			}
+			clockState = false;
+		} else {
+			if (prevClockConnection) {
+				for (int i=0; i<8; i++) {
+					internalState[i] = 0;
+					outputs[OUT_OUTPUT+i].setVoltage(0);
+					outputs[GATE_OUTPUT+i].setVoltage(0);
+					lights[OUT_LIGHT+i].setBrightness(0.f);
+					lights[WRN_LIGHT+i].setBrightness(0.f);
+				}
+			}
 		}
+		prevClockConnection = clockConnection;
 	}
 };
 
@@ -499,7 +402,7 @@ struct BtogglerWidget : ModuleWidget {
 		Btoggler* module = dynamic_cast<Btoggler*>(this->module);
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Restore State on Load", "", &module->stateRestore));
+		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 	}
 };
 

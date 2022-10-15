@@ -1,24 +1,6 @@
 #include "plugin.hpp"
 
 struct TogglerCompact : Module {
-	bool stateRestore = true;
-	int mode = 1;
-	int internalState = 0;
-	bool trigState = false;
-	float trigValue = 0;
-	float prevTrigValue = 0;
-	
-	float rst = 0;
-	float prevRst = 0;
-
-	float arSum = 0;
-	float maxFadeSample = 0;
-	float currentFadeSample = 0;
-	bool fading = false;
-	float sustain = 1;
-	float startFade = 0;
-	float lastFade = 0;
-	
 	enum ParamId {
 		MODE_SWITCH,
 		ATTACK_PARAMS,
@@ -45,6 +27,26 @@ struct TogglerCompact : Module {
 		LIGHTS_LEN
 	};
 
+	bool initStart = false;
+	bool trigConnection = false;
+	bool prevTrigConnection = false;
+	int mode = 1;
+	int internalState = 0;
+	bool trigState = false;
+	float trigValue = 0;
+	float prevTrigValue = 0;
+	
+	float rst = 0;
+	float prevRst = 0;
+
+	float arSum = 0;
+	float maxFadeSample = 0;
+	float currentFadeSample = 0;
+	bool fading = false;
+	float sustain = 1;
+	float startFade = 0;
+	float lastFade = 0;
+
 	TogglerCompact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
@@ -63,29 +65,50 @@ struct TogglerCompact : Module {
 		configOutput(GATE_OUTPUT, "Gate");
 	}
 
-	void onReset() override {
-		stateRestore = true;
+	void onReset(const ResetEvent &e) override {
+		initStart = false;
+		trigConnection = false;
+		prevTrigConnection = false;
+		mode = 1;
+		internalState = 0;
+		trigState = false;
+		trigValue = 0;
+		prevTrigValue = 0;
+
+		rst = 0;
+		prevRst = 0;
+
+		arSum = 0;
+		maxFadeSample = 0;
+		currentFadeSample = 0;
+		fading = false;
+		sustain = 1;
+		startFade = 0;
+		lastFade = 0;
+
+		outputs[GATE_OUTPUT].setVoltage(0);
+		outputs[OUT_OUTPUT].setVoltage(0);
+		outputs[OUT_OUTPUT+1].setVoltage(0);
+		lights[OUT_LIGHT].setBrightness(0.f);
+		Module::onReset(e);
 	}
 
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
-		json_object_set_new(rootJ, "StateRestore", json_boolean(stateRestore));
+		json_object_set_new(rootJ, "InitStart", json_boolean(initStart));
 		json_object_set_new(rootJ, "State", json_integer(internalState));
 		return rootJ;
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
-		json_t* jsonStateRestore = json_object_get(rootJ, "StateRestore");
-		if (jsonStateRestore)
-			stateRestore = json_boolean_value(jsonStateRestore);
+		json_t* initStartJ = json_object_get(rootJ, "InitStart");
+		if (initStartJ)
+			initStart = json_boolean_value(initStartJ);
 
-		if (stateRestore) {
+		if (!initStart) {
 			json_t* jsonState = json_object_get(rootJ, "State");
-			if (jsonState) {
+			if (jsonState)
 				internalState = json_integer_value(jsonState);
-				if (internalState)
-					lights[OUT_LIGHT].setBrightness(1.f);
-			}
 		}
 	}
 	
@@ -94,7 +117,8 @@ struct TogglerCompact : Module {
 		switch (mode) {
 			// ************************************** GATE MODE **********
 			case 0:
-				if (inputs[TRIG_INPUT].isConnected()){
+				trigConnection = inputs[TRIG_INPUT].isConnected();
+				if (trigConnection){
 					trigValue = inputs[TRIG_INPUT].getVoltage();
 					if (trigValue >= 1 && prevTrigValue < 1){
 						trigState = true;
@@ -331,12 +355,15 @@ struct TogglerCompact : Module {
 						break;
 					}
 				} else {
-					internalState = 0;
-					outputs[OUT_OUTPUT].setVoltage(0);
-					outputs[OUT_OUTPUT+1].setVoltage(0);
-					outputs[GATE_OUTPUT].setVoltage(0);
-					lights[OUT_LIGHT].setBrightness(0.f);
+					if (prevTrigConnection) {
+						internalState = 0;
+						outputs[OUT_OUTPUT].setVoltage(0);
+						outputs[OUT_OUTPUT+1].setVoltage(0);
+						outputs[GATE_OUTPUT].setVoltage(0);
+						lights[OUT_LIGHT].setBrightness(0.f);
+					}
 				}
+				prevTrigConnection = trigConnection;
 			break;
 			// ********************************** TOGGLER MODE ***************************************************
 			case 1:		
@@ -363,7 +390,11 @@ struct TogglerCompact : Module {
 					prevRst = rst; 
 				}
 				
-				if (inputs[TRIG_INPUT].isConnected()){
+				trigConnection = inputs[TRIG_INPUT].isConnected();
+				if (trigConnection){
+					if (!prevTrigConnection && internalState == 1)
+						lights[OUT_LIGHT].setBrightness(1.f);
+
 					trigValue = inputs[TRIG_INPUT].getVoltage();
 					if (trigValue >= 1 && prevTrigValue < 1){
 						trigState = true;
@@ -598,12 +629,15 @@ struct TogglerCompact : Module {
 						break;
 					}
 				} else {
-					internalState = 0;
-					outputs[OUT_OUTPUT].setVoltage(0);
-					outputs[OUT_OUTPUT+1].setVoltage(0);
-					outputs[GATE_OUTPUT].setVoltage(0);
-					lights[OUT_LIGHT].setBrightness(0.f);
+					if (prevTrigConnection) {
+						internalState = 0;
+						outputs[OUT_OUTPUT].setVoltage(0);
+						outputs[OUT_OUTPUT+1].setVoltage(0);
+						outputs[GATE_OUTPUT].setVoltage(0);
+						lights[OUT_LIGHT].setBrightness(0.f);
+					}
 				}
+				prevTrigConnection = trigConnection;
 			break;
 		}
 	}
@@ -645,7 +679,7 @@ struct TogglerCompactWidget : ModuleWidget {
 		TogglerCompact* module = dynamic_cast<TogglerCompact*>(this->module);
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Restore State on Load", "", &module->stateRestore));
+		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 	}
 };
 

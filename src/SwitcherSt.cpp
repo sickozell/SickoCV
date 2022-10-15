@@ -1,30 +1,6 @@
 #include "plugin.hpp"
 
 struct SwitcherSt : Module {
-	bool stateRestore = true;
-	int mode = 1;
-	int prevMode = 0;
-	int connection = 0;
-	int prevConnection = -1;
-	bool connectionChange = true;
-
-	float rst = 0;
-	float prevRst = 0;
-
-	bool currentSwitch = false;
-	bool trigState = false;
-	float trigValue = 0;
-	float prevTrigValue = 0;
-
-	float fadeValue = 0;
-	float cvFadeValue = 0;
-
-	float maxFadeSample = 0;
-	float currentFadeSample = 0;
-	bool fading = false;
-	float startFade = 0;
-	float lastFade = 0;
-	
 	enum ParamId {
 		MODE_SWITCH,
 		FADE_PARAMS,
@@ -51,6 +27,33 @@ struct SwitcherSt : Module {
 		LIGHTS_LEN
 	};
 
+	bool initStart = false;
+	int mode = 1;
+	int prevMode = 0;
+	bool trigConnection = false;
+	bool prevTrigConnection = false;
+	int connection = 0;
+	int prevConnection = -1;
+	bool connectionChange = true;
+
+	float rst = 0;
+	float prevRst = 0;
+
+	bool currentSwitch = false;
+	bool trigState = false;
+	float trigValue = 0;
+	float prevTrigValue = 0;
+
+	float fadeValue = 0;
+	float cvFadeValue = 0;
+
+	float maxFadeSample = 0;
+	float currentFadeSample = 0;
+	bool fading = false;
+	float startFade = 0;
+	float lastFade = 0;
+	
+
 	SwitcherSt() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
@@ -68,23 +71,41 @@ struct SwitcherSt : Module {
 		configOutput(OUT2_OUTPUT+1, "OUT 2 Right");
 	}
 
-	void onReset() override {
-		stateRestore = true;
+	void onReset(const ResetEvent &e) override {
+		initStart = false;
+		mode = 1;
+		prevMode = 0;
+		trigConnection = false;
+		prevTrigConnection = false;
+		connection = 0;
+		prevConnection = -1;
+		connectionChange = true;
+		currentSwitch = false;
+		fading = false;
+		outputs[OUT1_OUTPUT].setVoltage(0);
+		outputs[OUT1_OUTPUT+1].setVoltage(0);
+		outputs[OUT2_OUTPUT].setVoltage(0);
+		outputs[OUT2_OUTPUT+1].setVoltage(0);
+		lights[IN1_LIGHT].setBrightness(0.f);
+		lights[IN2_LIGHT].setBrightness(0.f);
+		lights[OUT1_LIGHT].setBrightness(0.f);
+		lights[OUT2_LIGHT].setBrightness(0.f);
+		Module::onReset(e);
 	}
 
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
-		json_object_set_new(rootJ, "StateRestore", json_boolean(stateRestore));
+		json_object_set_new(rootJ, "InitStart", json_boolean(initStart));
 		json_object_set_new(rootJ, "State", json_boolean(currentSwitch));
 		return rootJ;
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
-		json_t* jsonStateRestore = json_object_get(rootJ, "StateRestore");
-		if (jsonStateRestore)
-			stateRestore = json_boolean_value(jsonStateRestore);
+		json_t* initStartJ = json_object_get(rootJ, "InitStart");
+		if (initStartJ)
+			initStart = json_boolean_value(initStartJ);
 
-		if (stateRestore) {
+		if (!initStart) {
 			json_t* jsonState = json_object_get(rootJ, "State");
 			if (jsonState)
 				currentSwitch = json_boolean_value(jsonState);
@@ -92,16 +113,19 @@ struct SwitcherSt : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		if (!inputs[TRIG_INPUT].isConnected()){
-			outputs[OUT1_OUTPUT].setVoltage(0);
-			outputs[OUT2_OUTPUT].setVoltage(0);
-			lights[IN1_LIGHT].setBrightness(0.f);
-			lights[IN2_LIGHT].setBrightness(0.f);
-			lights[OUT1_LIGHT].setBrightness(0.f);
-			lights[OUT2_LIGHT].setBrightness(0.f);
-			connectionChange = false;
-			currentSwitch = false;
-			prevConnection = -1;
+		trigConnection = inputs[TRIG_INPUT].isConnected();
+		if (!trigConnection){
+			if (prevTrigConnection) {
+				outputs[OUT1_OUTPUT].setVoltage(0);
+				outputs[OUT2_OUTPUT].setVoltage(0);
+				lights[IN1_LIGHT].setBrightness(0.f);
+				lights[IN2_LIGHT].setBrightness(0.f);
+				lights[OUT1_LIGHT].setBrightness(0.f);
+				lights[OUT2_LIGHT].setBrightness(0.f);
+				connectionChange = false;
+				currentSwitch = false;
+				prevConnection = -1;
+			}
 		} else {
 			fadeValue = params[FADE_PARAMS].getValue() + inputs[FADECV_INPUT].getVoltage();
 
@@ -1183,6 +1207,7 @@ struct SwitcherSt : Module {
 					}
 			}
 		}
+		prevTrigConnection = trigConnection;
 	}
 };
 
@@ -1223,7 +1248,7 @@ struct SwitcherStWidget : ModuleWidget {
 		SwitcherSt* module = dynamic_cast<SwitcherSt*>(this->module);
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Restore State on Load", "", &module->stateRestore));
+		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 	}
 };
 

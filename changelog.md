@@ -1,3 +1,8 @@
+### 2.3.2 (2022-10-15)
+modified state storage in context menu  
+fixed 'state-storage' bug  
+removed no-clock buggy feature from 'bToggler' family modules  
+
 ### 2.3.1 (2022-10-09)
 changed trigger and gate input threshold from 0v to +1v on every module  
 added modules state storage and context menu  
