@@ -1,4 +1,4 @@
-# SickoCV v2.3.1
+# SickoCV v2.3.2
 VCV Rack plugin modules
 
 ![SickoCV modules 2 3 1](https://user-images.githubusercontent.com/80784296/194748989-69997df2-e00b-427a-b89c-9fa986ca3f37.JPG)
@@ -44,7 +44,7 @@ If a CV input is connected for modulation, CV sets the mix percentage and the MI
 - Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 
 #### - Detailed instructions:
-Connect a clock source. If no clock is connected 'bToggler' will act with no buffer feature, and becomes like 'Toggler' module in toggle mode.
+Connect a clock source.
 
 When ARM input is triggered (arm on), the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
 
@@ -94,7 +94,6 @@ Triggering RESET input will immediately stop the routing.
 Triggering RESETALL input will immediately stop all the 8 routings.
 
 NOTE: input trigger threshold is +1v.  
-NOTE2: if no clock is connected 'bToggler8' will act with no buffer feature, and becomes like 8 'Toggler' modules in toggle mode.
  
 
 ## bToggler8+
@@ -120,7 +119,6 @@ As to say: if WA is set to 0 and WR is set to max(200), WRN output will act like
 Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
 NOTE: input trigger threshold is +1v.  
-NOTE2: if no clock is connected 'bToggler8' will act with no buffer feature, and becomes like 8 'Toggler' modules in toggle mode.
 
 
 ## Calcs
@@ -129,42 +127,6 @@ NOTE2: if no clock is connected 'bToggler8' will act with no buffer feature, and
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or -5/+5v.
-
-
-## Toggler / Toggler Compact
-### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
-#### - Description:
-- Toggled VCA with builtin ASR envelope generator
-- Toggled ASR envelope generator
-- mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
-#### - Detailed instructions:
-**TOGGLE MODE**
-
-On receiving a trigger on TRIG input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
-
-Attack, Sustain and Release knobs set the envelope of the routed signal.
-
-A, S, R CVinputs are added to respective knob values.
-
-If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
-
-A trigger on RESET input will reset the toggle state.
-
-**GATE MODE**
-
-The same of toggle mode, but the signals will be routed only while GATE input is in a high state.
-
-NOTE: If a new GATE or Toggle TRIGGER is detected on Attack or Release phases, the envelope ramp will immediately restart from the reached point, as a regular envelope generator and not like a function generator.  
-NOTE2: input trigger and gate threshold is +1v.
-
-**SPECIAL BEHAVIORS**
-
-If Attack is set to 0 (and release is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
-
-If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
-
-These behaviors are more understandable connecting a scope on the output.
-
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
@@ -220,6 +182,41 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - In FlipFLop and ToggleGate function types the output will consist in a 'fixed' AR envelope
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
 - On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones.
+
+
+## Toggler / Toggler Compact
+### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
+#### - Description:
+- Toggled VCA with builtin ASR envelope generator
+- Toggled ASR envelope generator
+- mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
+#### - Detailed instructions:
+**TOGGLE MODE**
+
+On receiving a trigger on TRIG input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
+
+Attack, Sustain and Release knobs set the envelope of the routed signal.
+
+A, S, R CVinputs are added to respective knob values.
+
+If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
+
+A trigger on RESET input will reset the toggle state.
+
+**GATE MODE**
+
+The same of toggle mode, but the signals will be routed only while GATE input is in a high state.
+
+NOTE: If a new GATE or Toggle TRIGGER is detected on Attack or Release phases, the envelope ramp will immediately restart from the reached point, as a regular envelope generator and not like a function generator.  
+NOTE2: input trigger and gate threshold is +1v.
+
+**SPECIAL BEHAVIORS**
+
+If Attack is set to 0 (and release is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
+
+If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
+
+These behaviors are more understandable connecting a scope on the output.
 
 
 ## Credits
