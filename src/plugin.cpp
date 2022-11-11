@@ -23,4 +23,5 @@ void init(Plugin* p) {
 	p->addModel(modelBlender8);
 	p->addModel(modelSwitcher);
 	p->addModel(modelSwitcherSt);
+	p->addModel(modelDrummer);
 }

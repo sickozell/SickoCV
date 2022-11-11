@@ -1,3 +1,7 @@
+### 2.3.3 (2002-11-11)
+added foolowing module:
+- Drummer
+
 ### 2.3.2 (2022-10-15)
 modified state storage in context menu  
 fixed 'state-storage' bug  
