@@ -34,10 +34,10 @@ struct Drummer : Module {
 	float out[2] = {0.f,0.f};
 	float outFinal = 0.f;
 	
-	float maxFadeSample = 0.f;
-	float currentFadeSample = 0.f;
-	float startFade = 0.f;
-	float lastFade = 0.f;
+	float maxFadeSample[2] = {0.f,0.f};
+	float currentFadeSample[2] = {0.f,0.f};
+	float startFade[2] = {0.f,0.f};
+	float lastFade[2] = {0.f,0.f};
 
 	Drummer() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -96,9 +96,9 @@ struct Drummer : Module {
 					if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
 						choking[i] = true;
 						trigState[i] = true;
-						startFade = 1;
-						maxFadeSample = args.sampleRate * 0.05f;
-						currentFadeSample = 0;
+						startFade[i] = 1;
+						maxFadeSample[i] = args.sampleRate * 0.05f;
+						currentFadeSample[i] = 0;
 
 						if (inputs[ACCENT_INPUT+i].getVoltage() >= 1)
 							sustain[i] = params[ACCENT_PARAMS+i].getValue();
@@ -108,15 +108,15 @@ struct Drummer : Module {
 					prevTrigValue[i] = trigValue[i];
 
 					if (choking[!i]) {
-						lastFade = -(currentFadeSample / maxFadeSample) + startFade;
-						if (lastFade < 0) {
+						lastFade[i] = -(currentFadeSample[i] / maxFadeSample[i]) + startFade[i];
+						if (lastFade[i] < 0) {
 							choking[!i] = false;
 							trigState[i] = false;
-							currentFadeSample = 0;
-							startFade = 0;
-							lastFade = 0;
+							currentFadeSample[i] = 0;
+							startFade[i] = 0;
+							lastFade[i] = 0;
 						} else {
-							out[i] = inputs[IN_INPUT+i].getVoltage() * lastFade * sustain[i];
+							out[i] = inputs[IN_INPUT+i].getVoltage() * lastFade[i] * sustain[i];
 							if (limitMode) {
 								if (out[i] > 5)
 									out[i] = 5;
@@ -126,7 +126,7 @@ struct Drummer : Module {
 							if (!trigState[i])
 								out[i] = 0;
 						}
-						currentFadeSample++;
+						currentFadeSample[i]++;
 					} else {
 						if (trigState[i]) {
 							out[i] = inputs[IN_INPUT+i].getVoltage() * sustain[i];
