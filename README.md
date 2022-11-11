@@ -1,7 +1,7 @@
-# SickoCV v2.3.2
+# SickoCV v2.3.3
 VCV Rack plugin modules
 
-![SickoCV modules 2 3 1](https://user-images.githubusercontent.com/80784296/194748989-69997df2-e00b-427a-b89c-9fa986ca3f37.JPG)
+![SickoCV modules 2 3 3](https://user-images.githubusercontent.com/80784296/201406790-017be631-fcde-4a5b-9cd6-1f4363606aba.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -127,6 +127,22 @@ NOTE: input trigger threshold is +1v.
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or -5/+5v.
+
+## Drummer
+### Accent and choke utility for drum modules lacking these features
+#### - Instructions:
+Drummer module can handle two drum sounds with separate standard and accent volume levels set by respective knobs.  
+Connect the IN input to a drum-like audio source or sample player, and OUT output to the mixer.  
+Connect the TRIG input to the same module that feeds the drum module, it can be a sequencer or every other pulse generation module.  
+Connect the ACC input to the module which generates the accents, it can be the sequencer or every other suitable module.  
+When ACC is triggered at the same time as the TRIG input, Drummer module will output the Accent Level set by "Accent Level knob" instead of the one set by "Standard Level Knob".  
+Each knob range is from 0 to 200% of the incoming IN level.  
+LIMIT switch limits the output from -5v/+5v.  
+CHOKE switch mutes one output when the other is triggered (for example when used with open/closed hihat sounds).  
+If both outputs are connected, audio is routed separately, otherwise the two inputs are mixed in the only connected output.  
+
+Below is one example of Drummer module use
+![Drummer Example](https://user-images.githubusercontent.com/80784296/201431823-23f424de-3cc6-48a4-87d4-5c856ae79e34.JPG)
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
