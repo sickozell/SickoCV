@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -79,7 +79,18 @@
       "name": "Drummer",
       "description": "Accent and choke utility for drum modules lacking these features",
       "tags": [
-        "Utility, Drum"
+        "Utility",
+        "Drum"
+      ]
+    },
+    {
+      "slug": "Drummer4",
+      "name": "Drummer4",
+      "description": "4 channel accent utility for drum modules lacking these feature",
+      "tags": [
+        "Utility",
+        "Drum",
+        "Quad"
       ]
     },
     {

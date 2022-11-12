@@ -79,13 +79,6 @@ struct Drummer : Module {
 					}
 					prevTrigValue[i] = trigValue[i];
 					out[i] = inputs[IN_INPUT+i].getVoltage() * sustain[i];
-					
-					if (limitMode) {
-						if (out[i] > 5)
-							out[i] = 5;
-						else if (out[i] < -5)
-							out[i] = -5;
-					}
 				}
 			break;
 
@@ -116,13 +109,7 @@ struct Drummer : Module {
 							startFade[i] = 0;
 							lastFade[i] = 0;
 						} else {
-							out[i] = inputs[IN_INPUT+i].getVoltage() * lastFade[i] * sustain[i];
-							if (limitMode) {
-								if (out[i] > 5)
-									out[i] = 5;
-								else if (out[i] < -5)
-									out[i] = -5;
-							}
+							out[i] = inputs[IN_INPUT+i].getVoltage() * lastFade[i] * sustain[i];							
 							if (!trigState[i])
 								out[i] = 0;
 						}
@@ -130,12 +117,6 @@ struct Drummer : Module {
 					} else {
 						if (trigState[i]) {
 							out[i] = inputs[IN_INPUT+i].getVoltage() * sustain[i];
-							if (limitMode) {
-								if (out[i] > 5)
-									out[i] = 5;
-								else if (out[i] < -5)
-									out[i] = -5;
-							}
 							if (!trigState[i])
 								out[i] = 0;
 						}
@@ -144,6 +125,16 @@ struct Drummer : Module {
 			break;
 		}
 		if (outputs[OUT_OUTPUT].isConnected() && outputs[OUT_OUTPUT+1].isConnected()) {
+			if (limitMode) {
+				if (out[0] > 5)
+					out[0] = 5;
+				else if (out[0] < -5)
+					out[0] = -5;
+				if (out[1] > 5)
+					out[1] = 5;
+				else if (out[1] < -5)
+					out[1] = -5;
+			}
 			outputs[OUT_OUTPUT].setVoltage(out[0]);
 			outputs[OUT_OUTPUT+1].setVoltage(out[1]);
 		} else {

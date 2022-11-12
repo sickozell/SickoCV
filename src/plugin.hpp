@@ -21,3 +21,4 @@ extern Model* modelBlender8;
 extern Model* modelSwitcher;
 extern Model* modelSwitcherSt;
 extern Model* modelDrummer;
+extern Model* modelDrummer4;
