@@ -1,4 +1,4 @@
-### 2.4.0 (2002-11-12)
+### 2.4.0 (2022-11-12)
 added foolowing module:
 - Drummer
 - Drummer4
