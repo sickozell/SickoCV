@@ -1,7 +1,7 @@
-# SickoCV v2.3.3
+# SickoCV v2.4.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 3 3](https://user-images.githubusercontent.com/80784296/201406790-017be631-fcde-4a5b-9cd6-1f4363606aba.JPG)
+![SickoCV modules 2 4 0](https://user-images.githubusercontent.com/80784296/201479738-716cb60b-10e2-406f-ad0a-a60c64a3b2de.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -139,10 +139,16 @@ When ACC is triggered at the same time as the TRIG input, Drummer module will ou
 Each knob range is from 0 to 200% of the incoming IN level.  
 LIMIT switch limits the output from -5v/+5v.  
 CHOKE switch mutes one output when the other is triggered (for example when used with open/closed hihat sounds).  
-If both outputs are connected, audio is routed separately, otherwise the two inputs are mixed in the only connected output.  
+OUT outputs are normalled, so if both outputs are connected, audio is routed separately, otherwise the two inputs are mixed in the only connected output.  
 
 Below is one example of Drummer module use
 ![Drummer Example](https://user-images.githubusercontent.com/80784296/201431823-23f424de-3cc6-48a4-87d4-5c856ae79e34.JPG)
+
+## Drummer4
+### 4 channel accent utility for drum modules lacking this feature
+#### - Instructions:
+This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, no choking feature.  
+Outputs are normalled to the next ones. For example if you connect only out 2 and 4, out 1 and 3 will respectively mixed with those ones.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
