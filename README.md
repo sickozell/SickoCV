@@ -11,7 +11,10 @@ It can be used either with cv signals or audio sources.
 Mix can be modulated by uni/bipolar signals.  
 Modulation can be further modulated by another signal.  
 Audio rate modulations are allowed.
-#### - Detailed instructions:
+
+![blender](https://user-images.githubusercontent.com/80784296/201516763-00c7192d-f881-4b14-9c23-68c8be2a90d3.JPG)
+
+#### - Usage:
 Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used.  
 PHASE switches invert the sign of input signals.  
 MIX knob sets the crossfade level of the inputs.
@@ -31,7 +34,10 @@ ATNV MD can be used to add modulation to the ATNV knob in MIXMOD section, the ru
 As the previous one it can be used either with cv signals or audio sources.  
 Mix can be modulated by uni/bipolar signals.  
 Audio rate modulations are allowed.
-#### - Detailed instructions:
+
+![blender8](https://user-images.githubusercontent.com/80784296/201516772-12dac17b-f8a0-4f82-946a-da8b7d254b09.JPG)
+
+#### - Usage:
 'blender8' provides 8 mono crossfade mixers and differs from 'blender' module in the following things.  
 Only the IN2 input signal can be phase inverted.  
 If a CV input is connected for modulation, CV sets the mix percentage and the MIX knob becomes the CV attenuverter.
@@ -43,7 +49,9 @@ If a CV input is connected for modulation, CV sets the mix percentage and the MI
 - Buffered Toggled ASR envelope generator
 - Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 
-#### - Detailed instructions:
+![btoggler](https://user-images.githubusercontent.com/80784296/201516786-81b923a6-4d9d-4c6f-8c1c-74e43f9e7e9c.JPG)
+
+#### - Usage:
 Connect a clock source.
 
 When ARM input is triggered (arm on), the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
@@ -78,7 +86,10 @@ Then, by pressing buttons on the controller, 'bToggler8' will actually start/sto
 Otherwise bToggler OUTs can be connected to envelope generators. In that case the GATE output should be connected to the IN input to activate the envelope.
 
 'bToggler8' can also be used to route audio signals. Connect IN to the audio source and OUT to the mixer: the FADE knob will avoid clicks.
-#### - Detailed instructions:
+
+![btoggler8](https://user-images.githubusercontent.com/80784296/201516798-acfa6672-07d0-4f0e-bd38-6269a204eb64.JPG)
+
+#### - Usage:
 Connect a clock source.
 
 When ARM input is triggered (arm on) the IN input will start to be routed to OUT on next clock detection and GATE output will provide a high state.
@@ -104,7 +115,10 @@ NOTE: input trigger threshold is +1v.
 Some midi controllers can light up or turn off their button leds by receiving the same commands they send.  
 Taking advantage of this functionality, connect the WRN outs to a "GATE>MIDI" module connected to the same controller of the ARM inputs.  
 So when pressing buttons on controller, 'bToggler8+' will actually play/stop the sequencers or audio, and simultaneously give a visual feedback on the controller.
-#### - Detailed instructions:
+
+![btoggler8plus](https://user-images.githubusercontent.com/80784296/201516811-40c75bb5-84d2-411b-b9ed-fa876e178258.JPG)
+
+#### - Usage:
 The same of the previous one, plus:
 
 When 'armed on' or 'armed off', the WRN (warning) output will provide a sequence of pulses until next clock is detected.  
@@ -123,36 +137,50 @@ NOTE: input trigger threshold is +1v.
 
 ## Calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
-#### - Instructions:
+
+![calcs](https://user-images.githubusercontent.com/80784296/201516821-8ea683bd-db11-4687-971d-67bef380b81c.JPG)
+
+#### - Usage:
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or -5/+5v.
 
 ## Drummer
 ### Accent and choke utility for drum modules lacking these features
-#### - Instructions:
+
+![drummer](https://user-images.githubusercontent.com/80784296/201516831-bff1df4b-b7e1-4065-b486-7501d6c4cde7.JPG)
+
+#### - Usage:
 Drummer module can handle two drum sounds with separate standard and accent volume levels set by respective knobs.  
 Connect the IN input to a drum-like audio source or sample player, and OUT output to the mixer.  
 Connect the TRIG input to the same module that feeds the drum module, it can be a sequencer or every other pulse generation module.  
 Connect the ACC input to the module which generates the accents, it can be the sequencer or every other suitable module.  
 When ACC is triggered at the same time as the TRIG input, Drummer module will output the Accent Level set by "Accent Level knob" instead of the one set by "Standard Level Knob".  
+Input triggers threshold is +1v.  
 Each knob range is from 0 to 200% of the incoming IN level.  
 LIMIT switch limits the output from -5v/+5v.  
 CHOKE switch mutes one output when the other is triggered (for example when used with open/closed hihat sounds).  
 OUT outputs are normalled, so if both outputs are connected, audio is routed separately, otherwise the two inputs are mixed in the only connected output.  
+NOTE: In CHOKE mode, if both TRIG inputs are triggered at the same time, the upper section (#1) will have the priority and the lower one will be ignored.
 
 Below is one example of Drummer module use
 ![Drummer Example](https://user-images.githubusercontent.com/80784296/201431823-23f424de-3cc6-48a4-87d4-5c856ae79e34.JPG)
 
 ## Drummer4
 ### 4 channel accent utility for drum modules lacking this feature
-#### - Instructions:
-This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, no choking feature.  
+
+![drummer4](https://user-images.githubusercontent.com/80784296/201516839-54364ebe-d3cc-4a4e-9c32-d85e2ec2653b.JPG)
+
+#### - Usage:
+This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, there is no choking feature.  
 Outputs are normalled to the next ones. For example if you connect only out 2 and 4, out 1 and 3 will respectively mixed with those ones.
 
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
-#### - Instructions:
+
+![parking](https://user-images.githubusercontent.com/80784296/201516844-d0796154-73a8-446b-aff8-4be6424a6a5e.JPG)
+
+#### - Usage:
 This module doesn't do anything. It's just a place to connect your temporarily unused cables when you don't want to forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
 
@@ -168,7 +196,9 @@ It can also be used to connect other modules sockets when they need to be wired 
 - Toggle gate
 - Adjustable time crossfade between switched/routed/swapped signals
 
-#### - Detailed instructions:
+![switcher](https://user-images.githubusercontent.com/80784296/201516861-d3d2ab1b-7036-4355-b2ef-e4c5681fb432.JPG)
+
+#### - Usage:
 Switcher or SwitcherSt (used for stereo signals) are multifunction modules that can be used as follows. The versatility of the module is offered thanks to the automatic detection of the function type.
 
 **TOGGLE/GATE modes**  
@@ -218,7 +248,10 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - Toggled VCA with builtin ASR envelope generator
 - Toggled ASR envelope generator
 - mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
-#### - Detailed instructions:
+
+![toggler](https://user-images.githubusercontent.com/80784296/201516866-3ca90766-503c-435d-a560-ba0f5c02deff.JPG)
+
+#### - Usage:
 **TOGGLE MODE**
 
 On receiving a trigger on TRIG input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
