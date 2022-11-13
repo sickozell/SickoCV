@@ -1,5 +1,5 @@
 ### 2.4.0 (2022-11-13)
-added foolowing module:
+added following modules:
 - Drummer
 - Drummer4
 - Parking
