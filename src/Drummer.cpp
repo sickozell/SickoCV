@@ -68,59 +68,100 @@ struct Drummer : Module {
 
 		switch (chokeMode) {
 			case 0:
-				for (int i=0;i<2;i++) {
-					out[i] = 0;
-					trigValue[i] = inputs[TRIG_INPUT+i].getVoltage();
-					if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
-						if (inputs[ACCENT_INPUT+i].getVoltage() >= 1)
-							sustain[i] = params[ACCENT_PARAMS+i].getValue();
-						else
-							sustain[i] = params[NOACCENT_PARAMS+i].getValue();
-					}
-					prevTrigValue[i] = trigValue[i];
-					out[i] = inputs[IN_INPUT+i].getVoltage() * sustain[i];
+				trigValue[0] = inputs[TRIG_INPUT].getVoltage();
+				if (trigValue[0] >= 1 && prevTrigValue[0] < 1){
+					if (inputs[ACCENT_INPUT].getVoltage() >= 1)
+						sustain[0] = params[ACCENT_PARAMS].getValue();
+					else
+						sustain[0] = params[NOACCENT_PARAMS].getValue();
 				}
+				prevTrigValue[0] = trigValue[0];
+				out[0] = inputs[IN_INPUT].getVoltage() * sustain[0];
+
+				trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
+				if (trigValue[1] >= 1 && prevTrigValue[1] < 1){
+					if (inputs[ACCENT_INPUT+1].getVoltage() >= 1)
+						sustain[1] = params[ACCENT_PARAMS+1].getValue();
+					else
+						sustain[1] = params[NOACCENT_PARAMS+1].getValue();
+				}
+				prevTrigValue[1] = trigValue[1];
+				out[1] = inputs[IN_INPUT+1].getVoltage() * sustain[1];
 			break;
 
 			case 1:
-				for (int i=0;i<2;i++) {
-					out[i] = 0;
-					trigValue[i] = inputs[TRIG_INPUT+i].getVoltage();
-					if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
-						choking[i] = true;
-						trigState[i] = true;
-						startFade[i] = 1;
-						maxFadeSample[i] = args.sampleRate * 0.05f;
-						currentFadeSample[i] = 0;
+				trigValue[0] = inputs[TRIG_INPUT].getVoltage();
+				if (trigValue[0] >= 1 && prevTrigValue[0] < 1){
+					choking[0] = true;
+					trigState[0] = true;
+					startFade[0] = 1;
+					maxFadeSample[0] = args.sampleRate * 0.05f;
+					currentFadeSample[0] = 0;
 
-						if (inputs[ACCENT_INPUT+i].getVoltage() >= 1)
-							sustain[i] = params[ACCENT_PARAMS+i].getValue();
-						else
-							sustain[i] = params[NOACCENT_PARAMS+i].getValue();
-					}
-					prevTrigValue[i] = trigValue[i];
+					if (inputs[ACCENT_INPUT].getVoltage() >= 1)
+						sustain[0] = params[ACCENT_PARAMS].getValue();
+					else
+						sustain[0] = params[NOACCENT_PARAMS].getValue();
+				}
+				prevTrigValue[0] = trigValue[0];
 
-					if (choking[!i]) {
-						lastFade[i] = -(currentFadeSample[i] / maxFadeSample[i]) + startFade[i];
-						if (lastFade[i] < 0) {
-							choking[!i] = false;
-							trigState[i] = false;
-							currentFadeSample[i] = 0;
-							startFade[i] = 0;
-							lastFade[i] = 0;
-						} else {
-							out[i] = inputs[IN_INPUT+i].getVoltage() * lastFade[i] * sustain[i];							
-							if (!trigState[i])
-								out[i] = 0;
-						}
-						currentFadeSample[i]++;
+				if (choking[1]) {
+					lastFade[0] = -(currentFadeSample[0] / maxFadeSample[0]) + startFade[0];
+					if (lastFade[0] < 0) {
+						choking[1] = false;
+						trigState[0] = false;
+						currentFadeSample[0] = 0;
+						startFade[0] = 0;
+						lastFade[0] = 0;
 					} else {
-						if (trigState[i]) {
-							out[i] = inputs[IN_INPUT+i].getVoltage() * sustain[i];
-							if (!trigState[i])
-								out[i] = 0;
-						}
+						if (trigState[0])
+							out[0] = inputs[IN_INPUT].getVoltage() * lastFade[0] * sustain[0];							
+						else
+							out[0] = 0;
 					}
+					currentFadeSample[0]++;
+				} else {
+					if (trigState[0])
+						out[0] = inputs[IN_INPUT].getVoltage() * sustain[0];
+					else
+						out[0] = 0;
+				}
+
+				trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
+				if (trigValue[1] >= 1 && prevTrigValue[1] < 1 && !choking[0]){
+					choking[1] = true;
+					trigState[1] = true;
+					startFade[1] = 1;
+					maxFadeSample[1] = args.sampleRate * 0.05f;
+					currentFadeSample[1] = 0;
+
+					if (inputs[ACCENT_INPUT+1].getVoltage() >= 1)
+						sustain[1] = params[ACCENT_PARAMS+1].getValue();
+					else
+						sustain[1] = params[NOACCENT_PARAMS+1].getValue();
+				}
+				prevTrigValue[1] = trigValue[1];
+
+				if (choking[0]) {
+					lastFade[1] = -(currentFadeSample[1] / maxFadeSample[1]) + startFade[1];
+					if (lastFade[1] < 0) {
+						choking[0] = false;
+						trigState[1] = false;
+						currentFadeSample[1] = 0;
+						startFade[1] = 0;
+						lastFade[1] = 0;
+					} else {
+						if (trigState[1])
+							out[1] = inputs[IN_INPUT+1].getVoltage() * lastFade[1] * sustain[1];							
+						else
+							out[1] = 0;
+					}
+					currentFadeSample[1]++;
+				} else {
+					if (trigState[1])
+						out[1] = inputs[IN_INPUT+1].getVoltage() * sustain[1];
+					else
+						out[1] = 0;
 				}
 			break;
 		}

@@ -94,6 +94,14 @@
       ]
     },
     {
+      "slug": "Parking",
+      "name": "Parking",
+      "description": "Set of unconnected inputs and outputs just to park unused cables",
+      "tags": [
+        "Utility"
+      ]
+    },
+    {
       "slug": "Switcher",
       "name": "Switcher",
       "description": "2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate",

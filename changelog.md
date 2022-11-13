@@ -1,7 +1,8 @@
-### 2.4.0 (2022-11-12)
+### 2.4.0 (2022-11-13)
 added foolowing module:
 - Drummer
 - Drummer4
+- Parking
 
 ### 2.3.2 (2022-10-15)
 modified state storage in context menu  

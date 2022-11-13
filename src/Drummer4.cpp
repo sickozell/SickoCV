@@ -57,8 +57,8 @@ struct Drummer4 : Module {
 		configInput(IN_INPUT+3, "AUDIO #4");
 		configOutput(OUT_OUTPUT, "AUDIO #1");
 		configOutput(OUT_OUTPUT+1, "AUDIO #2");
-		configOutput(OUT_OUTPUT+2, "AUDIO #2");
-		configOutput(OUT_OUTPUT+3, "AUDIO #2");
+		configOutput(OUT_OUTPUT+2, "AUDIO #3");
+		configOutput(OUT_OUTPUT+3, "AUDIO #4");
 	}
 
 	void processBypass(const ProcessArgs& args) override {
