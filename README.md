@@ -183,7 +183,7 @@ Example of Drummer module usage:
 This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, there is no choking feature.  
 Outputs are normalled to the next ones. For example if you connect only out 2 and 4, out 1 and 3 will respectively mixed with those ones.
 
-Example of Drummer module usage:
+Example of Drummer4 module usage:
 
 ![drummer4 example](https://user-images.githubusercontent.com/80784296/201531658-fe7ee4d6-5d2f-415e-982c-84e0f66df989.JPG)
 
