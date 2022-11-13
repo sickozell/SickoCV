@@ -170,9 +170,9 @@ CHOKE switch mutes one output when the other is triggered (for example when used
 OUT outputs are normalled, so if both outputs are connected, audio is routed separately, otherwise the two inputs are mixed in the only connected output.  
 NOTE: In CHOKE mode, if both TRIG inputs are triggered at the same time, the upper section (#1) will have the priority and the lower one will be ignored.
 
-One example of Drummer module usage:
+Example of Drummer module usage:
 
-![Drummer Example](https://user-images.githubusercontent.com/80784296/201431823-23f424de-3cc6-48a4-87d4-5c856ae79e34.JPG)
+![drummer example](https://user-images.githubusercontent.com/80784296/201531638-62c9e364-9de9-4e98-8d9b-d44d351942f8.JPG)
 
 ## Drummer4
 ### 4 channel accent utility for drum modules lacking this feature
@@ -182,6 +182,10 @@ One example of Drummer module usage:
 #### - Usage:
 This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, there is no choking feature.  
 Outputs are normalled to the next ones. For example if you connect only out 2 and 4, out 1 and 3 will respectively mixed with those ones.
+
+Example of Drummer module usage:
+
+![drummer4 example](https://user-images.githubusercontent.com/80784296/201531658-fe7ee4d6-5d2f-415e-982c-84e0f66df989.JPG)
 
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
