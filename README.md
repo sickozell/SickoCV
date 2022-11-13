@@ -106,6 +106,10 @@ Triggering RESETALL input will immediately stop all the 8 routings.
 
 NOTE: input trigger threshold is +1v.  
  
+Here below is one example of bToggler8 usage. When buttons are pressed on PULSES module, incoming triggers from the sequencer are routed to drum modules only when the first step of the sequencer is reached. If buttons are pressed again, the routing will stop on next first step of the sequencer.
+
+![btoggler8 example](https://user-images.githubusercontent.com/80784296/201529085-8dca2d3d-ef9d-42f3-94b7-4d3a1c6da057.JPG)
+
 
 ## bToggler8+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
@@ -134,6 +138,9 @@ Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as si
 
 NOTE: input trigger threshold is +1v.  
 
+Here below is one example of bToggler+ usage. The MIDI>GATE module is connected to a programmable Led Midi controller and receives buttonpresses from it. The GATE>MIDI module send back triggers incoming from the sequencer to the controller, turning on and off the corresponding led buttons only when triggers are actually routed to drum modules. Routing rules are the same of previous example.
+
+![btoggler8plus example](https://user-images.githubusercontent.com/80784296/201529122-29f06a3f-ccc4-4901-973f-80cde6259a76.JPG)
 
 ## Calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
@@ -163,7 +170,8 @@ CHOKE switch mutes one output when the other is triggered (for example when used
 OUT outputs are normalled, so if both outputs are connected, audio is routed separately, otherwise the two inputs are mixed in the only connected output.  
 NOTE: In CHOKE mode, if both TRIG inputs are triggered at the same time, the upper section (#1) will have the priority and the lower one will be ignored.
 
-Below is one example of Drummer module use
+One example of Drummer module usage:
+
 ![Drummer Example](https://user-images.githubusercontent.com/80784296/201431823-23f424de-3cc6-48a4-87d4-5c856ae79e34.JPG)
 
 ## Drummer4
