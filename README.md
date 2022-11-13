@@ -1,7 +1,7 @@
 # SickoCV v2.4.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 4 0](https://user-images.githubusercontent.com/80784296/201479738-716cb60b-10e2-406f-ad0a-a60c64a3b2de.JPG)
+![SickoCV modules 2 4 0](https://user-images.githubusercontent.com/80784296/201501224-89b23039-fea0-4aed-aa6e-a428f5dd96c1.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -149,6 +149,12 @@ Below is one example of Drummer module use
 #### - Instructions:
 This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, no choking feature.  
 Outputs are normalled to the next ones. For example if you connect only out 2 and 4, out 1 and 3 will respectively mixed with those ones.
+
+## Parking
+### Set of unconnected inputs and outputs just to park unused cables
+#### - Instructions:
+This module doesn't do anything. It's just a place to connect your temporarily unused cables when you don't want to forget to where they were wired.  
+It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
