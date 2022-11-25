@@ -68,24 +68,18 @@ struct ParkingWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));		
 
-		float x1 = 8;
-		float x2 = 19.5;
+		float xs = 8;
+		float x = 11.5;
 		float ys = 34;
-		float y = 11.5;
+		float y = 23;
 
-		for (int i=0;i<8;i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ys+(y*i))), module, Parking::IN_INPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x2, ys+(y*i))), module, Parking::OUT_OUTPUT+i));
-		}
-
-		x1 = 30.5;
-		x2 = 42;
-		for (int i=8;i<16;i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ys+(y*(i-8)))), module, Parking::IN_INPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x2, ys+(y*(i-8)))), module, Parking::OUT_OUTPUT+i));
+		for (int j=0;j<4;j++) {
+			for (int i=0;i<4;i++) {
+				addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), ys+(y*j))), module, Parking::IN_INPUT+(i+(j*4))));
+				addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), ys+((y*j)+y/2))), module, Parking::OUT_OUTPUT+(i+(j*4))));
+			}
 		}
 	}
-
 };
 
 Model* modelParking = createModel<Parking, ParkingWidget>("Parking");

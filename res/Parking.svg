@@ -25,14 +25,14 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.73088336"
-     inkscape:cx="-112.87711"
+     inkscape:cx="-137.50484"
      inkscape:cy="197.02186"
-     inkscape:window-width="1366"
-     inkscape:window-height="705"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
      inkscape:window-x="1272"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer5"
      showguides="true" />
   <defs
      id="defs2">
@@ -191,25 +191,41 @@
      id="layer5"
      inkscape:label="Elementi">
     <rect
-       style="opacity:1;display:inline;fill:#474785;fill-opacity:1;stroke:#666699;stroke-width:0.591543;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#474785;fill-opacity:1;stroke:#666699;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
        id="rect2634"
-       width="12.106287"
-       height="113.74915"
-       x="13.989099"
-       y="31.160028"
-       ry="2.4903259"
-       inkscape:label="output rect"
-       transform="matrix(0.80328685,0,0,0.80328685,3.4003305,3.5071473)" />
+       width="45.661732"
+       height="9.8617325"
+       x="2.5691338"
+       y="40.549999"
+       ry="2"
+       inkscape:label="output rect" />
     <rect
-       style="opacity:1;display:inline;fill:#474785;fill-opacity:1;stroke:#666699;stroke-width:0.591543;stroke-dasharray:none;stroke-opacity:1"
-       id="rect19813"
-       width="12.106287"
-       height="113.74915"
-       x="41.999016"
-       y="31.160028"
-       ry="2.4903259"
-       inkscape:label="output rect"
-       transform="matrix(0.80328685,0,0,0.80328685,3.4003305,3.5071473)" />
+       style="display:inline;opacity:1;fill:#474785;fill-opacity:1;stroke:#666699;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
+       id="rect11397"
+       width="45.661732"
+       height="9.8617325"
+       x="2.5691338"
+       y="63.549999"
+       ry="2"
+       inkscape:label="output rect" />
+    <rect
+       style="display:inline;opacity:1;fill:#474785;fill-opacity:1;stroke:#666699;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
+       id="rect11399"
+       width="45.661732"
+       height="9.8617325"
+       x="2.5691338"
+       y="86.550003"
+       ry="2"
+       inkscape:label="output rect" />
+    <rect
+       style="display:inline;opacity:1;fill:#474785;fill-opacity:1;stroke:#666699;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
+       id="rect11401"
+       width="45.661732"
+       height="9.8617325"
+       x="2.5691338"
+       y="109.55"
+       ry="2"
+       inkscape:label="output rect" />
   </g>
   <g
      inkscape:label="header footer"

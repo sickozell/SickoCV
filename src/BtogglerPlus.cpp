@@ -29,6 +29,10 @@ struct BtogglerPlus : Module {
 	};
 
 	bool initStart = false;
+	bool wrnInvert = false;
+	bool inverting[8] = {false,false,false,false,false,false,false,false};
+	int invertTime[8] = {0,0,0,0,0,0,0,0};
+
 	bool clockConnection = false;
 	bool prevClockConnection = false;
 	bool clockState = false;
@@ -114,6 +118,7 @@ struct BtogglerPlus : Module {
 
 	void onReset(const ResetEvent &e) override {
 		initStart = false;
+		wrnInvert = false;
 		clockConnection = false;
 		prevClockConnection = false;
 		clockState = false;
@@ -150,6 +155,7 @@ struct BtogglerPlus : Module {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "InitStart", json_boolean(initStart));
+		json_object_set_new(rootJ, "WrnInvert", json_boolean(wrnInvert));
 		json_object_set_new(rootJ, "State1", json_integer(internalState[0]));
 		json_object_set_new(rootJ, "State2", json_integer(internalState[1]));
 		json_object_set_new(rootJ, "State3", json_integer(internalState[2]));
@@ -165,6 +171,10 @@ struct BtogglerPlus : Module {
 		json_t* initStartJ = json_object_get(rootJ, "InitStart");
 		if (initStartJ)
 			initStart = json_boolean_value(initStartJ);
+
+		json_t* wrnInvertJ = json_object_get(rootJ, "WrnInvert");
+		if (wrnInvertJ)
+			wrnInvert = json_boolean_value(wrnInvertJ);
 
 		if (!initStart) {
 			json_t* jsonState1 = json_object_get(rootJ, "State1");
@@ -376,7 +386,22 @@ struct BtogglerPlus : Module {
 							} else {								// if it's currently GATING and FADE IS NOT SET
 								outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
 								outputs[GATE_OUTPUT+i].setVoltage(10);
-								outputs[WARN_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
+								if (wrnInvert)
+									if (inverting[i]) {
+										invertTime[i]--;
+										if (invertTime[i] < 0)
+											inverting[i] = false;
+									} else {
+										if (inputs[IN_INPUT+i].getVoltage() >= 1) {
+											outputs[WARN_OUTPUT+i].setVoltage(0);
+											inverting[i] = true;
+											invertTime[i] = int(args.sampleRate / 10);
+										} else {
+											outputs[WARN_OUTPUT+i].setVoltage(10);
+										}
+									}
+								else
+									outputs[WARN_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
 							}
 						break;
 
@@ -475,6 +500,7 @@ struct BtogglerPlusWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
+		menu->addChild(createBoolPtrMenuItem("WRN inversion (trigs only)", "", &module->wrnInvert));
 	}
 };
 

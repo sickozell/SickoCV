@@ -1,3 +1,8 @@
+### 2.4.1 (2022-11-25)
+added Shifter module
+added "Warn Inversion" context menu feature on bToggler8+ module
+layout change on Parking module
+
 ### 2.4.0 (2022-11-13)
 added following modules:
 - Drummer
