@@ -190,7 +190,7 @@ Example of Drummer4 module usage:
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
 
-![parking](https://user-images.githubusercontent.com/80784296/201516844-d0796154-73a8-446b-aff8-4be6424a6a5e.JPG)
+![parking](https://user-images.githubusercontent.com/80784296/204013230-cda01462-92c9-4013-8599-c0ba9d798ae0.JPG)
 
 #### - Usage:
 This module doesn't do anything. It's just a place to connect your temporarily unused cables when you don't want to forget to where they were wired.  
