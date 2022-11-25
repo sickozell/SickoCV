@@ -1,7 +1,7 @@
-# SickoCV v2.4.0
+# SickoCV v2.4.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 4 0](https://user-images.githubusercontent.com/80784296/201501224-89b23039-fea0-4aed-aa6e-a428f5dd96c1.JPG)
+![SickoCV modules 2 4 1](https://user-images.githubusercontent.com/80784296/204008598-a1003f9b-6d89-41f8-a7ce-5b9f500a90cc.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -195,6 +195,21 @@ Example of Drummer4 module usage:
 #### - Usage:
 This module doesn't do anything. It's just a place to connect your temporarily unused cables when you don't want to forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
+
+## Shifter
+### 64 selectable stages shift register
+#### - Description:
+- 64 stages shift register that outputs only the selected stage controlled by knob/CV with attenuverter
+- Trigger delay to adjust the 1-sample latency of VCV cables
+
+![shifter](https://user-images.githubusercontent.com/80784296/204009935-efd147d4-2d28-4b72-a607-af41e7c8e894.JPG)
+
+#### - Usage:
+Shifter module can be useful to shift back and fotrth a sequencer output on the fly, thanks to the 64 stages register.  
+Stage can be controlled via the stage knob, or the 0-10v StageCV input with its attenuverter.  
+If StageCV input is not connected, the attenuverter reduces the range of the Stage knob.  
+Note that the Stage knob and StageCV are added together.  
+The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when you're triggering the sequencer with the same clock of Shifter module, and the input would be sampled before the sequencer advance.  
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
