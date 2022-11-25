@@ -136,6 +136,8 @@ If WA or WR are set to 0ms, WRN will output a low gate during warning time and i
 As to say: if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output.  
 Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
+In the context menu there is the option to invert WRN output when used with triggers. It can be useful when used with a Led Controller, so when a channel is 'toggled on', leds stay turned on, and when a trig is received they are turned off for 100ms.  
+
 NOTE: input trigger threshold is +1v.  
 
 Here below is one example of bToggler+ usage. The MIDI>GATE module is connected to a programmable Led Midi controller and receives buttonpresses from it. The GATE>MIDI module send back triggers incoming from the sequencer to the controller, turning on and off the corresponding led buttons only when triggers are actually routed to drum modules. Routing rules are the same of previous example.
