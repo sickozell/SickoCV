@@ -136,7 +136,7 @@ If WA or WR are set to 0ms, WRN will output a low gate during warning time and i
 As to say: if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output.  
 Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
-In the context menu there is the option to invert WRN output when used with triggers. It can be useful when used with a Led Controller, so when a channel is 'toggled on', leds stay turned on, and when a trig is received they are turned off for 100ms.  
+In the context menu there is the option to invert WRN output when used with triggers. It can be useful when used with a Led Controller, so when a channel is 'toggled on', leds will stay turned on until a trig is received and they will be turned off for 100ms.  
 
 NOTE: input trigger threshold is +1v.  
 
