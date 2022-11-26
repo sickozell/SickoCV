@@ -108,7 +108,8 @@ NOTE: input trigger threshold is +1v.
  
 Here below is one example of bToggler8 usage. When buttons are pressed on PULSES module, incoming triggers from the sequencer are routed to drum modules only when the first step of the sequencer is reached. If buttons are pressed again, the routing will stop on next first step of the sequencer.
 
-![bToggler8 example](https://user-images.githubusercontent.com/80784296/204083532-db145211-1f61-45cd-9c4d-572fc243d7d3.JPG)
+![bToggler8 example](https://user-images.githubusercontent.com/80784296/204083532-db145211-1f61-45cd-9c4d-572fc243d7d3.JPG)  
+[Download example](./examples/bToggler8%20example.vcvs?raw=true)
 
 ## bToggler8+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
