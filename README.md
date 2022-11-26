@@ -216,6 +216,9 @@ If StageCV input is not connected, the attenuverter reduces the range of the Sta
 Note that the Stage knob and StageCV are added together.  
 The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when you're triggering the sequencer with the same clock of Shifter module, and the input would be sampled before the sequencer advance.  
 
+![shifter example](https://user-images.githubusercontent.com/80784296/204090187-9ebec50d-65cf-4ae4-9310-0db271a24d32.JPG)
+[Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
+
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - Description:
