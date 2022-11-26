@@ -107,7 +107,8 @@
       "name": "Shifter",
       "description": "64 selectable stages shift register",
       "tags": [
-        "Sample and hold"
+        "Sample and hold",
+        "Utility"
       ]
     },
     {
