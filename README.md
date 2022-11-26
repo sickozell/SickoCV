@@ -108,8 +108,7 @@ NOTE: input trigger threshold is +1v.
  
 Here below is one example of bToggler8 usage. When buttons are pressed on PULSES module, incoming triggers from the sequencer are routed to drum modules only when the first step of the sequencer is reached. If buttons are pressed again, the routing will stop on next first step of the sequencer.
 
-![btoggler8 example](https://user-images.githubusercontent.com/80784296/201529085-8dca2d3d-ef9d-42f3-94b7-4d3a1c6da057.JPG)
-
+![bToggler8 example](https://user-images.githubusercontent.com/80784296/204083532-db145211-1f61-45cd-9c4d-572fc243d7d3.JPG)
 
 ## bToggler8+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
@@ -142,7 +141,7 @@ NOTE: input trigger threshold is +1v.
 
 Here below is one example of bToggler+ usage. The MIDI>GATE module is connected to a programmable Led Midi controller and receives buttonpresses from it. The GATE>MIDI module send back triggers incoming from the sequencer to the controller, turning on and off the corresponding led buttons only when triggers are actually routed to drum modules. Routing rules are the same of previous example.
 
-![btoggler8plus example](https://user-images.githubusercontent.com/80784296/201529122-29f06a3f-ccc4-4901-973f-80cde6259a76.JPG)
+![bToggler8plus example](https://user-images.githubusercontent.com/80784296/204083544-34ecf3b0-0d12-4965-bd72-f3bb85339551.JPG)
 
 ## Calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
@@ -174,7 +173,7 @@ NOTE: In CHOKE mode, if both TRIG inputs are triggered at the same time, the upp
 
 Example of Drummer module usage:
 
-![drummer example](https://user-images.githubusercontent.com/80784296/201531638-62c9e364-9de9-4e98-8d9b-d44d351942f8.JPG)
+![drummer example](https://user-images.githubusercontent.com/80784296/204083554-dc651ff0-b94d-4b13-a699-e1dfb348b7e7.JPG)
 
 ## Drummer4
 ### 4 channel accent utility for drum modules lacking this feature
@@ -187,7 +186,7 @@ Outputs are normalled to the next ones. For example if you connect only out #2 a
 
 Example of Drummer4 module usage:
 
-![drummer4 example](https://user-images.githubusercontent.com/80784296/201531658-fe7ee4d6-5d2f-415e-982c-84e0f66df989.JPG)
+![drummer4 example](https://user-images.githubusercontent.com/80784296/204083563-c0913d0a-abde-44c7-8434-4036691c8720.JPG)
 
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
