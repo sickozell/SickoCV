@@ -311,7 +311,7 @@ struct DrumPlayerPlus : Module {
 			prevTrigValue[i] = trigValue[i];
 			currentOutput = 0;
 
-			if (!loading[i] && play[i] && floor(samplePos[i]) < totalSampleC[i] && floor(samplePos[i]) >= 0) {
+			if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i] && floor(samplePos[i]) >= 0) {
 				switch (resamplingMode) {
 					case 0:
 						currentOutput = 5 * level[i] * playBuffer[i][floor(samplePos[i])];
