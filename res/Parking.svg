@@ -24,15 +24,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.73088336"
-     inkscape:cx="-137.50484"
-     inkscape:cy="197.02186"
+     inkscape:zoom="2.9235334"
+     inkscape:cx="63.450618"
+     inkscape:cy="88.93348"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1272"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer5"
+     inkscape:current-layer="layer4"
      showguides="true" />
   <defs
      id="defs2">
@@ -160,30 +160,31 @@
      transform="matrix(0.80328686,0,0,0.80328686,3.4003306,3.5071473)"
      style="opacity:0.8">
     <rect
-       style="display:inline;fill:#cccccc;fill-opacity:1;stroke:#3333ff;stroke-width:1.05039;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#304fe8;fill-opacity:1;stroke:none;stroke-width:1.15368;stroke-dasharray:none;stroke-opacity:1"
        id="rect1540"
-       width="17.908463"
-       height="17.184887"
-       x="18.432833"
-       y="8.5775442"
-       ry="3.1511459" />
+       width="19.669573"
+       height="18.874842"
+       x="17.552277"
+       y="7.7325668"
+       ry="3.4610283" />
     <rect
-       style="display:inline;fill:#3333ff;fill-opacity:1;stroke-width:0.337503"
+       style="display:inline;fill:none;fill-opacity:1;stroke-width:0.74693118;stroke:#f9f9f9;stroke-dasharray:none"
        id="rect1380"
-       width="15.119503"
-       height="14.508614"
-       x="19.827312"
-       y="9.9156809"
-       ry="2.109395" />
+       width="16.696795"
+       height="16.022175"
+       x="19.038668"
+       y="9.1589003"
+       ry="2.3294506" />
     <g
        aria-label="P"
        id="text1326"
-       style="font-weight:bold;font-size:16.9333px;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.4"
+       style="font-weight:bold;font-size:16.9333px;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;display:inline;fill:#f9f9f9;stroke-width:0.4"
        inkscape:label="P"
        transform="matrix(0.84375802,0,0,0.84375802,12.80209,2.1268459)">
       <path
          d="m 12.64313,23.889339 v -12.1212 h 3.927401 q 2.232417,0 2.910411,0.181901 1.041795,0.272851 1.744593,1.190623 0.702798,0.909503 0.702798,2.35644 0,1.116209 -0.405143,1.876885 -0.405142,0.760675 -1.033526,1.198891 -0.620116,0.429947 -1.265037,0.570506 -0.87643,0.173633 -2.538341,0.173633 h -1.595765 v 4.572321 z m 2.447391,-10.070683 v 3.439577 h 1.33945 q 1.446937,0 1.934762,-0.190169 0.487825,-0.190169 0.760676,-0.595312 0.281119,-0.405142 0.281119,-0.942576 0,-0.661457 -0.388606,-1.091404 -0.388606,-0.429947 -0.983918,-0.537434 -0.438215,-0.08268 -1.761129,-0.08268 z"
-         id="path3100" />
+         id="path3100"
+         style="fill:#f9f9f9" />
     </g>
   </g>
   <g

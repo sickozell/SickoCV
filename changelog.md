@@ -1,3 +1,8 @@
+### 2.5.0 (2022-12-10)
+added following modules:
+DrumPlayer
+DrumPlayer+
+
 ### 2.4.1 (2022-11-25)
 added Shifter module
 added "Warn Inversion" context menu feature on bToggler8+ module

@@ -24,3 +24,5 @@ extern Model* modelDrummer;
 extern Model* modelDrummer4;
 extern Model* modelParking;
 extern Model* modelShifter;
+extern Model *modelDrumPlayer;
+extern Model *modelDrumPlayerPlus;

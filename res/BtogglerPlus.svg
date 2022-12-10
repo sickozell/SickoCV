@@ -25,11 +25,11 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="3.9999998"
-     inkscape:cx="177.00001"
-     inkscape:cy="472.00002"
+     inkscape:cx="173.12501"
+     inkscape:cy="52.000003"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="-8"
+     inkscape:window-x="1272"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer7"
@@ -332,7 +332,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Etichette Testo"
-     style="display:inline">
+     style="display:none">
     <text
        xml:space="preserve"
        style="font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
@@ -439,15 +439,15 @@
        transform="translate(-1.3956279,-3.3767613)"><tspan
          x="50.800026"
          y="16.668739"
-         id="tspan4976"><tspan
+         id="tspan16856"><tspan
            style="stroke-width:0.265"
-           id="tspan4974">RST
+           id="tspan16854">RST
 </tspan></tspan><tspan
          x="50.800026"
          y="19.773192"
-         id="tspan4980"><tspan
+         id="tspan16860"><tspan
            style="stroke-width:0.265"
-           id="tspan4978">ALL</tspan></tspan></text>
+           id="tspan16858">ALL</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
