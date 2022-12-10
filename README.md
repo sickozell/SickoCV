@@ -1,7 +1,7 @@
 # SickoCV v2.4.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 4 1](https://user-images.githubusercontent.com/80784296/204008598-a1003f9b-6d89-41f8-a7ce-5b9f500a90cc.JPG)
+![SickoCV modules 2 5 0](https://user-images.githubusercontent.com/80784296/206871020-9b671118-03fa-45ca-9e4d-2a44b9ad53d2.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -191,6 +191,12 @@ Example of Drummer4 module usage:
 
 ![drummer4 example](https://user-images.githubusercontent.com/80784296/204083563-c0913d0a-abde-44c7-8434-4036691c8720.JPG)  
 [Download example](./examples/drummer4%20example.vcvs?raw=true) (right-click -> save link as)
+
+## DrumPlayer DrumPlayer+
+### 4 channel Drum Sample Player with accent and choke functionality
+
+![drumplayer](https://user-images.githubusercontent.com/80784296/206871272-e62df892-03fa-49d2-9197-310b219198a3.JPG)
+
 
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
