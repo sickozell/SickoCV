@@ -81,6 +81,8 @@ struct DrumPlayerPlus : Module {
 
 	bool clearSlots = false;
 
+	bool normalledOuts = true;
+
 	//std::string debugDisplay = "X";
 
 	DrumPlayerPlus() {
@@ -160,15 +162,24 @@ struct DrumPlayerPlus : Module {
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "Resampling", json_integer(resamplingMode));
+		json_object_set_new(rootJ, "NormalledOuts", json_boolean(normalledOuts));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		json_object_set_new(rootJ, "Slot3", json_string(storedPath[2].c_str()));
 		json_object_set_new(rootJ, "Slot4", json_string(storedPath[3].c_str()));
-		json_object_set_new(rootJ, "Resampling", json_integer(resamplingMode));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+		json_t* resamplingJ = json_object_get(rootJ, "Resampling");
+		if (resamplingJ)
+			resamplingMode = json_integer_value(resamplingJ);
+
+		json_t* normalledOutsJ = json_object_get(rootJ, "NormalledOuts");
+		if (normalledOutsJ)
+			normalledOuts = json_integer_value(normalledOutsJ);
+
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
@@ -189,11 +200,6 @@ struct DrumPlayerPlus : Module {
 			storedPath[3] = json_string_value(slot4J);
 			loadSample(storedPath[3], 3);
 		}
-		
-		json_t* resamplingJ = json_object_get(rootJ, "Resampling");
-		if (resamplingJ)
-			resamplingMode = json_integer_value(resamplingJ);
-		
 	}
 
 	void loadSample(std::string path, int slot) {
@@ -402,6 +408,9 @@ struct DrumPlayerPlus : Module {
 				outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
 				summedOutput = 0;
 			}
+
+			if (!normalledOuts)
+				summedOutput = 0;
 
 			if (!inputs[TRIG_INPUT+i].isConnected())
 				play[i] = false;
@@ -619,23 +628,26 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			menu->addChild(construct<ClearSlotsItem>(&MenuItem::text, "Clear ALL slots", &ClearSlotsItem::module, module));
 			menu->addChild(new MenuSeparator());
 
-			menu->addChild(createMenuLabel("Resampling Mode"));
-			struct ModeItem : MenuItem {
-				DrumPlayerPlus* module;
-				int resamplingMode;
-				void onAction(const event::Action& e) override {
-					module->resamplingMode = resamplingMode;
-				}
-			};
-
-			std::string modeNames[4] = {"No interpolation", "Linear 1", "Linear 2", "Hermite"};
-			for (int i = 0; i < 4; i++) {
-				ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
-				modeItem->rightText = CHECKMARK(module->resamplingMode == i);
-				modeItem->module = module;
-				modeItem->resamplingMode = i;
-				menu->addChild(modeItem);
+		menu->addChild(createMenuLabel("Resampling Mode"));
+		struct ModeItem : MenuItem {
+			DrumPlayerPlus* module;
+			int resamplingMode;
+			void onAction(const event::Action& e) override {
+				module->resamplingMode = resamplingMode;
 			}
+		};
+
+		std::string modeNames[4] = {"No interpolation", "Linear 1", "Linear 2", "Hermite"};
+		for (int i = 0; i < 4; i++) {
+			ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
+			modeItem->rightText = CHECKMARK(module->resamplingMode == i);
+			modeItem->module = module;
+			modeItem->resamplingMode = i;
+			menu->addChild(modeItem);
+		}
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Normalled OUTs", "", &module->normalledOuts));
 	}
 };
 
