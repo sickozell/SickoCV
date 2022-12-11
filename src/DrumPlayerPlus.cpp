@@ -77,7 +77,7 @@ struct DrumPlayerPlus : Module {
 	float currentOutput;
 	float summedOutput;
 
-	int resamplingMode = 1;
+	int resamplingMode = 3;
 
 	bool clearSlots = false;
 
@@ -149,7 +149,7 @@ struct DrumPlayerPlus : Module {
 	}
 
 	void onReset() override {
-		resamplingMode = 1;
+		resamplingMode = 3;
 		for (int i=0;i<4;i++) {
 			clearSlotFunct(i);
 			play[i] = false;
@@ -242,7 +242,8 @@ struct DrumPlayerPlus : Module {
 		totalSampleC[slot] = 0;
 	}
 
-	double CubicInterpolate(double y0, double y1, double y2, double y3, double mu) {
+	/*	
+	double cubicInterpolate(double y0, double y1, double y2, double y3, double mu) {
 		double a0,a1,a2,a3,mu2;
 		mu2 = mu*mu;
 		a0 = y3 - y2 - y0 + y1;
@@ -251,31 +252,21 @@ struct DrumPlayerPlus : Module {
 		a3 = y1;
 		return(a0*mu*mu2+a1*mu2+a2*mu+a3);
 	}
-	/*
-	double CosineInterpolate(double y1, double y2, double mu) {
+
+	double cosineInterpolate(double y1, double y2, double mu) {
 		double mu2;
 		mu2 = (1-cos(mu*M_PI))/2;
 		return(y1*(1-mu2)+y2*mu2);
 	}
-
-	double HermiteInterpolate(double y0, double y1, double y2, double y3, double mu, double tension, double bias) {
-		//	Tension: 1 is high, 0 normal, -1 is low
-		//	Bias: 0 is even, positive is towards first segment, negative towards the other
-		double m0,m1,mu2,mu3;
-		double a0,a1,a2,a3;
-		mu2 = mu * mu;
-		mu3 = mu2 * mu;
-		m0  = (y1-y0)*(1+bias)*(1-tension)/2;
-		m0 += (y2-y1)*(1-bias)*(1-tension)/2;
-		m1  = (y2-y1)*(1+bias)*(1-tension)/2;
-		m1 += (y3-y2)*(1-bias)*(1-tension)/2;
-		a0 =  2*mu3 - 3*mu2 + 1;
-		a1 =    mu3 - 2*mu2 + mu;
-		a2 =    mu3 -   mu2;
-		a3 = -2*mu3 + 3*mu2;
-		return(a0*y1+a1*m0+a2*m1+a3*y2);
-	}
 	*/
+
+	double hermiteInterpolate(double x0, double x1, double x2, double x3, double t) {
+		double c0 = x1;
+		double c1 = .5F * (x2 - x0);
+		double c2 = x0 - (2.5F * x1) + (2 * x2) - (.5F * x3);
+		double c3 = (.5F * (x3 - x0)) + (1.5F * (x1 - x2));
+		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
+	}
 
 	void process(const ProcessArgs &args) override {
 		summedOutput = 0;
@@ -357,26 +348,24 @@ struct DrumPlayerPlus : Module {
 						if (currSampleWeight[i] == 0.0) {
 							resampled[i] = playBuffer[i][floor(samplePos[i])];
 						} else {
-							if (floor(samplePos[i]) > 0 && floor(samplePos[i]) < totalSampleC[i] - 2) {
-								resampled[i] = CubicInterpolate(playBuffer[i][floor(samplePos[i])-1],
+							if (floor(samplePos[i]) > 1 && floor(samplePos[i]) < totalSampleC[i] - 2) {
+								/*
+								resampled[i] = cubicInterpolate(playBuffer[i][floor(samplePos[i])-1],
 																playBuffer[i][floor(samplePos[i])],
 																playBuffer[i][floor(samplePos[i])+1],
 																playBuffer[i][floor(samplePos[i])+2],
 																currSampleWeight[i]);
+								*/
 								/*
-								resampled[i] = CosineInterpolate(playBuffer[i][floor(samplePos[i])],
+								resampled[i] = cosineInterpolate(playBuffer[i][floor(samplePos[i])],
 																playBuffer[i][floor(samplePos[i])+1],
 																currSampleWeight[i]);
 								*/
-								/*
-								resampled[i] = HermiteInterpolate(playBuffer[i][floor(samplePos[i])-1],
-																playBuffer[i][floor(samplePos[i])],
-																playBuffer[i][floor(samplePos[i])+1],
-																playBuffer[i][floor(samplePos[i])+2],
-																currSampleWeight[i],
-																1,  // tension: 1 is high, 0 normal, -1 is low
-																1);	// bias:0 is even, positive is towards first segment, negative towards the other
-								*/
+								resampled[i] = hermiteInterpolate(playBuffer[i][floor(samplePos[i])-1],
+														playBuffer[i][floor(samplePos[i])],
+														playBuffer[i][floor(samplePos[i])+1],
+														playBuffer[i][floor(samplePos[i])+2],
+														currSampleWeight[i]);
 							} else {
 								resampled[i] = playBuffer[i][floor(samplePos[i])];
 							}
@@ -678,7 +667,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 				}
 			};
 
-			std::string modeNames[4] = {"No interpolation", "Interpolate 1", "Interpolate 2", "Cubic"};
+			std::string modeNames[4] = {"No interpolation", "Interpolate 1", "Interpolate 2", "Hermite"};
 			for (int i = 0; i < 4; i++) {
 				ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
 				modeItem->rightText = CHECKMARK(module->resamplingMode == i);
