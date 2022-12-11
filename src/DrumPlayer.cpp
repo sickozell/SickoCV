@@ -525,7 +525,7 @@ struct DrumPlayerWidget : ModuleWidget {
 				}
 			};
 
-			std::string modeNames[4] = {"No interpolation", "Interpolate 1", "Interpolate 2", "Hermite"};
+			std::string modeNames[4] = {"No interpolation", "Linear 1", "Linear 2", "Hermite"};
 			for (int i = 0; i < 4; i++) {
 				ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
 				modeItem->rightText = CHECKMARK(module->resamplingMode == i);
