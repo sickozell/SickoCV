@@ -242,32 +242,6 @@ struct DrumPlayerPlus : Module {
 		totalSampleC[slot] = 0;
 	}
 
-	/*	
-	double cubicInterpolate(double y0, double y1, double y2, double y3, double mu) {
-		double a0,a1,a2,a3,mu2;
-		mu2 = mu*mu;
-		a0 = y3 - y2 - y0 + y1;
-		a1 = y0 - y1 - a0;
-		a2 = y2 - y0;
-		a3 = y1;
-		return(a0*mu*mu2+a1*mu2+a2*mu+a3);
-	}
-
-	double cosineInterpolate(double y1, double y2, double mu) {
-		double mu2;
-		mu2 = (1-cos(mu*M_PI))/2;
-		return(y1*(1-mu2)+y2*mu2);
-	}
-	*/
-
-	double hermiteInterpolate(double x0, double x1, double x2, double x3, double t) {
-		double c0 = x1;
-		double c1 = .5F * (x2 - x0);
-		double c2 = x0 - (2.5F * x1) + (2 * x2) - (.5F * x3);
-		double c3 = (.5F * (x3 - x0)) + (1.5F * (x1 - x2));
-		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
-	}
-
 	void process(const ProcessArgs &args) override {
 		summedOutput = 0;
 		for (int i=0;i<4;i++){
@@ -349,23 +323,10 @@ struct DrumPlayerPlus : Module {
 							resampled[i] = playBuffer[i][floor(samplePos[i])];
 						} else {
 							if (floor(samplePos[i]) > 1 && floor(samplePos[i]) < totalSampleC[i] - 2) {
-								/*
-								resampled[i] = cubicInterpolate(playBuffer[i][floor(samplePos[i])-1],
-																playBuffer[i][floor(samplePos[i])],
-																playBuffer[i][floor(samplePos[i])+1],
-																playBuffer[i][floor(samplePos[i])+2],
-																currSampleWeight[i]);
-								*/
-								/*
-								resampled[i] = cosineInterpolate(playBuffer[i][floor(samplePos[i])],
-																playBuffer[i][floor(samplePos[i])+1],
-																currSampleWeight[i]);
-								*/
-								resampled[i] = hermiteInterpolate(playBuffer[i][floor(samplePos[i])-1],
-														playBuffer[i][floor(samplePos[i])],
-														playBuffer[i][floor(samplePos[i])+1],
-														playBuffer[i][floor(samplePos[i])+2],
-														currSampleWeight[i]);
+								double a1 = .5F * (playBuffer[i][floor(samplePos[i])+1] - playBuffer[i][floor(samplePos[i])-1]);
+								double a2 = playBuffer[i][floor(samplePos[i])-1] - (2.5F * playBuffer[i][floor(samplePos[i])]) + (2 * playBuffer[i][floor(samplePos[i])+1]) - (.5F * playBuffer[i][floor(samplePos[i])+2]);
+								double a3 = (.5F * (playBuffer[i][floor(samplePos[i])+2] - playBuffer[i][floor(samplePos[i])-1])) + (1.5F * (playBuffer[i][floor(samplePos[i])] - playBuffer[i][floor(samplePos[i])+1]));
+								resampled[i]= (((((a3 * currSampleWeight[i]) + a2) * currSampleWeight[i]) + a1) * currSampleWeight[i]) + playBuffer[i][floor(samplePos[i])];
 							} else {
 								resampled[i] = playBuffer[i][floor(samplePos[i])];
 							}
