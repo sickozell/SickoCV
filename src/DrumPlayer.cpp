@@ -290,7 +290,7 @@ struct DrumPlayer : Module {
 								double a1 = .5F * (playBuffer[i][floor(samplePos[i])+1] - playBuffer[i][floor(samplePos[i])-1]);
 								double a2 = playBuffer[i][floor(samplePos[i])-1] - (2.5F * playBuffer[i][floor(samplePos[i])]) + (2 * playBuffer[i][floor(samplePos[i])+1]) - (.5F * playBuffer[i][floor(samplePos[i])+2]);
 								double a3 = (.5F * (playBuffer[i][floor(samplePos[i])+2] - playBuffer[i][floor(samplePos[i])-1])) + (1.5F * (playBuffer[i][floor(samplePos[i])] - playBuffer[i][floor(samplePos[i])+1]));
-								resampled[i]= (((((a3 * currSampleWeight[i]) + a2) * currSampleWeight[i]) + a1) * currSampleWeight[i]) + playBuffer[i][floor(samplePos[i])];
+								resampled[i] = (((((a3 * currSampleWeight[i]) + a2) * currSampleWeight[i]) + a1) * currSampleWeight[i]) + playBuffer[i][floor(samplePos[i])];
 							} else {
 								resampled[i] = playBuffer[i][floor(samplePos[i])];
 							}
