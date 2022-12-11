@@ -206,13 +206,15 @@ Playing speed can be set by SPD knob from 1 to 200% and modulated with its atten
 If CHOKE switch is on when TRIG occurs, the playback of next slot will be stopped: it's commonly used to simulate a closed/open hihat.  
 LIM switch is a hard clipping limiter to -5v/+5v on the output.  
 If OUT is not connected, the audio signal will be added to the next OUT. In this way you can connect only the last OUT to have a master output, or you can skip some OUTs to mix only desired slots.  
+##### Context menu
+In the context menu there is an option to disable "Normalled OUTs", then only the connected OUTs will output the relative slot sample.  
 
-In the context menu, there are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
+There are also 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
 - 'No interpolation' can be used when sample rates match and speed is 100% constant.
 - 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages
-- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default).
+- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default).  
 
-Note that no anti-aliasing filter is present, so best audio quality results can be achieved matching samples/VCV samplerates and limiting speed variations.  
+At the moment no anti-aliasing filter is present, so best audio quality results can be achieved matching samples/VCV samplerates and limiting speed variations.  
 
 ##### DrumPlayer
 This version it's almost the same of the Plus one, but it hasn't the sample names display and it can't be external modulated.
