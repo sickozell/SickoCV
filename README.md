@@ -168,9 +168,9 @@ Connect the ACC input to the module which generates the accents, it can be the s
 When ACC is triggered at the same time as the TRIG input, Drummer module will output the Accent Level set by "Accent Level knob" instead of the one set by "Standard Level Knob".  
 Input triggers threshold is +1v.  
 Each knob range is from 0 to 200% of the incoming IN level.  
-LIMIT switch limits the output from -5v/+5v.  
+LIMIT switch hard clips the output in the range -5v/+5v.  
 CHOKE switch mutes one output when the other is triggered (for example when used with open/closed hihat sounds).  
-OUT outputs are normalled, so if both outputs are connected, audio is routed separately, otherwise the two inputs are mixed in the only connected output.  
+If 1 OUT is not connected, the audio signal will be mixed with the other one connected.  
 NOTE: In CHOKE mode, if both TRIG inputs are triggered at the same time, the upper section (#1) will have the priority and the lower one will be ignored.
 
 Example of Drummer module usage:
@@ -185,7 +185,7 @@ Example of Drummer module usage:
 
 #### - Usage:
 This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, there is no choking feature.  
-Outputs are normalled to the next ones. For example if you connect only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if you connect only out #4, this socket will output all the channels.
+If OUT is not connected, the audio signal will be added to the next OUT. For example if you connect only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if you connect only out #4, this socket will output all the channels.
 
 Example of Drummer4 module usage:
 
@@ -197,6 +197,27 @@ Example of Drummer4 module usage:
 
 ![drumplayer](https://user-images.githubusercontent.com/80784296/206871272-e62df892-03fa-49d2-9197-310b219198a3.JPG)
 
+#### Usage:  
+##### DrumPlayer+  
+Load wav samples in the slots using context menu.  
+When TRIG input is triggered the sample will be played at the volume percentage set by to "Standard Level" knob + its relative attenuverted CVinput.  
+If ACCENT input is HIGH when TRIG occurs, the sample will be played at "Accent Level" knob + its attenuverted CVinput.  
+Playing speed can be set by SPD knob from 1 to 200% and modulated with its attenuverted CVinput. Speed can be modified during sample playback.  
+If CHOKE switch is on when TRIG occurs, the playback of next slot will be stopped: it's commonly used to simulate a closed/open hihat.  
+LIM switch is a hard clipping limiter to -5v/+5v on the output.  
+If OUT is not connected, the audio signal will be added to the next OUT. In this way you can connect only the last OUT to have a master output, or you can skip some OUTs to mix only desired slots.  
+
+In the context menu, there are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
+- 'No interpolation' can be used when sample rates match and speed is 100% constant.
+- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages
+- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default).
+
+Note that no anti-aliasing filter is present, so best audio quality results can be achieved matching samples/VCV samplerates and limiting speed variations.  
+
+##### DrumPlayer
+This version it's almost the same of the Plus one, but it hasn't the sample names display and it can't be external modulated.
+
+NOTE: input trigger threshold is +1v.  
 
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
