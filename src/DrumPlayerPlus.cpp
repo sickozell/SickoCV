@@ -79,7 +79,7 @@ struct DrumPlayerPlus : Module {
 
 	int resamplingMode = 3;
 
-	bool clearSlots = false;
+	//bool clearSlots = false;
 
 	bool normalledOuts = true;
 
@@ -178,7 +178,7 @@ struct DrumPlayerPlus : Module {
 
 		json_t* normalledOutsJ = json_object_get(rootJ, "NormalledOuts");
 		if (normalledOutsJ)
-			normalledOuts = json_integer_value(normalledOutsJ);
+			normalledOuts = json_boolean_value(normalledOutsJ);
 
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
