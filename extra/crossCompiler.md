@@ -1,5 +1,5 @@
 git tag v2.5.1-beta10 -m "create v2.5.1-beta10"  
-push origin --tags
+git push origin --tags
 
 
 ### How to build a VCVRack plugin with Github Action
