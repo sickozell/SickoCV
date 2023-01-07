@@ -29,4 +29,5 @@ void init(Plugin* p) {
 	p->addModel(modelShifter);
 	p->addModel(modelDrumPlayer);
 	p->addModel(modelDrumPlayerPlus);
+	p->addModel(modelSickoPlayer);
 }
