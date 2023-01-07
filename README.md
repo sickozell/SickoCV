@@ -383,6 +383,7 @@ These behaviors are more understandable connecting a scope on the output.
 
 ## Credits
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
-Thanks to Squinky and FiroLFO for help and testing  
+
+Thanks to [squinkylabs](https://github.com/squinkylabs) and [András Szabó](https://github.com/firolightfog) for help and testing  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
 
