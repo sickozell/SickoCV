@@ -218,7 +218,7 @@ Example of Drummer module usage:
 ![drummer4](https://user-images.githubusercontent.com/80784296/201516839-54364ebe-d3cc-4a4e-9c32-d85e2ec2653b.JPG)
 
 #### - Usage:
-This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, there is no choking feature.  
+This module is almost the same of the previous one. It supports up to 4 channel.  
 If OUT is not connected, the audio signal will be added to the next OUT. For example if you connect only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if you connect only out #4, this socket will output all the channels.
 
 Example of Drummer4 module usage:
@@ -232,26 +232,34 @@ Example of Drummer4 module usage:
 ![drumplayer](https://user-images.githubusercontent.com/80784296/206871272-e62df892-03fa-49d2-9197-310b219198a3.JPG)
 
 #### Usage:  
-##### DrumPlayer+  
 Load wav samples in the slots using context menu.  
 When TRIG input is triggered the sample will be played at the volume percentage set by to "Standard Level" knob + its relative attenuverted CVinput.  
 If ACCENT input is HIGH when TRIG occurs, the sample will be played at "Accent Level" knob + its attenuverted CVinput.  
 Playing speed can be set by SPD knob from 1 to 200% and modulated with its attenuverted CVinput. Speed can be modified during sample playback.  
-If CHOKE switch is on when TRIG occurs, the playback of next slot will be stopped: it's commonly used to simulate a closed/open hihat.  
+External modulation is allowed only on drumPlayer+  
+If CHOKE switch is on when TRIG occurs, the playback of next slot is stopped with a 1ms fade out: it's commonly used to simulate a closed/open hihat.  
 LIM switch is a hard clipping limiter to -5v/+5v on the output.  
-If OUT is not connected, the audio signal will be added to the next OUT. In this way you can connect only the last OUT to have a master output, or you can skip some OUTs to mix only desired slots.  
+
 ##### Context menu
-In the context menu there is an option to disable "Normalled OUTs", then only the connected OUTs will output the relative slot sample.  
+**Sample Slots:**  
+Click on the slot number to open dialog.  
+When the sample is loaded the green led on the panel is turned on (drumPlayer), or the small 7segment display will show the first 5 chars of the filename (drumPlayer+).  
+Use Clear options to unload samples from slots.  
+Just right-click over the led areas or the displays to access the quick-load menus.  
 
-There are also 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
-- 'No interpolation' can be used when sample rates match and speed is 100% constant.
-- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages
-- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default).  
+**Interpolation**  
+There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
+- 'No interpolation' can be used when sample rates match and speed is 100% constant  
+- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages  
+- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default)  
 
-At the moment no anti-aliasing filter is present, so best audio quality results can be achieved matching samples/VCV samplerates and limiting speed variations.  
+**Anti-aliasing filter**  
+Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
-##### DrumPlayer
-This version it's almost the same of the Plus one, but it hasn't the sample names display and it can't be external modulated.
+**Outs mode**
+Normalled (default): if one slot out is not connected, its output will be added to the next slot  
+Solo: every slot has its own out socket  
+Unconnected on Out 4: Every unconnected out is routed to out n.4
 
 NOTE: input trigger threshold is +1v.  
 
@@ -281,6 +289,70 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 
 ![shifter example](https://user-images.githubusercontent.com/80784296/204090187-9ebec50d-65cf-4ae4-9310-0db271a24d32.JPG)
 [Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
+
+## SickoPlayer
+### wav sample player
+#### - Description:
+- samples and 1-cycle waveforms player
+- +/- 24 semitones tuning and v/oct input with polyphony
+- envelope generator, loop, phase-scan feature
+- different interpolation modes, anti-aliasing filter
+
+#### - Usage:
+Load sample using context menu or right-click in the waveform display area to access quick load menu.  
+
+The display shows the waveform, filename, sample rate and number of channels (1-2 channels wav file are allowed).  
+
+Mode switch allows to select if sample playback starts with a trigger or until a gate is high.  
+When in Trig Mode the Trig-Mode switch has 3 options:  
+**SS (Start/Stop)** A trigger starts attack stage from CueStart postition, another trigger sets playback to release stage and at the end sample position is reset to cue start  
+**S (Start only)** A trigger starts attack stage from CueStart position, another trigger has no effects  
+**PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage  
+In any Trig-Mode a trigger on STOP input sets the playback to release stage and reset sample position to Cue Start  
+
+Cue Start/End knobs are used to set the start of the Attack and the Release stage if before no stop triggers occur before.  
+When Loop button is switched on, Loop Start/end knobs become active and affect playback with expected behavior.  
+
+The envelope generator knobs can be external modulated with attenuverters.  
+
+Tune knob with its attenuverted CVinput, can tune up or down the sample with a +/- 2 octave range (semitone scale).  
+v/oct input accepts polyphonic cable usually combined with a polyphonic gate in, when in Gate Mode.  
+
+Master knob with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a +/- 5v range.  
+
+If sample file is mono, left out is duplicated to right out.  
+EOC outputs a 1ms pulse when sample reach the CueEnd position or LoopEnd when Loop is enabled.
+EOR outputs a 1ms pulse when sample reach the end of release stage.
+
+NOTE: input trigger threshold is +1v.  
+
+##### Context menu
+**Sample Slot:**  
+Click on "Load Sample" to open dialog. Use Clear options to unload sample from slot.  
+As described before, just right-click over the waveform display area to access the quick-load menu.  
+
+**Interpolation**  
+There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
+- 'No interpolation' can be used when sample rates match and speed is 100% constant  
+- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages  
+- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default)  
+
+**Anti-aliasing filter**  
+Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
+
+**Crossfade length**  
+Crossfade can be set from 0 to 50ms and is engaged when the sample skips from LoopEnd to LoopStart or from CueEnd to CueStart when in Gate Mode.  
+
+**Polyphonic Outs**
+When this option is enabled the outs reflects v/oct input polyphony. Otherwise polyphonic outputs are mixed in monophonic outs  
+
+**Phase scan**
+This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.
+Be sure to disable it when using 1-cycle waveforms.  
+
+##### Presets
+There are some factory presets stored in the context menu.  
+Loading a factory preset automatically clears the sample from memory, pay attention.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
@@ -382,4 +454,5 @@ These behaviors are more understandable connecting a scope on the output.
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 Thanks to Squinky and FiroLFO for help and testing  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
+
 
