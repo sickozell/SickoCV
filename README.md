@@ -38,7 +38,7 @@ Accent and choke utility for drum modules lacking these features
 # SickoCV v2.5.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/211176193-016d2610-1b00-460e-a06a-c9a07a82e38a.JPG)
+![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/211221875-2bf678bd-1b52-467e-b615-cc628182a283.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -86,7 +86,7 @@ If a CV input is connected for modulation, CV sets the mix percentage and the MI
 - Buffered Toggled ASR envelope generator
 - Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 
-![btoggler](https://user-images.githubusercontent.com/80784296/201516786-81b923a6-4d9d-4c6f-8c1c-74e43f9e7e9c.JPG)
+![btoggler](https://user-images.githubusercontent.com/80784296/211221913-2ac04d94-b80b-4222-a02b-2719e0fb4d38.JPG)
 
 #### - USAGE
 Connect a clock source.
@@ -99,7 +99,7 @@ If ARM is triggered again before clock detection it will abort arming (unarm).
 
 Attack, Sustain and Release knobs set the envelope of the routed signals.
 
-A, S, R CVinputs are added to respective knob values.
+A, S, R CVinputs are added to respective knob values, bToggler module has attenuverters.
 
 If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
@@ -428,7 +428,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - Toggled ASR envelope generator
 - mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
 
-![toggler](https://user-images.githubusercontent.com/80784296/201516866-3ca90766-503c-435d-a560-ba0f5c02deff.JPG)
+![toggler](https://user-images.githubusercontent.com/80784296/211222030-1a5b4e86-eccd-4e4f-ae56-65efd100e336.JPG)
 
 #### - USAGE
 **TOGGLE MODE**
@@ -437,7 +437,7 @@ On receiving a trigger on TRIG input, it will send the L+(R) inputs to L+(R) out
 
 Attack, Sustain and Release knobs set the envelope of the routed signal.
 
-A, S, R CVinputs are added to respective knob values.
+A, S, R CVinputs are added to respective knob values, Toggler module has attenuverters.
 
 If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
