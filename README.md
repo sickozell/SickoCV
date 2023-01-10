@@ -1,4 +1,4 @@
-# SickoCV v2.5.1-beta10
+# SickoCV v2.5.1-beta11
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -31,6 +31,11 @@ Accent and choke utility for drum modules lacking these features
 - added choke functionality and changed panel
 - code optimization  
 
+### Blender
+Stereo crossfade mixer with double modulation  
+- added input attenuators
+- changed artwork panel
+
 ## **to do list:** 
 - nothing in queue
 
@@ -38,7 +43,7 @@ Accent and choke utility for drum modules lacking these features
 # SickoCV v2.5.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/211221875-2bf678bd-1b52-467e-b615-cc628182a283.JPG)
+![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/211660913-8dc939e3-2c59-45b3-937b-3a8f5fe69df5.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -49,20 +54,22 @@ Mix can be modulated by uni/bipolar signals.
 Modulation can be further modulated by another signal.  
 Audio rate modulations are allowed.
 
-![blender](https://user-images.githubusercontent.com/80784296/201516763-00c7192d-f881-4b14-9c23-68c8be2a90d3.JPG)
+![blender](https://user-images.githubusercontent.com/80784296/211660967-ce9aa25d-cc8f-45a9-beae-3381a13cf0af.JPG)
 
 #### - USAGE
 Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used.  
 PHASE switches invert the sign of input signals.  
-MIX knob sets the crossfade level of the inputs.
+MIX knob sets the crossfade level of the inputs.  
+Inputs volume can be adjusted via two attenuators.  
+Master volume can be amplified up to 200%, a hard clip ±5v switch is present.
 
-**MIX MOD section**  
+**MOD section**  
 Connecting MIX MOD CV input enables mix modulation. ATNV knob attenuverts CV input.  
 CV input range is usually unipolar 0-10v. RNG switch in 'bipolar' position adds +5v to CV input, so audio signals can be used for modulation.    
 Modulation is added to the MIX knob.
 
-**ATNV MD section**  
-ATNV MD can be used to add modulation to the ATNV knob in MIXMOD section, the rules are the same.
+**MOD2 section**  
+MOD2 can be used to add modulation to the MOD attenuverter knob in MOD section, the rules are the same.
 
 ## Blender8
 ### 8 single crossfade mixers with modulation
@@ -190,7 +197,7 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 #### - USAGE
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
-U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or -5/+5v.
+U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 
 ## Drummer
 ### Accent and choke utility for drum modules lacking these features
@@ -207,7 +214,7 @@ When ACC is triggered at the same time as the TRIG input, Drummer module will ou
 
 Input triggers threshold is +1v.  
 Each knob range is from 0 to 200% of the incoming IN level.  
-LIMIT switch hard clips the output in the range -5v/+5v.  
+LIMIT switch hard clips the output in the range ±5v.  
 When CHOKE switch is on and a trigger occurs, the other slot (Drummer) or the next slot (Drummer4) is muted (for example when used with closed/open hihat sounds).  
 
 - **Drummer note:**  
@@ -242,7 +249,7 @@ Playing speed can be set by SPD knob from 1 to 200% and modulated with its atten
 External modulation is allowed only on drumPlayer+  
 
 If CHOKE switch is on when TRIG occurs, the playback of next slot is stopped with a 1ms fade out: it's commonly used to simulate a closed/open hihat.  
-LIM switch is a hard clipping limiter to -5v/+5v on the output.  
+LIM switch is a hard clipping limiter to ±5v on the output.  
 
 #### CONTEXT MENU
 **Sample Slots**  
@@ -301,7 +308,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 
 #### - DESCRIPTION
 - samples and 1-cycle waveforms player
-- +/- 24 semitones tuning and v/oct input with polyphony
+- ±24 semitones tuning and v/oct input with polyphony
 - envelope generator, loop, phase-scan feature
 - different interpolation modes, anti-aliasing filter
 
@@ -324,10 +331,10 @@ When Loop button is switched on, Loop Start/end knobs become active and affect p
 
 The envelope generator knobs can be external modulated with attenuverters.  
 
-Tune knob with its attenuverted CVinput, can tune up or down the sample with a +/- 2 octave range (semitone scale).  
+Tune knob with its attenuverted CVinput, can tune up or down the sample with a ±2 octave range (semitone scale).  
 v/oct input accepts polyphonic cable usually combined with a polyphonic gate in, when in Gate Mode.  
 
-Master knob with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a +/- 5v range.  
+Master knob with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range.  
 
 If sample file is mono, left out is duplicated to right out.  
 EOC outputs a 1ms pulse when sample reach the CueEnd position or LoopEnd when Loop is enabled.
@@ -353,7 +360,7 @@ Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.
 Crossfade can be set from 0 to 50ms and is engaged when the sample skips from LoopEnd to LoopStart or from CueEnd to CueStart when in Gate Mode.  
 
 **Polyphonic Outs**  
-When this option is enabled the outs reflects v/oct input polyphony. Otherwise polyphonic outputs are mixed in monophonic outs-  
+When this option is enabled the outs reflects v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out  
 
 **Phase scan**  
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
