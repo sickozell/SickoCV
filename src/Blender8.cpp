@@ -90,29 +90,26 @@ struct Blender8 : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		for (int i=0; i<8;i++){
-			if (outputs[OUT_OUTPUT+i].isConnected()){
-				if (inputs[MODMIXCV_INPUT+i].isConnected()){
-					if (params[RANGEMODMIX_SWITCH+i].getValue() == 1) {
+		for (int i=0; i<8; i++) {
+			if (outputs[OUT_OUTPUT+i].isConnected()) {
+				if (inputs[MODMIXCV_INPUT+i].isConnected()) {
+					if (params[RANGEMODMIX_SWITCH+i].getValue() == 1)
 						mix = params[MIX_PARAMS+i].getValue() * inputs[MODMIXCV_INPUT+i].getVoltage() / 10;
-					} else {
+					else
 						mix = params[MIX_PARAMS+i].getValue() * (inputs[MODMIXCV_INPUT+i].getVoltage() + 5) / 10;
-					}
-					if (mix > 1) {
-					mix = 1;
-					} else if (mix < 0) {
+					if (mix > 1)
+						mix = 1;
+					else if (mix < 0) {
 						mix = -mix;
-						if (mix < -1) {
+						if (mix < -1)
 							mix = -1;
-						}
 					}
 				} else {
 					mix = (params[MIX_PARAMS+i].getValue() + 1)/2;
 				}
 				input2 = inputs[IN2_INPUT+i].getVoltage();
-				if (params[PHASE_SWITCH+i].getValue() == 1){
+				if (params[PHASE_SWITCH+i].getValue() == 1)
 					input2 = -input2;
-				}
 				mixedOut = (inputs[IN1_INPUT+i].getVoltage() * (1 - mix)) + (input2 * mix);
 			} else {
 				mixedOut = 0;
@@ -134,7 +131,7 @@ struct Blender8Widget : ModuleWidget {
 
 		float y = 13;
 		float ys = 22;
-		for (int i=0;i<8;i++) {
+		for (int i=0; i<8; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.7, ys+(i*y))), module, Blender8::IN1_INPUT+i));
 			
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.1, ys+(i*y))), module, Blender8::IN2_INPUT+i));

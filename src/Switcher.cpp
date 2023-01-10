@@ -107,7 +107,7 @@ struct Switcher : Module {
 
 	void process(const ProcessArgs& args) override {
 		trigConnection = inputs[TRIG_INPUT].isConnected();
-		if (!trigConnection){
+		if (!trigConnection) {
 			if (prevTrigConnection) {
 				outputs[OUT1_OUTPUT].setVoltage(0);
 				outputs[OUT2_OUTPUT].setVoltage(0);
@@ -123,18 +123,14 @@ struct Switcher : Module {
 			fadeValue = params[FADE_PARAMS].getValue() + inputs[FADECV_INPUT].getVoltage();
 
 			connection = 0;
-			if (inputs[IN1_INPUT].isConnected()){
+			if (inputs[IN1_INPUT].isConnected())
 				connection = 1;
-			}
-			if (inputs[IN2_INPUT].isConnected()){
+			if (inputs[IN2_INPUT].isConnected())
 				connection += 2;
-			}
-			if (outputs[OUT1_OUTPUT].isConnected()){
+			if (outputs[OUT1_OUTPUT].isConnected())
 				connection += 4;
-			}
-			if (outputs[OUT2_OUTPUT].isConnected()){
+			if (outputs[OUT2_OUTPUT].isConnected())
 				connection += 8;
-			}
 			if (connection != prevConnection) {
 				connectionChange = true;
 				prevConnection = connection;
@@ -168,11 +164,11 @@ struct Switcher : Module {
 			switch (mode) {
 				// ************************************** GATE MODE **********
 				case 0:
-					if (trigValue >= 1 && prevTrigValue < 1){
+					if (trigValue >= 1 && prevTrigValue < 1) {
 						currentSwitch = true;
 						connectionChange = true;
 						trigState = true;
-					} else if (trigValue < 1 && prevTrigValue >= 1){
+					} else if (trigValue < 1 && prevTrigValue >= 1) {
 						currentSwitch = false;
 						connectionChange = true;
 						trigState = true;
@@ -180,7 +176,7 @@ struct Switcher : Module {
 					prevTrigValue = trigValue;
 
 					if (trigState) {
-						if (fadeValue != 0){
+						if (fadeValue != 0) {
 							if (fading) {
 								startFade = 1-lastFade;
 							} else {
@@ -194,17 +190,17 @@ struct Switcher : Module {
 				break;
 				// ************************************** TRIG MODE **********
 				case 1:
-					if (trigValue >= 1 && prevTrigValue < 1){
+					if (trigValue >= 1 && prevTrigValue < 1)
 						trigState = true;
-					} else {
+					else
 						trigState = false;
-					}
+
 					prevTrigValue = trigValue;
 
 					if (trigState) {
 						currentSwitch = !currentSwitch;
 						connectionChange = true;
-						if (fadeValue != 0){
+						if (fadeValue != 0) {
 							if (fading) {
 								startFade = 1-lastFade;
 							} else {
@@ -219,7 +215,7 @@ struct Switcher : Module {
 
 			switch (connection) {
 				case 4: 										// OUT1 = 4
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -240,11 +236,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -293,7 +289,7 @@ struct Switcher : Module {
 				break;
 				
 				case 8:											// OUT2 = 8
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -314,11 +310,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -367,7 +363,7 @@ struct Switcher : Module {
 				break;
 
 				case 12: 										// OUT1 + OUT2 = 12
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -388,11 +384,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -445,7 +441,7 @@ struct Switcher : Module {
 				break;
 
 				case 5:											// IN1 + OUT1 = 5
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -466,11 +462,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -519,7 +515,7 @@ struct Switcher : Module {
 				break;
 				
 				case 10:											// IN2 + OUT2 = 10
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -540,11 +536,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -593,7 +589,7 @@ struct Switcher : Module {
 				break;
 
 				case 9:											// IN1 + OUT2 = 9
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -614,11 +610,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -667,7 +663,7 @@ struct Switcher : Module {
 				break;
 
 				case 6:											// IN2 + OUT1 = 6
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -688,11 +684,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -741,7 +737,7 @@ struct Switcher : Module {
 				break;
 
 				case 7:													// IN1 + IN2 + OUT1 = 7
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -762,11 +758,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -815,7 +811,7 @@ struct Switcher : Module {
 				break;
 
 				case 11:												// IN1 + IN2 + OUT2 = 11
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -836,11 +832,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -889,7 +885,7 @@ struct Switcher : Module {
 				break;
 
 				case 13:											// IN1 + OUT1 + OUT2 = 13
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -910,11 +906,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -967,7 +963,7 @@ struct Switcher : Module {
 				break;
 
 				case 14:										// IN2 + OUT1 + OUT2 = 14
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -988,11 +984,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 
@@ -1045,7 +1041,7 @@ struct Switcher : Module {
 				break;
 
 				case 15:						// IN1 + IN2 + OUT1 + OUT2 = 15
-					if (inputs[RST_INPUT].isConnected()){
+					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
 							if (currentSwitch) {
@@ -1066,11 +1062,11 @@ struct Switcher : Module {
 					}
 
 					if (fading) {
-						if (fadeValue > 10) {
+						if (fadeValue > 10)
 							fadeValue = 10;
-						} else 	if (fadeValue < 0) {
+						else if (fadeValue < 0)
 							fadeValue = 0;
-						}
+
 						maxFadeSample = args.sampleRate * fadeValue;
 						lastFade = (currentFadeSample / maxFadeSample) + startFade;
 

@@ -25,14 +25,14 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.8284271"
-     inkscape:cx="16.263456"
-     inkscape:cy="130.81476"
+     inkscape:cx="10.783379"
+     inkscape:cy="329.15821"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="-8"
+     inkscape:window-x="1272"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer7"
+     inkscape:current-layer="g15193"
      showguides="true" />
   <defs
      id="defs2">
@@ -325,7 +325,7 @@
   <g
      inkscape:groupmode="layer"
      id="g15193"
-     inkscape:label="Etichette Path copy"
+     inkscape:label="Etichette Path nere"
      style="display:inline;fill:#000000"
      transform="translate(0.30033341,0.39981859)">
     <g
@@ -836,10 +836,4 @@
          id="path23739" />
     </g>
   </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="components"
-     style="display:inline"
-     sodipodi:insensitive="true" />
 </svg>

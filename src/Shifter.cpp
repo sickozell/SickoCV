@@ -63,7 +63,7 @@ struct Shifter : Module {
 	void onReset(const ResetEvent &e) override {
 		initStart = false;
 		currentStep = 1;
-		for (int i=0;i<65;i++)
+		for (int i=0; i<65; i++)
 			registerValue[i] = 0.f;
 	    Module::onReset(e);
 	}
@@ -79,7 +79,7 @@ struct Shifter : Module {
 		json_object_set_new(rootJ, "CurrentStep", json_integer(currentStep));
 		
 		json_t *registerJ = json_array();
-		for (int i=0;i<65;i++)
+		for (int i=0; i<65; i++)
 			json_array_insert_new(registerJ, i, json_real(registerValue[i]));
 		json_object_set_new(rootJ, "Register", registerJ);
 		return rootJ;
@@ -97,7 +97,7 @@ struct Shifter : Module {
 
 			json_t *registerJ = json_object_get(rootJ, "Register");
 			if (registerJ)
-				for (int i=0;i<65;i++) {
+				for (int i=0; i<65; i++) {
 					json_t *registerArrayJ = json_array_get(registerJ, i);
 					if (registerArrayJ)
 						registerValue[i] = json_number_value(registerArrayJ);
@@ -153,7 +153,7 @@ struct Shifter : Module {
 					
 					currentStep++;
 					
-					if (currentStep > regLength )
+					if (currentStep > regLength)
 						currentStep = 1;
 
 				} else {

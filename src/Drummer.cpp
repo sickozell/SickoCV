@@ -40,7 +40,7 @@ struct Drummer : Module {
 	Drummer() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(CHOKE_SWITCH, 0.f, 1.f, 0.f, "Mode", {"Off", "On"});
-		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "5v"});
+		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "±5v"});
 		configParam(ACCENT_PARAMS, 0.f, 2.f, 1.f, "Accent Level #1", "%", 0, 100);
 		configParam(ACCENT_PARAMS+1, 0.f, 2.f, 1.f, "Accent Level #2", "%", 0, 100);
 		configParam(NOACCENT_PARAMS, 0.f, 2.f, 1.f, "Standard Level #1", "%", 0, 100);
@@ -71,7 +71,7 @@ struct Drummer : Module {
 		switch (chokeMode) {
 			case 0:
 				trigValue[0] = inputs[TRIG_INPUT].getVoltage();
-				if (trigValue[0] >= 1 && prevTrigValue[0] < 1){
+				if (trigValue[0] >= 1 && prevTrigValue[0] < 1) {
 					if (inputs[ACCENT_INPUT].getVoltage() >= 1)
 						sustain[0] = params[ACCENT_PARAMS].getValue();
 					else
@@ -81,7 +81,7 @@ struct Drummer : Module {
 				out[0] = inputs[IN_INPUT].getVoltage() * sustain[0];
 
 				trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
-				if (trigValue[1] >= 1 && prevTrigValue[1] < 1){
+				if (trigValue[1] >= 1 && prevTrigValue[1] < 1) {
 					if (inputs[ACCENT_INPUT+1].getVoltage() >= 1)
 						sustain[1] = params[ACCENT_PARAMS+1].getValue();
 					else
@@ -93,7 +93,7 @@ struct Drummer : Module {
 
 			case 1:
 				trigValue[0] = inputs[TRIG_INPUT].getVoltage();
-				if (trigValue[0] >= 1 && prevTrigValue[0] < 1){
+				if (trigValue[0] >= 1 && prevTrigValue[0] < 1) {
 					choking[0] = true;
 					trigState[0] = true;
 					currentFade[0] = 1;
@@ -125,7 +125,7 @@ struct Drummer : Module {
 				}
 
 				trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
-				if (trigValue[1] >= 1 && prevTrigValue[1] < 1 && !choking[0]){
+				if (trigValue[1] >= 1 && prevTrigValue[1] < 1 && !choking[0]) {
 					choking[1] = true;
 					trigState[1] = true;
 					currentFade[1] = 1;
@@ -186,7 +186,6 @@ struct Drummer : Module {
 	}
 };
 
-
 struct DrummerWidget : ModuleWidget {
 	DrummerWidget(Drummer* module) {
 		setModule(module);
@@ -218,7 +217,6 @@ struct DrummerWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.5, 117)), module, Drummer::IN_INPUT+1));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(26.5, 117)), module, Drummer::OUT_OUTPUT+1));
 	}
-
 };
 
 Model* modelDrummer = createModel<Drummer, DrummerWidget>("Drummer");

@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.5.1-beta10",
+  "version": "2.5.1-beta11",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -36,7 +36,7 @@
       "tags": [
         "Logic",
         "Envelope generator",
-	"Voltage-controlled amplifier"
+        "Voltage-controlled amplifier"
       ]
     },
     {
@@ -46,7 +46,7 @@
       "tags": [
         "Logic",
         "Envelope generator",
-	"Voltage-controlled amplifier"
+        "Voltage-controlled amplifier"
       ]
     },
     {
@@ -81,7 +81,7 @@
       "tags": [
         "Utility",
         "Drum",
-	"Dual"
+        "Dual"
       ]
     },
     {
@@ -100,7 +100,7 @@
       "description": "Drum Sample Player",
       "tags": [
         "Sampler",
-	"Drum"
+        "Drum"
       ]
     },
     {
@@ -109,7 +109,7 @@
       "description": "Drum Sample Player",
       "tags": [
         "Sampler",
-	"Drum"
+        "Drum"
       ]
     },
     {
@@ -173,7 +173,7 @@
       "tags": [
         "Logic",
         "Envelope generator",
-	"Voltage-controlled amplifier"
+        "Voltage-controlled amplifier"
       ]
     }
   ]

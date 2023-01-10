@@ -217,11 +217,11 @@ struct SickoPlayer : Module {
 
 		//******************************************************************************
 
-		configParam(ATTACK_PARAM, 0.0001f, 10.f, 0.0001f, "Attack", " ms", 0, 1000);
+		configParam(ATTACK_PARAM, 0.0001f, 10.f, 0.0001f, "Attack", "ms", 0, 1000);
 		configInput(ATTACK_INPUT,"Attack CV");
 		configParam(ATTACKATNV_PARAM, -1.0f, 1.0f, 0.0f, "Attack CV Attenuv.");
 
-		configParam(DECAY_PARAM, 0.0001f, 10.f, 0.0001f, "Decay", " ms", 0, 1000);
+		configParam(DECAY_PARAM, 0.0001f, 10.f, 0.0001f, "Decay", "ms", 0, 1000);
 		configInput(DECAY_INPUT,"Decay CV");
 		configParam(DECAYATNV_PARAM, -1.0f, 1.0f, 0.0f, "Decay CV Attenuv.");
 
@@ -229,7 +229,7 @@ struct SickoPlayer : Module {
 		configInput(SUSTAIN_INPUT,"Sustain CV");
 		configParam(SUSTAINATNV_PARAM, -1.0f, 1.0f, 0.0f, "Sustain CV Attenuv.");
 
-		configParam(RELEASE_PARAM, 0.0001f, 10.f, 0.0001f, "Release", " ms", 0, 1000);
+		configParam(RELEASE_PARAM, 0.0001f, 10.f, 0.0001f, "Release", "ms", 0, 1000);
 		configInput(RELEASE_INPUT,"Release CV");
 		configParam(RELEASEATNV_PARAM, -1.0f, 1.0f, 0.0f, "Release CV Attenuv.");
 
@@ -245,7 +245,7 @@ struct SickoPlayer : Module {
 		configInput(VOL_INPUT,"Master Volume CV");
 		configParam(VOLATNV_PARAM, -1.f, 1.0f, 0.f, "Master Volume CV Attenuv.", "%", 0, 100);
 
-		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "5v"});
+		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "±5v"});
 
 		//******************************************************************************
 		

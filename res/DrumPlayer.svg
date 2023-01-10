@@ -25,14 +25,14 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="4.7405504"
-     inkscape:cx="135.32184"
+     inkscape:cx="132.15765"
      inkscape:cy="25.735408"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1272"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer1"
      showguides="true" /><defs
      id="defs2"><rect
        x="22.799086"
@@ -2135,8 +2135,4 @@
          d="m 37.861875,3.3906251 h -0.79375 v 0.396875 h 0.79375 z m 0.396875,-0.396875 v 0.396875 h 0.396875 v 0.79375 h -1.5875 v 0.396875 h 1.190625 v 0.396875 h -1.5875 v -0.396875 h -0.396875 v -1.190625 h 0.396875 v -0.396875 z"
          id="path1883" /><path
          d="m 39.052501,4.9781251 v -1.984375 h 1.984375 v 0.396875 h 0.396875 v 0.396875 h -0.79375 v -0.396875 h -0.79375 v 1.5875 z"
-         id="path1885" /></g></g><g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="components"
-     style="display:none" /></svg>
+         id="path1885" /></g></g></svg>

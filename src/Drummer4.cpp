@@ -42,10 +42,10 @@ struct Drummer4 : Module {
 
 	Drummer4() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configSwitch(LIMIT_PARAMS, 0.f, 1.f, 0.f, "Limit #1", {"Off", "5v"});
-		configSwitch(LIMIT_PARAMS+1, 0.f, 1.f, 0.f, "Limit #2", {"Off", "5v"});
-		configSwitch(LIMIT_PARAMS+2, 0.f, 1.f, 0.f, "Limit #3", {"Off", "5v"});
-		configSwitch(LIMIT_PARAMS+3, 0.f, 1.f, 0.f, "Limit #4", {"Off", "5v"});
+		configSwitch(LIMIT_PARAMS, 0.f, 1.f, 0.f, "Limit #1", {"Off", "±5v"});
+		configSwitch(LIMIT_PARAMS+1, 0.f, 1.f, 0.f, "Limit #2", {"Off", "±5v"});
+		configSwitch(LIMIT_PARAMS+2, 0.f, 1.f, 0.f, "Limit #3", {"Off", "±5v"});
+		configSwitch(LIMIT_PARAMS+3, 0.f, 1.f, 0.f, "Limit #4", {"Off", "±5v"});
 		configSwitch(CHOKE_PARAMS, 0.f, 1.f, 0.f, "Choke #1", {"Off", "On"});
 		configSwitch(CHOKE_PARAMS+1, 0.f, 1.f, 0.f, "Choke #2", {"Off", "On"});
 		configSwitch(CHOKE_PARAMS+2, 0.f, 1.f, 0.f, "Choke #3", {"Off", "On"});
@@ -108,7 +108,7 @@ struct Drummer4 : Module {
 		// --------  SLOT  0  --------
 		if (inputs[TRIG_INPUT].isConnected()) {
 			trigValue[0] = inputs[TRIG_INPUT].getVoltage();
-			if (trigValue[0] >= 1 && prevTrigValue[0] < 1){
+			if (trigValue[0] >= 1 && prevTrigValue[0] < 1) {
 				trigState[0] = true;
 				if (inputs[ACCENT_INPUT].getVoltage() >= 1)
 					sustain[0] = params[ACCENT_PARAMS].getValue();
@@ -130,7 +130,7 @@ struct Drummer4 : Module {
 
 		if (inputs[TRIG_INPUT+1].isConnected()) {
 			trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
-			if (trigValue[1] >= 1 && prevTrigValue[1] < 1){
+			if (trigValue[1] >= 1 && prevTrigValue[1] < 1) {
 				trigState[1] = true;
 				if (inputs[ACCENT_INPUT+1].getVoltage() >= 1)
 					sustain[1] = params[ACCENT_PARAMS+1].getValue();
@@ -151,7 +151,7 @@ struct Drummer4 : Module {
 
 		if (inputs[TRIG_INPUT+2].isConnected()) {
 		trigValue[2] = inputs[TRIG_INPUT+2].getVoltage();
-			if (trigValue[2] >= 1 && prevTrigValue[2] < 1){
+			if (trigValue[2] >= 1 && prevTrigValue[2] < 1) {
 				trigState[2] = true;
 				if (inputs[ACCENT_INPUT+2].getVoltage() >= 1)
 					sustain[2] = params[ACCENT_PARAMS+2].getValue();
@@ -172,7 +172,7 @@ struct Drummer4 : Module {
 
 		if (inputs[TRIG_INPUT+3].isConnected()) {
 			trigValue[3] = inputs[TRIG_INPUT+3].getVoltage();
-			if (trigValue[3] >= 1 && prevTrigValue[3] < 1){
+			if (trigValue[3] >= 1 && prevTrigValue[3] < 1) {
 				trigState[3] = true;
 				if (inputs[ACCENT_INPUT+3].getVoltage() >= 1)
 					sustain[3] = params[ACCENT_PARAMS+3].getValue();
@@ -342,7 +342,6 @@ struct Drummer4Widget : ModuleWidget {
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), 115.5)), module, Drummer4::OUT_OUTPUT+i));
 		}
 	}
-
 };
 
 Model* modelDrummer4 = createModel<Drummer4, Drummer4Widget>("Drummer4");

@@ -43,7 +43,6 @@ struct Calcs : Module {
 	};
 
 	Calcs() {
-
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configInput(A_INPUT, "a");
 		configInput(B_INPUT, "b");
@@ -81,38 +80,33 @@ struct Calcs : Module {
 
 
 	float checkRange(float checkedValue) {
-		if (params[RANGE_SWITCH].getValue() == 0){
-			if (checkedValue > 5) {
+		if (params[RANGE_SWITCH].getValue() == 0) {
+			if (checkedValue > 5)
 				checkedValue = 5;
-			} else {
-				if (checkedValue < -5) {
-					checkedValue = -5;
-				}
-			}
+			else if (checkedValue < -5)
+				checkedValue = -5;
 		} else {
-			if (checkedValue > 10) {
+			if (checkedValue > 10)
 				checkedValue = 10;
-			} else {
-				if (checkedValue < 0) {
-					checkedValue = 0;
-				}
-			}
+			else if (checkedValue < 0)
+				checkedValue = 0;
 		}
 		return checkedValue;
 	}
 
 	void process(const ProcessArgs& args) override {
-		if (inputs[A_INPUT].isConnected() && inputs[B_INPUT].isConnected()){
+		if (inputs[A_INPUT].isConnected() && inputs[B_INPUT].isConnected()) {
 			outputs[BPLUSA_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() + inputs[B_INPUT].getVoltage()));
 			outputs[ATIMESB_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() * inputs[B_INPUT].getVoltage()));
 			outputs[BMINUSA_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() - inputs[A_INPUT].getVoltage()));
 			outputs[AMINUSB_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() - inputs[B_INPUT].getVoltage()));
-			if (inputs[B_INPUT].getVoltage() != 0) {
+			
+			if (inputs[B_INPUT].getVoltage() != 0)
 				outputs[ADIVB_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() / inputs[B_INPUT].getVoltage()));
-			}
-			if (inputs[C_INPUT].getVoltage() != 0) {
+
+			if (inputs[C_INPUT].getVoltage() != 0)
 				outputs[BDIVA_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() / inputs[A_INPUT].getVoltage()));
-			}
+
 			outputs[AAVGB_OUTPUT].setVoltage(checkRange((inputs[A_INPUT].getVoltage() + inputs[B_INPUT].getVoltage())/2));
 		} else {
 			outputs[BPLUSA_OUTPUT].setVoltage(0);
@@ -123,17 +117,18 @@ struct Calcs : Module {
 			outputs[BDIVA_OUTPUT].setVoltage(0);
 			outputs[AAVGB_OUTPUT].setVoltage(0);
 		}
-		if (inputs[B_INPUT].isConnected() && inputs[C_INPUT].isConnected()){
+		if (inputs[B_INPUT].isConnected() && inputs[C_INPUT].isConnected()) {
 			outputs[CPLUSB_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() + inputs[C_INPUT].getVoltage()));
 			outputs[BTIMESC_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() * inputs[C_INPUT].getVoltage()));
 			outputs[BMINUSC_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() - inputs[C_INPUT].getVoltage()));
 			outputs[CMINUSB_OUTPUT].setVoltage(checkRange(inputs[C_INPUT].getVoltage() - inputs[B_INPUT].getVoltage()));
-			if (inputs[C_INPUT].getVoltage() != 0) {
+
+			if (inputs[C_INPUT].getVoltage() != 0)
 				outputs[BDIVC_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() / inputs[C_INPUT].getVoltage()));
-			}
-			if (inputs[B_INPUT].getVoltage() != 0) {
+
+			if (inputs[B_INPUT].getVoltage() != 0)
 				outputs[CDIVB_OUTPUT].setVoltage(checkRange(inputs[C_INPUT].getVoltage() / inputs[B_INPUT].getVoltage()));
-			}
+
 			outputs[BAVGC_OUTPUT].setVoltage(checkRange((inputs[B_INPUT].getVoltage() + inputs[C_INPUT].getVoltage())/2));	
 		} else {
 			outputs[CPLUSB_OUTPUT].setVoltage(0);
@@ -145,17 +140,18 @@ struct Calcs : Module {
 			outputs[BAVGC_OUTPUT].setVoltage(0);	
 		}
 
-		if (inputs[A_INPUT].isConnected() && inputs[C_INPUT].isConnected()){
+		if (inputs[A_INPUT].isConnected() && inputs[C_INPUT].isConnected()) {
 			outputs[CPLUSA_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() + inputs[C_INPUT].getVoltage()));
 			outputs[ATIMESC_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() * inputs[C_INPUT].getVoltage()));
 			outputs[AMINUSC_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() - inputs[C_INPUT].getVoltage()));
 			outputs[CMINUSA_OUTPUT].setVoltage(checkRange(inputs[C_INPUT].getVoltage() - inputs[A_INPUT].getVoltage()));
-			if (inputs[A_INPUT].getVoltage() != 0) {
+
+			if (inputs[A_INPUT].getVoltage() != 0)
 				outputs[CDIVA_OUTPUT].setVoltage(checkRange(inputs[C_INPUT].getVoltage() / inputs[A_INPUT].getVoltage()));
-			}
-			if (inputs[C_INPUT].getVoltage() != 0) {
+
+			if (inputs[C_INPUT].getVoltage() != 0)
 				outputs[ADIVC_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() / inputs[C_INPUT].getVoltage()));
-			}
+
 			outputs[AAVGC_OUTPUT].setVoltage(checkRange((inputs[A_INPUT].getVoltage() + inputs[C_INPUT].getVoltage())/2));
 		} else {
 			outputs[CPLUSA_OUTPUT].setVoltage(0);
@@ -167,14 +163,12 @@ struct Calcs : Module {
 			outputs[AAVGC_OUTPUT].setVoltage(0);
 		}
 
-		if (inputs[A_INPUT].isConnected() && inputs[B_INPUT].isConnected() && inputs[C_INPUT].isConnected()){
+		if (inputs[A_INPUT].isConnected() && inputs[B_INPUT].isConnected() && inputs[C_INPUT].isConnected())
 			outputs[AVGABC_OUTPUT].setVoltage(checkRange((inputs[A_INPUT].getVoltage() + inputs[B_INPUT].getVoltage() + inputs[C_INPUT].getVoltage())/3));
-		} else {
+		else
 			outputs[AVGABC_OUTPUT].setVoltage(0);
-		}
 	}
 };
-
 
 struct CalcsWidget : ModuleWidget {
 	CalcsWidget(Calcs* module) {
@@ -242,6 +236,5 @@ struct CalcsWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::AVGABC_OUTPUT));
 	}
 };
-
 
 Model* modelCalcs = createModel<Calcs, CalcsWidget>("Calcs");
