@@ -2,6 +2,9 @@
 #define LINEAR1_INTERP 1
 #define LINEAR2_INTERP 2
 #define HERMITE_INTERP 3
+#define NORMALLED_OUTS 0
+#define SOLO_OUTS 1
+#define UNCONNECTED_ON_4 2
 
 #include "plugin.hpp"
 #include "osdialog.h"
@@ -378,6 +381,7 @@ struct DrumPlayer : Module {
 				}
 
 				prevSamplePos[i] = samplePos[i];
+
 				currentSpeed = double(params[SPEED_PARAM+i].getValue());
 				samplePos[i] += sampleCoeff[i]*currentSpeed;
 
@@ -403,7 +407,7 @@ struct DrumPlayer : Module {
 			}
 
 			switch (outsMode) {
-				case 0: // normalled outs
+				case NORMALLED_OUTS:
 					summedOutput += currentOutput;
 					if (outputs[OUT_OUTPUT+i].isConnected()) {
 						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
@@ -411,12 +415,12 @@ struct DrumPlayer : Module {
 					}
 				break;
 
-				case 1: // solo outs
+				case SOLO_OUTS:
 					if (outputs[OUT_OUTPUT+i].isConnected())
 						outputs[OUT_OUTPUT+i].setVoltage(currentOutput);
 				break;
 
-				case 2: // unconnected on out #4
+				case UNCONNECTED_ON_4:
 					if (i == 3) {
 						summedOutput += currentOutput;
 						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);

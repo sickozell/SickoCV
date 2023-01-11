@@ -161,7 +161,6 @@ struct SickoPlayer : Module {
 	float fadeDecrement = fadeCoeff[xFade]/(APP->engine->getSampleRate());
 	double fadedPosition[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	float level;
 	float currentOutput;
 	float currentOutputR;
 	float sumOutput;
@@ -194,6 +193,7 @@ struct SickoPlayer : Module {
 	float decayValue;
 	float sustainValue;
 	float releaseValue;
+	float level;
 	int limiter;
 
 	SickoPlayer() {
@@ -585,10 +585,23 @@ struct SickoPlayer : Module {
 			trigType = params[TRIGMODE_SWITCH].getValue();
 
 			attackValue = params[ATTACK_PARAM].getValue() + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+
 			decayValue = params[DECAY_PARAM].getValue() + (inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue());
-			sustainValue = params[SUSTAIN_PARAM].getValue() + (inputs[SUSTAIN_INPUT].getVoltage()*params[SUSTAINATNV_PARAM].getValue());
+			
+			sustainValue = params[SUSTAIN_PARAM].getValue() + (inputs[SUSTAIN_INPUT].getVoltage() * params[SUSTAINATNV_PARAM].getValue() * 0.1);
+			if (sustainValue > 1)
+				sustainValue = 1;
+			else if (sustainValue < 0)
+				sustainValue = 0;
+
 			releaseValue = params[RELEASE_PARAM].getValue() + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
-			level = params[VOL_PARAM].getValue()+(inputs[VOL_INPUT].getVoltage()*params[VOLATNV_PARAM].getValue());
+			
+			level = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage() * params[VOLATNV_PARAM].getValue() * 0.1);
+			if (level > 2)
+				level = 2;
+			else if (level < 0)
+				level = 0;
+			
 			limiter = params[LIMIT_SWITCH].getValue();
 
 			knobTune = params[TUNE_PARAM].getValue();
@@ -598,7 +611,7 @@ struct SickoPlayer : Module {
 			}
 
 			if (inputs[TUNE_INPUT].isConnected()) {
-				currentSpeed = double((tune + (inputs[TUNE_INPUT].getVoltage()*params[TUNEATNV_PARAM].getValue())));
+				currentSpeed = double(tune + (inputs[TUNE_INPUT].getVoltage() * params[TUNEATNV_PARAM].getValue() * 0.1));
 				if (currentSpeed > 4)
 					currentSpeed = 4;
 				else if (currentSpeed < 0.25)
@@ -931,8 +944,8 @@ struct SickoPlayer : Module {
 							case ATTACK_STAGE:
 								if (attackValue > 10) {
 									attackValue = 10;
-								} else 	if (attackValue < 0) {
-									attackValue = 0;
+								} else 	if (attackValue < 0.0001f) {
+									attackValue = 0.0001f;
 								}
 								maxStageSample[c] = args.sampleRate * attackValue;
 								stageLevel[c] = (currentStageSample[c] / maxStageSample[c]) + lastStageLevel[c];
@@ -948,8 +961,8 @@ struct SickoPlayer : Module {
 							case DECAY_STAGE:
 								if (decayValue > 10) {
 									decayValue = 10;
-								} else 	if (decayValue < 0) {
-									decayValue = 0;
+								} else 	if (decayValue < 0.0001f) {
+									decayValue = 0.0001f;
 								}
 								maxStageSample[c] = args.sampleRate * decayValue / (1-sustainValue);
 								stageLevel[c] = 1-(currentStageSample[c] / maxStageSample[c]) + lastStageLevel[c];
@@ -974,8 +987,8 @@ struct SickoPlayer : Module {
 							case RELEASE_STAGE:
 								if (releaseValue > 10) {
 									releaseValue = 10;
-								} else 	if (releaseValue < 0) {
-									releaseValue = 0;
+								} else 	if (releaseValue < 0.0001f) {
+									releaseValue = 0.0001f;
 								}
 								maxStageSample[c] = args.sampleRate * releaseValue;
 								stageLevel[c] = 1-(currentStageSample[c] / maxStageSample[c]) - lastStageLevel[c];

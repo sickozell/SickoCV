@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.5.1-beta11",
+  "version": "2.5.1-beta12",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -59,7 +59,7 @@
     },
     {
       "slug": "BtogglerPlus",
-      "name": "bToggler8Plus",
+      "name": "bToggler8+",
       "description": "8 buffered toggle switch router, plus warnings to use with led midi controllers",
       "tags": [
         "Logic",
@@ -95,6 +95,16 @@
       ]
     },
     {
+      "slug": "Drummer4Plus",
+      "name": "Drummer4+",
+      "description": "4 channel accent and choke utility for drum modules lacking this feature",
+      "tags": [
+        "Utility",
+        "Drum",
+        "Quad"
+      ]
+    },
+    {
       "slug": "DrumPlayer",
       "name": "Drum Player",
       "description": "Drum Sample Player",
@@ -105,7 +115,7 @@
     },
     {
       "slug": "DrumPlayerPlus",
-      "name": "Drum Player Plus",
+      "name": "Drum Player+",
       "description": "Drum Sample Player",
       "tags": [
         "Sampler",

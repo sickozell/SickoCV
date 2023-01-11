@@ -3,7 +3,7 @@
 struct Blender : Module {
 	float mixedOut[2] = {0,0};
 	float mix = 0;
-	float modAtten = 0;
+	float mod2 = 0;
 	float input1[2] = {0,0};
 	float input2[2] = {0,0};
 	int limit;
@@ -74,22 +74,22 @@ struct Blender : Module {
 			if (inputs[MOD1_INPUT].isConnected()) {				
 				if (inputs[MOD2_INPUT].isConnected()) { 
 					if (params[MOD2_RANGE_SWITCH].getValue() == 1)
-						modAtten = params[MOD2_ATNV_PARAMS].getValue() * inputs[MOD2_INPUT].getVoltage() / 10;
+						mod2 = params[MOD2_ATNV_PARAMS].getValue() * inputs[MOD2_INPUT].getVoltage() * 0.1;
 					else
-						modAtten = params[MOD2_ATNV_PARAMS].getValue() * (inputs[MOD2_INPUT].getVoltage() + 5) / 10;
+						mod2 = params[MOD2_ATNV_PARAMS].getValue() * (inputs[MOD2_INPUT].getVoltage() + 5) * 0.1;
 				} else {
-					modAtten = 0;
+					mod2 = 0;
 				}
 
-				if (modAtten > 1)
-					modAtten = 1;
-				else if (modAtten < -1)
-					modAtten = -1;
+				if (mod2 > 1)
+					mod2 = 1;
+				else if (mod2 < -1)
+					mod2 = -1;
 
 				if (params[MOD1_RANGE_SWITCH].getValue() == 1)
-					mix = params[MIX_PARAMS].getValue() + ( (params[MOD1_ATNV_PARAMS].getValue() * inputs[MOD1_INPUT].getVoltage() / 10) + modAtten);
+					mix = params[MIX_PARAMS].getValue() + ( (params[MOD1_ATNV_PARAMS].getValue() * inputs[MOD1_INPUT].getVoltage() * 0.1) + mod2);
 				else
-					mix = params[MIX_PARAMS].getValue() + ( (params[MOD1_ATNV_PARAMS].getValue() * (inputs[MOD1_INPUT].getVoltage() + 5) / 10) + modAtten);
+					mix = params[MIX_PARAMS].getValue() + ( (params[MOD1_ATNV_PARAMS].getValue() * (inputs[MOD1_INPUT].getVoltage() + 5) * 0.1) + mod2);
 
 				if (mix > 1)
 					mix = 1;

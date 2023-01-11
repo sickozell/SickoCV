@@ -2,6 +2,9 @@
 #define LINEAR1_INTERP 1
 #define LINEAR2_INTERP 2
 #define HERMITE_INTERP 3
+#define NORMALLED_OUTS 0
+#define SOLO_OUTS 1
+#define UNCONNECTED_ON_4 2
 
 #include "plugin.hpp"
 #include "osdialog.h"
@@ -250,7 +253,7 @@ struct DrumPlayerPlus : Module {
 		double c3 = (.5F * (x3 - x0)) + (1.5F * (x1 - x2));
 		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
 	}
-	*/
+	*/ 
 
 	void loadSample(std::string path, int slot) {
 		unsigned int c;
@@ -270,6 +273,7 @@ struct DrumPlayerPlus : Module {
 				playBuffer[slot][0].push_back(0);
 			}
 			totalSampleC[slot] = playBuffer[slot][0].size();
+			totalSamples[slot] = totalSampleC[slot]-1;
 			drwav_free(pSampleData);
 
 			for (unsigned int i = 1; i < totalSamples[slot]; i = i + 2)
@@ -328,9 +332,14 @@ struct DrumPlayerPlus : Module {
 				prevSampleWeight[i] = 0;
 				//debugDisplay = "X";
 				if (inputs[ACC_INPUT+i].getVoltage() > 1)
-					level[i] = params[ACCVOL_PARAM+i].getValue() + (inputs[ACCVOL_INPUT+i].getVoltage() * params[ACCVOLATNV_PARAM+i].getValue());
+					level[i] = params[ACCVOL_PARAM+i].getValue() + (inputs[ACCVOL_INPUT+i].getVoltage() * params[ACCVOLATNV_PARAM+i].getValue() * 0.1);
 				else
-					level[i] = params[TRIGVOL_PARAM+i].getValue() + (inputs[TRIGVOL_INPUT+i].getVoltage() * params[TRIGVOLATNV_PARAM+i].getValue());
+					level[i] = params[TRIGVOL_PARAM+i].getValue() + (inputs[TRIGVOL_INPUT+i].getVoltage() * params[TRIGVOLATNV_PARAM+i].getValue() * 0.1);
+
+				if (level[i] > 2)
+					level[i] = 2;
+				else if (level[i] < 0)
+					level[i] = 0;
 				
 				if (i < 3 && params[CHOKE_SWITCH+i].getValue()) {
 					choking[i+1] = true;
@@ -411,7 +420,7 @@ struct DrumPlayerPlus : Module {
 
 				prevSamplePos[i] = samplePos[i];
 				if (inputs[SPEED_INPUT+i].isConnected()) {
-					currentSpeed = double((params[SPEED_PARAM+i].getValue()+(inputs[SPEED_INPUT+i].getVoltage()*params[SPEEDATNV_PARAM+i].getValue())));
+					currentSpeed = double(params[SPEED_PARAM+i].getValue() + (inputs[SPEED_INPUT+i].getVoltage() * params[SPEEDATNV_PARAM+i].getValue() * 0.1));
 					if (currentSpeed > 2)
 						currentSpeed = 2;
 					else {
@@ -434,7 +443,7 @@ struct DrumPlayerPlus : Module {
 						fadingValue[i] -= fadeDecrement;
 						currentOutput += (playBuffer[i][antiAlias][floor(fadedPosition[i])] * fadingValue[i] * level[i] * 5);
 						fadedPosition[i] += sampleCoeff[i]*currentSpeed;
-						if (fadedPosition[i] > totalSampleC[i])
+						if (fadedPosition[i] > totalSamples[i])
 							fading[i] = false;
 					} else
 						fading[i] = false;
@@ -446,14 +455,14 @@ struct DrumPlayerPlus : Module {
 			}
 
 			if (params[LIMIT_SWITCH+i].getValue()) {
-				if (summedOutput > 5)
-					summedOutput = 5;
-				else if (summedOutput < -5)
-					summedOutput = -5;
+				if (currentOutput > 5)
+					currentOutput = 5;
+				else if (currentOutput < -5)
+					currentOutput = -5;
 			}
 
 			switch (outsMode) {
-				case 0: // normalled outs
+				case NORMALLED_OUTS:
 					summedOutput += currentOutput;
 					if (outputs[OUT_OUTPUT+i].isConnected()) {
 						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
@@ -461,12 +470,12 @@ struct DrumPlayerPlus : Module {
 					}
 				break;
 
-				case 1: // solo outs
+				case SOLO_OUTS:
 					if (outputs[OUT_OUTPUT+i].isConnected())
 						outputs[OUT_OUTPUT+i].setVoltage(currentOutput);
 				break;
 
-				case 2: // unconnected on out #4
+				case UNCONNECTED_ON_4:
 					if (i == 3) {
 						summedOutput += currentOutput;
 						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
