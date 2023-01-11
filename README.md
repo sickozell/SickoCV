@@ -1,4 +1,4 @@
-# SickoCV v2.5.1-beta11
+# SickoCV v2.5.1-beta12
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -31,6 +31,10 @@ Accent and choke utility for drum modules lacking these features
 - added choke functionality and changed panel
 - code optimization  
 
+### Drummer4+
+Accent and choke utility for drum modules lacking these features  
+- added CV inputs with attenuverters to Drummer4  
+
 ### Blender
 Stereo crossfade mixer with double modulation  
 - added input attenuators
@@ -43,7 +47,7 @@ Stereo crossfade mixer with double modulation
 # SickoCV v2.5.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/211660913-8dc939e3-2c59-45b3-937b-3a8f5fe69df5.JPG)
+![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/211935220-534a8b74-7e36-4636-bd12-aa01ed4bcf28.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -199,10 +203,10 @@ A, B and C are the inputs. The output tables provide simple math calculations an
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 
-## Drummer
+## Drummer Drummer4 Drummer4+
 ### Accent and choke utility for drum modules lacking these features
 
-![drummer](https://user-images.githubusercontent.com/80784296/211175423-9ae58cf0-02b5-4124-b904-f727dfc2053d.JPG)
+![drummer](https://user-images.githubusercontent.com/80784296/211936925-8c0f65f3-f7ec-48eb-a323-9a938ba3be3b.JPG)
 
 #### - USAGE
 Drummer and Drummer4 module can handle 2 or 4 drum sounds with separate standard and accent volume levels set by respective knobs.  
