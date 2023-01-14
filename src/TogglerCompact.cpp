@@ -52,9 +52,9 @@ struct TogglerCompact : Module {
 	TogglerCompact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
-		configParam(ATTACK_PARAMS, 0.f, 10.f, 0.f, "Attack (s)");
+		configParam(ATTACK_PARAMS, 0.f, 10.f, 0.f, "Attack", "ms", 0, 1000);
 		configParam(SUSTAIN_PARAMS, 0.f, 1.f, 1.f, "Level", "%", 0, 100);
-		configParam(RELEASE_PARAMS, 0.f, 10.f, 0.f, "Release (s)");
+		configParam(RELEASE_PARAMS, 0.f, 10.f, 0.f, "Release", "ms", 0, 1000);
 		configInput(TRIG_INPUT, "Trig/Gate");
 		configInput(RST_INPUT, "Reset");
 		configInput(IN_INPUT, "L");

@@ -57,7 +57,7 @@ struct SwitcherSt : Module {
 	SwitcherSt() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
-		configParam(FADE_PARAMS, 0.f, 10.f, 0.f, "Fade Time (s)");
+		configParam(FADE_PARAMS, 0.f, 10.f, 0.f, "Fade Time", "ms", 0, 1000);
 		configInput(TRIG_INPUT, "Trig/Gate");
 		configInput(RST_INPUT, "Reset");
 		configInput(IN1_INPUT, "IN 1 Left");

@@ -196,8 +196,8 @@ struct DrummerWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));		
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 18.8)), module, Drummer::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 31.9)), module, Drummer::ACCENT_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 17.8)), module, Drummer::TRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 31.3)), module, Drummer::ACCENT_INPUT));
 		
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 17.8)), module, Drummer::NOACCENT_PARAMS));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 31.3)), module, Drummer::ACCENT_PARAMS));
@@ -208,8 +208,8 @@ struct DrummerWidget : ModuleWidget {
 		addParam(createParamCentered<CKSS>(mm2px(Vec(5.35, 67.45)), module, Drummer::CHOKE_SWITCH));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(22.25, 67.45)), module, Drummer::LIMIT_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 85.4)), module, Drummer::TRIG_INPUT+1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 98.5)), module, Drummer::ACCENT_INPUT+1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 84.4)), module, Drummer::TRIG_INPUT+1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 97.8)), module, Drummer::ACCENT_INPUT+1));
 
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 84.4)), module, Drummer::NOACCENT_PARAMS+1));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 97.8)), module, Drummer::ACCENT_PARAMS+1));

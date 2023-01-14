@@ -50,6 +50,8 @@ struct SickoPlayer : Module {
 		TRIGMODE_SWITCH,
 		LIMIT_SWITCH,
 		LOOP_PARAM,
+		REV_PARAM,
+		PINGPONG_PARAM,
 		NUM_PARAMS 
 	};
 	enum InputIds {
@@ -74,6 +76,8 @@ struct SickoPlayer : Module {
 	};
 	enum LightIds {
 		LOOP_LIGHT,
+		REV_LIGHT,
+		PINGPONG_LIGHT,
 		NUM_LIGHTS
 	};
   
@@ -150,7 +154,7 @@ struct SickoPlayer : Module {
 
 	int interpolationMode = HERMITE_INTERP;
 	int antiAlias = 1;
-	int polyOuts = MONOPHONIC;
+	int polyOuts = POLYPHONIC;
 	bool phaseScan = true;
 	
 	int xFade = 2;
@@ -196,6 +200,9 @@ struct SickoPlayer : Module {
 	float level;
 	int limiter;
 
+	int rev;
+	int pingpong;
+
 	SickoPlayer() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -237,6 +244,9 @@ struct SickoPlayer : Module {
 		
 		configInput(VO_INPUT,"V/Oct");
 
+		configSwitch(REV_PARAM, 0.f, 1.f, 0.f, "Playback", {"Forward", "Reverse"});
+		configSwitch(PINGPONG_PARAM, 0.f, 1.f, 0.f, "PingPong", {"Off", "On"});
+
 		configParam(TUNE_PARAM, -2.f, 2.f, 0.f, "Tune", " semitones", 0, 12);
 		configInput(TUNE_INPUT,"Tune CV");
 		configParam(TUNEATNV_PARAM, -1.0f, 1.0f, 0.0f, "Tune CV Attenuv.");
@@ -263,7 +273,7 @@ struct SickoPlayer : Module {
 	void onReset() override {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
-		polyOuts = MONOPHONIC;
+		polyOuts = POLYPHONIC;
 		xFade = 2;
 		phaseScan = true;
 		clearSlot();
@@ -451,6 +461,12 @@ struct SickoPlayer : Module {
 	
 	void process(const ProcessArgs &args) override {
 
+		rev = params[REV_PARAM].getValue();
+		lights[REV_LIGHT].setBrightness(rev);
+
+		pingpong = params[PINGPONG_PARAM].getValue();
+		lights[PINGPONG_LIGHT].setBrightness(pingpong);
+
 		loop = params[LOOP_PARAM].getValue();
 		lights[LOOP_LIGHT].setBrightness(loop);
 		chan = std::max(1, inputs[VO_INPUT].getChannels());
@@ -636,10 +652,17 @@ struct SickoPlayer : Module {
 						if (trigValue[c] >= 1) {
 							if (!play[c]) {
 								play[c] = true;
-								samplePos[c] = floor(cueStartPos+1);
-								currSampleWeight[c] = sampleCoeff;
-								prevSamplePos[c] = floor(cueStartPos);
-								prevSampleWeight[c] = 0;
+								if (rev) {
+									samplePos[c] = floor(cueEndPos-1);
+									currSampleWeight[c] = sampleCoeff;
+									prevSamplePos[c] = floor(cueEndPos);
+									prevSampleWeight[c] = 0;
+								} else {
+									samplePos[c] = floor(cueStartPos+1);
+									currSampleWeight[c] = sampleCoeff;
+									prevSamplePos[c] = floor(cueStartPos);
+									prevSampleWeight[c] = 0;
+								}
 								stage[c] = ATTACK_STAGE;
 								currentStageSample[c] = 0;
 								lastStageLevel[c] = 0;
@@ -677,10 +700,17 @@ struct SickoPlayer : Module {
 										}
 									} else {
 										play[c] = true;
-										samplePos[c] = floor(cueStartPos+1);
-										currSampleWeight[c] = sampleCoeff;
-										prevSamplePos[c] = floor(cueStartPos);
-										prevSampleWeight[c] = 0;
+										if (rev) {
+											samplePos[c] = floor(cueEndPos-1);
+											currSampleWeight[c] = sampleCoeff;
+											prevSamplePos[c] = floor(cueEndPos);
+											prevSampleWeight[c] = 0;
+										} else {
+											samplePos[c] = floor(cueStartPos+1);
+											currSampleWeight[c] = sampleCoeff;
+											prevSamplePos[c] = floor(cueStartPos);
+											prevSampleWeight[c] = 0;
+										}
 										stage[c] = ATTACK_STAGE;
 										currentStageSample[c] = 0;
 										lastStageLevel[c] = 0;
@@ -688,14 +718,20 @@ struct SickoPlayer : Module {
 									}
 								break;
 
-								
 								case START_ONLY:									// trig type: START ONLY
 									if (!play[c]) {
 										play[c] = true;
-										samplePos[c] = floor(cueStartPos+1);
-										currSampleWeight[c] = sampleCoeff;
-										prevSamplePos[c] = floor(cueStartPos);
-										prevSampleWeight[c] = 0;
+										if (rev) {
+											samplePos[c] = floor(cueEndPos-1);
+											currSampleWeight[c] = sampleCoeff;
+											prevSamplePos[c] = floor(cueEndPos);
+											prevSampleWeight[c] = 0;
+										} else {
+											samplePos[c] = floor(cueStartPos+1);
+											currSampleWeight[c] = sampleCoeff;
+											prevSamplePos[c] = floor(cueStartPos);
+											prevSampleWeight[c] = 0;
+										}
 										stage[c] = ATTACK_STAGE;
 										currentStageSample[c] = 0;
 										lastStageLevel[c] = 0;
@@ -752,10 +788,17 @@ struct SickoPlayer : Module {
 											fadeStageLevel[c] = stageLevel[c];
 										} else {
 											play[c] = true;
-											samplePos[c] = floor(cueStartPos+1);
-											currSampleWeight[c] = sampleCoeff;
-											prevSamplePos[c] = floor(cueStartPos);
-											prevSampleWeight[c] = 0;
+											if (rev) {
+												samplePos[c] = floor(cueEndPos-1);
+												currSampleWeight[c] = sampleCoeff;
+												prevSamplePos[c] = floor(cueEndPos);
+												prevSampleWeight[c] = 0;
+											} else {
+												samplePos[c] = floor(cueStartPos+1);
+												currSampleWeight[c] = sampleCoeff;
+												prevSamplePos[c] = floor(cueStartPos);
+												prevSampleWeight[c] = 0;
+											}
 											stage[c] = ATTACK_STAGE;
 											currentStageSample[c] = 0;
 											lastStageLevel[c] = 0;
@@ -788,52 +831,133 @@ struct SickoPlayer : Module {
 						voctDisplay = voct[c];
 					}
 
-					if (loop && floor(samplePos[c]) > loopEndPos-distancePos[c]) {
-						fading[c] = true;				// **** START  FADING 
-						fadingValue[c] = 1.f;
-						fadedPosition[c] = samplePos[c];
-						fadeStageLevel[c] = stageLevel[c];
-						samplePos[c] = floor(loopStartPos)+sampleCoeff;
-						currSampleWeight[c] = sampleCoeff;
-						prevSamplePos[c] = floor(loopStartPos);
-						prevSampleWeight[c] = 0;
+					switch (rev) {
+						case 0:		// FORWARD PLAYBACK
+							if (loop && samplePos[c] > floor(loopEndPos)) {		// *** REACHED END OF LOOP ***
+								if (pingpong) {
+									rev = 1;
+									params[REV_PARAM].setValue(1);
+									samplePos[c] = floor(loopEndPos)-1;
+									currSampleWeight[c] = sampleCoeff;
+									prevSamplePos[c] = floor(loopEndPos);
+									prevSampleWeight[c] = 0;
+								} else {
+									fading[c] = true;
+									fadingValue[c] = 1.f;
+									fadedPosition[c] = samplePos[c];
+									fadeStageLevel[c] = stageLevel[c];
+									samplePos[c] = floor(loopStartPos)+1;
+									currSampleWeight[c] = sampleCoeff;
+									prevSamplePos[c] = floor(loopStartPos);
+									prevSampleWeight[c] = 0;
+									if (fadedPosition[c] > totalSamples)
+										fading[c] = false;
+								}
+								if (c == currentDisplay) {
+									eoc = true;
+									eocTime = eocEorTime;
+								}
+							} else if (floor(samplePos[c]) > totalSamples) {	// *** REACHED END OF SAMPLE ***
+								play[c] = false;
+								inPause[c] = false;
+								if (c == currentDisplay) {
+									eoc = true;
+									eocTime = eocEorTime;
+								}
+							} else if (samplePos[c] > cueEndPos) {				// *** REACHED CUE END ***
+								if (stage[c] != RELEASE_STAGE) {
+									stage[c] = RELEASE_STAGE;
+									currentStageSample[c] = 0;
+									lastStageLevel[c] = 1-stageLevel[c];
+								}
+								if (trigMode == GATE_MODE) {
+									if (pingpong) {
+										rev = 1;
+										params[REV_PARAM].setValue(1);
+										samplePos[c] = floor(cueEndPos)-1;
+										currSampleWeight[c] = sampleCoeff;
+										prevSamplePos[c] = floor(cueEndPos);
+										prevSampleWeight[c] = 0;
+									} else {
+										fading[c] = true;
+										fadingValue[c] = 1.f;
+										fadedPosition[c] = samplePos[c];
 
-						if (fadedPosition[c] > totalSamples)
-							fading[c] = false;
+										samplePos[c] = floor(cueStartPos)+1;
+										currSampleWeight[c] = sampleCoeff;
+										prevSamplePos[c] = floor(cueStartPos);
+										prevSampleWeight[c] = 0;
+									}
+								}
+								if (c == currentDisplay) {
+									eoc = true;
+									eocTime = eocEorTime;
+								}
+							} 
+						break;
 
-						if (c == currentDisplay) {
-							eoc = true;
-							eocTime = eocEorTime;
-						}
-					} else if (floor(samplePos[c]) > totalSamples) {
-						play[c] = false;
-						inPause[c] = false;
-						if (c == currentDisplay) {
-							eoc = true;
-							eocTime = eocEorTime;
-						}
-					} else if (floor(samplePos[c]) > cueEndPos) {
-						if (stage[c] != RELEASE_STAGE) {
-							stage[c] = RELEASE_STAGE;
-							currentStageSample[c] = 0;
-							lastStageLevel[c] = 1-stageLevel[c];
-						}
-						if (trigMode == GATE_MODE) {	// if GATE MODE and reached EndPos: fades in from StartPos
-							fading[c] = true;		// **** START  FADING
-							fadingValue[c] = 1.f;
-							fadedPosition[c] = samplePos[c];
-
-							samplePos[c] = floor(cueStartPos);
-							currSampleWeight[c] = 0;
-							prevSamplePos[c] = floor(loopStartPos);
-							prevSampleWeight[c] = 0;
-						}
-						if (c == currentDisplay) {
-							eoc = true;
-							eocTime = eocEorTime;
-						}
-					//} else if (floor(samplePos[c]) <= 0) {		// maybe there's non need of this, it's true only when reverse playing
-					//	play[c] = false;
+						case 1:		// REVERSE PLAYBACK
+							if (loop && samplePos[c] < floor(loopStartPos)) {	// *** REACHED BEGIN OF LOOP ***
+								if (pingpong) {
+									rev = 0;
+									params[REV_PARAM].setValue(0);
+									samplePos[c] = floor(loopStartPos)+1;
+									currSampleWeight[c] = sampleCoeff;
+									prevSamplePos[c] = floor(loopStartPos);
+									prevSampleWeight[c] = 0;
+								} else {
+									fading[c] = true;
+									fadingValue[c] = 1.f;
+									fadedPosition[c] = samplePos[c];
+									fadeStageLevel[c] = stageLevel[c];
+									samplePos[c] = floor(loopEndPos)-1;
+									currSampleWeight[c] = sampleCoeff;
+									prevSamplePos[c] = floor(loopEndPos);
+									prevSampleWeight[c] = 0;
+									if (fadedPosition[c] < 0)
+										fading[c] = false;
+								}
+								if (c == currentDisplay) {
+									eoc = true;
+									eocTime = eocEorTime;
+								}
+							} else if (floor(samplePos[c]) < 0) {				// *** REACHED START OF SAMPLE ***
+								play[c] = false;
+								inPause[c] = false;
+								if (c == currentDisplay) {
+									eoc = true;
+									eocTime = eocEorTime;
+								}
+							} else if (samplePos[c] < cueStartPos) {			// *** REACHED CUE START ***
+								if (stage[c] != RELEASE_STAGE) {
+									stage[c] = RELEASE_STAGE;
+									currentStageSample[c] = 0;
+									lastStageLevel[c] = 1-stageLevel[c];
+								}
+								if (trigMode == GATE_MODE) {
+									if (pingpong) {
+										rev = 0;
+										params[REV_PARAM].setValue(0);
+										samplePos[c] = floor(cueStartPos)+1;
+										currSampleWeight[c] = sampleCoeff;
+										prevSamplePos[c] = floor(cueStartPos);
+										prevSampleWeight[c] = 0;										
+									} else {
+										fading[c] = true;
+										fadingValue[c] = 1.f;
+										fadedPosition[c] = samplePos[c];
+										samplePos[c] = floor(cueEndPos)-1;
+										currSampleWeight[c] = sampleCoeff;
+										prevSamplePos[c] = floor(cueEndPos);
+										prevSampleWeight[c] = 0;
+									}
+								}
+								if (c == currentDisplay) {
+									eoc = true;
+									eocTime = eocEorTime;
+								}
+							}
+						break;
 					}
 
 					if (play[c]) {									// it's false only if end of sample has reached, see above
@@ -932,8 +1056,11 @@ struct SickoPlayer : Module {
 						}
 
 						prevSamplePos[c] = samplePos[c];
-
-						samplePos[c] += distancePos[c];
+						
+						if (rev)
+							samplePos[c] -= distancePos[c];
+						else
+							samplePos[c] += distancePos[c];
 
 						if (interpolationMode > NO_INTERP) {
 							prevSampleWeight[c] = currSampleWeight[c];
@@ -1028,9 +1155,15 @@ struct SickoPlayer : Module {
 									currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * level * fadeStageLevel[c]);
 								}
 								
-								fadedPosition[c] += distancePos[c];
-								if (fadedPosition[c] > totalSamples)
-									fading[c] = false;
+								if (rev) {
+									fadedPosition[c] -= distancePos[c];
+									if (fadedPosition[c] < 0)
+										fading[c] = false;
+								} else {
+									fadedPosition[c] += distancePos[c];
+									if (fadedPosition[c] > totalSamples)
+										fading[c] = false;
+								}
 							} else
 								fading[c] = false;
 						}	
@@ -1340,8 +1473,8 @@ struct SickoPlayerWidget : ModuleWidget {
 		float xTrig2 = 31;
 		float yTrig1 = 50;
 		float yTrig2 = 64; 
-		float xStart1 = 59;
-		float xStart2 = 71;
+		float xStart1 = 58;
+		float xStart2 = 70;
 		float yStart1 = 54;
 		float yStart2 = 64;
 
@@ -1369,7 +1502,8 @@ struct SickoPlayerWidget : ModuleWidget {
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart1, yStart2)), module, SickoPlayer::LOOPSTART_PARAM));
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart2, yStart2)), module, SickoPlayer::LOOPEND_PARAM));
 
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xStart2+9.5, yStart2)), module, SickoPlayer::LOOP_PARAM, SickoPlayer::LOOP_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xStart2+9.5, yStart1+0.5)), module, SickoPlayer::PINGPONG_PARAM, SickoPlayer::PINGPONG_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xStart2+9.5, yStart2-2)), module, SickoPlayer::LOOP_PARAM, SickoPlayer::LOOP_LIGHT));
 		//----------------------------------------------------------------------------------------------------------------------------
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEnv1, yEnv1)), module, SickoPlayer::ATTACK_PARAM));
@@ -1389,7 +1523,9 @@ struct SickoPlayerWidget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv2+xEnv2Add+xEnv2Skip*3, yEnv2)), module, SickoPlayer::RELEASEATNV_PARAM));
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, 110)), module, SickoPlayer::VO_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, 105.3)), module, SickoPlayer::VO_INPUT));
+
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(9, yTunVol2)), module, SickoPlayer::REV_PARAM, SickoPlayer::REV_LIGHT));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23.5, yTunVol)), module, SickoPlayer::TUNE_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.5, yTunVol2)), module, SickoPlayer::TUNE_INPUT));

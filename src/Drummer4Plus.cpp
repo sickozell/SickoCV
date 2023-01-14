@@ -2,8 +2,6 @@
 
 struct Drummer4Plus : Module {
 	enum ParamId {
-		//ENUMS(CHOKE_PARAMS,3),
-		//ENUMS(LIMIT_PARAMS,4),
 		ENUMS(CHOKE_SWITCH,3),
 		ENUMS(LIMIT_SWITCH,4),
 		ENUMS(NOACCENTVOL_PARAMS,4),
@@ -25,8 +23,6 @@ struct Drummer4Plus : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		//ENUMS(CHOKE_LIGHT,3),
-		//ENUMS(LIMIT_LIGHT,4),
 		LIGHTS_LEN
 	};
 
@@ -123,7 +119,7 @@ struct Drummer4Plus : Module {
 
 		outSum = 0;
 
-		// --------  SLOT  0  --------
+		// --------  SLOT  1  --------
 		if (inputs[TRIG_INPUT].isConnected()) {
 			trigValue[0] = inputs[TRIG_INPUT].getVoltage();
 			if (trigValue[0] >= 1 && prevTrigValue[0] < 1) {
@@ -133,6 +129,11 @@ struct Drummer4Plus : Module {
 				else
 					sustain[0] = params[NOACCENTVOL_PARAMS].getValue() + (inputs[NOACCENTVOL_INPUT].getVoltage() * params[NOACCENTVOLATNV_PARAMS].getValue() * 0.1);
 				
+				if (sustain[0] > 2)
+					sustain[0] = 2;
+				else if (sustain[0] < 0)
+					sustain[0] = 0;
+
 				if (choke[0]) {
 					trigState[1] = false;
 					choking[0] = true;
@@ -144,7 +145,7 @@ struct Drummer4Plus : Module {
 		} else
 			out[0] = 0;
 
-		// --------  SLOT  1  --------
+		// --------  SLOT  2  --------
 
 		if (inputs[TRIG_INPUT+1].isConnected()) {
 			trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
@@ -155,6 +156,11 @@ struct Drummer4Plus : Module {
 				else
 					sustain[1] = params[NOACCENTVOL_PARAMS+1].getValue() + (inputs[NOACCENTVOL_INPUT+1].getVoltage() * params[NOACCENTVOLATNV_PARAMS+1].getValue() * 0.1);
 				
+				if (sustain[1] > 2)
+					sustain[1] = 2;
+				else if (sustain[1] < 0)
+					sustain[1] = 0;
+
 				if (choke[1]) {
 					choking[1] = true;
 					currentFade[1] = 1;
@@ -165,7 +171,7 @@ struct Drummer4Plus : Module {
 		} else
 			out[1] = 0;
 
-		// --------  SLOT  2  --------
+		// --------  SLOT  3  --------
 
 		if (inputs[TRIG_INPUT+2].isConnected()) {
 		trigValue[2] = inputs[TRIG_INPUT+2].getVoltage();
@@ -176,6 +182,11 @@ struct Drummer4Plus : Module {
 				else
 					sustain[2] = params[NOACCENTVOL_PARAMS+2].getValue() + (inputs[NOACCENTVOL_INPUT+2].getVoltage() * params[NOACCENTVOLATNV_PARAMS+2].getValue() * 0.1);
 				
+				if (sustain[2] > 2)
+					sustain[2] = 2;
+				else if (sustain[2] < 0)
+					sustain[2] = 0;
+
 				if (choke[2]) {
 					choking[2] = true;
 					currentFade[2] = 1;
@@ -186,7 +197,7 @@ struct Drummer4Plus : Module {
 		} else 
 			out[2] = 0;
 
-		// --------  SLOT  3  --------
+		// --------  SLOT  4  --------
 
 		if (inputs[TRIG_INPUT+3].isConnected()) {
 			trigValue[3] = inputs[TRIG_INPUT+3].getVoltage();
@@ -196,6 +207,12 @@ struct Drummer4Plus : Module {
 					sustain[3] = params[ACCENTVOL_PARAMS+3].getValue() + (inputs[ACCENTVOL_INPUT+3].getVoltage() * params[ACCENTVOLATNV_PARAMS+3].getValue() * 0.1);
 				else
 					sustain[3] = params[NOACCENTVOL_PARAMS+3].getValue() + (inputs[NOACCENTVOL_INPUT+3].getVoltage() * params[NOACCENTVOLATNV_PARAMS+3].getValue() * 0.1);
+				
+				if (sustain[3] > 2)
+					sustain[3] = 2;
+				else if (sustain[3] < 0)
+					sustain[3] = 0;
+
 			}
 			prevTrigValue[3] = trigValue[3];
 			out[3] = inputs[IN_INPUT+3].getVoltage() * sustain[3];
@@ -204,7 +221,7 @@ struct Drummer4Plus : Module {
 
 		// --------------------------------------------------------
 
-		// --------  OUT  0  --------
+		// --------  OUT  1  --------
 
 		if (limit[0]) {
 			if (out[0] > 5)
@@ -219,7 +236,7 @@ struct Drummer4Plus : Module {
 			outSum = out[0];
 		}
 
-		// --------  OUT  1  --------
+		// --------  OUT  2  --------
 			
 		if (choke[0]) {
 			if (choking[0]) {
@@ -257,7 +274,7 @@ struct Drummer4Plus : Module {
 			outSum += out[1];
 		}
 
-		// --------  OUT  2  --------
+		// --------  OUT  3  --------
 		
 		if (choke[1]) {
 			if (choking[1]) {
@@ -296,7 +313,7 @@ struct Drummer4Plus : Module {
 		}
 
 
-		// --------  OUT  3  --------
+		// --------  OUT  4  --------
 
 		if (choke[2]) {
 			if (choking[2]) {
@@ -348,17 +365,19 @@ struct Drummer4PlusWidget : ModuleWidget {
 		float xDelta = 23.5;
 
 		for (int i = 0; i < 4; i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.9+(xDelta*i), 21)), module, Drummer4Plus::TRIG_INPUT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 15)), module, Drummer4Plus::TRIG_INPUT+i));
 
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(11.9+(xDelta*i), 33.5)), module, Drummer4Plus::NOACCENTVOL_PARAMS+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 47)), module, Drummer4Plus::NOACCENTVOL_INPUT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(18.4+(xDelta*i), 44.5)), module, Drummer4Plus::NOACCENTVOLATNV_PARAMS+i));
+			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(9.9+(xDelta*i), 25.5)), module, Drummer4Plus::NOACCENTVOL_PARAMS+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(18.4+(xDelta*i), 35.5)), module, Drummer4Plus::NOACCENTVOLATNV_PARAMS+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.9+(xDelta*i), 40)), module, Drummer4Plus::NOACCENTVOL_INPUT+i));
 			
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.9+(xDelta*i), 62)), module, Drummer4Plus::ACCENT_INPUT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 51.5)), module, Drummer4Plus::ACCENT_INPUT+i));
 
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(11.9+(xDelta*i), 74.5)), module, Drummer4Plus::ACCENTVOL_PARAMS+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 88)), module, Drummer4Plus::ACCENTVOL_INPUT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(18.4+(xDelta*i), 85.5)), module, Drummer4Plus::ACCENTVOLATNV_PARAMS+i));
+			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(9.9+(xDelta*i), 62)), module, Drummer4Plus::ACCENTVOL_PARAMS+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(18.4+(xDelta*i), 72)), module, Drummer4Plus::ACCENTVOLATNV_PARAMS+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.9+(xDelta*i), 76.5)), module, Drummer4Plus::ACCENTVOL_INPUT+i));
+
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 87)), module, Drummer4Plus::IN_INPUT+i));
 
 			if (i<3) {
 				addParam(createParamCentered<CKSS>(mm2px(Vec(7.9+(xDelta*i), 103.9)), module, Drummer4Plus::LIMIT_SWITCH+i));

@@ -105,7 +105,8 @@ struct Drummer4 : Module {
 
 		outSum = 0;
 
-		// --------  SLOT  0  --------
+		// --------  SLOT  1  --------
+
 		if (inputs[TRIG_INPUT].isConnected()) {
 			trigValue[0] = inputs[TRIG_INPUT].getVoltage();
 			if (trigValue[0] >= 1 && prevTrigValue[0] < 1) {
@@ -126,7 +127,7 @@ struct Drummer4 : Module {
 		} else
 			out[0] = 0;
 
-		// --------  SLOT  1  --------
+		// --------  SLOT  2  --------
 
 		if (inputs[TRIG_INPUT+1].isConnected()) {
 			trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
@@ -147,7 +148,7 @@ struct Drummer4 : Module {
 		} else
 			out[1] = 0;
 
-		// --------  SLOT  2  --------
+		// --------  SLOT  3  --------
 
 		if (inputs[TRIG_INPUT+2].isConnected()) {
 		trigValue[2] = inputs[TRIG_INPUT+2].getVoltage();
@@ -168,7 +169,7 @@ struct Drummer4 : Module {
 		} else 
 			out[2] = 0;
 
-		// --------  SLOT  3  --------
+		// --------  SLOT  4  --------
 
 		if (inputs[TRIG_INPUT+3].isConnected()) {
 			trigValue[3] = inputs[TRIG_INPUT+3].getVoltage();
@@ -186,7 +187,7 @@ struct Drummer4 : Module {
 
 		// --------------------------------------------------------
 
-		// --------  OUT  0  --------
+		// --------  OUT  1  --------
 
 		if (limit[0]) {
 			if (out[0] > 5)
@@ -201,7 +202,7 @@ struct Drummer4 : Module {
 			outSum = out[0];
 		}
 
-		// --------  OUT  1  --------
+		// --------  OUT  2  --------
 			
 		if (choke[0]) {
 			if (choking[0]) {
@@ -239,7 +240,7 @@ struct Drummer4 : Module {
 			outSum += out[1];
 		}
 
-		// --------  OUT  2  --------
+		// --------  OUT  3  --------
 		
 		if (choke[1]) {
 			if (choking[1]) {
@@ -278,7 +279,7 @@ struct Drummer4 : Module {
 		}
 
 
-		// --------  OUT  3  --------
+		// --------  OUT  4  --------
 
 		if (choke[2]) {
 			if (choking[2]) {

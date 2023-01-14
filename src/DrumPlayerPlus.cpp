@@ -828,13 +828,13 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		for (int i = 0; i < 4; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 21)), module, DrumPlayerPlus::TRIG_INPUT+i));
 			addParam(createParamCentered<Trimpot>(mm2px(Vec(17.9+(xDelta*i), 28.5)), module, DrumPlayerPlus::TRIGVOLATNV_PARAM+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(7.9+(xDelta*i), 33)), module, DrumPlayerPlus::TRIGVOL_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 36.5)), module, DrumPlayerPlus::TRIGVOL_INPUT+i));
+			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(7.9+(xDelta*i), 32)), module, DrumPlayerPlus::TRIGVOL_PARAM+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 37)), module, DrumPlayerPlus::TRIGVOL_INPUT+i));
 
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 47)), module, DrumPlayerPlus::ACC_INPUT+i));
 			addParam(createParamCentered<Trimpot>(mm2px(Vec(17.9+(xDelta*i), 54.5)), module, DrumPlayerPlus::ACCVOLATNV_PARAM+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(7.9+(xDelta*i), 59)), module, DrumPlayerPlus::ACCVOL_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 62.5)), module, DrumPlayerPlus::ACCVOL_INPUT+i));
+			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(7.9+(xDelta*i), 58)), module, DrumPlayerPlus::ACCVOL_PARAM+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 63)), module, DrumPlayerPlus::ACCVOL_INPUT+i));
 
 			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.9+(xDelta*i), 78.5)), module, DrumPlayerPlus::SPEED_PARAM+i));
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 88)), module, DrumPlayerPlus::SPEED_INPUT+i));

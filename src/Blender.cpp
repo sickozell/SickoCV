@@ -1,12 +1,24 @@
+#define MONOPHONIC 0
+#define POLYPHONIC 1
 #include "plugin.hpp"
 
 struct Blender : Module {
-	float mixedOut[2] = {0,0};
 	float mix = 0;
 	float mod2 = 0;
-	float input1[2] = {0,0};
-	float input2[2] = {0,0};
+	float input1[2][16];
+	float input2[2][16];
+	float mixedOut[2][16];
+	float summedOut[2];
 	int limit;
+	float vol;
+	float vol1;
+	float vol2;
+	int phase1;
+	int phase2;
+
+	int chanL;
+	int chanR;
+	int polyOuts = MONOPHONIC;
 
 	enum ParamId {
 		ENUMS(PHASE_SWITCH,2),
@@ -66,13 +78,36 @@ struct Blender : Module {
 		configOutput(OUT_OUTPUT+1, "R");
 	}
 
+	void onReset() override {
+		polyOuts = POLYPHONIC;
+	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
+		if (polyOutsJ)
+			polyOuts = json_integer_value(polyOutsJ);
+	}
+
 	void process(const ProcessArgs& args) override {
+		
 		limit = params[LIMIT_PARAMS].getValue();
 		lights[LIMIT_LIGHT].setBrightness(limit);
 
 		if (outputs[OUT_OUTPUT].isConnected() || outputs[OUT_OUTPUT+1].isConnected()) {
-			if (inputs[MOD1_INPUT].isConnected()) {				
-				if (inputs[MOD2_INPUT].isConnected()) { 
+			vol1 = params[VOL1_PARAMS].getValue();
+			vol2 = params[VOL2_PARAMS].getValue();
+			phase1 = params[PHASE_SWITCH].getValue();
+			phase2 = params[PHASE_SWITCH+1].getValue();
+			vol = params[VOL_PARAMS].getValue();
+
+			if (inputs[MOD1_INPUT].isConnected()) {		
+				if (inputs[MOD2_INPUT].isConnected()) {
 					if (params[MOD2_RANGE_SWITCH].getValue() == 1)
 						mod2 = params[MOD2_ATNV_PARAMS].getValue() * inputs[MOD2_INPUT].getVoltage() * 0.1;
 					else
@@ -101,40 +136,114 @@ struct Blender : Module {
 			} else {
 				mix = params[MIX_PARAMS].getValue();
 			}
-			
-			for (int i=0; i<2; i++) {
-				if (outputs[OUT_OUTPUT+i].isConnected()) {
-					input1[i] = inputs[IN1_INPUT+i].getVoltage() * params[VOL1_PARAMS].getValue();
-					if (!params[PHASE_SWITCH].getValue())	// inverted if because of inverted switch widget
-						input1[i] = -input1[i];
-					input2[i] = inputs[IN2_INPUT+i].getVoltage() * params[VOL2_PARAMS].getValue();
-					if (!params[PHASE_SWITCH+1].getValue())	// inverted if because of inverted switch widget
-						input2[i] = -input2[i];
-					mixedOut[i] = (input1[i] * (1 - mix)) + (input2[i] * mix);
-				} else {
-					mixedOut[i] = 0;
-				}
-			}			
-		} else {
-			mixedOut[0] = 0;
-			mixedOut[1] = 0;
 		}
-		mixedOut[0] *= params[VOL_PARAMS].getValue();
-		mixedOut[1] *= params[VOL_PARAMS].getValue();
 
-		if (params[LIMIT_PARAMS].getValue()) {
-			if (mixedOut[0] > 5)
-				mixedOut[0] = 5;
-			else if (mixedOut[0] < -5)
-				mixedOut[0] = -5;
-			if (mixedOut[1] > 5)
-				mixedOut[1] = 5;
-			else if (mixedOut[1] < -5)
-				mixedOut[1] = -5;
+		// LEFT CHANNEL
+
+		if (outputs[OUT_OUTPUT].isConnected()) {
+			chanL = std::max(1, inputs[IN1_INPUT].getChannels());
+			summedOut[0] = 0;
+
+			for (int c = 0; c < chanL; c++) {
+
+				input1[0][c] = inputs[IN1_INPUT].getVoltage(c) * vol1;
+				if (!phase1)	// inverted if because of inverted switch widget
+					input1[0][c] = -input1[0][c];
+
+				input2[0][c] = inputs[IN2_INPUT].getVoltage(c) * vol2;
+				if (!phase2)	// inverted if because of inverted switch widget
+					input2[0][c] = -input2[0][c];
+				
+				mixedOut[0][c] = (input1[0][c] * (1 - mix)) + (input2[0][c] * mix) * vol;
+
+				switch (polyOuts) {
+					case MONOPHONIC:
+						summedOut[0] += mixedOut[0][c];
+					break;
+
+					case POLYPHONIC:
+						if (limit) {
+							if (mixedOut[0][c] > 5)
+								mixedOut[0][c] = 5;
+							else if (mixedOut[0][c] < -5)
+								mixedOut[0][c] = -5;
+						}
+						outputs[OUT_OUTPUT].setVoltage(mixedOut[0][c], c);
+					break;
+				}
+
+			}
+
+		} else {
+			for (int c = 0; c < 16; c++)
+				outputs[OUT_OUTPUT].setVoltage(0, c);
 		}
-		outputs[OUT_OUTPUT].setVoltage(mixedOut[0]);
-		outputs[OUT_OUTPUT+1].setVoltage(mixedOut[1]);
-	}		
+
+		// RIGHT CHANNEL
+
+		if (outputs[OUT_OUTPUT+1].isConnected()) {
+			chanR = std::max(1, inputs[IN1_INPUT+1].getChannels());
+			summedOut[1] = 0;
+
+			for (int c = 0; c < chanR; c++) {
+
+				input1[1][c] = inputs[IN1_INPUT+1].getVoltage(c) * vol1;
+				if (!phase1)	// inverted if because of inverted switch widget
+					input1[1][c] = -input1[1][c];
+
+				input2[1][c] = inputs[IN2_INPUT+1].getVoltage(c) * vol2;
+				if (!phase2)	// inverted if because of inverted switch widget
+					input2[1][c] = -input2[1][c];
+
+				mixedOut[1][c] = (input1[1][c] * (1 - mix)) + (input2[1][c] * mix) * vol;
+
+				switch (polyOuts) {
+					case MONOPHONIC:
+						summedOut[1] += mixedOut[1][c];
+					break;
+
+					case POLYPHONIC:
+						if (limit) {
+							if (mixedOut[1][c] > 5)
+								mixedOut[1][c] = 5;
+							else if (mixedOut[1][c] < -5)
+								mixedOut[1][c] = -5;
+						}
+						outputs[OUT_OUTPUT+1].setVoltage(mixedOut[1][c], c);
+					break;
+				}
+					
+			}
+
+		} else {
+			for (int c = 0; c < 16; c++)
+				outputs[OUT_OUTPUT+1].setVoltage(0, c);
+		}
+
+		switch (polyOuts) {
+			case MONOPHONIC:
+				if (limit) {
+					if (summedOut[0] > 5)
+						summedOut[0] = 5;
+					else if (summedOut[0] < -5)
+						summedOut[0] = -5;
+
+					if (summedOut[1] > 5)
+						summedOut[1] = 5;
+					else if (summedOut[1] < -5)
+						summedOut[1] = -5;
+				}
+				outputs[OUT_OUTPUT].setVoltage(summedOut[0]);
+				outputs[OUT_OUTPUT+1].setVoltage(summedOut[1]);
+			break;
+
+			case POLYPHONIC:
+				outputs[OUT_OUTPUT].setChannels(chanL);
+				outputs[OUT_OUTPUT+1].setChannels(chanR);
+			break;
+		}
+		
+	}
 };
 
 struct BlenderWidget : ModuleWidget {
@@ -172,6 +281,13 @@ struct BlenderWidget : ModuleWidget {
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(27.8, 115.2)), module, Blender::OUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.4, 115.2)), module, Blender::OUT_OUTPUT+1));
+	}
+
+	void appendContextMenu(Menu *menu) override {
+	   	Blender *module = dynamic_cast<Blender*>(this->module);
+		assert(module);
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
 	}
 };
 
