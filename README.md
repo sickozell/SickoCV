@@ -1,4 +1,4 @@
-# SickoCV v2.5.1-beta12
+# SickoCV v2.5.1-beta13
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -47,7 +47,7 @@ Stereo crossfade mixer with double modulation
 # SickoCV v2.5.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/211935220-534a8b74-7e36-4636-bd12-aa01ed4bcf28.JPG)
+![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/212480942-1812dcd5-8a6b-449a-8a5d-956da30b4cf5.JPG)
 
 ## Blender
 ### Stereo crossfade mixer with double modulation
@@ -60,7 +60,7 @@ Audio rate modulations are allowed.
 
 ![blender](https://user-images.githubusercontent.com/80784296/211660967-ce9aa25d-cc8f-45a9-beae-3381a13cf0af.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used.  
 PHASE switches invert the sign of input signals.  
 MIX knob sets the crossfade level of the inputs.  
@@ -85,7 +85,7 @@ Audio rate modulations are allowed.
 
 ![blender8](https://user-images.githubusercontent.com/80784296/201516772-12dac17b-f8a0-4f82-946a-da8b7d254b09.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 'blender8' provides 8 mono crossfade mixers and differs from 'blender' module in the following things.  
 Only the IN2 input signal can be phase inverted.  
 If a CV input is connected for modulation, CV sets the mix percentage and the MIX knob becomes the CV attenuverter.
@@ -99,7 +99,7 @@ If a CV input is connected for modulation, CV sets the mix percentage and the MI
 
 ![btoggler](https://user-images.githubusercontent.com/80784296/211221913-2ac04d94-b80b-4222-a02b-2719e0fb4d38.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 Connect a clock source.
 
 When ARM input is triggered (arm on), the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
@@ -137,7 +137,7 @@ Otherwise bToggler OUTs can be connected to envelope generators. In that case th
 
 ![btoggler8](https://user-images.githubusercontent.com/80784296/201516798-acfa6672-07d0-4f0e-bd38-6269a204eb64.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 Connect a clock source.
 
 When ARM input is triggered (arm on) the IN input will start to be routed to OUT on next clock detection and GATE output will provide a high state.
@@ -170,7 +170,7 @@ So when pressing buttons on controller, 'bToggler8+' will actually play/stop the
 
 ![btoggler8plus](https://user-images.githubusercontent.com/80784296/201516811-40c75bb5-84d2-411b-b9ed-fa876e178258.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 The same of the previous one, plus:
 
 When 'armed on' or 'armed off', the WRN (warning) output will provide a sequence of pulses until next clock is detected.  
@@ -198,7 +198,7 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 
 ![calcs](https://user-images.githubusercontent.com/80784296/201516821-8ea683bd-db11-4687-971d-67bef380b81c.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
@@ -208,7 +208,7 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 
 ![drummer](https://user-images.githubusercontent.com/80784296/211936925-8c0f65f3-f7ec-48eb-a323-9a938ba3be3b.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 Drummer and Drummer4 module can handle 2 or 4 drum sounds with separate standard and accent volume levels set by respective knobs.  
 
 Connect the IN input to a drum-like audio source or sample player, and OUT output to the mixer.  
@@ -243,7 +243,7 @@ Example of Drummer4 module usage:
 
 ![drumplayer](https://user-images.githubusercontent.com/80784296/211175360-52a19c7f-9aad-4b2e-ae4f-c6728e7715a8.JPG)
 
-#### USAGE  
+#### INSTRUCTIONS  
 Load wav samples in the slots using context menu.  
 
 When TRIG input is triggered the sample will be played at the volume percentage set by to "Standard Level" knob + its relative attenuverted CVinput.  
@@ -283,7 +283,7 @@ NOTE: input trigger threshold is +1v.
 
 ![parking](https://user-images.githubusercontent.com/80784296/204013230-cda01462-92c9-4013-8599-c0ba9d798ae0.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 This module doesn't do anything. It's just a place to connect your temporarily unused cables when you don't want to forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
 
@@ -295,7 +295,7 @@ It can also be used to connect other modules sockets when they need to be wired 
 
 ![shifter](https://user-images.githubusercontent.com/80784296/204009935-efd147d4-2d28-4b72-a607-af41e7c8e894.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 Shifter module can be useful to shift back and fotrth a sequencer output on the fly, thanks to the 64 stages register.  
 Stage can be controlled via the stage knob, or the 0-10v StageCV input with its attenuverter.  
 If StageCV input is not connected, the attenuverter reduces the range of the Stage knob.  
@@ -308,15 +308,15 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ## SickoPlayer
 ### wav sample player
 
-![sickoplayer](https://user-images.githubusercontent.com/80784296/211175383-02624c53-8af1-4579-9a15-720f2e7f72ad.JPG)
+![sickoplayer](https://user-images.githubusercontent.com/80784296/212481297-755598b1-aa1e-4252-b750-42f86b337f25.JPG)
 
 #### - DESCRIPTION
 - samples and 1-cycle waveforms player
 - ±24 semitones tuning and v/oct input with polyphony
-- envelope generator, loop, phase-scan feature
+- envelope generator, loop, reverse, pingpong, phase-scan feature
 - different interpolation modes, anti-aliasing filter
 
-#### - USAGE
+#### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
 
 The display shows the waveform, filename, sample rate and number of channels (1-2 channels wav file are allowed).  
@@ -324,14 +324,21 @@ The display shows the waveform, filename, sample rate and number of channels (1-
 Mode switch allows to select if sample playback starts with a trigger or until a gate is high.  
 
 When in Trig Mode the Trig-Mode switch has 3 options:  
-**SS (Start/Stop)** A trigger starts attack stage from CueStart postition, another trigger sets playback to release stage and at the end sample position is reset to cue start  
-**S (Start only)** A trigger starts attack stage from CueStart position, another trigger has no effects  
-**PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage  
+- **SS (Start/Stop)** A trigger starts attack stage from CueStart postition, another trigger sets playback to release stage and at the end sample position is reset to cue start  
+- **S (Start only)** A trigger starts attack stage from CueStart position, another trigger has no effects  
+- **PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage  
 
 In any Trig-Mode a trigger on STOP input sets the playback to release stage and reset sample position to Cue Start  
 
-Cue Start/End knobs are used to set the start of the Attack and the Release stage if before no stop triggers occur before.  
-When Loop button is switched on, Loop Start/end knobs become active and affect playback with expected behavior.  
+Cue Start/End knobs are used to set the start of the Attack and the Release stage.  
+
+When Loop button is switched on, playback restarts from Loop Start when Loop End is reached.  
+
+REV button changes the playback direction.
+
+PNG button enables PingPong mode:
+- in TRIG mode, when loop is enabled, it automatically switches the REV button when Loop Start/End is reached and inverts playback direction.
+- in GATE mode, it automatically switches the REV button when Loop Start/End is reached when loop is enabled, or when Cue Start/End is reached, and playback direction is inverted.
 
 The envelope generator knobs can be external modulated with attenuverters.  
 
@@ -377,18 +384,18 @@ Loading a factory preset automatically clears the sample from memory, pay attent
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - DESCRIPTION
-- Function type (switch, route, swap, mute, flipflop, toggle gate) autodetection
 - Signal switch (2 inputs, 1 output)
 - Signal router (1 input, 2 outputs)
 - Signal swapper (2 inputs, 2 outputs)
 - Mute (1 input, 1 output)
 - Flip flop
 - Toggle gate
+- Function type autodetection (switch, route, swap, mute, flipflop, toggle gate)
 - Adjustable time crossfade between switched/routed/swapped signals
 
 ![switcher](https://user-images.githubusercontent.com/80784296/201516861-d3d2ab1b-7036-4355-b2ef-e4c5681fb432.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 Switcher or SwitcherSt (used for stereo signals) are multifunction modules that can be used as follows. The versatility of the module is offered thanks to the automatic detection of the function type.
 
 **TOGGLE/GATE modes**  
@@ -441,7 +448,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 
 ![toggler](https://user-images.githubusercontent.com/80784296/211222030-1a5b4e86-eccd-4e4f-ae56-65efd100e336.JPG)
 
-#### - USAGE
+#### - INSTRUCTIONS
 **TOGGLE MODE**
 
 On receiving a trigger on TRIG input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
@@ -473,7 +480,7 @@ These behaviors are more understandable connecting a scope on the output.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
-Thanks to [squinkylabs](https://github.com/squinkylabs) and [András Szabó](https://github.com/firolightfog) for help and testing  
+Thanks to [squinkylabs](https://github.com/squinkylabs) and [FiroLFO](https://github.com/firolightfog) for help and testing  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
 
 
