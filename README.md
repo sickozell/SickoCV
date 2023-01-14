@@ -313,43 +313,43 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 #### - DESCRIPTION
 - samples and 1-cycle waveforms player
 - ±24 semitones tuning and v/oct input with polyphony
-- envelope generator, loop, reverse, pingpong, phase-scan feature
-- different interpolation modes, anti-aliasing filter
+- envelope generator, loop, reverse, pingpong
+- different interpolation modes, anti-aliasing filter, phase-scan feature
 
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
 
 The display shows the waveform, filename, sample rate and number of channels (1-2 channels wav file are allowed).  
 
-Mode switch allows to select if sample playback starts with a trigger or until a gate is high.  
+Mode switch allows to select if sample playback starts with a trigger or play it until a gate is high.  
 
 When in Trig Mode the Trig-Mode switch has 3 options:  
 - **SS (Start/Stop)** A trigger starts attack stage from CueStart postition, another trigger sets playback to release stage and at the end sample position is reset to cue start  
 - **S (Start only)** A trigger starts attack stage from CueStart position, another trigger has no effects  
 - **PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage  
 
-In any Trig-Mode a trigger on STOP input sets the playback to release stage and reset sample position to Cue Start  
+In any Trig-Mode a trigger on STOP input sets the playback to release stage and reset sample position to Cue Start.
 
-Cue Start/End knobs are used to set the start of the Attack and the Release stage.  
+Cue Start/End knobs are used to set the start of the Attack and the Release stage.
 
-When Loop button is switched on, playback restarts from Loop Start when Loop End is reached.  
+When Loop button is switched on, playback restarts from Loop Start when Loop End is reached.
 
 REV button changes the playback direction.
 
 PNG button enables PingPong mode:
-- in TRIG mode, when loop is enabled, it automatically switches the REV button when Loop Start/End is reached and inverts playback direction.
-- in GATE mode, it automatically switches the REV button when Loop Start/End is reached when loop is enabled, or when Cue Start/End is reached, and playback direction is inverted.
+- in TRIG mode, when loop is enabled, it automatically switches the REV button when Loop Start/End is reached and inverts playback direction without stopping playback
+- in GATE mode, it automatically switches the REV button when Loop Start/End is reached when loop is enabled, or when Cue Start/End is reached, and playback direction is inverted without stopping playback
 
-The envelope generator knobs can be external modulated with attenuverters.  
+The envelope knobs can be external modulated with attenuverted CVinputs.
 
 Tune knob with its attenuverted CVinput, can tune up or down the sample with a ±2 octave range (semitone scale).  
-v/oct input accepts polyphonic cable usually combined with a polyphonic gate in, when in Gate Mode.  
+v/oct input accepts polyphonic cable usually combined with a polyphonic gate in when in Gate Mode.  
 
-Master knob with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range.  
+Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range.  
 
 If sample file is mono, left out is duplicated to right out.  
-EOC outputs a 1ms pulse when sample reach the CueEnd position or LoopEnd when Loop is enabled.
-EOR outputs a 1ms pulse when sample reach the end of release stage.
+EOC outputs a 1ms pulse when sample reaches CueEnd or LoopEnd if Loop is enabled (or when Start positions are reached when in reverse playback).  
+EOR outputs a 1ms pulse when sample reaches the end of release stage.
 
 NOTE: input trigger threshold is +1v.  
 
@@ -362,24 +362,28 @@ As described before, just right-click over the waveform display area to access t
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
 - 'No interpolation' can be used when sample rates match and speed is 100% constant  
 - 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages  
-- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default)  
+- 'Hermite' uses a Cubic Hermite spline interpolation that usually offers a better result (default)  
 
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
 **Crossfade length**  
-Crossfade can be set from 0 to 50ms and is engaged when the sample skips from LoopEnd to LoopStart or from CueEnd to CueStart when in Gate Mode.  
+Crossfade can be set from 0 to 50ms and is engaged when the sample skips from LoopEnd to LoopStart or from CueEnd to CueStart when in Gate Mode.
 
 **Polyphonic Outs**  
-When this option is enabled the outs reflects v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out  
+When this option is enabled the outs reflects v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out.
 
 **Phase scan**  
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
-Be sure to disable it when using 1-cycle waveforms.  
+Be sure to disable it when using one-cycle waveforms.  
 
 #### PRESETS
 There are some factory presets stored in the context menu.  
 Loading a factory preset automatically clears the sample from memory, pay attention.
+
+#### USING ONE-CYCLE WAVEFORMS
+One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
+Be sure to disable PhaseScan functionality, adjust Cue and Loop START to 0% and Cue/Loop END to 100%, or load relative factory preset before loading the sample.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
@@ -480,7 +484,7 @@ These behaviors are more understandable connecting a scope on the output.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
-Thanks to [squinkylabs](https://github.com/squinkylabs) and [FiroLFO](https://github.com/firolightfog) for help and testing  
+Thanks to [Squinkylabs](https://github.com/squinkylabs) and [Firo Lightfog](https://github.com/firolightfog) for help and testing  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
 
 
