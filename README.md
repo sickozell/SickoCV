@@ -1,4 +1,5 @@
-# SickoCV v2.5.1-beta14
+# NEXT UPCOMING VERSION:
+# SickoCV v2.5.2-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -12,37 +13,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-### SickoPlayer
-Wav sample player with v/oct, polyphony, tuning, envelope, loop, interpolation and anti-aliasing filter
-
-### DrumPlayer  
-Drum Sample Player with audio signal interpolation and anti-aliasing filter  
-- added a "sample loaded led" for each slot in DrumPlayer  
-
-### DrumPlayer+  
-Drum Sample Player with audio signal interpolation and anti-aliasing filter  
-
-### Drummer  
-Accent and choke utility for drum modules lacking these features  
-- code optimization  
-
-### Drummer4
-Accent and choke utility for drum modules lacking these features  
-- added choke functionality and changed panel
-- code optimization  
-
-### Drummer4+
-Accent and choke utility for drum modules lacking these features  
-- added CV inputs with attenuverters to Drummer4  
-
-### Blender
-Stereo crossfade mixer with double modulation  
-- added input attenuators
-- changed artwork panel
+- NONE
 
 ## **to do list:** 
 - nothing in queue
-
 
 # SickoCV v2.5.1
 VCV Rack plugin modules
@@ -490,5 +464,3 @@ The Component Library graphics for these modules are copyright © VCV and licens
 
 Thanks to [Squinkylabs](https://github.com/squinkylabs) and [Firo Lightfog](https://github.com/firolightfog) for help and testing  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
-
-
