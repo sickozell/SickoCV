@@ -117,8 +117,6 @@ struct Drummer4Plus : Module {
 		limit[2] = params[LIMIT_SWITCH+2].getValue();
 		limit[3] = params[LIMIT_SWITCH+3].getValue();
 
-		outSum = 0;
-
 		// --------  SLOT  1  --------
 		if (inputs[TRIG_INPUT].isConnected()) {
 			trigValue[0] = inputs[TRIG_INPUT].getVoltage();
@@ -223,15 +221,18 @@ struct Drummer4Plus : Module {
 
 		// --------  OUT  1  --------
 
+		outSum = out[0];
+
 		if (limit[0]) {
-			if (out[0] > 5)
-				out[0] = 5;
-			else if (out[0] < -5)
-				out[0] = -5;
+			if (outSum > 5)
+				outSum = 5;
+			else if (outSum < -5)
+				outSum = -5;
 		}
 
 		if (outputs[OUT_OUTPUT].isConnected()) { 
-			outputs[OUT_OUTPUT].setVoltage(out[0]);
+			outputs[OUT_OUTPUT].setVoltage(outSum);
+			outSum = 0;
 		} else {
 			outSum = out[0];
 		}
@@ -258,20 +259,18 @@ struct Drummer4Plus : Module {
 					out[1] = 0;
 			}
 		}
-		
+
+		outSum += out[1];
 		if (limit[1]) {
-			if (out[1] > 5)
-				out[1] = 5;
-			else if (out[1] < -5)
-				out[1] = -5;
+			if (outSum > 5)
+				outSum = 5;
+			else if (outSum < -5)
+				outSum = -5;
 		}
 
 		if (outputs[OUT_OUTPUT+1].isConnected()) { 
-			outSum += out[1];
 			outputs[OUT_OUTPUT+1].setVoltage(outSum);
 			outSum = 0;
-		} else {
-			outSum += out[1];
 		}
 
 		// --------  OUT  3  --------
@@ -297,21 +296,18 @@ struct Drummer4Plus : Module {
 			}
 		}
 
+		outSum += out[2];
 		if (limit[2]) {
-			if (out[2] > 5)
-				out[2] = 5;
-			else if (out[2] < -5)
-				out[2] = -5;
+			if (outSum > 5)
+				outSum = 5;
+			else if (outSum < -5)
+				outSum = -5;
 		}
 
 		if (outputs[OUT_OUTPUT+2].isConnected()) { 
-			outSum += out[2];
 			outputs[OUT_OUTPUT+2].setVoltage(outSum);
 			outSum = 0;
-		} else {
-			outSum += out[2];
 		}
-
 
 		// --------  OUT  4  --------
 
@@ -336,15 +332,14 @@ struct Drummer4Plus : Module {
 			}
 		}
 
-		if (limit[3]) {
-			if (out[3] > 5)
-				out[3] = 5;
-			else if (out[3] < -5)
-				out[3] = -5;
-		}
-
 		if (outputs[OUT_OUTPUT+3].isConnected()) { 
 			outSum += out[3];
+			if (limit[3]) {
+			if (outSum > 5)
+				outSum = 5;
+			else if (outSum < -5)
+				outSum = -5;
+			}
 			outputs[OUT_OUTPUT+3].setVoltage(outSum);
 		} else {
 			outputs[OUT_OUTPUT+3].setVoltage(0);

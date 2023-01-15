@@ -18,7 +18,7 @@ struct Blender : Module {
 
 	int chanL;
 	int chanR;
-	int polyOuts = MONOPHONIC;
+	int polyOuts = POLYPHONIC;
 
 	enum ParamId {
 		ENUMS(PHASE_SWITCH,2),

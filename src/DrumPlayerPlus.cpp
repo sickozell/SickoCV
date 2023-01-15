@@ -454,16 +454,26 @@ struct DrumPlayerPlus : Module {
 				fading[i] = false;
 			}
 
+			/*
 			if (params[LIMIT_SWITCH+i].getValue()) {
 				if (currentOutput > 5)
 					currentOutput = 5;
 				else if (currentOutput < -5)
 					currentOutput = -5;
 			}
+			*/
 
 			switch (outsMode) {
 				case NORMALLED_OUTS:
 					summedOutput += currentOutput;
+
+					if (params[LIMIT_SWITCH+i].getValue()) {
+						if (summedOutput > 5)
+							summedOutput = 5;
+						else if (summedOutput < -5)
+							summedOutput = -5;
+					}
+
 					if (outputs[OUT_OUTPUT+i].isConnected()) {
 						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
 						summedOutput = 0;
@@ -471,18 +481,46 @@ struct DrumPlayerPlus : Module {
 				break;
 
 				case SOLO_OUTS:
-					if (outputs[OUT_OUTPUT+i].isConnected())
+					if (outputs[OUT_OUTPUT+i].isConnected()) {
+						
+						if (params[LIMIT_SWITCH+i].getValue()) {
+							if (currentOutput > 5)
+								currentOutput = 5;
+							else if (currentOutput < -5)
+								currentOutput = -5;
+						}
 						outputs[OUT_OUTPUT+i].setVoltage(currentOutput);
+
+					}
 				break;
 
 				case UNCONNECTED_ON_4:
 					if (i == 3) {
 						summedOutput += currentOutput;
+						if (params[LIMIT_SWITCH+i].getValue()) {
+							if (summedOutput > 5)
+								summedOutput = 5;
+							else if (summedOutput < -5)
+								summedOutput = -5;
+						}
 						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
-					} else if (outputs[OUT_OUTPUT+i].isConnected())
+					} else if (outputs[OUT_OUTPUT+i].isConnected()) {
+						if (params[LIMIT_SWITCH+i].getValue()) {
+							if (currentOutput > 5)
+								currentOutput = 5;
+							else if (currentOutput < -5)
+								currentOutput = -5;
+						}
 						outputs[OUT_OUTPUT+i].setVoltage(currentOutput);
-					else
+					} else {
 						summedOutput += currentOutput;
+						if (params[LIMIT_SWITCH+i].getValue()) {
+							if (summedOutput > 5)
+								summedOutput = 5;
+							else if (summedOutput < -5)
+								summedOutput = -5;
+						}
+					}
 				break;
 			}
 

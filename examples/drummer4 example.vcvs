@@ -1,162 +1,7 @@
 {
   "modules": [
     {
-      "id": 3497961449537548,
-      "plugin": "SickoCV",
-      "model": "Drummer4",
-      "version": "2.4.0",
-      "params": [
-        {
-          "value": 0.0,
-          "id": 0
-        },
-        {
-          "value": 0.0,
-          "id": 1
-        },
-        {
-          "value": 0.0,
-          "id": 2
-        },
-        {
-          "value": 0.0,
-          "id": 3
-        },
-        {
-          "value": 1.0,
-          "id": 4
-        },
-        {
-          "value": 0.5,
-          "id": 5
-        },
-        {
-          "value": 0.5,
-          "id": 6
-        },
-        {
-          "value": 1.0,
-          "id": 7
-        },
-        {
-          "value": 1.3999999761581421,
-          "id": 8
-        },
-        {
-          "value": 1.0,
-          "id": 9
-        },
-        {
-          "value": 1.0,
-          "id": 10
-        },
-        {
-          "value": 1.0,
-          "id": 11
-        }
-      ],
-      "pos": [
-        -51,
-        0
-      ]
-    },
-    {
-      "id": 3070995261695945,
-      "plugin": "Core",
-      "model": "Notes",
-      "version": "2.1.2",
-      "params": [],
-      "data": {
-        "text": "DRUMMER4 IS USED TO ACCENT DRUM ELEMENTS TRIGGERED BY uGRAPH.\n\nTRY TO DISCONNECT 'ACC' CABLES TO GET THE DIFFERENCE"
-      },
-      "pos": [
-        -80,
-        0
-      ]
-    },
-    {
-      "id": 7797171171641972,
-      "plugin": "Autodafe-DrumKit",
-      "model": "DrumsKick",
-      "version": "2.0.0",
-      "params": [
-        {
-          "value": 0.0,
-          "id": 0
-        }
-      ],
-      "rightModuleId": 4346439725187691,
-      "data": {
-        "sampletype": 1
-      },
-      "pos": [
-        -38,
-        0
-      ]
-    },
-    {
-      "id": 4346439725187691,
-      "plugin": "Autodafe-DrumKit",
-      "model": "DrumsSnare",
-      "version": "2.0.0",
-      "params": [
-        {
-          "value": 0.0,
-          "id": 0
-        }
-      ],
-      "leftModuleId": 7797171171641972,
-      "rightModuleId": 777101487573142,
-      "data": {
-        "sampletype": 1
-      },
-      "pos": [
-        -34,
-        0
-      ]
-    },
-    {
-      "id": 777101487573142,
-      "plugin": "Autodafe-DrumKit",
-      "model": "DrumsHiHatClosed",
-      "version": "2.0.0",
-      "params": [
-        {
-          "value": 0.0,
-          "id": 0
-        }
-      ],
-      "leftModuleId": 4346439725187691,
-      "data": {
-        "sampletype": 1
-      },
-      "pos": [
-        -30,
-        0
-      ]
-    },
-    {
-      "id": 1184885113607329,
-      "plugin": "Fundamental",
-      "model": "Mixer",
-      "version": "2.3.1",
-      "params": [
-        {
-          "value": 0.33614465594291687,
-          "id": 0
-        }
-      ],
-      "data": {
-        "average": false,
-        "invert": false
-      },
-      "pos": [
-        -25,
-        0
-      ]
-    },
-    {
-      "id": 5231550025391975,
+      "id": 223850238714815,
       "plugin": "Valley",
       "model": "uGraph",
       "version": "2.0.4",
@@ -174,27 +19,27 @@
           "id": 2
         },
         {
-          "value": 0.57228881120681763,
+          "value": 0.3939756453037262,
           "id": 3
         },
         {
-          "value": 0.67469853162765503,
+          "value": 0.75783085823059082,
           "id": 4
         },
         {
-          "value": 0.53373509645462036,
+          "value": 0.62891554832458496,
           "id": 5
         },
         {
-          "value": 0.47228938341140747,
+          "value": 0.57469886541366577,
           "id": 6
         },
         {
-          "value": 0.59518057107925415,
+          "value": 0.39156582951545715,
           "id": 7
         },
         {
-          "value": 0.8301205039024353,
+          "value": 0.64096337556838989,
           "id": 8
         },
         {
@@ -216,126 +61,293 @@
         -63,
         0
       ]
+    },
+    {
+      "id": 2901042281631902,
+      "plugin": "Core",
+      "model": "Notes",
+      "version": "2.1.2",
+      "params": [],
+      "data": {
+        "text": "DRUMMER4 IS USED TO ACCENT DRUM ELEMENTS TRIGGERED BY uGRAPH.\n\nTRY TO DISCONNECT 'ACC' CABLES TO GET THE DIFFERENCE"
+      },
+      "pos": [
+        -80,
+        0
+      ]
+    },
+    {
+      "id": 2409955625037567,
+      "plugin": "SickoCV",
+      "model": "Drummer4",
+      "version": "2.5.1-beta13",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.5,
+          "id": 5
+        },
+        {
+          "value": 0.5,
+          "id": 6
+        },
+        {
+          "value": 0.80000001192092896,
+          "id": 7
+        },
+        {
+          "value": 0.5,
+          "id": 8
+        },
+        {
+          "value": 0.5,
+          "id": 9
+        },
+        {
+          "value": 1.0,
+          "id": 10
+        },
+        {
+          "value": 1.5,
+          "id": 11
+        },
+        {
+          "value": 1.0,
+          "id": 12
+        },
+        {
+          "value": 1.0,
+          "id": 13
+        },
+        {
+          "value": 1.0,
+          "id": 14
+        }
+      ],
+      "pos": [
+        -51,
+        0
+      ]
+    },
+    {
+      "id": 6490468293922188,
+      "plugin": "Autodafe-DrumKit",
+      "model": "DrumsHiHatClosed",
+      "version": "2.0.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 3927591237463672,
+      "data": {
+        "sampletype": 1
+      },
+      "pos": [
+        -30,
+        0
+      ]
+    },
+    {
+      "id": 6342306170980849,
+      "plugin": "Autodafe-DrumKit",
+      "model": "DrumsKick",
+      "version": "2.0.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        }
+      ],
+      "rightModuleId": 3927591237463672,
+      "data": {
+        "sampletype": 1
+      },
+      "pos": [
+        -38,
+        0
+      ]
+    },
+    {
+      "id": 3927591237463672,
+      "plugin": "Autodafe-DrumKit",
+      "model": "DrumsSnare",
+      "version": "2.0.0",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 6342306170980849,
+      "rightModuleId": 6490468293922188,
+      "data": {
+        "sampletype": 1
+      },
+      "pos": [
+        -34,
+        0
+      ]
+    },
+    {
+      "id": 5702467638535008,
+      "plugin": "Fundamental",
+      "model": "Mixer",
+      "version": "2.3.1",
+      "params": [
+        {
+          "value": 0.33614465594291687,
+          "id": 0
+        }
+      ],
+      "data": {
+        "average": false,
+        "invert": false
+      },
+      "pos": [
+        -25,
+        0
+      ]
     }
   ],
   "cables": [
     {
-      "id": 4774703347885065,
-      "outputModuleId": 5231550025391975,
+      "id": 5823684175079074,
+      "outputModuleId": 223850238714815,
       "outputId": 0,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 0,
       "color": "#f3374b"
     },
     {
-      "id": 2790194009028746,
-      "outputModuleId": 5231550025391975,
+      "id": 3974565371374600,
+      "outputModuleId": 223850238714815,
       "outputId": 1,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 1,
       "color": "#3695ef"
     },
     {
-      "id": 4586379066983711,
-      "outputModuleId": 5231550025391975,
+      "id": 6497874647626622,
+      "outputModuleId": 223850238714815,
       "outputId": 2,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 2,
       "color": "#ffb437"
     },
     {
-      "id": 1791452362943270,
-      "outputModuleId": 5231550025391975,
+      "id": 4335309241939342,
+      "outputModuleId": 223850238714815,
       "outputId": 0,
-      "inputModuleId": 7797171171641972,
+      "inputModuleId": 6342306170980849,
       "inputId": 0,
       "color": "#f3374b"
     },
     {
-      "id": 8333556453732491,
-      "outputModuleId": 5231550025391975,
+      "id": 4222266341004006,
+      "outputModuleId": 223850238714815,
       "outputId": 1,
-      "inputModuleId": 4346439725187691,
+      "inputModuleId": 3927591237463672,
       "inputId": 0,
       "color": "#3695ef"
     },
     {
-      "id": 110901914169552,
-      "outputModuleId": 5231550025391975,
+      "id": 8536420122931654,
+      "outputModuleId": 223850238714815,
       "outputId": 2,
-      "inputModuleId": 777101487573142,
+      "inputModuleId": 6490468293922188,
       "inputId": 0,
       "color": "#ffb437"
     },
     {
-      "id": 6043275697190761,
-      "outputModuleId": 7797171171641972,
+      "id": 6194698884742427,
+      "outputModuleId": 6342306170980849,
       "outputId": 0,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 8,
       "color": "#f3374b"
     },
     {
-      "id": 3235711675445026,
-      "outputModuleId": 4346439725187691,
+      "id": 5068268336921712,
+      "outputModuleId": 3927591237463672,
       "outputId": 0,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 9,
       "color": "#3695ef"
     },
     {
-      "id": 276257367877262,
-      "outputModuleId": 777101487573142,
+      "id": 2214586665397933,
+      "outputModuleId": 6490468293922188,
       "outputId": 0,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 10,
       "color": "#ffb437"
     },
     {
-      "id": 7977816361358507,
-      "outputModuleId": 3497961449537548,
+      "id": 4815836318978239,
+      "outputModuleId": 2409955625037567,
       "outputId": 0,
-      "inputModuleId": 1184885113607329,
+      "inputModuleId": 5702467638535008,
       "inputId": 0,
       "color": "#f3374b"
     },
     {
-      "id": 7201972880467894,
-      "outputModuleId": 3497961449537548,
+      "id": 3369976190819465,
+      "outputModuleId": 2409955625037567,
       "outputId": 1,
-      "inputModuleId": 1184885113607329,
+      "inputModuleId": 5702467638535008,
       "inputId": 1,
       "color": "#3695ef"
     },
     {
-      "id": 1850465808429826,
-      "outputModuleId": 3497961449537548,
+      "id": 8649739344974933,
+      "outputModuleId": 2409955625037567,
       "outputId": 2,
-      "inputModuleId": 1184885113607329,
+      "inputModuleId": 5702467638535008,
       "inputId": 2,
       "color": "#ffb437"
     },
     {
-      "id": 1592120579850387,
-      "outputModuleId": 5231550025391975,
+      "id": 7511800003092808,
+      "outputModuleId": 223850238714815,
       "outputId": 3,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 4,
       "color": "#00b56e"
     },
     {
-      "id": 5904744497133076,
-      "outputModuleId": 5231550025391975,
+      "id": 2445988826538185,
+      "outputModuleId": 223850238714815,
       "outputId": 5,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 6,
       "color": "#00b56e"
     },
     {
-      "id": 2165477586161459,
-      "outputModuleId": 5231550025391975,
+      "id": 7149353699988909,
+      "outputModuleId": 223850238714815,
       "outputId": 4,
-      "inputModuleId": 3497961449537548,
+      "inputModuleId": 2409955625037567,
       "inputId": 5,
       "color": "#00b56e"
     }
