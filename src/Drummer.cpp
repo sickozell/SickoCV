@@ -34,15 +34,13 @@ struct Drummer : Module {
 	float out[2] = {0.f,0.f};
 	float outFinal = 0.f;
 	
-	float maxFadeSample[2] = {0.f,0.f};
-	float currentFadeSample[2] = {0.f,0.f};
-	float startFade[2] = {0.f,0.f};
-	float lastFade[2] = {0.f,0.f};
+	float fadeCoeff = 1000 / APP->engine->getSampleRate(); // 1ms choke
+	float currentFade[2] = {0.f,0.f};
 
 	Drummer() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(CHOKE_SWITCH, 0.f, 1.f, 0.f, "Mode", {"Off", "On"});
-		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "5v"});
+		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "±5v"});
 		configParam(ACCENT_PARAMS, 0.f, 2.f, 1.f, "Accent Level #1", "%", 0, 100);
 		configParam(ACCENT_PARAMS+1, 0.f, 2.f, 1.f, "Accent Level #2", "%", 0, 100);
 		configParam(NOACCENT_PARAMS, 0.f, 2.f, 1.f, "Standard Level #1", "%", 0, 100);
@@ -62,6 +60,10 @@ struct Drummer : Module {
 		outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage());
 	}
 	
+	void onSampleRateChange() override {
+		fadeCoeff = 1000 / APP->engine->getSampleRate();	// 1ms choke
+	}
+
 	void process(const ProcessArgs& args) override {
 		chokeMode = params[CHOKE_SWITCH].getValue();
 		limitMode = params[LIMIT_SWITCH].getValue();
@@ -69,7 +71,7 @@ struct Drummer : Module {
 		switch (chokeMode) {
 			case 0:
 				trigValue[0] = inputs[TRIG_INPUT].getVoltage();
-				if (trigValue[0] >= 1 && prevTrigValue[0] < 1){
+				if (trigValue[0] >= 1 && prevTrigValue[0] < 1) {
 					if (inputs[ACCENT_INPUT].getVoltage() >= 1)
 						sustain[0] = params[ACCENT_PARAMS].getValue();
 					else
@@ -79,7 +81,7 @@ struct Drummer : Module {
 				out[0] = inputs[IN_INPUT].getVoltage() * sustain[0];
 
 				trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
-				if (trigValue[1] >= 1 && prevTrigValue[1] < 1){
+				if (trigValue[1] >= 1 && prevTrigValue[1] < 1) {
 					if (inputs[ACCENT_INPUT+1].getVoltage() >= 1)
 						sustain[1] = params[ACCENT_PARAMS+1].getValue();
 					else
@@ -91,12 +93,10 @@ struct Drummer : Module {
 
 			case 1:
 				trigValue[0] = inputs[TRIG_INPUT].getVoltage();
-				if (trigValue[0] >= 1 && prevTrigValue[0] < 1){
+				if (trigValue[0] >= 1 && prevTrigValue[0] < 1) {
 					choking[0] = true;
 					trigState[0] = true;
-					startFade[0] = 1;
-					maxFadeSample[0] = args.sampleRate * 0.05f;
-					currentFadeSample[0] = 0;
+					currentFade[0] = 1;
 
 					if (inputs[ACCENT_INPUT].getVoltage() >= 1)
 						sustain[0] = params[ACCENT_PARAMS].getValue();
@@ -106,20 +106,17 @@ struct Drummer : Module {
 				prevTrigValue[0] = trigValue[0];
 
 				if (choking[1]) {
-					lastFade[0] = -(currentFadeSample[0] / maxFadeSample[0]) + startFade[0];
-					if (lastFade[0] < 0) {
+					currentFade[0] -= fadeCoeff;
+					if (currentFade[0] < 0) {
 						choking[1] = false;
 						trigState[0] = false;
-						currentFadeSample[0] = 0;
-						startFade[0] = 0;
-						lastFade[0] = 0;
+						currentFade[0] = 0;
 					} else {
 						if (trigState[0])
-							out[0] = inputs[IN_INPUT].getVoltage() * lastFade[0] * sustain[0];							
+							out[0] = inputs[IN_INPUT].getVoltage() * currentFade[0] * sustain[0];							
 						else
 							out[0] = 0;
 					}
-					currentFadeSample[0]++;
 				} else {
 					if (trigState[0])
 						out[0] = inputs[IN_INPUT].getVoltage() * sustain[0];
@@ -128,12 +125,10 @@ struct Drummer : Module {
 				}
 
 				trigValue[1] = inputs[TRIG_INPUT+1].getVoltage();
-				if (trigValue[1] >= 1 && prevTrigValue[1] < 1 && !choking[0]){
+				if (trigValue[1] >= 1 && prevTrigValue[1] < 1 && !choking[0]) {
 					choking[1] = true;
 					trigState[1] = true;
-					startFade[1] = 1;
-					maxFadeSample[1] = args.sampleRate * 0.05f;
-					currentFadeSample[1] = 0;
+					currentFade[1] = 1;
 
 					if (inputs[ACCENT_INPUT+1].getVoltage() >= 1)
 						sustain[1] = params[ACCENT_PARAMS+1].getValue();
@@ -143,20 +138,17 @@ struct Drummer : Module {
 				prevTrigValue[1] = trigValue[1];
 
 				if (choking[0]) {
-					lastFade[1] = -(currentFadeSample[1] / maxFadeSample[1]) + startFade[1];
-					if (lastFade[1] < 0) {
+					currentFade[1] -= fadeCoeff;
+					if (currentFade[1] < 0) {
 						choking[0] = false;
 						trigState[1] = false;
-						currentFadeSample[1] = 0;
-						startFade[1] = 0;
-						lastFade[1] = 0;
+						currentFade[1] = 0;
 					} else {
 						if (trigState[1])
-							out[1] = inputs[IN_INPUT+1].getVoltage() * lastFade[1] * sustain[1];							
+							out[1] = inputs[IN_INPUT+1].getVoltage() * currentFade[1] * sustain[1];							
 						else
 							out[1] = 0;
 					}
-					currentFadeSample[1]++;
 				} else {
 					if (trigState[1])
 						out[1] = inputs[IN_INPUT+1].getVoltage() * sustain[1];
@@ -194,7 +186,6 @@ struct Drummer : Module {
 	}
 };
 
-
 struct DrummerWidget : ModuleWidget {
 	DrummerWidget(Drummer* module) {
 		setModule(module);
@@ -205,8 +196,8 @@ struct DrummerWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));		
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 18.8)), module, Drummer::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 31.9)), module, Drummer::ACCENT_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 17.8)), module, Drummer::TRIG_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 31.3)), module, Drummer::ACCENT_INPUT));
 		
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 17.8)), module, Drummer::NOACCENT_PARAMS));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 31.3)), module, Drummer::ACCENT_PARAMS));
@@ -217,8 +208,8 @@ struct DrummerWidget : ModuleWidget {
 		addParam(createParamCentered<CKSS>(mm2px(Vec(5.35, 67.45)), module, Drummer::CHOKE_SWITCH));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(22.25, 67.45)), module, Drummer::LIMIT_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 85.4)), module, Drummer::TRIG_INPUT+1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 98.5)), module, Drummer::ACCENT_INPUT+1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 84.4)), module, Drummer::TRIG_INPUT+1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 97.8)), module, Drummer::ACCENT_INPUT+1));
 
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 84.4)), module, Drummer::NOACCENT_PARAMS+1));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 97.8)), module, Drummer::ACCENT_PARAMS+1));
@@ -226,7 +217,6 @@ struct DrummerWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.5, 117)), module, Drummer::IN_INPUT+1));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(26.5, 117)), module, Drummer::OUT_OUTPUT+1));
 	}
-
 };
 
 Model* modelDrummer = createModel<Drummer, DrummerWidget>("Drummer");

@@ -1,35 +1,38 @@
-# SickoCV v2.5.0
+# SickoCV v2.5.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 0](https://user-images.githubusercontent.com/80784296/206871020-9b671118-03fa-45ca-9e4d-2a44b9ad53d2.JPG)
+![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/212480942-1812dcd5-8a6b-449a-8a5d-956da30b4cf5.JPG)
 
 ## Blender
-### Stereo crossfade mixer with double modulation
-#### - Description:
+### Polyphonic stereo crossfade mixer with double modulation
+#### - DESCRIPTION
 'blender' is a crossfade mixer of mono or stereo signals.  
 It can be used either with cv signals or audio sources.  
 Mix can be modulated by uni/bipolar signals.  
 Modulation can be further modulated by another signal.  
 Audio rate modulations are allowed.
 
-![blender](https://user-images.githubusercontent.com/80784296/201516763-00c7192d-f881-4b14-9c23-68c8be2a90d3.JPG)
+![blender](https://user-images.githubusercontent.com/80784296/211660967-ce9aa25d-cc8f-45a9-beae-3381a13cf0af.JPG)
 
-#### - Usage:
-Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used.  
+#### - INSTRUCTIONS
+Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used. Polyphonic inputs are allowed and are left/right independent, but accordingly to number of channels of IN1 input.  
 PHASE switches invert the sign of input signals.  
-MIX knob sets the crossfade level of the inputs.
+MIX knob sets the crossfade level of the inputs.  
+Inputs volume can be adjusted via two attenuators.  
+Master volume can be amplified up to 200%, a hard clip ±5v switch is present.  
+Output replicates input polyphony, but deticking in the context menu 'Polyphonic outs' option will mix channels into monophonic outs.
 
-**MIX MOD section**  
+**MOD section**  
 Connecting MIX MOD CV input enables mix modulation. ATNV knob attenuverts CV input.  
 CV input range is usually unipolar 0-10v. RNG switch in 'bipolar' position adds +5v to CV input, so audio signals can be used for modulation.    
 Modulation is added to the MIX knob.
 
-**ATNV MD section**  
-ATNV MD can be used to add modulation to the ATNV knob in MIXMOD section, the rules are the same.
+**MOD2 section**  
+MOD2 can be used to add modulation to the MOD attenuverter knob in MOD section, the rules are the same.
 
 ## Blender8
 ### 8 single crossfade mixers with modulation
-#### - Description:
+#### - DESCRIPTION
 'blender8' is a set of 8 crossfade mixers of two signals.  
 As the previous one it can be used either with cv signals or audio sources.  
 Mix can be modulated by uni/bipolar signals.  
@@ -37,21 +40,21 @@ Audio rate modulations are allowed.
 
 ![blender8](https://user-images.githubusercontent.com/80784296/201516772-12dac17b-f8a0-4f82-946a-da8b7d254b09.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 'blender8' provides 8 mono crossfade mixers and differs from 'blender' module in the following things.  
 Only the IN2 input signal can be phase inverted.  
 If a CV input is connected for modulation, CV sets the mix percentage and the MIX knob becomes the CV attenuverter.
 
 ## bToggler / bToggler Compact
 ### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
-#### - Description:
+#### - DESCRIPTION
 - Buffered Toggled VCA with builtin ASR envelope generator
 - Buffered Toggled ASR envelope generator
 - Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 
-![btoggler](https://user-images.githubusercontent.com/80784296/201516786-81b923a6-4d9d-4c6f-8c1c-74e43f9e7e9c.JPG)
+![btoggler](https://user-images.githubusercontent.com/80784296/211221913-2ac04d94-b80b-4222-a02b-2719e0fb4d38.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 Connect a clock source.
 
 When ARM input is triggered (arm on), the L+(R) inputs will start to be routed to L+(R) outputs on next clock detection (according to ASR envelope values) and GATE output will provide a high state.
@@ -62,7 +65,7 @@ If ARM is triggered again before clock detection it will abort arming (unarm).
 
 Attack, Sustain and Release knobs set the envelope of the routed signals.
 
-A, S, R CVinputs are added to respective knob values.
+A, S, R CVinputs are added to respective knob values, bToggler module has attenuverters.
 
 If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
@@ -73,7 +76,7 @@ NOTE: input trigger threshold is +1v.
 
 ## bToggler8
 ### 8 buffered toggle switch signal router
-#### - Description:
+#### - DESCRIPTION
 'bToggler8' can be used to mute/unmute up to 8 CVs or AUDIO signals, in sync to a tempo clock source.  
 For example it can be used to play/stop drumkit parts independently (kick, snare, hats, etc):
 - connect an appropriate clock source to CLOCK 
@@ -89,7 +92,7 @@ Otherwise bToggler OUTs can be connected to envelope generators. In that case th
 
 ![btoggler8](https://user-images.githubusercontent.com/80784296/201516798-acfa6672-07d0-4f0e-bd38-6269a204eb64.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 Connect a clock source.
 
 When ARM input is triggered (arm on) the IN input will start to be routed to OUT on next clock detection and GATE output will provide a high state.
@@ -113,7 +116,7 @@ Here below is one example of bToggler8 usage. When buttons are pressed on PULSES
 
 ## bToggler8+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
-#### - Description:
+#### - DESCRIPTION
 'bToggler8+' is almost the same of the previous one, but it has a further feature (WRN outs) to be used with programmable led midi controllers to have a visual feedback on the controller.
 
 Some midi controllers can light up or turn off their button leds by receiving the same commands they send.  
@@ -122,7 +125,7 @@ So when pressing buttons on controller, 'bToggler8+' will actually play/stop the
 
 ![btoggler8plus](https://user-images.githubusercontent.com/80784296/201516811-40c75bb5-84d2-411b-b9ed-fa876e178258.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 The same of the previous one, plus:
 
 When 'armed on' or 'armed off', the WRN (warning) output will provide a sequence of pulses until next clock is detected.  
@@ -150,74 +153,86 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 
 ![calcs](https://user-images.githubusercontent.com/80784296/201516821-8ea683bd-db11-4687-971d-67bef380b81c.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
-U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or -5/+5v.
+U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 
-## Drummer
+## Drummer Drummer4 Drummer4+
 ### Accent and choke utility for drum modules lacking these features
 
-![drummer](https://user-images.githubusercontent.com/80784296/201516831-bff1df4b-b7e1-4065-b486-7501d6c4cde7.JPG)
+![drummer](https://user-images.githubusercontent.com/80784296/212536993-c8ac8011-b324-4dae-99f6-8f8b548557eb.JPG)
 
-#### - Usage:
-Drummer module can handle two drum sounds with separate standard and accent volume levels set by respective knobs.  
+#### - INSTRUCTIONS
+Drummer and Drummer4/Drummer4+ module can handle 2 or 4 drum sounds with separate standard and accent volume levels set by respective knobs.  
+
 Connect the IN input to a drum-like audio source or sample player, and OUT output to the mixer.  
 Connect the TRIG input to the same module that feeds the drum module, it can be a sequencer or every other pulse generation module.  
 Connect the ACC input to the module which generates the accents, it can be the sequencer or every other suitable module.  
 When ACC is triggered at the same time as the TRIG input, Drummer module will output the Accent Level set by "Accent Level knob" instead of the one set by "Standard Level Knob".  
+
 Input triggers threshold is +1v.  
 Each knob range is from 0 to 200% of the incoming IN level.  
-LIMIT switch hard clips the output in the range -5v/+5v.  
-CHOKE switch mutes one output when the other is triggered (for example when used with open/closed hihat sounds).  
+LIMIT switch hard clips the output in the range ±5v.  
+When CHOKE switch is on and a trigger occurs, the other slot (Drummer) or the next slot (Drummer4) is muted (for example when used with closed/open hihat sounds).  
+
+- **Drummer note:**  
 If 1 OUT is not connected, the audio signal will be mixed with the other one connected.  
-NOTE: In CHOKE mode, if both TRIG inputs are triggered at the same time, the upper section (#1) will have the priority and the lower one will be ignored.
+In CHOKE mode, if both TRIG inputs are triggered at the same time, the upper section (#1) will have the priority and the lower one will be ignored.
 
 Example of Drummer module usage:
 
-![drummer example](https://user-images.githubusercontent.com/80784296/204083554-dc651ff0-b94d-4b13-a699-e1dfb348b7e7.JPG)
+![drummer example](https://user-images.githubusercontent.com/80784296/212531420-150a0d94-12c6-463e-b46b-0828f5d45895.JPG)  
 [Download example](./examples/drummer%20example.vcvs?raw=true) (right-click -> save link as)
 
-## Drummer4
-### 4 channel accent utility for drum modules lacking this feature
-
-![drummer4](https://user-images.githubusercontent.com/80784296/201516839-54364ebe-d3cc-4a4e-9c32-d85e2ec2653b.JPG)
-
-#### - Usage:
-This module is almost the same of the previous one. It supports up to 4 channel and it manages only accent levels, there is no choking feature.  
-If OUT is not connected, the audio signal will be added to the next OUT. For example if you connect only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if you connect only out #4, this socket will output all the channels.
+- **Drummer4 note:**  
+If one slot OUT is not connected, the audio signal will be added to the next one. For example if you connect only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if you connect only out #4, this socket will output all the channels.
 
 Example of Drummer4 module usage:
 
-![drummer4 example](https://user-images.githubusercontent.com/80784296/204083563-c0913d0a-abde-44c7-8434-4036691c8720.JPG)  
+![drummer4 example](https://user-images.githubusercontent.com/80784296/212531441-575f9b49-dee2-47ca-a82d-0861a10145e5.JPG)  
 [Download example](./examples/drummer4%20example.vcvs?raw=true) (right-click -> save link as)
+
+- **Drummer4+ note:**  
+Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to parameter knobs.
 
 ## DrumPlayer DrumPlayer+
 ### 4 channel Drum Sample Player with accent and choke functionality
 
-![drumplayer](https://user-images.githubusercontent.com/80784296/206871272-e62df892-03fa-49d2-9197-310b219198a3.JPG)
+![drumplayer](https://user-images.githubusercontent.com/80784296/212537149-9a38032b-694f-488e-86b5-31bdfad43c7b.JPG)
 
-#### Usage:  
-##### DrumPlayer+  
+#### INSTRUCTIONS  
 Load wav samples in the slots using context menu.  
+
 When TRIG input is triggered the sample will be played at the volume percentage set by to "Standard Level" knob + its relative attenuverted CVinput.  
 If ACCENT input is HIGH when TRIG occurs, the sample will be played at "Accent Level" knob + its attenuverted CVinput.  
+
 Playing speed can be set by SPD knob from 1 to 200% and modulated with its attenuverted CVinput. Speed can be modified during sample playback.  
-If CHOKE switch is on when TRIG occurs, the playback of next slot will be stopped: it's commonly used to simulate a closed/open hihat.  
-LIM switch is a hard clipping limiter to -5v/+5v on the output.  
-If OUT is not connected, the audio signal will be added to the next OUT. In this way you can connect only the last OUT to have a master output, or you can skip some OUTs to mix only desired slots.  
-##### Context menu
-In the context menu there is an option to disable "Normalled OUTs", then only the connected OUTs will output the relative slot sample.  
+External modulation is allowed only on drumPlayer+  
 
-There are also 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
-- 'No interpolation' can be used when sample rates match and speed is 100% constant.
-- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages
-- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default).  
+If CHOKE switch is on when TRIG occurs, the playback of next slot is stopped with a 1ms fade out: it's commonly used to simulate a closed/open hihat.  
+LIM switch is a hard clipping limiter to ±5v on the output.  
 
-At the moment no anti-aliasing filter is present, so best audio quality results can be achieved matching samples/VCV samplerates and limiting speed variations.  
+#### CONTEXT MENU
+**Sample Slots**  
+Click on the slot number to open dialog.  
+When the sample is loaded the green led on the panel is turned on (drumPlayer), or the small 7segment display will show the first 5 chars of the filename (drumPlayer+).  
+Use Clear options to unload samples from slots.  
+Just right-click over the led areas or the displays to access the quick-load menus.  
 
-##### DrumPlayer
-This version it's almost the same of the Plus one, but it hasn't the sample names display and it can't be external modulated.
+**Interpolation**  
+There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
+- 'No interpolation' can be used when sample rates match and speed is 100% constant  
+- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages  
+- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default)  
+
+**Anti-aliasing filter**  
+Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
+
+**Outs mode**  
+Normalled (default): if one slot out is not connected, its output will be added to the next slot  
+Solo: every slot has its own out socket  
+Unconnected on Out 4: Every unconnected out is routed to out n.4
 
 NOTE: input trigger threshold is +1v.  
 
@@ -226,43 +241,123 @@ NOTE: input trigger threshold is +1v.
 
 ![parking](https://user-images.githubusercontent.com/80784296/204013230-cda01462-92c9-4013-8599-c0ba9d798ae0.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 This module doesn't do anything. It's just a place to connect your temporarily unused cables when you don't want to forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
 
 ## Shifter
 ### 64 selectable stages shift register
-#### - Description:
+#### - DESCRIPTION
 - 64 stages shift register that outputs only the selected stage controlled by knob/CV with attenuverter
 - Trigger delay to adjust the 1-sample latency of VCV cables
 
-![shifter](https://user-images.githubusercontent.com/80784296/204009935-efd147d4-2d28-4b72-a607-af41e7c8e894.JPG)
+![shifter](https://user-images.githubusercontent.com/80784296/212537155-aceff24b-4dc8-4c04-9063-fad4543c9cd6.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 Shifter module can be useful to shift back and fotrth a sequencer output on the fly, thanks to the 64 stages register.  
 Stage can be controlled via the stage knob, or the 0-10v StageCV input with its attenuverter.  
 If StageCV input is not connected, the attenuverter reduces the range of the Stage knob.  
 Note that the Stage knob and StageCV are added together.  
 The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when you're triggering the sequencer with the same clock of Shifter module, and the input would be sampled before the sequencer advance.  
 
-![shifter example](https://user-images.githubusercontent.com/80784296/204090187-9ebec50d-65cf-4ae4-9310-0db271a24d32.JPG)
+![shifter example](https://user-images.githubusercontent.com/80784296/212531455-776e3110-78ef-4bec-a3f8-64180fe4ca53.JPG)  
 [Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
+
+## SickoPlayer
+### wav sample player
+
+![sickoplayer](https://user-images.githubusercontent.com/80784296/212481297-755598b1-aa1e-4252-b750-42f86b337f25.JPG)
+
+#### - DESCRIPTION
+- samples and 1-cycle waveforms player
+- ±24 semitones tuning and v/oct input with polyphony
+- envelope generator, loop, reverse, pingpong
+- different interpolation modes, anti-aliasing filter, phase-scan feature
+
+#### - INSTRUCTIONS
+Load sample using context menu or right-click in the waveform display area to access quick load menu.  
+
+The display shows the waveform, filename, sample rate and number of channels (1-2 channels wav file are allowed).  
+
+Mode switch allows to select if sample playback starts with a trigger or play it until a gate is high.  
+
+When in Trig Mode the Trig-Mode switch has 3 options:  
+- **SS (Start/Stop)** A trigger starts attack stage from CueStart postition, another trigger sets playback to release stage and at the end sample position is reset to cue start  
+- **S (Start only)** A trigger starts attack stage from CueStart position, another trigger has no effects  
+- **PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage  
+
+In any Trig-Mode a trigger on STOP input sets the playback to release stage and reset sample position to Cue Start.
+
+Cue Start/End knobs are used to set the start of the Attack and the Release stage.
+
+When Loop button is switched on, playback restarts from Loop Start when Loop End is reached.
+
+REV button changes the playback direction.
+
+PNG button enables PingPong mode:
+- in TRIG mode, when loop is enabled, it automatically switches the REV button when Loop Start/End is reached and inverts playback direction without stopping playback
+- in GATE mode, it automatically switches the REV button when Loop Start/End is reached when loop is enabled, or when Cue Start/End is reached, and playback direction is inverted without stopping playback
+
+The envelope knobs can be external modulated with attenuverted CVinputs.
+
+Tune knob with its attenuverted CVinput, can tune up or down the sample with a ±2 octave range (semitone scale).  
+v/oct input accepts polyphonic cable usually combined with a polyphonic gate in when in Gate Mode.  
+
+Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range.  
+
+If sample file is mono, left out is duplicated to right out.  
+EOC outputs a 1ms pulse when sample reaches CueEnd or LoopEnd if Loop is enabled (or when Start positions are reached when in reverse playback).  
+EOR outputs a 1ms pulse when sample reaches the end of release stage.
+
+NOTE: input trigger threshold is +1v.  
+
+#### CONTEXT MENU
+**Sample Slot**  
+Click on "Load Sample" to open dialog. Use Clear options to unload sample from slot.  
+As described before, just right-click over the waveform display area to access the quick-load menu.  
+
+**Interpolation**  
+There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
+- 'No interpolation' can be used when sample rates match and speed is 100% constant  
+- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages  
+- 'Hermite' uses a Cubic Hermite spline interpolation that usually offers a better result (default)  
+
+**Anti-aliasing filter**  
+Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
+
+**Crossfade length**  
+Crossfade can be set from 0 to 50ms and is engaged when the sample skips from LoopEnd to LoopStart or from CueEnd to CueStart when in Gate Mode.
+
+**Polyphonic Outs**  
+When this option is enabled the outs reflects v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out.
+
+**Phase scan**  
+This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
+Be sure to disable it when using one-cycle waveforms.  
+
+#### PRESETS
+There are some factory presets stored in the context menu.  
+Loading a factory preset automatically clears the sample from memory, pay attention.
+
+#### USING ONE-CYCLE WAVEFORMS
+One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
+Be sure to disable PhaseScan functionality, adjust Cue and Loop START to 0% and Cue/Loop END to 100%, or load relative factory preset before loading the sample.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
-#### - Description:
-- Function type (switch, route, swap, mute, flipflop, toggle gate) autodetection
+#### - DESCRIPTION
 - Signal switch (2 inputs, 1 output)
 - Signal router (1 input, 2 outputs)
 - Signal swapper (2 inputs, 2 outputs)
 - Mute (1 input, 1 output)
 - Flip flop
 - Toggle gate
+- Function type autodetection (switch, route, swap, mute, flipflop, toggle gate)
 - Adjustable time crossfade between switched/routed/swapped signals
 
 ![switcher](https://user-images.githubusercontent.com/80784296/201516861-d3d2ab1b-7036-4355-b2ef-e4c5681fb432.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 Switcher or SwitcherSt (used for stereo signals) are multifunction modules that can be used as follows. The versatility of the module is offered thanks to the automatic detection of the function type.
 
 **TOGGLE/GATE modes**  
@@ -308,21 +403,21 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 
 ## Toggler / Toggler Compact
 ### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
-#### - Description:
+#### - DESCRIPTION
 - Toggled VCA with builtin ASR envelope generator
 - Toggled ASR envelope generator
 - mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
 
-![toggler](https://user-images.githubusercontent.com/80784296/201516866-3ca90766-503c-435d-a560-ba0f5c02deff.JPG)
+![toggler](https://user-images.githubusercontent.com/80784296/211222030-1a5b4e86-eccd-4e4f-ae56-65efd100e336.JPG)
 
-#### - Usage:
+#### - INSTRUCTIONS
 **TOGGLE MODE**
 
 On receiving a trigger on TRIG input, it will send the L+(R) inputs to L+(R) outputs and set the GATE output to high. On next trigger it will interrupt L+(R) outputs and set the GATE output to low.
 
 Attack, Sustain and Release knobs set the envelope of the routed signal.
 
-A, S, R CVinputs are added to respective knob values.
+A, S, R CVinputs are added to respective knob values, Toggler module has attenuverters.
 
 If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
@@ -344,6 +439,8 @@ If Release is set to 0 (and attack is set greater than 0) and a new GATE or Togg
 These behaviors are more understandable connecting a scope on the output.
 
 
-## Credits
-The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+## CREDITS
+The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
+Thanks to [Squinkylabs](https://github.com/squinkylabs) and [Firo Lightfog](https://github.com/firolightfog) for help and testing  
+Thanks to [Omri Cohen](https://omricohen-music.com/) for support  

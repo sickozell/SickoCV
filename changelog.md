@@ -1,15 +1,25 @@
+### 2.5.1 (2023-01-15)
+added following modules:  
+- Drummer4+  
+- SickoPlayer  
+
+Added anti-aliasing filter to DrumPlayer and DrumPlayer+
+Added polyphony to Blender and changed front panel  
+Added attenuverters to Toggler and bToggler  
+Changed time scale in ms to time knobs of all modules  
+
 ### 2.5.0 (2022-12-10)
-added following modules:
-DrumPlayer
-DrumPlayer+
+added following modules:  
+DrumPlayer  
+DrumPlayer+  
 
 ### 2.4.1 (2022-11-25)
-added Shifter module
-added "Warn Inversion" context menu feature on bToggler8+ module
-layout change on Parking module
+added Shifter module  
+added "Warn Inversion" context menu feature on bToggler8+ module  
+layout change on Parking module  
 
 ### 2.4.0 (2022-11-13)
-added following modules:
+added following modules:  
 - Drummer
 - Drummer4
 - Parking

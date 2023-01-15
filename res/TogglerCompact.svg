@@ -25,14 +25,14 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="4.0000001"
-     inkscape:cx="12.75"
-     inkscape:cy="83.499998"
+     inkscape:cx="8.8749998"
+     inkscape:cy="403.74999"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="-8"
+     inkscape:window-x="1272"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer7"
+     inkscape:current-layer="layer4"
      showguides="true" />
   <defs
      id="defs2">
@@ -149,7 +149,7 @@
        ry="2"
        inkscape:label="trg gate" />
     <rect
-       style="fill:#000000;display:inline;stroke:#a2a2c3;stroke-width:0.545548;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;display:inline;stroke:#a2a2c3;stroke-width:0.545548;stroke-dasharray:none;stroke-opacity:1"
        id="rect1157"
        width="5.0544515"
        height="7.4544516"
@@ -942,10 +942,4 @@
          style="stroke-width:0.265;stroke-dasharray:none;fill:#e5e5e5;fill-opacity:1" />
     </g>
   </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="components"
-     style="display:inline"
-     sodipodi:insensitive="true" />
 </svg>

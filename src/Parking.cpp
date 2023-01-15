@@ -54,7 +54,6 @@ struct Parking : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-
 	}
 };
 

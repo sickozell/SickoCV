@@ -204,17 +204,17 @@ struct Btoggler : Module {
 
 		if (clockConnection) {
 			clock = inputs[CLOCK_INPUT].getVoltage();
-			if (clock >= 1 && prevClock < 1) {
+			if (clock >= 1 && prevClock < 1)
 				clockState = true;
-			} else {
+			else
 				clockState = false;
-			}
+
 			prevClock = clock;
 		
 			if (inputs[RSTALL_INPUT].isConnected()){
 				rstAll = inputs[RSTALL_INPUT].getVoltage();
 				if (rstAll >= 1 && prevRstAll < 1) {
-					for (int i=0; i<8;i++){
+					for (int i=0; i<8; i++) {
 						// next lines are duplicated from case 3
 						outputs[GATE_OUTPUT+i].setVoltage(0);
 						lights[OUT_LIGHT+i].setBrightness(0.f);
@@ -233,8 +233,8 @@ struct Btoggler : Module {
 				prevRstAll = rstAll; 
 			}
 
-			for (int i=0; i<8; i++){
-				if (inputs[RST_INPUT+i].isConnected()){
+			for (int i=0; i<8; i++) {
+				if (inputs[RST_INPUT+i].isConnected()) {
 					rst[i] = inputs[RST_INPUT+i].getVoltage();
 					if (rst[i] >= 1 && prevRst[i] < 1) {
 						// next lines are duplicated from case 3
@@ -243,7 +243,7 @@ struct Btoggler : Module {
 						lights[WRN_LIGHT+i].setBrightness(0.f);
 						// below is different from original: if internalState is 0 or 1
 						// it will not do the fade 
-						if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
+						if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1) {
 							fading[i] = true;
 							currentFadeSample[i] = 0;
 							maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
@@ -254,13 +254,13 @@ struct Btoggler : Module {
 					prevRst[i] = rst[i]; 
 				}
 
-				if (inputs[ARM_INPUT+i].isConnected()){
+				if (inputs[ARM_INPUT+i].isConnected()) {
 					trigValue[i] = inputs[ARM_INPUT+i].getVoltage();
-					if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
+					if (trigValue[i] >= 1 && prevTrigValue[i] < 1)
 						trigState[i] = true;
-					} else {
+					else
 						trigState[i] = false;
-					}
+
 					prevTrigValue[i] = trigValue[i];
 
 					switch (internalState[i]) {
@@ -268,7 +268,7 @@ struct Btoggler : Module {
 							if (trigState[i]){					// if occurs
 								internalState[i] = 1;
 								lights[WRN_LIGHT+i].setBrightness(1.f);
-							} else if (params[FADE_PARAMS].getValue() != 0){
+							} else if (params[FADE_PARAMS].getValue() != 0) {
 								if (fading[i] == true) {
 									if (currentFadeSample[i] > maxFadeSample) {
 										fading[i] = false;
@@ -288,7 +288,7 @@ struct Btoggler : Module {
 						break;
 
 						case 1: 									// triggered waiting for next clock
-							if (trigState[i]){						// if another trigger occurs, then abort
+							if (trigState[i]) {						// if another trigger occurs, then abort
 								lights[WRN_LIGHT+i].setBrightness(0.f);
 								internalState[i] = 0;
 							} else if (clockState) { 							// if clock occurs
@@ -296,7 +296,7 @@ struct Btoggler : Module {
 								lights[OUT_LIGHT+i].setBrightness(1.f);
 								lights[WRN_LIGHT+i].setBrightness(0.f);
 								internalState[i] = 2;
-								if (params[FADE_PARAMS].getValue() != 0){
+								if (params[FADE_PARAMS].getValue() != 0) {
 									fading[i] = true;
 									currentFadeSample[i] = 0;
 									maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
@@ -308,7 +308,7 @@ struct Btoggler : Module {
 							if (trigState[i]) { 					// if ARM occurs
 								internalState[i] = 3;
 								lights[WRN_LIGHT+i].setBrightness(1.f);
-							} else if (params[FADE_PARAMS].getValue() != 0){
+							} else if (params[FADE_PARAMS].getValue() != 0) {
 								if (fading[i] == true) {
 									outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * currentFadeSample[i] / maxFadeSample);
 									currentFadeSample[i]++;
@@ -327,7 +327,7 @@ struct Btoggler : Module {
 						break;
 
 						case 3: 									// gating and triggered, waiting for next clock
-							if (trigState[i]){					// if another trigger occurs, then abort
+							if (trigState[i]) {					// if another trigger occurs, then abort
 								internalState[i] = 2;
 								lights[WRN_LIGHT+i].setBrightness(0.f);
 							} else if (clockState) {
@@ -335,7 +335,7 @@ struct Btoggler : Module {
 								internalState[i] = 0;
 								lights[OUT_LIGHT+i].setBrightness(0.f);
 								lights[WRN_LIGHT+i].setBrightness(0.f);
-								if (params[FADE_PARAMS].getValue() != 0){
+								if (params[FADE_PARAMS].getValue() != 0) {
 									fading[i] = true;
 									currentFadeSample[i] = 0;
 									maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
@@ -370,7 +370,6 @@ struct Btoggler : Module {
 	}
 };
 
-
 struct BtogglerWidget : ModuleWidget {
 	BtogglerWidget(Btoggler* module) {
 		setModule(module);
@@ -387,7 +386,7 @@ struct BtogglerWidget : ModuleWidget {
 		
 		float x = 8.9;
 		float y = 10.8;
-		for (int i=0;i<8;i++) {
+		for (int i=0; i<8; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.1, 41+(i*y))), module, Btoggler::ARM_INPUT+i));
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.1+x, 41+(i*y))), module, Btoggler::IN_INPUT+i));
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(5.1+(2*x), 41+(i*y))), module, Btoggler::OUT_OUTPUT+i));

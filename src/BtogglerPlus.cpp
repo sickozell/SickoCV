@@ -241,17 +241,17 @@ struct BtogglerPlus : Module {
 
 		if (clockConnection) {
 			clock = inputs[CLOCK_INPUT].getVoltage();
-			if (clock >= 1 && prevClock < 1) {
+			if (clock >= 1 && prevClock < 1)
 				clockState = true;
-			} else {
+			else
 				clockState = false;
-			}
+
 			prevClock = clock;
 
-			if (inputs[RSTALL_INPUT].isConnected()){
+			if (inputs[RSTALL_INPUT].isConnected()) {
 				rstAll = inputs[RSTALL_INPUT].getVoltage();
 				if (rstAll >= 1 && prevRstAll < 1) {
-					for (int i=0; i<8;i++){
+					for (int i=0; i<8; i++) {
 						// next lines are duplicated from case 3
 						warnCounter[i] = 0;
 						outputs[WARN_OUTPUT+i].setVoltage(0);
@@ -260,7 +260,7 @@ struct BtogglerPlus : Module {
 						lights[WRN_LIGHT+i].setBrightness(0.f);
 						// below is different from original: if internalState is 0 or 1
 						// it will not do the fade 
-						if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
+						if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1) {
 							fading[i] = true;
 							currentFadeSample[i] = 0;
 							maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
@@ -272,8 +272,8 @@ struct BtogglerPlus : Module {
 				prevRstAll = rstAll; 
 			}
 		
-			for (int i=0; i<8;i++){
-				if (inputs[RST_INPUT+i].isConnected()){
+			for (int i=0; i<8; i++) {
+				if (inputs[RST_INPUT+i].isConnected()) {
 					rst[i] = inputs[RST_INPUT+i].getVoltage();
 					if (rst[i] >= 1 && prevRst[i] < 1) {
 						// next lines are duplicated from case 3
@@ -284,7 +284,7 @@ struct BtogglerPlus : Module {
 						lights[WRN_LIGHT+i].setBrightness(0.f);
 						// below is different from original: if internalState is 0 or 1
 						// it will not do the fade 
-						if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1){
+						if (params[FADE_PARAMS].getValue() != 0 && internalState[i] > 1) {
 							fading[i] = true;
 							currentFadeSample[i] = 0;
 							maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
@@ -295,24 +295,24 @@ struct BtogglerPlus : Module {
 					prevRst[i] = rst[i]; 
 				}
 				
-				if (inputs[ARM_INPUT+i].isConnected()){
+				if (inputs[ARM_INPUT+i].isConnected()) {
 					trigValue[i] = inputs[ARM_INPUT+i].getVoltage();
-					if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
+					if (trigValue[i] >= 1 && prevTrigValue[i] < 1)
 						trigState[i] = true;
-					} else {
+					else
 						trigState[i] = false;
-					}
+
 					prevTrigValue[i] = trigValue[i];
 
 					switch (internalState[i]) {
 						case 0: 									// waiting for ARM
-							if (trigState[i]){					// if ARM occurs
+							if (trigState[i]) {					// if ARM occurs
 								internalState[i] = 1;
 								lights[WRN_LIGHT+i].setBrightness(1.f);
 								warnInOn = args.sampleRate / 2000 * params[WARNIN_PARAMS].getValue();
 								warnInOff = warnInOn + warnInOn;
-							} else if (params[FADE_PARAMS].getValue() != 0){ // if a FADE value is set
-								if (fading[i] == true) {					// if it's currently fading
+							} else if (params[FADE_PARAMS].getValue() != 0) {	// if a FADE value is set
+								if (fading[i] == true) {						// if it's currently fading
 									if (currentFadeSample[i] > maxFadeSample) { // if FADING has reached end
 										fading[i] = false;
 										currentFadeSample[i] = 0;
@@ -330,7 +330,7 @@ struct BtogglerPlus : Module {
 						break;
 
 						case 1: 									// ARMed ON, waiting for next clock
-							if (trigState[i]){						// if another ARM occurs, then abort
+							if (trigState[i]) {						// if another ARM occurs, then abort
 								outputs[WARN_OUTPUT+i].setVoltage(0);
 								lights[WRN_LIGHT+i].setBrightness(0.f);
 								internalState[i] = 0;
@@ -341,24 +341,23 @@ struct BtogglerPlus : Module {
 								lights[WRN_LIGHT+i].setBrightness(0.f);
 								warnCounter[i] = 0;
 								internalState[i] = 2;
-								if (params[FADE_PARAMS].getValue() != 0){
+								if (params[FADE_PARAMS].getValue() != 0) {
 									fading[i] = true;
 									currentFadeSample[i] = 0;
 									maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
 								}
 							} else if (params[WARNIN_PARAMS].getValue() == 0) {// if clock has not reached and it's still warning
 								outputs[WARN_OUTPUT+i].setVoltage(10);
-							} else if (params[WARNIN_PARAMS].getValue() == 200){
+							} else if (params[WARNIN_PARAMS].getValue() == 200) {
 								outputs[WARN_OUTPUT+i].setVoltage(0);
 							} else {
 								warnCounter[i]++;
-								if (warnCounter[i] > warnInOff) {
+								if (warnCounter[i] > warnInOff)
 									warnCounter[i] = 0;
-								} else if (warnCounter[i] > warnInOn) {
+								else if (warnCounter[i] > warnInOn)
 									outputs[WARN_OUTPUT+i].setVoltage(0);
-								} else {
+								else
 									outputs[WARN_OUTPUT+i].setVoltage(10);
-								}
 							}
 						break;
 
@@ -368,8 +367,8 @@ struct BtogglerPlus : Module {
 								lights[WRN_LIGHT+i].setBrightness(1.f);
 								warnOutOn = args.sampleRate / 2000 * params[WARNOUT_PARAMS].getValue();
 								warnOutOff = warnOutOn + warnOutOn;
-							} else if (params[FADE_PARAMS].getValue() != 0){ // if it's currently GATING, if FADE is set
-								if (fading[i] == true) {					// if is currently FADING
+							} else if (params[FADE_PARAMS].getValue() != 0) {	// if it's currently GATING, if FADE is set
+								if (fading[i] == true) {						// if is currently FADING
 									outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * currentFadeSample[i] / maxFadeSample);
 									outputs[GATE_OUTPUT+i].setVoltage(10);
 									outputs[WARN_OUTPUT+i].setVoltage(10);
@@ -406,7 +405,7 @@ struct BtogglerPlus : Module {
 						break;
 
 						case 3: 									// gating and ARMed off, waiting for next clock
-							if (trigState[i]){					// if another ARM occurs, then abort
+							if (trigState[i]) {					// if another ARM occurs, then abort
 								internalState[i] = 2;
 								lights[WRN_LIGHT+i].setBrightness(0.f);
 							} else if (clockState) {							// if clock occurs
@@ -416,7 +415,7 @@ struct BtogglerPlus : Module {
 								lights[OUT_LIGHT+i].setBrightness(0.f);
 								lights[WRN_LIGHT+i].setBrightness(0.f);
 								internalState[i] = 0;
-								if (params[FADE_PARAMS].getValue() != 0){
+								if (params[FADE_PARAMS].getValue() != 0) {
 									fading[i] = true;
 									currentFadeSample[i] = 0;
 									maxFadeSample = args.sampleRate / 1000 * params[FADE_PARAMS].getValue();
@@ -427,13 +426,12 @@ struct BtogglerPlus : Module {
 								outputs[WARN_OUTPUT+i].setVoltage(0);
 							} else {
 								warnCounter[i]++;
-								if (warnCounter[i] > warnOutOff) {
+								if (warnCounter[i] > warnOutOff)
 									warnCounter[i] = 0;
-								} else if (warnCounter[i] > warnOutOn) {
+								else if (warnCounter[i] > warnOutOn)
 									outputs[WARN_OUTPUT+i].setVoltage(0);
-								} else {
+								else
 									outputs[WARN_OUTPUT+i].setVoltage(10);
-								}
 							}
 							outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage());
 						break;
@@ -463,7 +461,6 @@ struct BtogglerPlus : Module {
 		prevClockConnection = clockConnection;
 	}
 };
-
 
 struct BtogglerPlusWidget : ModuleWidget {
 	BtogglerPlusWidget(BtogglerPlus* module) {

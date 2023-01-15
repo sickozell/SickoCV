@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="2.8284273"
-     inkscape:cx="-40.835415"
-     inkscape:cy="125.15789"
+     inkscape:zoom="8.0000005"
+     inkscape:cx="60.687496"
+     inkscape:cy="282.74998"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1272"
@@ -182,13 +182,13 @@
        inkscape:label="circle MIX 1"
        sodipodi:type="arc"
        sodipodi:cx="7.6199999"
-       sodipodi:cy="85.354004"
+       sodipodi:cy="76.053894"
        sodipodi:rx="3.5"
        sodipodi:ry="3.5"
        sodipodi:start="2.268928"
        sodipodi:end="0.87266463"
        sodipodi:arc-type="arc"
-       d="M 5.3702433,88.03516 A 3.5,3.5 0 0 1 4.3310757,84.156933 3.5,3.5 0 0 1 7.6199999,81.854004 3.5,3.5 0 0 1 10.908924,84.156933 3.5,3.5 0 0 1 9.8697565,88.035159"
+       d="m 5.3702433,78.73505 a 3.5,3.5 0 0 1 -1.0391676,-3.878226 3.5,3.5 0 0 1 3.2889242,-2.30293 3.5,3.5 0 0 1 3.2889241,2.30293 3.5,3.5 0 0 1 -1.0391675,3.878226"
        sodipodi:open="true" />
     <rect
        style="fill:#f2f2f2;stroke:none;stroke-width:0.375045;stroke-dasharray:none"
@@ -196,7 +196,7 @@
        width="0.62838537"
        height="0.95759505"
        x="7.3058071"
-       y="81.002113"
+       y="71.702003"
        ry="0.087054096"
        inkscape:label="line circle MIX 1" />
     <rect
@@ -207,6 +207,11 @@
        x="3.4572773"
        y="50.5"
        rx="1" />
+    <path
+       style="display:inline;fill:#000000;stroke:#a3a3c2;stroke-width:0.4;stroke-opacity:0.5"
+       d="m 7.6199998,79.447104 0,0.947188"
+       id="path29187"
+       sodipodi:nodetypes="cc" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -389,7 +394,7 @@
   <g
      inkscape:groupmode="layer"
      id="g8676"
-     inkscape:label="Etichette Testo PATH NERE"
+     inkscape:label="Etichette Testo nere"
      style="display:inline;fill:#000000"
      transform="translate(0.30037183,0.2999568)">
     <g
@@ -615,7 +620,7 @@
   <g
      inkscape:groupmode="layer"
      id="g8732"
-     inkscape:label="Etichette Testo PATH"
+     inkscape:label="Etichette Testo path"
      style="display:inline">
     <g
        aria-label="OUT"
@@ -915,10 +920,4 @@
          id="path3378" />
     </g>
   </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="components"
-     style="display:inline"
-     sodipodi:insensitive="true" />
 </svg>
