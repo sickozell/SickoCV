@@ -1,4 +1,4 @@
-# SickoCV v2.5.1-beta13
+# SickoCV v2.5.1-beta14
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -50,7 +50,7 @@ VCV Rack plugin modules
 ![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/212480942-1812dcd5-8a6b-449a-8a5d-956da30b4cf5.JPG)
 
 ## Blender
-### Stereo crossfade mixer with double modulation
+### Polyphonic stereo crossfade mixer with double modulation
 #### - DESCRIPTION
 'blender' is a crossfade mixer of mono or stereo signals.  
 It can be used either with cv signals or audio sources.  
@@ -61,11 +61,12 @@ Audio rate modulations are allowed.
 ![blender](https://user-images.githubusercontent.com/80784296/211660967-ce9aa25d-cc8f-45a9-beae-3381a13cf0af.JPG)
 
 #### - INSTRUCTIONS
-Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used.  
+Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used. Polyphonic inputs are allowed and are left/right independent, but accordingly to number of channels of IN1 input.
 PHASE switches invert the sign of input signals.  
 MIX knob sets the crossfade level of the inputs.  
 Inputs volume can be adjusted via two attenuators.  
 Master volume can be amplified up to 200%, a hard clip ±5v switch is present.
+Output replicate input polyphony, but deticking in the context menu 'Polyphonic outs' option will mix channels in monophonic outs.
 
 **MOD section**  
 Connecting MIX MOD CV input enables mix modulation. ATNV knob attenuverts CV input.  
@@ -227,7 +228,7 @@ In CHOKE mode, if both TRIG inputs are triggered at the same time, the upper sec
 
 Example of Drummer module usage:
 
-![drummer example](https://user-images.githubusercontent.com/80784296/204083554-dc651ff0-b94d-4b13-a699-e1dfb348b7e7.JPG)
+![drummer example](https://user-images.githubusercontent.com/80784296/212531420-150a0d94-12c6-463e-b46b-0828f5d45895.JPG)  
 [Download example](./examples/drummer%20example.vcvs?raw=true) (right-click -> save link as)
 
 - **Drummer4 note:**  
@@ -235,7 +236,7 @@ If one slot OUT is not connected, the audio signal will be added to the next one
 
 Example of Drummer4 module usage:
 
-![drummer4 example](https://user-images.githubusercontent.com/80784296/204083563-c0913d0a-abde-44c7-8434-4036691c8720.JPG)  
+![drummer4 example](https://user-images.githubusercontent.com/80784296/212531441-575f9b49-dee2-47ca-a82d-0861a10145e5.JPG)  
 [Download example](./examples/drummer4%20example.vcvs?raw=true) (right-click -> save link as)
 
 ## DrumPlayer DrumPlayer+
@@ -302,7 +303,7 @@ If StageCV input is not connected, the attenuverter reduces the range of the Sta
 Note that the Stage knob and StageCV are added together.  
 The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when you're triggering the sequencer with the same clock of Shifter module, and the input would be sampled before the sequencer advance.  
 
-![shifter example](https://user-images.githubusercontent.com/80784296/204090187-9ebec50d-65cf-4ae4-9310-0db271a24d32.JPG)
+![shifter example](https://user-images.githubusercontent.com/80784296/212531455-776e3110-78ef-4bec-a3f8-64180fe4ca53.JPG)  
 [Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
 
 ## SickoPlayer
