@@ -207,10 +207,10 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 ## Drummer Drummer4 Drummer4+
 ### Accent and choke utility for drum modules lacking these features
 
-![drummer](https://user-images.githubusercontent.com/80784296/211936925-8c0f65f3-f7ec-48eb-a323-9a938ba3be3b.JPG)
+![drummer](https://user-images.githubusercontent.com/80784296/212536993-c8ac8011-b324-4dae-99f6-8f8b548557eb.JPG)
 
 #### - INSTRUCTIONS
-Drummer and Drummer4 module can handle 2 or 4 drum sounds with separate standard and accent volume levels set by respective knobs.  
+Drummer and Drummer4/Drummer4+ module can handle 2 or 4 drum sounds with separate standard and accent volume levels set by respective knobs.  
 
 Connect the IN input to a drum-like audio source or sample player, and OUT output to the mixer.  
 Connect the TRIG input to the same module that feeds the drum module, it can be a sequencer or every other pulse generation module.  
@@ -239,10 +239,13 @@ Example of Drummer4 module usage:
 ![drummer4 example](https://user-images.githubusercontent.com/80784296/212531441-575f9b49-dee2-47ca-a82d-0861a10145e5.JPG)  
 [Download example](./examples/drummer4%20example.vcvs?raw=true) (right-click -> save link as)
 
+- **Drummer4+ note:**  
+Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to parameter knobs.
+
 ## DrumPlayer DrumPlayer+
 ### 4 channel Drum Sample Player with accent and choke functionality
 
-![drumplayer](https://user-images.githubusercontent.com/80784296/211175360-52a19c7f-9aad-4b2e-ae4f-c6728e7715a8.JPG)
+![drumplayer](https://user-images.githubusercontent.com/80784296/212537149-9a38032b-694f-488e-86b5-31bdfad43c7b.JPG)
 
 #### INSTRUCTIONS  
 Load wav samples in the slots using context menu.  
@@ -294,7 +297,7 @@ It can also be used to connect other modules sockets when they need to be wired 
 - 64 stages shift register that outputs only the selected stage controlled by knob/CV with attenuverter
 - Trigger delay to adjust the 1-sample latency of VCV cables
 
-![shifter](https://user-images.githubusercontent.com/80784296/204009935-efd147d4-2d28-4b72-a607-af41e7c8e894.JPG)
+![shifter](https://user-images.githubusercontent.com/80784296/212537155-aceff24b-4dc8-4c04-9063-fad4543c9cd6.JPG)
 
 #### - INSTRUCTIONS
 Shifter module can be useful to shift back and fotrth a sequencer output on the fly, thanks to the 64 stages register.  
