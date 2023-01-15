@@ -61,7 +61,7 @@ Audio rate modulations are allowed.
 ![blender](https://user-images.githubusercontent.com/80784296/211660967-ce9aa25d-cc8f-45a9-beae-3381a13cf0af.JPG)
 
 #### - INSTRUCTIONS
-Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used. Polyphonic inputs are allowed and are left/right independent, but accordingly to number of channels of IN1 input.
+Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used. Polyphonic inputs are allowed and are left/right independent, but accordingly to number of channels of IN1 input.  
 PHASE switches invert the sign of input signals.  
 MIX knob sets the crossfade level of the inputs.  
 Inputs volume can be adjusted via two attenuators.  
