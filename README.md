@@ -65,7 +65,7 @@ Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be indep
 PHASE switches invert the sign of input signals.  
 MIX knob sets the crossfade level of the inputs.  
 Inputs volume can be adjusted via two attenuators.  
-Master volume can be amplified up to 200%, a hard clip ±5v switch is present.
+Master volume can be amplified up to 200%, a hard clip ±5v switch is present.  
 Output replicate input polyphony, but deticking in the context menu 'Polyphonic outs' option will mix channels in monophonic outs.
 
 **MOD section**  
