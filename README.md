@@ -18,10 +18,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **to do list:** 
 - add to context menu a user folder browser feature to drumPlayer, drumPlayer+, sickoPlayer, sickoSampler
 
-# SickoCV v2.5.1
+# SickoCV v2.5.2-beta1
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 1](https://user-images.githubusercontent.com/80784296/212480942-1812dcd5-8a6b-449a-8a5d-956da30b4cf5.JPG)
+![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/217615574-28b09068-ae36-42d3-911c-85977b61067e.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -286,7 +286,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ## SickoPlayer
 ### wav sample player
 
-![sickoplayer](https://user-images.githubusercontent.com/80784296/212481297-755598b1-aa1e-4252-b750-42f86b337f25.JPG)
+![sickoplayer](https://user-images.githubusercontent.com/80784296/217615665-8750bfc9-d58c-4dc1-a8d3-5fab0720e406.JPG)
 
 #### - DESCRIPTION
 - samples and 1-cycle waveforms player
@@ -297,7 +297,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
 
-The display shows the waveform, filename, sample rate and number of channels (1-2 channels wav file are allowed).  
+The display shows the waveform, filename, sample duration and number of channels (1-2 channels wav file are allowed).  
 
 Mode switch allows to select if sample playback starts with a trigger or play it until a gate is high.  
 
@@ -312,18 +312,20 @@ Cue Start/End knobs are used to set the start of the Attack and the Release stag
 
 When Loop button is switched on, playback restarts from Loop Start when Loop End is reached.
 
-REV button changes the playback direction.
+REV button changes the playback start direction.
 
 PNG button enables PingPong mode:
-- in TRIG mode, when loop is enabled, it automatically switches the REV button when Loop Start/End is reached and inverts playback direction without stopping playback
-- in GATE mode, it automatically switches the REV button when Loop Start/End is reached when loop is enabled, or when Cue Start/End is reached, and playback direction is inverted without stopping playback
+- in TRIG mode, when loop is enabled, if Loop Start/End is reached playback direction is inverted without stopping playback
+- in GATE mode, if Loop Start/End is reached when loop is enabled, or when Cue Start/End is reached, playback direction is inverted without stopping playback
+
+XFD knob (crossfade) sets crossfading time in loop mode, or fadeout time before the end of sample is reached.  
 
 The envelope knobs can be external modulated with attenuverted CVinputs.
 
 Tune knob with its attenuverted CVinput, can tune up or down the sample with a ±2 octave range (semitone scale).  
 v/oct input accepts polyphonic cable usually combined with a polyphonic gate in when in Gate Mode.  
 
-Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range.  
+Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range. A led clip light warns of clipping.  
 
 If sample file is mono, left out is duplicated to right out.  
 EOC outputs a 1ms pulse when sample reaches CueEnd or LoopEnd if Loop is enabled (or when Start positions are reached when in reverse playback).  
@@ -345,9 +347,6 @@ There are 3 different interpolation algorithms, that are engaged during playback
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
-**Crossfade length**  
-Crossfade can be set from 0 to 50ms and is engaged when the sample skips from LoopEnd to LoopStart or from CueEnd to CueStart when in Gate Mode.
-
 **Polyphonic Outs**  
 When this option is enabled the outs reflects v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out.
 
@@ -355,13 +354,42 @@ When this option is enabled the outs reflects v/oct input polyphony. Otherwise p
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
 Be sure to disable it when using one-cycle waveforms.  
 
+#### RESET CURSORS
+Reset Cue/Loop Start/stop to 0 and 100%.  
+
 #### PRESETS
-There are some factory presets stored in the context menu.  
-Loading a factory preset automatically clears the sample from memory, pay attention.
+There are some factory presets stored in the context menu for common using settings.  
 
 #### USING ONE-CYCLE WAVEFORMS
 One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
-Be sure to disable PhaseScan functionality, adjust Cue and Loop START to 0% and Cue/Loop END to 100%, or load relative factory preset before loading the sample.
+Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100%.  
+
+## SickoSampler
+### wav sample player and sampler
+
+![sickosampler](https://user-images.githubusercontent.com/80784296/217618559-1e97d706-cbb3-4d8e-9e79-9174811e5380.JPG)
+
+#### - DESCRIPTION
+- mono/stereo sample recorder  
+- resampler
+- mono/stereo samples and 1-cycle waveforms player
+- ±24 semitones tuning and v/oct input with polyphony
+- envelope generator, loop, reverse, pingpong
+- anti-aliasing filter, phase-scan feature
+
+#### - INSTRUCTIONS
+
+About player functionalities please follow sickoPlayer instructions. Please note that loaded samples in sickoSampler are always resampled to VCV working samplerate. For this reason interpolation is fixed to Hermite. It can be always toggled antialiasing filter from context menu. 
+
+In sickoSampler the display shows also the recording time and a yellow "S" if sample is not saved yet.  
+Recording sections has 2 inputs, but record is only enabled if at least left channel is connected.  
+Record starts/stops if RecButton is pressed or if a toggle trig input is detected.  
+GAIN knob adjusts the volume of inputs.  
+FD knob sets the fade in/out time when recording starts or stops.  
+OVD button overdubs existing sample.  
+BLC button blocks Cue/Loop END positions if recording is longer than existing sample.  
+STRT switch selects recording starting point: Cue Start [CS], Loop Start [LS], Current Position [CS] (if used while playing back).  
+MON switch selects if inputs are routed to the outs: always [ON], only while recording [REC], or never [OFF].  
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
