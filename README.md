@@ -388,8 +388,8 @@ GAIN knob adjusts the volume of inputs.
 FD knob sets the fade in/out time when recording starts or stops.  
 OVD button overdubs existing sample.  
 BLC button blocks Cue/Loop END positions if recording is longer than existing sample.  
-STRT switch selects recording starting point: Cue Start [CS], Loop Start [LS], Current Position [CS] (if used while playing back).  
-MON switch selects if inputs are routed to the outs: always [ON], only while recording [REC], or never [OFF].  
+STRT switch selects recording starting point: Cue Start [CS], Loop Start [LS], Current Position [CP] (if used while playing back).  
+MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
