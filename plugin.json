@@ -152,6 +152,15 @@
       ]
     },
     {
+      "slug": "SickoSampler",
+      "name": "SickoSampler",
+      "description": "Sample Player and recorder",
+      "tags": [
+        "Sampler",
+        "Polyphonic"
+      ]
+    },
+    {
       "slug": "Switcher",
       "name": "Switcher",
       "description": "2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate",

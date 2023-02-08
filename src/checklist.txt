@@ -1,0 +1,70 @@
+checklist
+
+sickosampler
+- registrazione senza overdub mentre si fa playback
+- ottimizzare data type delle variabili
+- verificare funzionamento posizionamento cursori e velocizzarlo
+- togliere "rm->storedPath = std::string(path);" da "struct SickoSamplerItem : MenuItem {"
+- controllare i fadestage e se il tempo di crossfade supera 
+
+- verificare clicks al fade in e fade out quando in overdub
+- decidere come fare il salvataggio se antialias o no
+- fare test di salvataggio cue e loop
+- fare test di salvataggio stereo
+- provare ad eliminare i floor(currRecPosition)
+- impostare posizioni fisse per i widget
+- creare conversione da mono stereo e viceversa
+- decidere se far registrare anche se solo l'IN destro è connesso
+- pensare a come visualizzare la forma d'onda in real time
+- controllare il totalSamples se diminuirlo di -2 invece che -1 durante il loadSample
+- verificare se è il caso di cambiare la disattivazione del PLAY prima del LoadSample da "fileloaded = false" in "play = false"
+
+- (da testare bene) cursor block : BLOCCA SOLO IL CUE END
+- (da testare bene) controllo trig per stop registrazione
+- (fatto, verificare) azzerare i LPF all'inizio di ogni registrazione
+- (fatto, verificare bene) crash se file mono e registrazione stereo
+- (fatto, verificare bene) fade in / fade out su switch monitor
+- (fatto) aggiungere tempo registrazione
+- (fatto, verificare funzionamenti varii) barra di registrazione
+- (fatto, verificare funzionamenti varii) spostamento forma d'onda quando registrando si dovrebbe strettire
+- (risolto , ma verificare per benino) controllo quale mancata inizializzazione di rec fa crashare il secondo sickosampler
+- (fatto) controllo caratteri nome file
+- (fatto) sistemare il calcolo del primo sample in registrazione
+- (fatto) predisporre salvataggi o intero / solo cue StartEnd / o Loop oppure con envelope o senza
+- (verificare correttezza) decidere sul ricalcolo sample se viene salvata cue o loop region
+- (dovrebbe andare, verificare per benino) far caricare il nuovo sample registrato al nuovo avvio
+- (fatto)evitare il salvataggio se il file non è caricato
+- (fatto) evitare click quando si pigia il rev button
+- (fatto) verificare durata clipping light
+- (fatto)inversione di fase se è in reverse playing
+- (si lascia comè?) controllare il calcolo del EOC (end of cycle) sui loop col crossfade;
+- (fatto, verificare correttezza) far ripartire scanphase dopo registrazione;
+- (ok, fatto) verificare uguaglianza della lunchezza file quando si salva
+- (tolti tutti i resize) tempbuffer resize o solo clear
+- (fatto) impostare limite di memoria alla registrazione e caricamento file
+- (fatto, ok) controllare adeguatezza del calcolo sui sample pari che non hanno bisogno di interpolazione (controllo weight)
+- (ok, non si può salvare un file vuoto) eliminare disegno forma d'onda quando si salva un file vuoto.
+
+
+sickoplayer
+- aggiungre nota nelle istruzioni per eliminare i factory preset
+- togliere "rm->storedPath = std::string(path);" da "struct SickoPlayerItem : MenuItem {"
+- verificare durata clipping light
+- sistemare ordine di calcolo CueStartPos e LoopStartPos come su sickosampler
+- verificare se è il caso di cambiare la disattivazione del PLAY prima del LoadSample da  "fileloaded = false" in "play = false"
+
+- (fatto, da verificare) verificare il lowpassfilter su sampleload per lo stereo
+- (fatto) eliminare un if (fileloaded assieme a un && play[c])
+- (fatto) aggiungere filtri su finestra dialogo open file
+- (fatto) impostare limite di memoria alla registrazione e caricamento file
+- (fatto, da decidere se migliorarlo per rapporti di samplerate > 2, tipo da 44100 a 11025) verificare quando sampleweight funziona per davvero
+- (fatto, verificare tutti i funzionamenti, fade ecc) decidere se registrare la forma d'onda moltiplicata per 5 per evitare il ricalcolo ogni sample
+
+drumplayer
+drumplayer+
+
+- sistemare il display su drumplayer4+ a 5 caratteri
+- decidere se registrare la forma d'onda moltiplicata per 5 per evitare il ricalcolo ogni sample
+- aggiungere filtri su finestra dialogo open file
+- controllare il totalSamples se diminuirlo di -2 invece che -1 durante il loadSample
+- verificare se è il caso di cambiare la disattivazione del PLAY prima del LoadSample da  "fileloaded = false" in "play = false"
