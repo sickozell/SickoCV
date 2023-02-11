@@ -1,6 +1,7 @@
 checklist
 
 sickosampler
+- sistemare il salvataggio cue/loop region per il phase scan
 - registrazione senza overdub mentre si fa playback
 - ottimizzare data type delle variabili
 - verificare funzionamento posizionamento cursori e velocizzarlo

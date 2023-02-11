@@ -155,6 +155,10 @@ struct SickoPlayer : Module {
 	std::string timeDisplay = "";
 	std::string samplerateDisplay = "";
 
+	std::string userFolderName = "";
+	vector <std::string> browserFileName;
+	vector <std::string> browserFileDisplay;
+
 	int seconds;
 	int minutes;
 
@@ -331,6 +335,7 @@ struct SickoPlayer : Module {
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
 		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
+		json_object_set_new(rootJ, "UserFolder", json_string(userFolderName.c_str()));
 		return rootJ;
 	}
 
@@ -355,6 +360,11 @@ struct SickoPlayer : Module {
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
 			loadSample(storedPath);
+		}
+		json_t *userFolderNameJ = json_object_get(rootJ, "UserFolder");
+		if (userFolderNameJ) {
+			userFolderName = json_string_value(userFolderNameJ);
+			folderSelection(userFolderName);
 		}
 	}
 	
@@ -394,6 +404,30 @@ struct SickoPlayer : Module {
 		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
 	}
 	*/
+
+	void folderSelection(std::string path) {
+		DIR* rep = NULL;
+		struct dirent* dirp = NULL;
+			char* pathDup = strdup(path.c_str());
+			std::string dir = pathDup;
+		rep = opendir(dir.c_str());
+		browserFileName.clear();
+		browserFileDisplay.clear();
+		while ((dirp = readdir(rep)) != NULL) {
+			std::string name = dirp->d_name;
+			std::size_t found = name.find(".wav",name.length()-5);
+			if (found==std::string::npos)
+				found = name.find(".WAV",name.length()-5);
+
+			if (found!=std::string::npos) {
+				browserFileName.push_back(name);
+				browserFileDisplay.push_back(name.substr(0, name.length()-4));
+			}
+		}
+		sort(browserFileName.begin(), browserFileName.end());
+		sort(browserFileDisplay.begin(), browserFileDisplay.end());
+		closedir(rep);
+	};
 
 	void loadSample(std::string path) {
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
@@ -1533,14 +1567,49 @@ struct SickoPlayer : Module {
 	}
 };
 
+struct SickoPlayerOpenFolder : MenuItem {
+	SickoPlayer *rm ;
+	void onAction(const event::Action &e) override {
+		const char* prevFolder = rm->userFolderName.c_str();
+		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+		if (path) {
+			rm->userFolderName = std::string(path);
+			DIR* rep = NULL;
+			struct dirent* dirp = NULL;
+				char* pathDup = path;
+				std::string dir = pathDup;
+
+			rep = opendir(dir.c_str());
+			rm->browserFileName.clear();
+			rm->browserFileDisplay.clear();
+			while ((dirp = readdir(rep)) != NULL) {
+				std::string name = dirp->d_name;
+
+				std::size_t found = name.find(".wav",name.length()-5);
+				if (found==std::string::npos)
+					found = name.find(".WAV",name.length()-5);
+
+				if (found!=std::string::npos) {
+					rm->browserFileName.push_back(name);
+					rm->browserFileDisplay.push_back(name.substr(0, name.length()-4));
+				}
+			}
+			sort(rm->browserFileName.begin(), rm->browserFileName.end());
+			sort(rm->browserFileDisplay.begin(), rm->browserFileDisplay.end());
+			closedir(rep);
+		}
+		free(path);
+	}
+};
+
 struct SickoPlayerItem : MenuItem {
 	SickoPlayer *rm ;
 	void onAction(const event::Action &e) override {
-		rm->fileLoaded = false;
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+		rm->fileLoaded = false;
 		if (path) {
 			rm->loadSample(path);
 			rm->storedPath = std::string(path);
@@ -1739,13 +1808,26 @@ struct SickoPlayerDisplay : TransparentWidget {
 				rootDirItem->text = "Load Sample";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
-				menu->addChild(createMenuLabel("Current Sample:"));
-				menu->addChild(createMenuLabel(module->fileDescription));
+
+				if (module->browserFileName.size() > 0) {
+					menu->addChild(createSubmenuItem("Folder Browser", "",
+						[=](Menu* menu) {
+							for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
+								menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
+							}
+						}
+					));
+				}
 
 				if (module->fileLoaded) {
+					menu->addChild(new MenuSeparator());
+					menu->addChild(createMenuLabel("Current Sample:"));
+					menu->addChild(createMenuLabel(module->fileDescription));
 					menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
 					menu->addChild(construct<ClearSlotItem>(&MenuItem::rightText, "Clear", &ClearSlotItem::module, module));
 				}
+
+
 
 			menu->addChild(new MenuSeparator());
 			menu->addChild(construct<ResetCursorsItem>(&MenuItem::text, "Reset Cursors", &ResetCursorsItem::module, module));
@@ -1883,6 +1965,13 @@ struct SickoPlayerWidget : ModuleWidget {
 		}
 	};
 
+	struct RefreshUserFolderItem : MenuItem {
+		SickoPlayer *module;
+		void onAction(const event::Action &e) override {
+			module->folderSelection(module->userFolderName);
+		}
+	};
+
 	void appendContextMenu(Menu *menu) override {
 	   	SickoPlayer *module = dynamic_cast<SickoPlayer*>(this->module);
 			assert(module);
@@ -1892,16 +1981,36 @@ struct SickoPlayerWidget : ModuleWidget {
 			rootDirItem->text = "Load Sample";
 			rootDirItem->rm = module;
 			menu->addChild(rootDirItem);
-			menu->addChild(createMenuLabel("Current Sample:"));
-			menu->addChild(createMenuLabel(module->fileDescription));
+
+			if (module->browserFileName.size() > 0) {
+				menu->addChild(createSubmenuItem("Folder Browser", "",
+					[=](Menu* menu) {
+						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
+						}
+					}
+				));
+			}
 
 			if (module->fileLoaded) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createMenuLabel("Current Sample:"));
+				menu->addChild(createMenuLabel(module->fileDescription));
 				menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
 				menu->addChild(construct<ClearSlotItem>(&MenuItem::rightText, "Clear", &ClearSlotItem::module, module));
 			}
 
 		menu->addChild(new MenuSeparator());
+		SickoPlayerOpenFolder *rootFolder = new SickoPlayerOpenFolder;
+			rootFolder->text = "Select Samples Folder";
+			rootFolder->rm = module;
+			menu->addChild(rootFolder);
+		if (module->userFolderName != "") {
+			menu->addChild(createMenuLabel(module->userFolderName));
+			menu->addChild(construct<RefreshUserFolderItem>(&MenuItem::rightText, "Refresh", &RefreshUserFolderItem::module, module));
+		}
 
+		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Interpolation"));
 		struct ModeItem : MenuItem {
 			SickoPlayer* module;

@@ -67,6 +67,9 @@ struct DrumPlayerPlus : Module {
 	std::string storedPath[4] = {"","","",""};
 	std::string fileDescription[4] = {"--none--","--none--","--none--","--none--"};
 	std::string fileDisplay[4] = {"-----","-----","-----","-----"};
+	std::string userFolderName = "";
+	vector <std::string> browserFileName;
+	vector <std::string> browserFileDisplay;
 
 	float trigValue[4] = {0.f, 0.f, 0.f, 0.f};
 	float prevTrigValue[4] = {0.f, 0.f, 0.f, 0.f};
@@ -187,6 +190,7 @@ struct DrumPlayerPlus : Module {
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		json_object_set_new(rootJ, "Slot3", json_string(storedPath[2].c_str()));
 		json_object_set_new(rootJ, "Slot4", json_string(storedPath[3].c_str()));
+		json_object_set_new(rootJ, "UserFolder", json_string(userFolderName.c_str()));
 		return rootJ;
 	}
 
@@ -223,6 +227,11 @@ struct DrumPlayerPlus : Module {
 			storedPath[3] = json_string_value(slot4J);
 			loadSample(storedPath[3], 3);
 		}
+		json_t *userFolderNameJ = json_object_get(rootJ, "UserFolder");
+		if (userFolderNameJ) {
+			userFolderName = json_string_value(userFolderNameJ);
+			folderSelection(userFolderName);
+		}
 	}
 	
 	void calcBiquadLpf(double frequency, double samplerate, double Q) {
@@ -254,6 +263,30 @@ struct DrumPlayerPlus : Module {
 		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
 	}
 	*/ 
+
+	void folderSelection(std::string path) {
+		DIR* rep = NULL;
+		struct dirent* dirp = NULL;
+			char* pathDup = strdup(path.c_str());
+			std::string dir = pathDup;
+		rep = opendir(dir.c_str());
+		browserFileName.clear();
+		browserFileDisplay.clear();
+		while ((dirp = readdir(rep)) != NULL) {
+			std::string name = dirp->d_name;
+			std::size_t found = name.find(".wav",name.length()-5);
+			if (found==std::string::npos)
+				found = name.find(".WAV",name.length()-5);
+
+			if (found!=std::string::npos) {
+				browserFileName.push_back(name);
+				browserFileDisplay.push_back(name.substr(0, name.length()-4));
+			}
+		}
+		sort(browserFileName.begin(), browserFileName.end());
+		sort(browserFileDisplay.begin(), browserFileDisplay.end());
+		closedir(rep);
+	};
 
 	void loadSample(std::string path, int slot) {
 		unsigned int c;
@@ -530,10 +563,48 @@ struct DrumPlayerPlus : Module {
 	}
 };
 
+struct DrumPlayerPlusOpenFolder : MenuItem {
+	DrumPlayerPlus *rm ;
+	void onAction(const event::Action &e) override {
+		const char* prevFolder = rm->userFolderName.c_str();
+		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+		if (path) {
+			rm->userFolderName = std::string(path);
+			DIR* rep = NULL;
+			struct dirent* dirp = NULL;
+				char* pathDup = path;
+				std::string dir = pathDup;
+
+			rep = opendir(dir.c_str());
+			rm->browserFileName.clear();
+			rm->browserFileDisplay.clear();
+			while ((dirp = readdir(rep)) != NULL) {
+				std::string name = dirp->d_name;
+
+				std::size_t found = name.find(".wav",name.length()-5);
+				if (found==std::string::npos)
+					found = name.find(".WAV",name.length()-5);
+
+				if (found!=std::string::npos) {
+					rm->browserFileName.push_back(name);
+					rm->browserFileDisplay.push_back(name.substr(0, name.length()-4));
+				}
+			}
+			sort(rm->browserFileName.begin(), rm->browserFileName.end());
+			sort(rm->browserFileDisplay.begin(), rm->browserFileDisplay.end());
+			closedir(rep);
+		}
+		free(path);
+	}
+};
+
 struct DrumPlayerPlusItem1 : MenuItem {
 	DrumPlayerPlus *rm ;
 	void onAction(const event::Action &e) override {
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, NULL);
+		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		int i = 0;
 		rm->fileLoaded[i] = false;
 		if (path) {
@@ -550,7 +621,10 @@ struct DrumPlayerPlusItem1 : MenuItem {
 struct DrumPlayerPlusItem2 : MenuItem {
 	DrumPlayerPlus *rm ;
 	void onAction(const event::Action &e) override {
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, NULL);
+		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		int i = 1;
 		rm->fileLoaded[i] = false;
 		if (path) {
@@ -567,7 +641,10 @@ struct DrumPlayerPlusItem2 : MenuItem {
 struct DrumPlayerPlusItem3 : MenuItem {
 	DrumPlayerPlus *rm ;
 	void onAction(const event::Action &e) override {
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, NULL);
+		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		int i = 2;
 		rm->fileLoaded[i] = false;
 		if (path) {
@@ -584,7 +661,10 @@ struct DrumPlayerPlusItem3 : MenuItem {
 struct DrumPlayerPlusItem4 : MenuItem {
 	DrumPlayerPlus *rm ;
 	void onAction(const event::Action &e) override {
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, NULL);
+		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		int i = 3;
 		rm->fileLoaded[i] = false;
 		if (path) {
@@ -611,7 +691,6 @@ struct dppSlot1Display : TransparentWidget {
 		DrumPlayerPlus *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(0);
-			//module->fileDescription[0] = "abcde";
 		}
 	};
 
@@ -636,11 +715,21 @@ struct dppSlot1Display : TransparentWidget {
 				rootDirItem->text = "Load Sample Slot #1";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
+
+			if (module->browserFileName.size() > 0) {
+				menu->addChild(createSubmenuItem("Folder Browser", "",
+					[=](Menu* menu) {
+						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 0);}));
+						}
+					}
+				));
+			}
+			if (module->fileLoaded[0]) {
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[0]));
-
-			menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear", &ClearSlot1Item::module, module));
-
+				menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear", &ClearSlot1Item::module, module));
+			}
 		}
 	}
 };
@@ -681,11 +770,21 @@ struct dppSlot2Display : TransparentWidget {
 				rootDirItem->text = "Load Sample Slot #2";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
+
+			if (module->browserFileName.size() > 0) {
+				menu->addChild(createSubmenuItem("Folder Browser", "",
+					[=](Menu* menu) {
+						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 1);}));
+						}
+					}
+				));
+			}
+			if (module->fileLoaded[1]) {
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[1]));
-
-			menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear", &ClearSlot2Item::module, module));
-
+				menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear", &ClearSlot2Item::module, module));
+			}
 		}
 	}
 };
@@ -726,11 +825,21 @@ struct dppSlot3Display : TransparentWidget {
 				rootDirItem->text = "Load Sample Slot #3";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
+
+			if (module->browserFileName.size() > 0) {
+				menu->addChild(createSubmenuItem("Folder Browser", "",
+					[=](Menu* menu) {
+						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 2);}));
+						}
+					}
+				));
+			}
+			if (module->fileLoaded[2]) {
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[2]));
-
-			menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear", &ClearSlot3Item::module, module));
-
+				menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear", &ClearSlot3Item::module, module));
+			}
 		}
 	}
 };
@@ -771,15 +880,23 @@ struct dppSlot4Display : TransparentWidget {
 				rootDirItem->text = "Load Sample Slot #4";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
+
+			if (module->browserFileName.size() > 0) {
+				menu->addChild(createSubmenuItem("Folder Browser", "",
+					[=](Menu* menu) {
+						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 3);}));
+						}
+					}
+				));
+			}
+			if (module->fileLoaded[3]) {
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[3]));
-
-			menu->addChild(construct<ClearSlot4Item>(&MenuItem::rightText, "Clear", &ClearSlot4Item::module, module));
-
+				menu->addChild(construct<ClearSlot4Item>(&MenuItem::rightText, "Clear", &ClearSlot4Item::module, module));
+			}
 		}
 	}
-
-	
 };
 
 struct DrumPlayerPlusDisplay : TransparentWidget {
@@ -925,6 +1042,13 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 	};
 
+	struct RefreshUserFolderItem : MenuItem {
+		DrumPlayerPlus *module;
+		void onAction(const event::Action &e) override {
+			module->folderSelection(module->userFolderName);
+		}
+	};
+
 	void appendContextMenu(Menu *menu) override {
 	   	DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
 			assert(module);
@@ -961,6 +1085,16 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			
 		menu->addChild(new MenuSeparator());
 		menu->addChild(construct<ClearSlotsItem>(&MenuItem::text, "Clear ALL slots", &ClearSlotsItem::module, module));
+		menu->addChild(new MenuSeparator());
+
+		DrumPlayerPlusOpenFolder *rootFolder = new DrumPlayerPlusOpenFolder;
+			rootFolder->text = "Select Samples Folder";
+			rootFolder->rm = module;
+			menu->addChild(rootFolder);
+		if (module->userFolderName != "") {
+			menu->addChild(createMenuLabel(module->userFolderName));
+			menu->addChild(construct<RefreshUserFolderItem>(&MenuItem::rightText, "Refresh", &RefreshUserFolderItem::module, module));
+		}
 		menu->addChild(new MenuSeparator());
 
 		menu->addChild(createMenuLabel("Interpolation"));

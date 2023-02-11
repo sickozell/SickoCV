@@ -174,6 +174,10 @@ struct SickoSampler : Module {
 	std::string recTimeDisplay = "";
 	std::string samplerateDisplay = "";
 
+	std::string userFolderName = "";
+	vector <std::string> browserFileName;
+	vector <std::string> browserFileDisplay;
+
 	int seconds;
 	int minutes;
 	int recSeconds;
@@ -545,6 +549,7 @@ struct SickoSampler : Module {
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
 		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
+		json_object_set_new(rootJ, "UserFolder", json_string(userFolderName.c_str()));
 		return rootJ;
 	}
 
@@ -569,6 +574,11 @@ struct SickoSampler : Module {
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
 			loadSample(storedPath);
+		}
+		json_t *userFolderNameJ = json_object_get(rootJ, "UserFolder");
+		if (userFolderNameJ) {
+			userFolderName = json_string_value(userFolderNameJ);
+			folderSelection(userFolderName);
 		}
 	}
 	
@@ -607,6 +617,30 @@ struct SickoSampler : Module {
 		double c3 = (.5F * (x3 - x0)) + (1.5F * (x1 - x2));
 		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
 	}
+
+	void folderSelection(std::string path) {
+		DIR* rep = NULL;
+		struct dirent* dirp = NULL;
+			char* pathDup = strdup(path.c_str());
+			std::string dir = pathDup;
+		rep = opendir(dir.c_str());
+		browserFileName.clear();
+		browserFileDisplay.clear();
+		while ((dirp = readdir(rep)) != NULL) {
+			std::string name = dirp->d_name;
+			std::size_t found = name.find(".wav",name.length()-5);
+			if (found==std::string::npos)
+				found = name.find(".WAV",name.length()-5);
+
+			if (found!=std::string::npos) {
+				browserFileName.push_back(name);
+				browserFileDisplay.push_back(name.substr(0, name.length()-4));
+			}
+		}
+		sort(browserFileName.begin(), browserFileName.end());
+		sort(browserFileDisplay.begin(), browserFileDisplay.end());
+		closedir(rep);
+	};
 	
 /*
 
@@ -2637,15 +2671,49 @@ struct SickoSampler : Module {
 
 */
 
+struct SickoSamplerOpenFolder : MenuItem {
+	SickoSampler *rm ;
+	void onAction(const event::Action &e) override {
+		const char* prevFolder = rm->userFolderName.c_str();
+		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+		if (path) {
+			rm->userFolderName = std::string(path);
+			DIR* rep = NULL;
+			struct dirent* dirp = NULL;
+				char* pathDup = path;
+				std::string dir = pathDup;
+
+			rep = opendir(dir.c_str());
+			rm->browserFileName.clear();
+			rm->browserFileDisplay.clear();
+			while ((dirp = readdir(rep)) != NULL) {
+				std::string name = dirp->d_name;
+
+				std::size_t found = name.find(".wav",name.length()-5);
+				if (found==std::string::npos)
+					found = name.find(".WAV",name.length()-5);
+
+				if (found!=std::string::npos) {
+					rm->browserFileName.push_back(name);
+					rm->browserFileDisplay.push_back(name.substr(0, name.length()-4));
+				}
+			}
+			sort(rm->browserFileName.begin(), rm->browserFileName.end());
+			sort(rm->browserFileDisplay.begin(), rm->browserFileDisplay.end());
+			closedir(rep);
+		}
+		free(path);
+	}
+};
 
 struct SickoSamplerItem : MenuItem {
 	SickoSampler *rm ;
 	void onAction(const event::Action &e) override {
-		rm->fileLoaded = false;
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+		rm->fileLoaded = false;
 		if (path) {
 			rm->loadSample(path);
 			rm->storedPath = std::string(path);
@@ -2955,10 +3023,21 @@ struct SickoSamplerDisplay : TransparentWidget {
 				rootDirItem->text = "Load Sample";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
-				menu->addChild(createMenuLabel("Current Sample:"));
-				menu->addChild(createMenuLabel(module->fileDescription));
-			
+
+				if (module->browserFileName.size() > 0) {
+					menu->addChild(createSubmenuItem("Folder Browser", "",
+						[=](Menu* menu) {
+							for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
+								menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
+							}
+						}
+					));
+				}
+
 			if (module->fileLoaded) {
+					menu->addChild(new MenuSeparator());
+					menu->addChild(createMenuLabel("Current Sample:"));
+					menu->addChild(createMenuLabel(module->fileDescription));
 					menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
 					std::string tempDisplay = " ";
 					if (module->resampled) {
@@ -3151,6 +3230,13 @@ struct SickoSamplerWidget : ModuleWidget {
 		}
 	};
 
+	struct RefreshUserFolderItem : MenuItem {
+		SickoSampler *module;
+		void onAction(const event::Action &e) override {
+			module->folderSelection(module->userFolderName);
+		}
+	};
+
 	void appendContextMenu(Menu *menu) override {
 	   	SickoSampler *module = dynamic_cast<SickoSampler*>(this->module);
 			assert(module);
@@ -3160,10 +3246,21 @@ struct SickoSamplerWidget : ModuleWidget {
 			rootDirItem->text = "Load Sample";
 			rootDirItem->rm = module;
 			menu->addChild(rootDirItem);
-			menu->addChild(createMenuLabel("Current Sample:"));
-			menu->addChild(createMenuLabel(module->fileDescription));
+
+			if (module->browserFileName.size() > 0) {
+				menu->addChild(createSubmenuItem("Folder Browser", "",
+					[=](Menu* menu) {
+						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
+						}
+					}
+				));
+			}
 
 		if (module->fileLoaded) {
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("Current Sample:"));
+			menu->addChild(createMenuLabel(module->fileDescription));
 			menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
 			std::string tempDisplay = " ";
 			if (module->resampled) {
@@ -3197,6 +3294,16 @@ struct SickoSamplerWidget : ModuleWidget {
 				menu->addChild(saveLoopItem);
 
 			menu->addChild(createBoolPtrMenuItem("Trim Sample after Save", "", &module->trimOnSave));
+		}
+
+		menu->addChild(new MenuSeparator());
+		SickoSamplerOpenFolder *rootFolder = new SickoSamplerOpenFolder;
+			rootFolder->text = "Select Samples Folder";
+			rootFolder->rm = module;
+			menu->addChild(rootFolder);
+		if (module->userFolderName != "") {
+			menu->addChild(createMenuLabel(module->userFolderName));
+			menu->addChild(construct<RefreshUserFolderItem>(&MenuItem::rightText, "Refresh", &RefreshUserFolderItem::module, module));
 		}
 
 		menu->addChild(new MenuSeparator());
