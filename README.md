@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta1
+# SickoCV v2.5.2-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -16,9 +16,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - **SickoPlayer**
 
 ## **to do list:** 
-- add to context menu a user folder browser feature to drumPlayer, drumPlayer+, sickoPlayer, sickoSampler
+- ~~add to context menu a user folder browser feature to drumPlayer, drumPlayer+, sickoPlayer, sickoSampler~~
 
-# SickoCV v2.5.2-beta1
+# SickoCV v2.5.2-beta2
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/217615574-28b09068-ae36-42d3-911c-85977b61067e.JPG)
