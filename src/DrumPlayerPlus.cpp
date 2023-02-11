@@ -720,7 +720,8 @@ struct dppSlot1Display : TransparentWidget {
 				menu->addChild(createSubmenuItem("Folder Browser", "",
 					[=](Menu* menu) {
 						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
-							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 0);}));
+							//menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 0);}));
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"/"+ module->browserFileName[i], 0);}));
 						}
 					}
 				));
@@ -775,7 +776,8 @@ struct dppSlot2Display : TransparentWidget {
 				menu->addChild(createSubmenuItem("Folder Browser", "",
 					[=](Menu* menu) {
 						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
-							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 1);}));
+							//menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 1);}));
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"/"+ module->browserFileName[i], 1);}));
 						}
 					}
 				));
@@ -830,7 +832,8 @@ struct dppSlot3Display : TransparentWidget {
 				menu->addChild(createSubmenuItem("Folder Browser", "",
 					[=](Menu* menu) {
 						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
-							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 2);}));
+							//menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 2);}));
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"/"+ module->browserFileName[i], 2);}));
 						}
 					}
 				));
@@ -885,7 +888,8 @@ struct dppSlot4Display : TransparentWidget {
 				menu->addChild(createSubmenuItem("Folder Browser", "",
 					[=](Menu* menu) {
 						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
-							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 3);}));
+							//menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i], 3);}));
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"/"+ module->browserFileName[i], 3);}));
 						}
 					}
 				));

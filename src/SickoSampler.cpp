@@ -3028,7 +3028,8 @@ struct SickoSamplerDisplay : TransparentWidget {
 					menu->addChild(createSubmenuItem("Folder Browser", "",
 						[=](Menu* menu) {
 							for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
-								menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
+								//menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
+								menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"/"+ module->browserFileName[i]);}));
 							}
 						}
 					));
@@ -3251,7 +3252,8 @@ struct SickoSamplerWidget : ModuleWidget {
 				menu->addChild(createSubmenuItem("Folder Browser", "",
 					[=](Menu* menu) {
 						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
-							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
+							//menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
+							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"/"+ module->browserFileName[i]);}));
 						}
 					}
 				));
