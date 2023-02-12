@@ -343,7 +343,7 @@ As described before, just right-click over the waveform display area to access t
 When a sample is loaded, file sample rate and number of channels are shown here.  
 
 **Set samples folder**  
-Once a folder is set, 'Folder browser' option is activated in the quick load menu (right click on display) to quickly choose samples from the selected folder.  
+Once a folder is set, 'Folder browser' option is activated here and in the quick load menu (right click on display) to quickly choose samples from the selected folder.  
 
 **Interpolation**  
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
