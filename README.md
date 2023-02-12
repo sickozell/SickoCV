@@ -240,6 +240,9 @@ When the sample is loaded the green led on the panel is turned on (drumPlayer), 
 Use Clear options to unload samples from slots.  
 Just right-click over the led areas or the displays to access the quick-load menus.  
 
+**Set samples folder**
+Once a folder is set, 'Folder browser' option is activated in the quick load menu (right click in the relative led slot area/display) to quickly choose samples from the selected folder.  
+
 **Interpolation**  
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
 - 'No interpolation' can be used when sample rates match and speed is 100% constant  
@@ -337,6 +340,10 @@ NOTE: input trigger threshold is +1v.
 **Sample Slot**  
 Click on "Load Sample" to open dialog. Use Clear options to unload sample from slot.  
 As described before, just right-click over the waveform display area to access the quick-load menu.  
+When a sample is loaded, file sample rate and number of channels are shown here.  
+
+**Set samples folder**
+Once a folder is set, 'Folder browser' option is activated in the quick load menu (right click on display) to quickly choose samples from the selected folder.  
 
 **Interpolation**  
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
@@ -371,7 +378,6 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 
 #### - DESCRIPTION
 - mono/stereo sample recorder  
-- resampler
 - mono/stereo samples and 1-cycle waveforms player
 - ±24 semitones tuning and v/oct input with polyphony
 - envelope generator, loop, reverse, pingpong
@@ -381,7 +387,8 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 
 About player functionalities please follow sickoPlayer instructions. Please note that loaded samples in sickoSampler are always resampled to VCV working samplerate. For this reason interpolation is fixed to Hermite. It can be always toggled antialiasing filter from context menu. 
 
-In sickoSampler the display shows also the recording time and a yellow "S" if sample is not saved yet.  
+In sickoSampler the display shows also the recording time and a yellow "S" if sample is not saved yet. 
+In the context menu, along file infos, it's shown if the sample was resampled on loading and if it has to be saved because a recording occurred.  
 Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
 Record starts/stops if RecButton is pressed or if a toggle trig input is detected.  
 GAIN knob adjusts the volume of inputs.  
