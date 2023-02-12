@@ -63,7 +63,7 @@ struct SickoSampler : Module {
 		RECFADE_PARAM,
 		STARTREC_SWITCH,
 		OVERDUB_SWITCH,
-		BLOCKCURSORS_SWITCH,
+		UPDATECURSORS_SWITCH,
 		MONITOR_SWITCH,
 		NUM_PARAMS 
 	};
@@ -95,7 +95,7 @@ struct SickoSampler : Module {
 		PINGPONG_LIGHT,
 		REC_LIGHT,
 		OVERDUB_LIGHT,
-		BLOCKCURSORS_LIGHT,
+		UPDATECURSORS_LIGHT,
 		CLIPPING_LIGHT,
 		NUM_LIGHTS
 	};
@@ -274,7 +274,8 @@ struct SickoSampler : Module {
 	bool recFadeOut = false;
 	int recOutChan = 0;
 	bool overdub = false;
-	bool blockCursors = false;
+	bool updateCursors = false;
+	bool uceCueStart = false;
 
 	int fileSampleRate = 0;
 	bool resampled = false;
@@ -286,8 +287,6 @@ struct SickoSampler : Module {
 	bool monitorFade = false;
 	float monitorFadeValue = 0;
 	float monitorFadeCoeff = 10 / (APP->engine->getSampleRate());
-
-
 
 	int saveMode = 0;
 
@@ -362,8 +361,8 @@ struct SickoSampler : Module {
 		//configParam(RECFADE_PARAM, 0.0001f, 10.0f, 0.0001f, "REC Fade in/out", "ms", 0, 1000);
 		configParam(RECFADE_PARAM, 0.f, 10.0f, 0.f, "REC Fade in/out", "ms", 0, 1000);
 		configSwitch(STARTREC_SWITCH, 0.f, 2.f, 0.f, "Start REC Position", {"Cue Start", "Loop Start", "Current Position"});
-		configSwitch(OVERDUB_SWITCH, 0.f, 1.f, 0.f, "Overdub", {"Off", "On"});
-		configSwitch(BLOCKCURSORS_SWITCH, 0.f, 1.f, 0.f, "Block cursors", {"Off", "On"});
+		configSwitch(OVERDUB_SWITCH, 0.f, 1.f, 0.f, "OVerDub", {"Off", "On"});
+		configSwitch(UPDATECURSORS_SWITCH, 0.f, 1.f, 0.f, "Update Cue End", {"Off", "On"});
 		configSwitch(MONITOR_SWITCH, 0.f, 2.f, 0.f, "Monitor", {"Off", "Rec Only", "Always"});
 
 		playBuffer[0][0].resize(0);
@@ -380,6 +379,7 @@ struct SickoSampler : Module {
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
 		phaseScan = true;
+		uceCueStart = false;
 		clearSlot();
 		for (int i = 0; i < 16; i++) {
 			play[i] = false;
@@ -406,6 +406,111 @@ struct SickoSampler : Module {
 		recButton = 0;
 		newRecording = true;
 	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "TrimOnSave", json_boolean(trimOnSave));
+		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
+		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
+		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
+		json_object_set_new(rootJ, "UceCueStart", json_boolean(uceCueStart));
+		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
+		json_object_set_new(rootJ, "UserFolder", json_string(userFolderName.c_str()));
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+		json_t* trimOnSaveJ = json_object_get(rootJ, "TrimOnSave");
+		if (trimOnSaveJ)
+			trimOnSave = json_boolean_value(trimOnSaveJ);
+
+		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
+		if (antiAliasJ)
+			antiAlias = json_integer_value(antiAliasJ);
+
+		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
+		if (polyOutsJ)
+			polyOuts = json_integer_value(polyOutsJ);
+
+		json_t* phaseScanJ = json_object_get(rootJ, "PhaseScan");
+		if (phaseScanJ)
+			phaseScan = json_boolean_value(phaseScanJ);
+
+		json_t* uceCueStartJ = json_object_get(rootJ, "UceCueStart");
+		if (uceCueStartJ)
+			uceCueStart = json_boolean_value(uceCueStartJ);
+
+		json_t *slotJ = json_object_get(rootJ, "Slot");
+		if (slotJ) {
+			storedPath = json_string_value(slotJ);
+			loadSample(storedPath);
+		}
+		json_t *userFolderNameJ = json_object_get(rootJ, "UserFolder");
+		if (userFolderNameJ) {
+			userFolderName = json_string_value(userFolderNameJ);
+			folderSelection(userFolderName);
+		}
+	}
+	
+	void calcBiquadLpf(double frequency, double samplerate, double Q) {
+	    z1 = z2 = 0.0;
+	    double Fc = frequency / samplerate;
+	    double norm;
+	    double K = tan(M_PI * Fc);
+        norm = 1 / (1 + K / Q + K * K);
+        a0 = K * K * norm;
+        a1 = 2 * a0;
+        a2 = a0;
+        b1 = 2 * (K * K - 1) * norm;
+        b2 = (1 - K / Q + K * K) * norm;
+    }
+
+	float biquadLpf(float in) {
+	    double out = in * a0 + z1;
+	    z1 = in * a1 + z2 - b1 * out;
+	    z2 = in * a2 - b2 * out;
+	    return out;
+	}
+
+	float biquadLpf2(float in) {
+	    double out = in * a0 + z1r;
+	    z1r = in * a1 + z2r - b1 * out;
+	    z2r = in * a2 - b2 * out;
+	    return out;
+	}
+
+	
+	double hermiteInterpol(double x0, double x1, double x2, double x3, double t)	{
+		double c0 = x1;
+		double c1 = .5F * (x2 - x0);
+		double c2 = x0 - (2.5F * x1) + (2 * x2) - (.5F * x3);
+		double c3 = (.5F * (x3 - x0)) + (1.5F * (x1 - x2));
+		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
+	}
+
+	void folderSelection(std::string path) {
+		DIR* rep = NULL;
+		struct dirent* dirp = NULL;
+			char* pathDup = strdup(path.c_str());
+			std::string dir = pathDup;
+		rep = opendir(dir.c_str());
+		browserFileName.clear();
+		browserFileDisplay.clear();
+		while ((dirp = readdir(rep)) != NULL) {
+			std::string name = dirp->d_name;
+			std::size_t found = name.find(".wav",name.length()-5);
+			if (found==std::string::npos)
+				found = name.find(".WAV",name.length()-5);
+
+			if (found!=std::string::npos) {
+				browserFileName.push_back(name);
+				browserFileDisplay.push_back(name.substr(0, name.length()-4));
+			}
+		}
+		sort(browserFileName.begin(), browserFileName.end());
+		sort(browserFileDisplay.begin(), browserFileDisplay.end());
+		closedir(rep);
+	};
 
 /*
 
@@ -537,111 +642,7 @@ struct SickoSampler : Module {
 			recSamples = 0;
 			fileLoaded = true;
 		}
-		
-
-
-	}
-
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "TrimOnSave", json_boolean(trimOnSave));
-		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
-		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
-		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
-		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
-		json_object_set_new(rootJ, "UserFolder", json_string(userFolderName.c_str()));
-		return rootJ;
-	}
-
-	void dataFromJson(json_t *rootJ) override {
-		json_t* trimOnSaveJ = json_object_get(rootJ, "TrimOnSave");
-		if (trimOnSaveJ)
-			trimOnSave = json_boolean_value(trimOnSaveJ);
-
-		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
-		if (antiAliasJ)
-			antiAlias = json_integer_value(antiAliasJ);
-
-		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
-		if (polyOutsJ)
-			polyOuts = json_integer_value(polyOutsJ);
-
-		json_t* phaseScanJ = json_object_get(rootJ, "PhaseScan");
-		if (phaseScanJ)
-			phaseScan = json_boolean_value(phaseScanJ);
-
-		json_t *slotJ = json_object_get(rootJ, "Slot");
-		if (slotJ) {
-			storedPath = json_string_value(slotJ);
-			loadSample(storedPath);
-		}
-		json_t *userFolderNameJ = json_object_get(rootJ, "UserFolder");
-		if (userFolderNameJ) {
-			userFolderName = json_string_value(userFolderNameJ);
-			folderSelection(userFolderName);
-		}
-	}
-	
-	void calcBiquadLpf(double frequency, double samplerate, double Q) {
-	    z1 = z2 = 0.0;
-	    double Fc = frequency / samplerate;
-	    double norm;
-	    double K = tan(M_PI * Fc);
-        norm = 1 / (1 + K / Q + K * K);
-        a0 = K * K * norm;
-        a1 = 2 * a0;
-        a2 = a0;
-        b1 = 2 * (K * K - 1) * norm;
-        b2 = (1 - K / Q + K * K) * norm;
-    }
-
-	float biquadLpf(float in) {
-	    double out = in * a0 + z1;
-	    z1 = in * a1 + z2 - b1 * out;
-	    z2 = in * a2 - b2 * out;
-	    return out;
-	}
-
-	float biquadLpf2(float in) {
-	    double out = in * a0 + z1r;
-	    z1r = in * a1 + z2r - b1 * out;
-	    z2r = in * a2 - b2 * out;
-	    return out;
-	}
-
-	
-	double hermiteInterpol(double x0, double x1, double x2, double x3, double t)	{
-		double c0 = x1;
-		double c1 = .5F * (x2 - x0);
-		double c2 = x0 - (2.5F * x1) + (2 * x2) - (.5F * x3);
-		double c3 = (.5F * (x3 - x0)) + (1.5F * (x1 - x2));
-		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
-	}
-
-	void folderSelection(std::string path) {
-		DIR* rep = NULL;
-		struct dirent* dirp = NULL;
-			char* pathDup = strdup(path.c_str());
-			std::string dir = pathDup;
-		rep = opendir(dir.c_str());
-		browserFileName.clear();
-		browserFileDisplay.clear();
-		while ((dirp = readdir(rep)) != NULL) {
-			std::string name = dirp->d_name;
-			std::size_t found = name.find(".wav",name.length()-5);
-			if (found==std::string::npos)
-				found = name.find(".WAV",name.length()-5);
-
-			if (found!=std::string::npos) {
-				browserFileName.push_back(name);
-				browserFileDisplay.push_back(name.substr(0, name.length()-4));
-			}
-		}
-		sort(browserFileName.begin(), browserFileName.end());
-		sort(browserFileDisplay.begin(), browserFileDisplay.end());
-		closedir(rep);
-	};
-	
+	}	
 /*
 
 																							░██████╗░█████╗░██╗░░░██╗███████╗
@@ -1091,8 +1092,8 @@ struct SickoSampler : Module {
 		overdub = params[OVERDUB_SWITCH].getValue();
 		lights[OVERDUB_LIGHT].setBrightness(overdub);
 
-		blockCursors = params[BLOCKCURSORS_SWITCH].getValue();
-		lights[BLOCKCURSORS_LIGHT].setBrightness(blockCursors);
+		updateCursors = params[UPDATECURSORS_SWITCH].getValue();
+		lights[UPDATECURSORS_LIGHT].setBrightness(updateCursors);
 		
 		chan = std::max(1, inputs[VO_INPUT].getChannels());
 
@@ -2179,6 +2180,15 @@ struct SickoSampler : Module {
 					prevKnobLoopStartPos = -1.f;
 					prevKnobLoopEndPos = 2.f;
 
+				} else if (updateCursors) {
+					if (uceCueStart) {
+						cueStartPos = startRecPosition;
+						params[CUESTART_PARAM].setValue(cueStartPos/totalSampleC);
+						prevKnobCueStartPos = -1.f;
+					}
+					cueEndPos = currRecPosition;
+					params[CUEEND_PARAM].setValue(cueEndPos/totalSampleC);
+					prevKnobCueEndPos = 2.f;
 				}
 
 				if (phaseScan) {
@@ -2327,7 +2337,8 @@ struct SickoSampler : Module {
 						tempKnob = loopStartPos / totalSampleC;
 						params[LOOPSTART_PARAM].setValue(tempKnob);
 						prevKnobLoopStartPos = tempKnob;
-						if (blockCursors) {
+						/*
+						if (updateCursors) {
 							cueEndPos = recKnobCueEndPos * totalSampleC;
 							tempKnob = cueEndPos / totalSampleC;
 							params[CUEEND_PARAM].setValue(tempKnob);
@@ -2337,13 +2348,14 @@ struct SickoSampler : Module {
 							params[LOOPEND_PARAM].setValue(tempKnob);
 							prevKnobLoopEndPos = tempKnob;
 						} else {
+						*/
 							tempKnob = cueEndPos / totalSampleC;
 							params[CUEEND_PARAM].setValue(tempKnob);
 							prevKnobCueEndPos = tempKnob;
 							tempKnob = loopEndPos / totalSampleC;
 							params[LOOPEND_PARAM].setValue(tempKnob);
 							prevKnobLoopEndPos = tempKnob;
-						}
+						//}
 					}
 				}
 				if (currRecPosition > 52428800) {
@@ -3195,7 +3207,7 @@ struct SickoSamplerWidget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(95.88, yStartRec+26.85)), module, SickoSampler::RECFADE_PARAM));
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(91.5, yStartRec+38.1)), module, SickoSampler::OVERDUB_SWITCH, SickoSampler::OVERDUB_LIGHT));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(100.4, yStartRec+38.1)), module, SickoSampler::BLOCKCURSORS_SWITCH, SickoSampler::BLOCKCURSORS_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(100.4, yStartRec+38.1)), module, SickoSampler::UPDATECURSORS_SWITCH, SickoSampler::UPDATECURSORS_LIGHT));
 		
 		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(95.8, yStartRec+49.1)), module, SickoSampler::STARTREC_SWITCH));
 		
@@ -3319,6 +3331,7 @@ struct SickoSamplerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(construct<ResetCursorsItem>(&MenuItem::text, "Reset Cursors", &ResetCursorsItem::module, module));
+		menu->addChild(createBoolPtrMenuItem("UCE updates also Cue Start", "", &module->uceCueStart));
 
 		menu->addChild(createSubmenuItem("Presets", "",
 			[ = ](Menu * menu) {
