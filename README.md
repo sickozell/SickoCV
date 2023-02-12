@@ -240,7 +240,7 @@ When the sample is loaded the green led on the panel is turned on (drumPlayer), 
 Use Clear options to unload samples from slots.  
 Just right-click over the led areas or the displays to access the quick-load menus.  
 
-**Set samples folder**. 
+**Set samples folder**  
 Once a folder is set, 'Folder browser' option is activated in the quick load menu (right click in the relative led slot area/display) to quickly choose samples from the selected folder.  
 
 **Interpolation**  
