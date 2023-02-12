@@ -348,7 +348,7 @@ There are 3 different interpolation algorithms, that are engaged during playback
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
 **Polyphonic Outs**  
-When this option is enabled the outs reflects v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out.
+When this option is enabled the outs reflect v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out.
 
 **Phase scan**  
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
