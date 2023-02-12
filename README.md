@@ -246,7 +246,7 @@ Once a folder is set, 'Folder browser' option is activated in the quick load men
 **Interpolation**  
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
 - 'No interpolation' can be used when sample rates match and speed is 100% constant  
-- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages  
+- 'Linear 1' and 'Linear 2' interpolate the samples with different weighted averages  
 - 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default)  
 
 **Anti-aliasing filter**  
@@ -347,8 +347,8 @@ Once a folder is set, 'Folder browser' option is activated here and in the quick
 
 **Interpolation**  
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
-- 'No interpolation' can be used when sample rates match and speed is 100% constant  
-- 'Linear 1' and 'Linear 2' interpolates the samples with different weighted averages  
+- 'No interpolation' can be used when sample rates match and tune is set to zero  
+- 'Linear 1' and 'Linear 2' interpolate the samples with different weighted averages  
 - 'Hermite' uses a Cubic Hermite spline interpolation that usually offers a better result (default)  
 
 **Anti-aliasing filter**  
