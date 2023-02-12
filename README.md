@@ -354,10 +354,10 @@ When this option is enabled the outs reflects v/oct input polyphony. Otherwise p
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
 Be sure to disable it when using one-cycle waveforms.  
 
-#### RESET CURSORS
+**Reset Cursors**
 Reset Cue/Loop Start/stop to 0 and 100%.  
 
-#### PRESETS
+**Presets**
 There are some factory presets stored in the context menu for common using settings.  
 
 #### USING ONE-CYCLE WAVEFORMS
@@ -382,7 +382,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 About player functionalities please follow sickoPlayer instructions. Please note that loaded samples in sickoSampler are always resampled to VCV working samplerate. For this reason interpolation is fixed to Hermite. It can be always toggled antialiasing filter from context menu. 
 
 In sickoSampler the display shows also the recording time and a yellow "S" if sample is not saved yet.  
-Recording sections has 2 inputs, but record is only enabled if at least left channel is connected.  
+Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
 Record starts/stops if RecButton is pressed or if a toggle trig input is detected.  
 GAIN knob adjusts the volume of inputs.  
 FD knob sets the fade in/out time when recording starts or stops.  
