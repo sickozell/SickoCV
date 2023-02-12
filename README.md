@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta2
+# SickoCV v2.5.2-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -18,10 +18,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **to do list:** 
 - ~~add to context menu a user folder browser feature to drumPlayer, drumPlayer+, sickoPlayer, sickoSampler~~
 
-# SickoCV v2.5.2-beta2
+# SickoCV v2.5.2-beta4
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/217615574-28b09068-ae36-42d3-911c-85977b61067e.JPG)
+![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/218306894-e7795b75-e534-49b1-990f-6d039faeff12.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -367,7 +367,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 ## SickoSampler
 ### wav sample player and sampler
 
-![sickosampler](https://user-images.githubusercontent.com/80784296/217618559-1e97d706-cbb3-4d8e-9e79-9174811e5380.JPG)
+![sickosampler](https://user-images.githubusercontent.com/80784296/218306918-c10d0983-24c6-4b7d-ad49-142552da2ba4.JPG)
 
 #### - DESCRIPTION
 - mono/stereo sample recorder  
@@ -387,7 +387,7 @@ Record starts/stops if RecButton is pressed or if a toggle trig input is detecte
 GAIN knob adjusts the volume of inputs.  
 FD knob sets the fade in/out time when recording starts or stops.  
 OVD button overdubs existing sample.  
-BLC button blocks Cue/Loop END positions if recording is longer than existing sample.  
+UCE button updates Cue End cursor at the end of recording when it is stopped. Note that there is an "UCE update also Cue Start" option in the general context menu.  
 STRT switch selects recording starting point: Cue Start [CS], Loop Start [LS], Current Position [CP] (if used while playing back).  
 MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
 
