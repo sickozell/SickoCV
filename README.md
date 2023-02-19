@@ -21,7 +21,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.5.2-beta4
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/218306894-e7795b75-e534-49b1-990f-6d039faeff12.JPG)
+![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/219940320-71f4c2c7-143c-4d4c-9bfc-3a288cbce11c.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -240,8 +240,8 @@ When the sample is loaded the green led on the panel is turned on (drumPlayer), 
 Use Clear options to unload samples from slots.  
 Just right-click over the led areas or the displays to access the quick-load menus.  
 
-**Set samples folder**  
-Once a folder is set, 'Folder browser' option is activated in the quick load menu (right click in the relative led slot area/display) to quickly choose samples from the selected folder.  
+**Set samples root folder**  
+Once a folder is set, 'Samples browser' option is activated in the quick load menu (right click in the relative led slot area/display) to quickly choose samples from the selected folder.  
 
 **Interpolation**  
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
@@ -289,7 +289,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ## SickoPlayer
 ### wav sample player
 
-![sickoplayer](https://user-images.githubusercontent.com/80784296/217615665-8750bfc9-d58c-4dc1-a8d3-5fab0720e406.JPG)
+![sickoplayer](https://user-images.githubusercontent.com/80784296/219940335-1f5640df-651f-4635-8d84-ba2fdb96ee08.JPG)
 
 #### - DESCRIPTION
 - samples and 1-cycle waveforms player
@@ -342,8 +342,8 @@ Click on "Load Sample" to open dialog. Use Clear options to unload sample from s
 As described before, just right-click over the waveform display area to access the quick-load menu.  
 When a sample is loaded, file sample rate and number of channels are shown here.  
 
-**Set samples folder**  
-Once a folder is set, 'Folder browser' option is activated here and in the quick load menu (right click on display) to quickly choose samples from the selected folder.  
+**Set samples root folder**  
+Once a folder is set, 'Samples browser' option is activated here and in the quick load menu (right click on display) to quickly choose samples from the selected folder.  
 
 **Interpolation**  
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
@@ -374,7 +374,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 ## SickoSampler
 ### wav sample player and sampler
 
-![sickosampler](https://user-images.githubusercontent.com/80784296/218306918-c10d0983-24c6-4b7d-ad49-142552da2ba4.JPG)
+![sickosampler](https://user-images.githubusercontent.com/80784296/219940349-6f7162dd-7363-4906-b779-63b29c97b91d.JPG)
 
 #### - DESCRIPTION
 - mono/stereo sample recorder  
