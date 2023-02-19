@@ -705,7 +705,7 @@ struct SickoPlayer : Module {
 	void process(const ProcessArgs &args) override {
 
 		nextSample = params[NEXTSAMPLE_PARAM].getValue();
-		if (nextSample && !prevNextSample) {
+		if (fileLoaded && nextSample && !prevNextSample) {
 			for (int i = 0; i < 16; i++)
 				play[i] = false;
 			currentFile++;
@@ -716,7 +716,7 @@ struct SickoPlayer : Module {
 		prevNextSample = nextSample;
 
 		prevSample = params[PREVSAMPLE_PARAM].getValue();
-		if (prevSample && !prevPrevSample) {
+		if (fileLoaded && prevSample && !prevPrevSample) {
 			for (int i = 0; i < 16; i++)
 				play[i] = false;
 			currentFile--;
