@@ -163,8 +163,6 @@ struct SickoPlayer : Module {
 	std::string currentFolder = "";
 	vector <std::string> currentFolderV;
 	int currentFile = 0;
-	//vector <std::string> browserFileName;
-	//vector <std::string> browserFileDisplay;
 
 	std::string tempDir = "";
 	vector<vector<std::string>> folderTreeData;
@@ -357,7 +355,6 @@ struct SickoPlayer : Module {
 		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
-		json_object_set_new(rootJ, "CurrentFolder", json_string(currentFolder.c_str()));
 		return rootJ;
 	}
 
@@ -386,13 +383,11 @@ struct SickoPlayer : Module {
 		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
 		if (userFolderJ) {
 			userFolder = json_string_value(userFolderJ);
-			createFolder(userFolder);
-			folderTreeData.push_back(tempTreeData);
-			folderTreeDisplay.push_back(tempTreeDisplay);
-		}
-		json_t *currentFolderJ = json_object_get(rootJ, "CurrentFolder");
-		if (currentFolderJ) {
-			currentFolder = json_string_value(currentFolderJ);
+			if (userFolder != "") {
+				createFolder(userFolder);
+				folderTreeData.push_back(tempTreeData);
+				folderTreeDisplay.push_back(tempTreeDisplay);
+			}
 		}
 	}
 	
@@ -453,7 +448,6 @@ struct SickoPlayer : Module {
 		while ((d = readdir(dir))) {
 			std::string filename = d->d_name;
 			if (filename != "." && filename != "..") {
-				//std::string filepath = std::string(dir_path) + "/" + filename;
 				std::string filepath = std::string(dir_path) + filename;
 				struct stat statbuf;
 				if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
@@ -477,7 +471,6 @@ struct SickoPlayer : Module {
 		sort(browserFiles.begin(), browserFiles.end());
 		sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
 		
-		// il primo record è il path della cartella
 		tempTreeData.push_back(dir_path);
 		tempTreeDisplay.push_back(dir_path);
 
@@ -506,7 +499,6 @@ struct SickoPlayer : Module {
 		while ((d = readdir(dir))) {
 			std::string filename = d->d_name;
 			if (filename != "." && filename != "..") {
-				//std::string filepath = std::string(dir_path) + "/" + filename;
 				std::string filepath = std::string(dir_path) + filename;
 
 					std::size_t found = filename.find(".wav",filename.length()-5);
@@ -2010,12 +2002,10 @@ struct SickoPlayerWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SickoPlayer.svg")));
 
-		//addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		//addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
+		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
 		{
 			SickoPlayerDisplay *display = new SickoPlayerDisplay();
@@ -2045,8 +2035,8 @@ struct SickoPlayerWidget : ModuleWidget {
 		float yTunVol = 108;
 		float yTunVol2 = 117.5;
 
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(10, 4)), module, SickoPlayer::PREVSAMPLE_PARAM));
-		addParam(createParamCentered<VCVButton>(mm2px(Vec(76.5, 4)), module, SickoPlayer::NEXTSAMPLE_PARAM));
+		addParam(createParamCentered<VCVButton>(mm2px(Vec(12, 4)), module, SickoPlayer::PREVSAMPLE_PARAM));
+		addParam(createParamCentered<VCVButton>(mm2px(Vec(74.4, 4)), module, SickoPlayer::NEXTSAMPLE_PARAM));
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xTrig1, yTrig1)), module, SickoPlayer::TRIGGATEMODE_SWITCH));
 		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xTrig2, yTrig1+1)), module, SickoPlayer::TRIGMODE_SWITCH));
