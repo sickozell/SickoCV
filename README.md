@@ -301,6 +301,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
+Once a sample is loaded you can browse samples in the same folder using Previous and Next buttons above the display.  
 
 The display shows the waveform, filename, sample duration and number of channels (1-2 channels wav file are allowed).  
 
