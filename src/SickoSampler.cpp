@@ -3515,7 +3515,7 @@ struct SickoSamplerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		SickoSamplerInitializeUserFolder *rootFolder = new SickoSamplerInitializeUserFolder;
-			rootFolder->text = "Select Samples Folder";
+			rootFolder->text = "Select Samples Root";
 			rootFolder->rm = module;
 			menu->addChild(rootFolder);
 		if (module->userFolder != "") {
