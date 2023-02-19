@@ -500,5 +500,5 @@ These behaviors are more understandable connecting a scope on the output.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
-Thanks to [Squinkylabs](https://github.com/squinkylabs) and [Firo Lightfog](https://github.com/firolightfog) for help and testing  
+Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and AuxMux for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
