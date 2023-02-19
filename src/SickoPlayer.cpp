@@ -31,6 +31,8 @@
 #include "cmath"
 #include <dirent.h>
 #include <libgen.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -59,6 +61,8 @@ struct SickoPlayer : Module {
 		REV_PARAM,
 		PINGPONG_PARAM,
 		XFADE_PARAM,
+		PREVSAMPLE_PARAM,
+		NEXTSAMPLE_PARAM,
 		NUM_PARAMS 
 	};
 	enum InputIds {
@@ -155,9 +159,18 @@ struct SickoPlayer : Module {
 	std::string timeDisplay = "";
 	std::string samplerateDisplay = "";
 
-	std::string userFolderName = "";
-	vector <std::string> browserFileName;
-	vector <std::string> browserFileDisplay;
+	std::string userFolder = "";
+	std::string currentFolder = "";
+	vector <std::string> currentFolderV;
+	int currentFile = 0;
+	//vector <std::string> browserFileName;
+	//vector <std::string> browserFileDisplay;
+
+	std::string tempDir = "";
+	vector<vector<std::string>> folderTreeData;
+	vector<vector<std::string>> folderTreeDisplay;
+	vector<std::string> tempTreeData;
+	vector<std::string> tempTreeDisplay;
 
 	int seconds;
 	int minutes;
@@ -227,8 +240,16 @@ struct SickoPlayer : Module {
 	float clippingCoeff = 5 / (APP->engine->getSampleRate());	// nr of samples of 200 ms (1/0.2)
 	bool clipping = false;
 
+	bool nextSample = false;
+	bool prevNextSample = false;
+	bool prevSample = false;
+	bool prevPrevSample = false;
+
 	SickoPlayer() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+
+		configSwitch(PREVSAMPLE_PARAM, 0.f, 1.f, 0.f, "Previous Sample");
+		configSwitch(NEXTSAMPLE_PARAM, 0.f, 1.f, 0.f, "Next Sample");
 
 		configSwitch(TRIGGATEMODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Trig"});
 		configSwitch(TRIGMODE_SWITCH, 0.f, 2.f, 0.f, "Trig mode", {"Start/Stop", "Start Only", "Play/Pause"});
@@ -335,7 +356,8 @@ struct SickoPlayer : Module {
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
 		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
-		json_object_set_new(rootJ, "UserFolder", json_string(userFolderName.c_str()));
+		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
+		json_object_set_new(rootJ, "CurrentFolder", json_string(currentFolder.c_str()));
 		return rootJ;
 	}
 
@@ -361,38 +383,44 @@ struct SickoPlayer : Module {
 			storedPath = json_string_value(slotJ);
 			loadSample(storedPath);
 		}
-		json_t *userFolderNameJ = json_object_get(rootJ, "UserFolder");
-		if (userFolderNameJ) {
-			userFolderName = json_string_value(userFolderNameJ);
-			folderSelection(userFolderName);
+		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
+		if (userFolderJ) {
+			userFolder = json_string_value(userFolderJ);
+			createFolder(userFolder);
+			folderTreeData.push_back(tempTreeData);
+			folderTreeDisplay.push_back(tempTreeDisplay);
+		}
+		json_t *currentFolderJ = json_object_get(rootJ, "CurrentFolder");
+		if (currentFolderJ) {
+			currentFolder = json_string_value(currentFolderJ);
 		}
 	}
 	
 	void calcBiquadLpf(double frequency, double samplerate, double Q) {
-	    z1 = z2 = 0.0;
-	    double Fc = frequency / samplerate;
-	    double norm;
-	    double K = tan(M_PI * Fc);
-        norm = 1 / (1 + K / Q + K * K);
-        a0 = K * K * norm;
-        a1 = 2 * a0;
-        a2 = a0;
-        b1 = 2 * (K * K - 1) * norm;
-        b2 = (1 - K / Q + K * K) * norm;
-    }
+		z1 = z2 = 0.0;
+		double Fc = frequency / samplerate;
+		double norm;
+		double K = tan(M_PI * Fc);
+		norm = 1 / (1 + K / Q + K * K);
+		a0 = K * K * norm;
+		a1 = 2 * a0;
+		a2 = a0;
+		b1 = 2 * (K * K - 1) * norm;
+		b2 = (1 - K / Q + K * K) * norm;
+	}
 
 	float biquadLpf(float in) {
-	    double out = in * a0 + z1;
-	    z1 = in * a1 + z2 - b1 * out;
-	    z2 = in * a2 - b2 * out;
-	    return out;
+		double out = in * a0 + z1;
+		z1 = in * a1 + z2 - b1 * out;
+		z2 = in * a2 - b2 * out;
+		return out;
 	}
 
 	float biquadLpf2(float in) {
-	    double out = in * a0 + z1r;
-	    z1r = in * a1 + z2r - b1 * out;
-	    z2r = in * a2 - b2 * out;
-	    return out;
+		double out = in * a0 + z1r;
+		z1r = in * a1 + z2r - b1 * out;
+		z2r = in * a2 - b2 * out;
+		return out;
 	}
 
 	/*
@@ -405,28 +433,98 @@ struct SickoPlayer : Module {
 	}
 	*/
 
-	void folderSelection(std::string path) {
-		DIR* rep = NULL;
-		struct dirent* dirp = NULL;
-			char* pathDup = strdup(path.c_str());
-			std::string dir = pathDup;
-		rep = opendir(dir.c_str());
-		browserFileName.clear();
-		browserFileDisplay.clear();
-		while ((dirp = readdir(rep)) != NULL) {
-			std::string name = dirp->d_name;
-			std::size_t found = name.find(".wav",name.length()-5);
-			if (found==std::string::npos)
-				found = name.find(".WAV",name.length()-5);
+	void createFolder(std::string dir_path) {
+		vector <std::string> browserList;
+		vector <std::string> browserListDisplay;
+		vector <std::string> browserDir;
+		vector <std::string> browserDirDisplay;
+		vector <std::string> browserFiles;
+		vector <std::string> browserFilesDisplay;
 
-			if (found!=std::string::npos) {
-				browserFileName.push_back(name);
-				browserFileDisplay.push_back(name.substr(0, name.length()-4));
+		tempTreeData.clear();
+		tempTreeDisplay.clear();
+
+		std::string lastChar = dir_path.substr(dir_path.length()-1,dir_path.length()-1);
+		if (lastChar != "/")
+			dir_path += "/";
+
+		DIR *dir = opendir(dir_path.c_str());
+		struct dirent *d;
+		while ((d = readdir(dir))) {
+			std::string filename = d->d_name;
+			if (filename != "." && filename != "..") {
+				//std::string filepath = std::string(dir_path) + "/" + filename;
+				std::string filepath = std::string(dir_path) + filename;
+				struct stat statbuf;
+				if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
+					browserDir.push_back(filepath + "/");
+					browserDirDisplay.push_back(filename);
+				} else {
+					std::size_t found = filename.find(".wav",filename.length()-5);
+					if (found==std::string::npos)
+						found = filename.find(".WAV",filename.length()-5);
+					if (found!=std::string::npos) {
+						browserFiles.push_back(filepath);
+						browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+					}
+				}
 			}
+   		}
+   		closedir(dir);
+
+		sort(browserDir.begin(), browserDir.end());
+		sort(browserDirDisplay.begin(), browserDirDisplay.end());
+		sort(browserFiles.begin(), browserFiles.end());
+		sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+		
+		// il primo record è il path della cartella
+		tempTreeData.push_back(dir_path);
+		tempTreeDisplay.push_back(dir_path);
+
+		for (unsigned int i = 0; i < browserDir.size(); i++) {
+			tempTreeData.push_back(browserDir[i]);
+			tempTreeDisplay.push_back(browserDirDisplay[i]);
 		}
-		sort(browserFileName.begin(), browserFileName.end());
-		sort(browserFileDisplay.begin(), browserFileDisplay.end());
-		closedir(rep);
+		for (unsigned int i = 0; i < browserFiles.size(); i++) {
+			tempTreeData.push_back(browserFiles[i]);
+			tempTreeDisplay.push_back(browserFilesDisplay[i]);
+		}
+	};
+
+	void createCurrentFolder(std::string dir_path) {
+		vector <std::string> browserList;
+		vector <std::string> browserFiles;
+
+		tempTreeData.clear();
+
+		std::string lastChar = dir_path.substr(dir_path.length()-1,dir_path.length()-1);
+		if (lastChar != "/")
+			dir_path += "/";
+
+		DIR *dir = opendir(dir_path.c_str());
+		struct dirent *d;
+		while ((d = readdir(dir))) {
+			std::string filename = d->d_name;
+			if (filename != "." && filename != "..") {
+				//std::string filepath = std::string(dir_path) + "/" + filename;
+				std::string filepath = std::string(dir_path) + filename;
+
+					std::size_t found = filename.find(".wav",filename.length()-5);
+					if (found==std::string::npos)
+						found = filename.find(".WAV",filename.length()-5);
+					if (found!=std::string::npos) {
+						browserFiles.push_back(filepath);
+					}
+
+			}
+   		}
+   		closedir(dir);
+
+		sort(browserFiles.begin(), browserFiles.end());
+		
+		for (unsigned int i = 0; i < browserFiles.size(); i++) {
+			tempTreeData.push_back(browserFiles[i]);
+		}
 	};
 
 	void loadSample(std::string path) {
@@ -521,6 +619,16 @@ struct SickoPlayer : Module {
 
 			free(pathDup);
 			storedPath = path;
+			currentFolder = system::getDirectory(path);
+			createCurrentFolder(currentFolder);
+			currentFolderV.clear();
+			currentFolderV = tempTreeData;
+			for (unsigned int i = 0; i < currentFolderV.size(); i++) {
+				if (system::getFilename(path) == system::getFilename(currentFolderV[i])) {
+					currentFile = i;
+					i = currentFolderV.size();
+				}
+			}
 
 			fileLoaded = true;
 		} else {
@@ -595,6 +703,28 @@ struct SickoPlayer : Module {
 	}
 	
 	void process(const ProcessArgs &args) override {
+
+		nextSample = params[NEXTSAMPLE_PARAM].getValue();
+		if (nextSample && !prevNextSample) {
+			for (int i = 0; i < 16; i++)
+				play[i] = false;
+			currentFile++;
+			if (currentFile >= int(currentFolderV.size()))
+				currentFile = 0;
+			loadSample(currentFolderV[currentFile]);
+		}
+		prevNextSample = nextSample;
+
+		prevSample = params[PREVSAMPLE_PARAM].getValue();
+		if (prevSample && !prevPrevSample) {
+			for (int i = 0; i < 16; i++)
+				play[i] = false;
+			currentFile--;
+			if (currentFile < 0)
+				currentFile = currentFolderV.size()-1;
+			loadSample(currentFolderV[currentFile]);
+		}
+		prevPrevSample = prevSample;
 
 		reverseStart = params[REV_PARAM].getValue();
 		lights[REV_LIGHT].setBrightness(reverseStart);
@@ -1567,36 +1697,18 @@ struct SickoPlayer : Module {
 	}
 };
 
-struct SickoPlayerOpenFolder : MenuItem {
+struct SickoPlayerInitializeUserFolder : MenuItem {
 	SickoPlayer *rm ;
 	void onAction(const event::Action &e) override {
-		const char* prevFolder = rm->userFolderName.c_str();
+		const char* prevFolder = rm->userFolder.c_str();
 		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
 		if (path) {
-			rm->userFolderName = std::string(path);
-			DIR* rep = NULL;
-			struct dirent* dirp = NULL;
-				char* pathDup = path;
-				std::string dir = pathDup;
-
-			rep = opendir(dir.c_str());
-			rm->browserFileName.clear();
-			rm->browserFileDisplay.clear();
-			while ((dirp = readdir(rep)) != NULL) {
-				std::string name = dirp->d_name;
-
-				std::size_t found = name.find(".wav",name.length()-5);
-				if (found==std::string::npos)
-					found = name.find(".WAV",name.length()-5);
-
-				if (found!=std::string::npos) {
-					rm->browserFileName.push_back(name);
-					rm->browserFileDisplay.push_back(name.substr(0, name.length()-4));
-				}
-			}
-			sort(rm->browserFileName.begin(), rm->browserFileName.end());
-			sort(rm->browserFileDisplay.begin(), rm->browserFileDisplay.end());
-			closedir(rep);
+			rm->folderTreeData.clear();
+			rm->folderTreeDisplay.clear();
+			rm->userFolder = std::string(path);
+			rm->createFolder(rm->userFolder);
+			rm->folderTreeData.push_back(rm->tempTreeData);
+			rm->folderTreeDisplay.push_back(rm->tempTreeDisplay);
 		}
 		free(path);
 	}
@@ -1797,6 +1909,48 @@ struct SickoPlayerDisplay : TransparentWidget {
 		Widget::drawLayer(args, layer);
 	}
 
+	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
+		SickoPlayer *module = dynamic_cast<SickoPlayer*>(this->module);
+			assert(module);
+		std::string currentDir = path;
+		int tempIndex = 1;
+		if (module->folderTreeData.size() < 2) {
+			module->createFolder(currentDir.substr(0,currentDir.length()-1));
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+			module->folderTreeData[1][0] = currentDir;
+			module->folderTreeDisplay[1][0] = currentDir;
+		} else {
+			bool exited = false;
+			for (unsigned int i = 1 ; i < module->folderTreeData.size(); i++) {
+				if (module->folderTreeData[i][0] == currentDir) {
+					tempIndex = i;
+					i = module->folderTreeData.size();
+					exited = true;
+				} 
+			}
+			if (!exited) {
+				module->createFolder(currentDir);
+				module->folderTreeData.push_back(module->tempTreeData);
+				module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+				tempIndex = module->folderTreeData.size()-1;
+			}	
+		}
+		if (module->folderTreeData[tempIndex].size() > 2) {
+			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
+				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
+						module->tempDir = module->folderTreeData[tempIndex][i];
+						menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "",
+							[=](Menu* menu) {
+								loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+							}));
+				} else {
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
+				}
+			}
+		}
+	}
+
 	void createContextMenu() {
 		SickoPlayer *module = dynamic_cast<SickoPlayer *>(this->module);
 		assert(module);
@@ -1809,12 +1963,21 @@ struct SickoPlayerDisplay : TransparentWidget {
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
 
-				if (module->browserFileName.size() > 0) {
-					menu->addChild(createSubmenuItem("Folder Browser", "",
+				if (module->folderTreeData.size() > 0) {
+					menu->addChild(createSubmenuItem("Samples Browser", "",
 						[=](Menu* menu) {
-							for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
-								//menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
-								menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"/"+ module->browserFileName[i]);}));
+							module->folderTreeData.resize(1);
+							module->folderTreeDisplay.resize(1);
+							for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+								if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+										module->tempDir = module->folderTreeData[0][i];
+										menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "",
+											[=](Menu* menu) {
+												loadSubfolder(menu, module->folderTreeData[0][i]);
+											}));
+								} else {
+									menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
+								}
 							}
 						}
 					));
@@ -1847,8 +2010,10 @@ struct SickoPlayerWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SickoPlayer.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		//addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
+		//addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
@@ -1879,6 +2044,9 @@ struct SickoPlayerWidget : ModuleWidget {
 		
 		float yTunVol = 108;
 		float yTunVol2 = 117.5;
+
+		addParam(createParamCentered<VCVButton>(mm2px(Vec(10, 4)), module, SickoPlayer::PREVSAMPLE_PARAM));
+		addParam(createParamCentered<VCVButton>(mm2px(Vec(76.5, 4)), module, SickoPlayer::NEXTSAMPLE_PARAM));
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xTrig1, yTrig1)), module, SickoPlayer::TRIGGATEMODE_SWITCH));
 		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xTrig2, yTrig1+1)), module, SickoPlayer::TRIGMODE_SWITCH));
@@ -1969,9 +2137,51 @@ struct SickoPlayerWidget : ModuleWidget {
 	struct RefreshUserFolderItem : MenuItem {
 		SickoPlayer *module;
 		void onAction(const event::Action &e) override {
-			module->folderSelection(module->userFolderName);
+			module->createFolder(module->userFolder);
 		}
 	};
+
+	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
+		SickoPlayer *module = dynamic_cast<SickoPlayer*>(this->module);
+			assert(module);
+		std::string currentDir = path;
+		int tempIndex = 1;
+		if (module->folderTreeData.size() < 2) {
+			module->createFolder(currentDir.substr(0,currentDir.length()-1));
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+			module->folderTreeData[1][0] = currentDir;
+			module->folderTreeDisplay[1][0] = currentDir;
+		} else {
+			bool exited = false;
+			for (unsigned int i = 1 ; i < module->folderTreeData.size(); i++) {
+				if (module->folderTreeData[i][0] == currentDir) {
+					tempIndex = i;
+					i = module->folderTreeData.size();
+					exited = true;
+				} 
+			}
+			if (!exited) {
+				module->createFolder(currentDir);
+				module->folderTreeData.push_back(module->tempTreeData);
+				module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+				tempIndex = module->folderTreeData.size()-1;
+			}	
+		}
+		if (module->folderTreeData[tempIndex].size() > 2) {
+			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
+				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
+						module->tempDir = module->folderTreeData[tempIndex][i];
+						menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "",
+							[=](Menu* menu) {
+								loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+							}));
+				} else {
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
+				}
+			}
+		}
+	}
 
 	void appendContextMenu(Menu *menu) override {
 	   	SickoPlayer *module = dynamic_cast<SickoPlayer*>(this->module);
@@ -1983,12 +2193,21 @@ struct SickoPlayerWidget : ModuleWidget {
 			rootDirItem->rm = module;
 			menu->addChild(rootDirItem);
 
-			if (module->browserFileName.size() > 0) {
-				menu->addChild(createSubmenuItem("Folder Browser", "",
+			if (module->folderTreeData.size() > 0) {
+				menu->addChild(createSubmenuItem("Samples Browser", "",
 					[=](Menu* menu) {
-						for (unsigned int i = 0; i < module->browserFileName.size(); i++) {
-							//menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"\\"+ module->browserFileName[i]);}));
-							menu->addChild(createMenuItem(module->browserFileDisplay[i], "", [=]() {module->loadSample(module->userFolderName+"/"+ module->browserFileName[i]);}));
+						module->folderTreeData.resize(1);
+						module->folderTreeDisplay.resize(1);
+						for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+							if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+									module->tempDir = module->folderTreeData[0][i];
+									menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "",
+										[=](Menu* menu) {
+											loadSubfolder(menu, module->folderTreeData[0][i]);
+										}));
+							} else {
+								menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
+							}
 						}
 					}
 				));
@@ -2003,12 +2222,12 @@ struct SickoPlayerWidget : ModuleWidget {
 			}
 
 		menu->addChild(new MenuSeparator());
-		SickoPlayerOpenFolder *rootFolder = new SickoPlayerOpenFolder;
+		SickoPlayerInitializeUserFolder *rootFolder = new SickoPlayerInitializeUserFolder;
 			rootFolder->text = "Select Samples Folder";
 			rootFolder->rm = module;
 			menu->addChild(rootFolder);
-		if (module->userFolderName != "") {
-			menu->addChild(createMenuLabel(module->userFolderName));
+		if (module->userFolder != "") {
+			menu->addChild(createMenuLabel(module->userFolder));
 			menu->addChild(construct<RefreshUserFolderItem>(&MenuItem::rightText, "Refresh", &RefreshUserFolderItem::module, module));
 		}
 
