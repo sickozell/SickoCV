@@ -1129,7 +1129,7 @@ struct SickoSampler : Module {
 
 	void setPreset(int presetNo) {
 		switch (presetNo) {
-			case 0:
+			case 0:	// wavetable
 				phaseScan = false;
 				params[TRIGGATEMODE_SWITCH].setValue(0);
 				params[TRIGMODE_SWITCH].setValue(0);
@@ -1140,12 +1140,13 @@ struct SickoSampler : Module {
 				params[XFADE_PARAM].setValue(0);
 				params[LOOP_PARAM].setValue(1);
 				params[PINGPONG_PARAM].setValue(0);
+				reverseStart = false;
 				prevKnobCueStartPos = -1;
 				prevKnobCueEndPos = 2;
 				prevKnobLoopStartPos = -1;
 				prevKnobLoopEndPos = 2;
 			break;
-			case 1:
+			case 1:	// trig with envelope
 				phaseScan = true;
 				params[TRIGGATEMODE_SWITCH].setValue(1);
 				params[TRIGMODE_SWITCH].setValue(0);
@@ -1156,6 +1157,26 @@ struct SickoSampler : Module {
 				params[DECAY_PARAM].setValue(0);
 				params[SUSTAIN_PARAM].setValue(1);
 				params[RELEASE_PARAM].setValue(0.2f);
+				prevKnobCueStartPos = -1;
+				prevKnobCueEndPos = 2;
+				prevKnobLoopStartPos = -1;
+				prevKnobLoopEndPos = 2;
+			break;
+			case 2:	// drums
+				phaseScan = false;
+				params[TRIGGATEMODE_SWITCH].setValue(1);
+				params[TRIGMODE_SWITCH].setValue(1);
+				params[XFADE_PARAM].setValue(0);
+				params[LOOP_PARAM].setValue(0);
+				params[PINGPONG_PARAM].setValue(0);
+				params[ATTACK_PARAM].setValue(0);
+				params[DECAY_PARAM].setValue(0);
+				params[SUSTAIN_PARAM].setValue(1);
+				params[RELEASE_PARAM].setValue(0);
+				params[CUESTART_PARAM].setValue(0);
+				params[CUEEND_PARAM].setValue(1);
+				params[LOOPSTART_PARAM].setValue(0);
+				params[LOOPEND_PARAM].setValue(1);
 				prevKnobCueStartPos = -1;
 				prevKnobCueEndPos = 2;
 				prevKnobLoopStartPos = -1;
@@ -1280,7 +1301,7 @@ struct SickoSampler : Module {
 				scanLoopStartSample = loopStartPos;
 				if (loopStartPos > loopEndPos)
 					loopStartPos = loopEndPos;
-			} 
+			}
 
 			if (phaseScan) {
 				float tempKnob;
@@ -2937,6 +2958,13 @@ struct SickoSamplerDisplay : TransparentWidget {
 		}
 	};
 
+	struct SetPreset2 : MenuItem {
+		SickoSampler *module;
+		void onAction(const event::Action &e) override {
+			module->setPreset(2);
+		}
+	};
+
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
 			e.consume(this);
@@ -3240,6 +3268,7 @@ struct SickoSamplerDisplay : TransparentWidget {
 				[ = ](Menu * menu) {
 					menu->addChild(construct<SetPreset0>(&MenuItem::text, "Wavetable", &SetPreset0::module, module));
 					menu->addChild(construct<SetPreset1>(&MenuItem::text, "Triggered Sample with Envelope", &SetPreset1::module, module));
+					menu->addChild(construct<SetPreset2>(&MenuItem::text, "Drums", &SetPreset2::module, module));
 				}));
 		}
 	}
@@ -3395,10 +3424,21 @@ struct SickoSamplerWidget : ModuleWidget {
 		}
 	};
 
+	struct SetPreset2 : MenuItem {
+		SickoSampler *module;
+		void onAction(const event::Action &e) override {
+			module->setPreset(2);
+		}
+	};
+
 	struct RefreshUserFolderItem : MenuItem {
 		SickoSampler *module;
 		void onAction(const event::Action &e) override {
+			module->folderTreeData.clear();
+			module->folderTreeDisplay.clear();
 			module->createFolder(module->userFolder);
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
 		}
 	};
 
@@ -3540,6 +3580,7 @@ struct SickoSamplerWidget : ModuleWidget {
 			[ = ](Menu * menu) {
 				menu->addChild(construct<SetPreset0>(&MenuItem::text, "Wavetable", &SetPreset0::module, module));
 				menu->addChild(construct<SetPreset1>(&MenuItem::text, "Triggered Sample with Envelope", &SetPreset1::module, module));
+				menu->addChild(construct<SetPreset2>(&MenuItem::text, "Drums", &SetPreset2::module, module));
 			}));
 	}
 };

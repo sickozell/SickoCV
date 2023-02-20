@@ -138,7 +138,7 @@ struct DrumPlayer : Module {
 	void onReset() override {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
-		outsMode = 0;
+		outsMode = NORMALLED_OUTS;
 		for (int i = 0; i < 4; i++) {
 			clearSlot(i);
 			play[i] = false;
@@ -1155,7 +1155,11 @@ struct DrumPlayerWidget : ModuleWidget {
 	struct RefreshUserFolderItem : MenuItem {
 		DrumPlayer *module;
 		void onAction(const event::Action &e) override {
+			module->folderTreeData.clear();
+			module->folderTreeDisplay.clear();
 			module->createFolder(module->userFolder);
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
 		}
 	};
 

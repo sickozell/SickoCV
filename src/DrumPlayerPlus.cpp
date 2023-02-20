@@ -69,6 +69,7 @@ struct DrumPlayerPlus : Module {
 	std::string storedPath[4] = {"","","",""};
 	std::string fileDescription[4] = {"--none--","--none--","--none--","--none--"};
 	std::string fileDisplay[4] = {"-----","-----","-----","-----"};
+	std::string scrollDisplay[4] = {"-----","-----","-----","-----"};
 	std::string userFolder = "";
 
 	std::string tempDir = "";
@@ -93,6 +94,7 @@ struct DrumPlayerPlus : Module {
 	int interpolationMode = HERMITE_INTERP;
 	int outsMode = 0;
 	int antiAlias = 1;
+	int scrolling = 1;
 
 	//std::string debugDisplay = "X";
 
@@ -170,7 +172,8 @@ struct DrumPlayerPlus : Module {
 	void onReset() override {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
-		outsMode = 0;
+		outsMode = NORMALLED_OUTS;
+		scrolling = 1;
 		for (int i = 0; i < 4; i++) {
 			clearSlot(i);
 			play[i] = false;
@@ -192,6 +195,7 @@ struct DrumPlayerPlus : Module {
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "OutsMode", json_integer(outsMode));
+		json_object_set_new(rootJ, "Scrolling", json_integer(scrolling));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		json_object_set_new(rootJ, "Slot3", json_string(storedPath[2].c_str()));
@@ -212,6 +216,10 @@ struct DrumPlayerPlus : Module {
 		json_t* outsModeJ = json_object_get(rootJ, "OutsMode");
 		if (outsModeJ)
 			outsMode = json_integer_value(outsModeJ);
+
+		json_t* scrollingJ = json_object_get(rootJ, "Scrolling");
+		if (scrollingJ)
+			scrolling = json_integer_value(scrollingJ);
 
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
@@ -361,11 +369,26 @@ struct DrumPlayerPlus : Module {
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
 
-			char* pathDup = strdup(path.c_str());
+			//char* pathDup = strdup(path.c_str());
 			fileDescription[slot] = system::getFilename(std::string(path));
 			fileDescription[slot] = fileDescription[slot].substr(0,fileDescription[slot].length()-4);
-			fileDisplay[slot] = fileDescription[slot].substr(0,5);
-			free(pathDup);
+			//fileDisplay[slot] = fileDescription[slot].substr(0,5);
+			//free(pathDup);
+
+			// *** CHARs CHECK according to font
+			std::string tempFileDisplay = fileDescription[slot];
+			char tempFileChar;
+			fileDisplay[slot] = "";
+			for (int i = 0; i < int(tempFileDisplay.length()); i++) {
+				tempFileChar = tempFileDisplay.at(i);
+				if ( (int(tempFileChar) > 47 && int(tempFileChar) < 58)
+					|| (int(tempFileChar) > 64 && int(tempFileChar) < 123)
+					|| int(tempFileChar) == 45 || int(tempFileChar) == 46 || int(tempFileChar) == 95 )
+					fileDisplay[slot] += tempFileChar;
+			}
+
+			if (fileDisplay[slot].length() > 5)
+				scrollDisplay[slot] = "!!!!!" + fileDisplay[slot] + "!!!!";
 
 			storedPath[slot] = path;
 
@@ -383,6 +406,7 @@ struct DrumPlayerPlus : Module {
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
 		fileDisplay[slot] = "-----";
+		scrollDisplay[slot] = "-----";
 		fileLoaded[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
@@ -1136,6 +1160,12 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 	DrumPlayerPlus *module;
 	int frame = 0;
 
+	std::string currFileDisplay[4];
+	int fileGap[4] = {0,0,0,0};
+	float currTime;
+	float deltaTime;
+	float prevTime;
+
 	DrumPlayerPlusDisplay() {
 
 	}
@@ -1144,14 +1174,42 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 		if (module) {
 			if (layer ==1) {
 				shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf"));
+				//shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
 				nvgFontSize(args.vg, 10);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
 				nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-				nvgTextBox(args.vg, 6, 0,120, module->fileDisplay[0].c_str(), NULL);
-				nvgTextBox(args.vg, 75, 0,120, module->fileDisplay[1].c_str(), NULL);
-				nvgTextBox(args.vg, 144, 0,120, module->fileDisplay[2].c_str(), NULL);
-				nvgTextBox(args.vg, 214, 0,120, module->fileDisplay[3].c_str(), NULL);
+
+				switch (module->scrolling) {
+					case 0:
+						for (int i = 0; i < 4; i++)
+							//currFileDisplay[i] = module->fileDescription[i].substr(0,5);;
+							currFileDisplay[i] = module->fileDisplay[i].substr(0,5);
+					break;
+					case 1:
+						currTime = system::getTime();
+						deltaTime = currTime - prevTime;
+						for (int i = 0; i < 4; i++) {
+							if (module->scrollDisplay[i].length() > 4) {
+								if (deltaTime > 0.4f) {
+									prevTime = currTime;
+									if (fileGap[i] > int(module->scrollDisplay[i].length()) - 5 ) {
+										fileGap[i] = 0;
+									}
+									currFileDisplay[i] = module->scrollDisplay[i].substr(fileGap[i],5);
+									fileGap[i]++;
+								}
+							} //else {
+							//	currFileDisplay[i] = module->scrollDisplay[i].substr(0,5); // si potrebbe eliminare perché è stato già inizializzato a 5 chars
+							//}
+						}
+					break;
+				}
+
+				nvgTextBox(args.vg, 6, 0,120, currFileDisplay[0].c_str(), NULL);
+				nvgTextBox(args.vg, 75, 0,120, currFileDisplay[1].c_str(), NULL);
+				nvgTextBox(args.vg, 144, 0,120, currFileDisplay[2].c_str(), NULL);
+				nvgTextBox(args.vg, 214, 0,120, currFileDisplay[3].c_str(), NULL);
 				//nvgTextBox(args.vg, 2, -20,120, module->debugDisplay.c_str(), NULL);
 			}
 		}
@@ -1278,7 +1336,11 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 	struct RefreshUserFolderItem : MenuItem {
 		DrumPlayerPlus *module;
 		void onAction(const event::Action &e) override {
+			module->folderTreeData.clear();
+			module->folderTreeDisplay.clear();
 			module->createFolder(module->userFolder);
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
 		}
 	};
 
@@ -1367,6 +1429,8 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			outsItem->outsMode = i;
 			menu->addChild(outsItem);
 		}
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Scrolling displays", "", &module->scrolling));
 	}
 };
 
