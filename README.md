@@ -20,13 +20,13 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **to do list:** 
 - ~~add to context menu a user folder browser feature to drumPlayer, drumPlayer+, sickoPlayer, sickoSampler~~
 
-## **changelog**
+## **changelog**  
 - added subfolder navigation on sample player modules  
 
-**drumPlayer+**
+**drumPlayer+**  
 -added text scrolling to sample name displays and a context menu option to disable it  
 
-**sickoPlayer**
+**sickoPlayer**  
 - fixed some bugs on cursors repositioning
 
 # SickoCV v2.5.2-beta9
