@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta8
+# SickoCV v2.5.2-beta9
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -20,7 +20,15 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **to do list:** 
 - ~~add to context menu a user folder browser feature to drumPlayer, drumPlayer+, sickoPlayer, sickoSampler~~
 
-# SickoCV v2.5.2-beta8
+## **changelog**
+- added subfolder navigation on sample player modules  
+**drumPlayer+**
+-added text scrolling to sample name displays and a context menu option to disable it  
+**sickoPlayer**
+- fixed some bugs on cursors repositioning
+
+
+# SickoCV v2.5.2-beta9
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/219940320-71f4c2c7-143c-4d4c-9bfc-3a288cbce11c.JPG)
@@ -258,6 +266,9 @@ Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.
 Normalled (default): if one slot out is not connected, its output will be added to the next slot  
 Solo: every slot has its own out socket  
 Unconnected on Out 4: Every unconnected out is routed to out n.4
+
+**Scrolling Display** (drumPlayer+ only)  
+This option enables text scrolling on sample name displays  
 
 NOTE: input trigger threshold is +1v.  
 
