@@ -22,11 +22,12 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog**
 - added subfolder navigation on sample player modules  
+
 **drumPlayer+**
 -added text scrolling to sample name displays and a context menu option to disable it  
+
 **sickoPlayer**
 - fixed some bugs on cursors repositioning
-
 
 # SickoCV v2.5.2-beta9
 VCV Rack plugin modules
@@ -267,7 +268,7 @@ Normalled (default): if one slot out is not connected, its output will be added 
 Solo: every slot has its own out socket  
 Unconnected on Out 4: Every unconnected out is routed to out n.4
 
-**Scrolling Display** (drumPlayer+ only)  
+**Scrolling Displays** (drumPlayer+ only)  
 This option enables text scrolling on sample name displays  
 
 NOTE: input trigger threshold is +1v.  
