@@ -25,6 +25,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 **drumPlayer+**  
 -added text scrolling to sample name displays and a context menu option to disable it  
+- moved Rev button to cursor knobs area. Now it selects next playback direction  
 
 **sickoPlayer**  
 - fixed some bugs on cursors repositioning
