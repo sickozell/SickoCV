@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added subfolder navigation on sample player modules  
 
 **drumPlayer+**  
--added text scrolling to sample name displays and a context menu option to disable it  
+- added text scrolling to sample name displays and a context menu option to disable it  
 - moved Rev button to cursor knobs area. Now it selects next playback direction  
 
 **sickoPlayer**  
