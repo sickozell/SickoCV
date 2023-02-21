@@ -30,6 +30,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - fixed some bugs on cursors repositioning
 - moved REV button to cursor knobs area. Now it selects next playback direction   
 - added XFD knob  
+- moved factory presets to module context menu  
 
 # SickoCV v2.5.2-beta9
 VCV Rack plugin modules
