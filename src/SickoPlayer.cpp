@@ -1786,13 +1786,6 @@ struct SickoPlayerDisplay : TransparentWidget {
 		}
 	};
 
-	struct SetPreset2 : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(2);
-		}
-	};
-
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
 			e.consume(this);
@@ -2024,7 +2017,6 @@ struct SickoPlayerDisplay : TransparentWidget {
 				[ = ](Menu * menu) {
 					menu->addChild(construct<SetPreset0>(&MenuItem::text, "Wavetable", &SetPreset0::module, module));
 					menu->addChild(construct<SetPreset1>(&MenuItem::text, "Triggered Sample with Envelope", &SetPreset1::module, module));
-					menu->addChild(construct<SetPreset2>(&MenuItem::text, "Drums", &SetPreset2::module, module));
 				}));
 		}
 	}
@@ -2154,13 +2146,6 @@ struct SickoPlayerWidget : ModuleWidget {
 		SickoPlayer *module;
 		void onAction(const event::Action &e) override {
 			module->setPreset(1);
-		}
-	};
-
-	struct SetPreset2 : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(2);
 		}
 	};
 
@@ -2300,7 +2285,6 @@ struct SickoPlayerWidget : ModuleWidget {
 			[ = ](Menu * menu) {
 				menu->addChild(construct<SetPreset0>(&MenuItem::text, "Wavetable", &SetPreset0::module, module));
 				menu->addChild(construct<SetPreset1>(&MenuItem::text, "Triggered Sample with Envelope", &SetPreset1::module, module));
-				menu->addChild(construct<SetPreset2>(&MenuItem::text, "Drums", &SetPreset2::module, module));
 			}));
 	}
 };

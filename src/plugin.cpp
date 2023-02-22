@@ -32,4 +32,5 @@ void init(Plugin* p) {
 	p->addModel(modelSickoPlayer);
 	p->addModel(modelDrummer4Plus);
 	p->addModel(modelSickoSampler);
+	p->addModel(modelDrumPlayerXtra);
 }

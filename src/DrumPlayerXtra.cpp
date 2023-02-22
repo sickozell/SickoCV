@@ -19,7 +19,7 @@
 
 using namespace std;
 
-struct DrumPlayerPlus : Module {
+struct DrumPlayerXtra : Module {
 	enum ParamIds {
 		ENUMS(TRIGVOL_PARAM,4),
 		ENUMS(TRIGVOLATNV_PARAM,4),
@@ -27,8 +27,8 @@ struct DrumPlayerPlus : Module {
 		ENUMS(ACCVOLATNV_PARAM,4),
 		ENUMS(SPEED_PARAM,4),
 		ENUMS(SPEEDATNV_PARAM,4),
-		ENUMS(LIMIT_SWITCH,4),
-		ENUMS(CHOKE_SWITCH,3),
+		ENUMS(LIMIT_PARAMS,4),
+		ENUMS(CHOKE_PARAMS,3),
 		NUM_PARAMS 
 	};
 	enum InputIds {
@@ -44,6 +44,8 @@ struct DrumPlayerPlus : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
+		ENUMS(CHOKE_LIGHT,3),
+		ENUMS(LIMIT_LIGHT,4),
 		NUM_LIGHTS
 	};
   
@@ -53,6 +55,7 @@ struct DrumPlayerPlus : Module {
 	drwav_uint64 totalSamples[4];
 
 	vector<float> playBuffer[4][2];
+	vector<double> displayBuff[4];
 
 	bool fileLoaded[4] = {false, false, false, false};
 
@@ -68,8 +71,8 @@ struct DrumPlayerPlus : Module {
 
 	std::string storedPath[4] = {"","","",""};
 	std::string fileDescription[4] = {"--none--","--none--","--none--","--none--"};
-	std::string fileDisplay[4] = {"-----","-----","-----","-----"};
-	std::string scrollDisplay[4] = {"-----","-----","-----","-----"};
+	std::string fileDisplay[4] = {"-------","-------","-------","-------"};
+	std::string scrollDisplay[4] = {"-------","-------","-------","-------"};
 	std::string userFolder = "";
 
 	std::string tempDir = "";
@@ -77,6 +80,9 @@ struct DrumPlayerPlus : Module {
 	vector<vector<std::string>> folderTreeDisplay;
 	vector<std::string> tempTreeData;
 	vector<std::string> tempTreeDisplay;
+
+	bool choke[4] = {false, false, false, false};
+	int limit[4];
 
 	float trigValue[4] = {0.f, 0.f, 0.f, 0.f};
 	float prevTrigValue[4] = {0.f, 0.f, 0.f, 0.f};
@@ -95,12 +101,17 @@ struct DrumPlayerPlus : Module {
 	int outsMode = 0;
 	int antiAlias = 1;
 	int scrolling = 1;
+	int lightBox = true;
+	int colorBox[4] = {0,1,2,3};
+
+	bool slotTriggered[4] = {false, false, false, false};
 
 	//std::string debugDisplay = "X";
+	int debugCount = 0;
 
 	double a0, a1, a2, b1, b2, z1, z2;
 
-	DrumPlayerPlus() {
+	DrumPlayerXtra() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configInput(TRIG_INPUT,"Trig #1");
 		configInput(TRIG_INPUT+1,"Trig #2");
@@ -146,13 +157,13 @@ struct DrumPlayerPlus : Module {
 		configInput(SPEED_INPUT+1,"Speed CV #2");
 		configInput(SPEED_INPUT+2,"Speed CV #3");
 		configInput(SPEED_INPUT+3,"Speed CV #4");
-		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit #1", {"Off", "±5v"});
-		configSwitch(LIMIT_SWITCH+1, 0.f, 1.f, 0.f, "Limit #2", {"Off", "±5v"});
-		configSwitch(LIMIT_SWITCH+2, 0.f, 1.f, 0.f, "Limit #3", {"Off", "±5v"});
-		configSwitch(LIMIT_SWITCH+3, 0.f, 1.f, 0.f, "Limit #4", {"Off", "±5v"});
-		configSwitch(CHOKE_SWITCH, 0.f, 1.f, 0.f, "Choke #1", {"Off", "On"});
-		configSwitch(CHOKE_SWITCH+1, 0.f, 1.f, 0.f, "Choke #2", {"Off", "On"});
-		configSwitch(CHOKE_SWITCH+2, 0.f, 1.f, 0.f, "Choke #3", {"Off", "On"});
+		configSwitch(LIMIT_PARAMS, 0.f, 1.f, 0.f, "Limit #1", {"Off", "±5v"});
+		configSwitch(LIMIT_PARAMS+1, 0.f, 1.f, 0.f, "Limit #2", {"Off", "±5v"});
+		configSwitch(LIMIT_PARAMS+2, 0.f, 1.f, 0.f, "Limit #3", {"Off", "±5v"});
+		configSwitch(LIMIT_PARAMS+3, 0.f, 1.f, 0.f, "Limit #4", {"Off", "±5v"});
+		configSwitch(CHOKE_PARAMS, 0.f, 1.f, 0.f, "Choke #1", {"Off", "On"});
+		configSwitch(CHOKE_PARAMS+1, 0.f, 1.f, 0.f, "Choke #2", {"Off", "On"});
+		configSwitch(CHOKE_PARAMS+2, 0.f, 1.f, 0.f, "Choke #3", {"Off", "On"});
 
 		configOutput(OUT_OUTPUT,"out #1");
 		configOutput(OUT_OUTPUT+1,"out #2");
@@ -174,11 +185,13 @@ struct DrumPlayerPlus : Module {
 		antiAlias = 1;
 		outsMode = NORMALLED_OUTS;
 		scrolling = 1;
+		lightBox = true;
 		for (int i = 0; i < 4; i++) {
 			clearSlot(i);
 			play[i] = false;
 			choking[i] = false;
 			fading[i] = false;
+			colorBox[i] = i;
 		}
 	}
 
@@ -196,6 +209,11 @@ struct DrumPlayerPlus : Module {
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "OutsMode", json_integer(outsMode));
 		json_object_set_new(rootJ, "Scrolling", json_integer(scrolling));
+		json_object_set_new(rootJ, "LightBox", json_integer(lightBox));
+		json_object_set_new(rootJ, "Color1", json_integer(colorBox[0]));
+		json_object_set_new(rootJ, "Color2", json_integer(colorBox[1]));
+		json_object_set_new(rootJ, "Color3", json_integer(colorBox[2]));
+		json_object_set_new(rootJ, "Color4", json_integer(colorBox[3]));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		json_object_set_new(rootJ, "Slot3", json_string(storedPath[2].c_str()));
@@ -220,6 +238,26 @@ struct DrumPlayerPlus : Module {
 		json_t* scrollingJ = json_object_get(rootJ, "Scrolling");
 		if (scrollingJ)
 			scrolling = json_integer_value(scrollingJ);
+
+		json_t* lightBoxJ = json_object_get(rootJ, "LightBox");
+		if (lightBoxJ)
+			lightBox = json_integer_value(lightBoxJ);
+
+		json_t* color1J = json_object_get(rootJ, "Color1");
+		if (color1J)
+			colorBox[0] = json_integer_value(color1J);
+
+		json_t* color2J = json_object_get(rootJ, "Color2");
+		if (color2J)
+			colorBox[1] = json_integer_value(color2J);
+
+		json_t* color3J = json_object_get(rootJ, "Color3");
+		if (color3J)
+			colorBox[2] = json_integer_value(color3J);
+
+		json_t* color4J = json_object_get(rootJ, "Color4");
+		if (color4J)
+			colorBox[3] = json_integer_value(color4J);
 
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
@@ -351,6 +389,7 @@ struct DrumPlayerPlus : Module {
 			calcBiquadLpf(20000.0, sampleRate[slot], 1);
 			playBuffer[slot][0].clear();
 			playBuffer[slot][1].clear();
+			displayBuff[slot].clear();
 			for (unsigned int i = 0; i < tsc; i = i + c) {
 				playBuffer[slot][0].push_back(pSampleData[i]);
 				playBuffer[slot][0].push_back(0);
@@ -368,6 +407,10 @@ struct DrumPlayerPlus : Module {
 				playBuffer[slot][1].push_back(biquadLpf(playBuffer[slot][0][i]));
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
+
+			vector<double>().swap(displayBuff[slot]);
+			for (int i = 0; i < floor(totalSampleC[slot]); i = i + floor(totalSampleC[slot]/59))
+				displayBuff[slot].push_back(playBuffer[slot][0][i]);
 
 			//char* pathDup = strdup(path.c_str());
 			fileDescription[slot] = system::getFilename(std::string(path));
@@ -387,8 +430,8 @@ struct DrumPlayerPlus : Module {
 					fileDisplay[slot] += tempFileChar;
 			}
 
-			if (fileDisplay[slot].length() > 5)
-				scrollDisplay[slot] = "!!!!!" + fileDisplay[slot] + "!!!!";
+			if (fileDisplay[slot].length() > 7)
+				scrollDisplay[slot] = "!!!!!!!" + fileDisplay[slot] + "!!!!!!";
 			else
 				scrollDisplay[slot] = fileDisplay[slot];
 
@@ -400,15 +443,15 @@ struct DrumPlayerPlus : Module {
 			fileLoaded[slot] = false;
 			storedPath[slot] = "";
 			fileDescription[slot] = "--none--";
-			fileDisplay[slot] = "-----";
+			fileDisplay[slot] = "-------";
 		}
 	};
 	
 	void clearSlot(int slot) {
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
-		fileDisplay[slot] = "-----";
-		scrollDisplay[slot] = "-----";
+		fileDisplay[slot] = "-------";
+		scrollDisplay[slot] = "-------";
 		fileLoaded[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
@@ -416,6 +459,22 @@ struct DrumPlayerPlus : Module {
 	}
 	
 	void process(const ProcessArgs &args) override {
+
+		choke[0] = params[CHOKE_PARAMS].getValue();
+		choke[1] = params[CHOKE_PARAMS+1].getValue();
+		choke[2] = params[CHOKE_PARAMS+2].getValue();
+		lights[CHOKE_LIGHT].setBrightness(choke[0]);
+		lights[CHOKE_LIGHT+1].setBrightness(choke[1]);
+		lights[CHOKE_LIGHT+2].setBrightness(choke[2]);
+		limit[0] = params[LIMIT_PARAMS].getValue();
+		limit[1] = params[LIMIT_PARAMS+1].getValue();
+		limit[2] = params[LIMIT_PARAMS+2].getValue();
+		limit[3] = params[LIMIT_PARAMS+3].getValue();
+		lights[LIMIT_LIGHT].setBrightness(limit[0]);
+		lights[LIMIT_LIGHT+1].setBrightness(limit[1]);
+		lights[LIMIT_LIGHT+2].setBrightness(limit[2]);
+		lights[LIMIT_LIGHT+3].setBrightness(limit[3]);
+
 		summedOutput = 0;
 		for (int i = 0; i < 4; i++){
 
@@ -428,6 +487,7 @@ struct DrumPlayerPlus : Module {
 					fadedPosition[i] = samplePos[i];
 				}
 				play[i] = true;
+				slotTriggered[i] = true;
 				samplePos[i] = 0;
 				currSampleWeight[i] = sampleCoeff[i];
 				prevSamplePos[i] = 0;
@@ -443,7 +503,8 @@ struct DrumPlayerPlus : Module {
 				else if (level[i] < 0)
 					level[i] = 0;
 				
-				if (i < 3 && params[CHOKE_SWITCH+i].getValue()) {
+				//if (i < 3 && params[CHOKE_PARAMS+i].getValue()) {
+				if (i < 3 && choke[i]) {
 					choking[i+1] = true;
 					chokeValue[i+1] = 1.f;
 				}
@@ -557,7 +618,7 @@ struct DrumPlayerPlus : Module {
 			}
 
 			/*
-			if (params[LIMIT_SWITCH+i].getValue()) {
+			if (params[LIMIT_PARAMS+i].getValue()) {
 				if (currentOutput > 5)
 					currentOutput = 5;
 				else if (currentOutput < -5)
@@ -569,7 +630,8 @@ struct DrumPlayerPlus : Module {
 				case NORMALLED_OUTS:
 					summedOutput += currentOutput;
 
-					if (params[LIMIT_SWITCH+i].getValue()) {
+					//if (params[LIMIT_PARAMS+i].getValue()) {
+					if (limit[i]) {
 						if (summedOutput > 5)
 							summedOutput = 5;
 						else if (summedOutput < -5)
@@ -585,7 +647,7 @@ struct DrumPlayerPlus : Module {
 				case SOLO_OUTS:
 					if (outputs[OUT_OUTPUT+i].isConnected()) {
 						
-						if (params[LIMIT_SWITCH+i].getValue()) {
+						if (limit[i]) {
 							if (currentOutput > 5)
 								currentOutput = 5;
 							else if (currentOutput < -5)
@@ -599,7 +661,7 @@ struct DrumPlayerPlus : Module {
 				case UNCONNECTED_ON_4:
 					if (i == 3) {
 						summedOutput += currentOutput;
-						if (params[LIMIT_SWITCH+i].getValue()) {
+						if (limit[i]) {
 							if (summedOutput > 5)
 								summedOutput = 5;
 							else if (summedOutput < -5)
@@ -607,7 +669,7 @@ struct DrumPlayerPlus : Module {
 						}
 						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
 					} else if (outputs[OUT_OUTPUT+i].isConnected()) {
-						if (params[LIMIT_SWITCH+i].getValue()) {
+						if (limit[i]) {
 							if (currentOutput > 5)
 								currentOutput = 5;
 							else if (currentOutput < -5)
@@ -616,7 +678,7 @@ struct DrumPlayerPlus : Module {
 						outputs[OUT_OUTPUT+i].setVoltage(currentOutput);
 					} else {
 						summedOutput += currentOutput;
-						if (params[LIMIT_SWITCH+i].getValue()) {
+						if (limit[i]) {
 							if (summedOutput > 5)
 								summedOutput = 5;
 							else if (summedOutput < -5)
@@ -632,8 +694,8 @@ struct DrumPlayerPlus : Module {
 	}
 };
 
-struct DrumPlayerPlusInitializeUserFolder : MenuItem {
-	DrumPlayerPlus *rm ;
+struct DrumPlayerXtraInitializeUserFolder : MenuItem {
+	DrumPlayerXtra *rm ;
 	void onAction(const event::Action &e) override {
 		const char* prevFolder = rm->userFolder.c_str();
 		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
@@ -649,8 +711,8 @@ struct DrumPlayerPlusInitializeUserFolder : MenuItem {
 	}
 };
 
-struct DrumPlayerPlusItem1 : MenuItem {
-	DrumPlayerPlus *rm ;
+struct DrumPlayerXtraItem1 : MenuItem {
+	DrumPlayerXtra *rm ;
 	void onAction(const event::Action &e) override {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
@@ -669,8 +731,8 @@ struct DrumPlayerPlusItem1 : MenuItem {
 	}
 };
 
-struct DrumPlayerPlusItem2 : MenuItem {
-	DrumPlayerPlus *rm ;
+struct DrumPlayerXtraItem2 : MenuItem {
+	DrumPlayerXtra *rm ;
 	void onAction(const event::Action &e) override {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
@@ -689,8 +751,8 @@ struct DrumPlayerPlusItem2 : MenuItem {
 	}
 };
 
-struct DrumPlayerPlusItem3 : MenuItem {
-	DrumPlayerPlus *rm ;
+struct DrumPlayerXtraItem3 : MenuItem {
+	DrumPlayerXtra *rm ;
 	void onAction(const event::Action &e) override {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
@@ -709,8 +771,8 @@ struct DrumPlayerPlusItem3 : MenuItem {
 	}
 };
 
-struct DrumPlayerPlusItem4 : MenuItem {
-	DrumPlayerPlus *rm ;
+struct DrumPlayerXtraItem4 : MenuItem {
+	DrumPlayerXtra *rm ;
 	void onAction(const event::Action &e) override {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
@@ -730,18 +792,26 @@ struct DrumPlayerPlusItem4 : MenuItem {
 };
 
 
-struct dppSlot1Display : TransparentWidget {
-	DrumPlayerPlus *module;
+struct dpxSlot1Display : TransparentWidget {
+	DrumPlayerXtra *module;
 	int frame = 0;
 
-	dppSlot1Display() {
+	dpxSlot1Display() {
 
 	}
 
 	struct ClearSlot1Item : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(0);
+		}
+	};
+
+	struct ColorItem : MenuItem {
+		DrumPlayerXtra* module;
+		int colorBox;
+		void onAction(const event::Action& e) override {
+			module->colorBox[0] = colorBox;
 		}
 	};
 
@@ -756,7 +826,7 @@ struct dppSlot1Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+		DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -798,13 +868,13 @@ struct dppSlot1Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus *>(this->module);
+		DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra *>(this->module);
 		assert(module);
 
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			DrumPlayerPlusItem1 *rootDirItem = new DrumPlayerPlusItem1;
+			DrumPlayerXtraItem1 *rootDirItem = new DrumPlayerXtraItem1;
 				rootDirItem->text = "Load Sample Slot #1";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
@@ -833,22 +903,43 @@ struct dppSlot1Display : TransparentWidget {
 				menu->addChild(createMenuLabel(module->fileDescription[0]));
 				menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear", &ClearSlot1Item::module, module));
 			}
+			if (module->lightBox) {
+				menu->addChild(createSubmenuItem("Light Box Color", "",
+					[=](Menu* menu) {
+						std::string colorNames[4] = {"Blue", "Red", "Yellow", "Green"};
+						for (int i = 0; i < 4; i++) {
+							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
+							colorItem->rightText = CHECKMARK(module->colorBox[0] == i);
+							colorItem->module = module;
+							colorItem->colorBox = i;
+							menu->addChild(colorItem);
+						}
+					}));
+			}
 		}
 	}
 };
 
-struct dppSlot2Display : TransparentWidget {
-	DrumPlayerPlus *module;
+struct dpxSlot2Display : TransparentWidget {
+	DrumPlayerXtra *module;
 	int frame = 0;
 
-	dppSlot2Display() {
+	dpxSlot2Display() {
 
 	}
 
 	struct ClearSlot2Item : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(1);
+		}
+	};
+
+	struct ColorItem : MenuItem {
+		DrumPlayerXtra* module;
+		int colorBox;
+		void onAction(const event::Action& e) override {
+			module->colorBox[1] = colorBox;
 		}
 	};
 
@@ -863,7 +954,7 @@ struct dppSlot2Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+		DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -905,13 +996,13 @@ struct dppSlot2Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus *>(this->module);
+		DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra *>(this->module);
 		assert(module);
 
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			DrumPlayerPlusItem2 *rootDirItem = new DrumPlayerPlusItem2;
+			DrumPlayerXtraItem2 *rootDirItem = new DrumPlayerXtraItem2;
 				rootDirItem->text = "Load Sample Slot #2";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
@@ -940,22 +1031,43 @@ struct dppSlot2Display : TransparentWidget {
 				menu->addChild(createMenuLabel(module->fileDescription[1]));
 				menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear", &ClearSlot2Item::module, module));
 			}
+			if (module->lightBox) {
+				menu->addChild(createSubmenuItem("Light Box Color", "",
+					[=](Menu* menu) {
+						std::string colorNames[4] = {"Blue", "Red", "Yellow", "Green"};
+						for (int i = 0; i < 4; i++) {
+							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
+							colorItem->rightText = CHECKMARK(module->colorBox[1] == i);
+							colorItem->module = module;
+							colorItem->colorBox = i;
+							menu->addChild(colorItem);
+						}
+					}));
+			}
 		}
 	}
 };
 
-struct dppSlot3Display : TransparentWidget {
-	DrumPlayerPlus *module;
+struct dpxSlot3Display : TransparentWidget {
+	DrumPlayerXtra *module;
 	int frame = 0;
 
-	dppSlot3Display() {
+	dpxSlot3Display() {
 
 	}
 
 	struct ClearSlot3Item : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(2);
+		}
+	};
+
+	struct ColorItem : MenuItem {
+		DrumPlayerXtra* module;
+		int colorBox;
+		void onAction(const event::Action& e) override {
+			module->colorBox[2] = colorBox;
 		}
 	};
 
@@ -970,7 +1082,7 @@ struct dppSlot3Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+		DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -1012,13 +1124,13 @@ struct dppSlot3Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus *>(this->module);
+		DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra *>(this->module);
 		assert(module);
 
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			DrumPlayerPlusItem3 *rootDirItem = new DrumPlayerPlusItem3;
+			DrumPlayerXtraItem3 *rootDirItem = new DrumPlayerXtraItem3;
 				rootDirItem->text = "Load Sample Slot #3";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
@@ -1047,22 +1159,43 @@ struct dppSlot3Display : TransparentWidget {
 				menu->addChild(createMenuLabel(module->fileDescription[2]));
 				menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear", &ClearSlot3Item::module, module));
 			}
+			if (module->lightBox) {
+				menu->addChild(createSubmenuItem("Light Box Color", "",
+					[=](Menu* menu) {
+						std::string colorNames[4] = {"Blue", "Red", "Yellow", "Green"};
+						for (int i = 0; i < 4; i++) {
+							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
+							colorItem->rightText = CHECKMARK(module->colorBox[2] == i);
+							colorItem->module = module;
+							colorItem->colorBox = i;
+							menu->addChild(colorItem);
+						}
+					}));
+			}
 		}
 	}
 };
 
-struct dppSlot4Display : TransparentWidget {
-	DrumPlayerPlus *module;
+struct dpxSlot4Display : TransparentWidget {
+	DrumPlayerXtra *module;
 	int frame = 0;
 
-	dppSlot4Display() {
+	dpxSlot4Display() {
 
 	}
 
 	struct ClearSlot4Item : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(3);
+		}
+	};
+
+	struct ColorItem : MenuItem {
+		DrumPlayerXtra* module;
+		int colorBox;
+		void onAction(const event::Action& e) override {
+			module->colorBox[3] = colorBox;
 		}
 	};
 
@@ -1077,7 +1210,7 @@ struct dppSlot4Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+		DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -1119,13 +1252,13 @@ struct dppSlot4Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus *>(this->module);
+		DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra *>(this->module);
 		assert(module);
 
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			DrumPlayerPlusItem4 *rootDirItem = new DrumPlayerPlusItem4;
+			DrumPlayerXtraItem4 *rootDirItem = new DrumPlayerXtraItem4;
 				rootDirItem->text = "Load Sample Slot #4";
 				rootDirItem->rm = module;
 				menu->addChild(rootDirItem);
@@ -1154,12 +1287,25 @@ struct dppSlot4Display : TransparentWidget {
 				menu->addChild(createMenuLabel(module->fileDescription[3]));
 				menu->addChild(construct<ClearSlot4Item>(&MenuItem::rightText, "Clear", &ClearSlot4Item::module, module));
 			}
+			if (module->lightBox) {
+				menu->addChild(createSubmenuItem("Light Box Color", "",
+					[=](Menu* menu) {
+						std::string colorNames[4] = {"Blue", "Red", "Yellow", "Green"};
+						for (int i = 0; i < 4; i++) {
+							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
+							colorItem->rightText = CHECKMARK(module->colorBox[3] == i);
+							colorItem->module = module;
+							colorItem->colorBox = i;
+							menu->addChild(colorItem);
+						}
+					}));
+			}
 		}
 	}
 };
 
-struct DrumPlayerPlusDisplay : TransparentWidget {
-	DrumPlayerPlus *module;
+struct DrumPlayerXtraDisplay : TransparentWidget {
+	DrumPlayerXtra *module;
 	int frame = 0;
 
 	std::string currFileDisplay[4];
@@ -1168,7 +1314,24 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 	float deltaTime;
 	float prevTime;
 
-	DrumPlayerPlusDisplay() {
+	float boxMaxTime = 0.2f;
+	float deltaBoxTime[4];
+	float startBoxTime[4];
+	int currAlpha[4] = {0,0,0,0};
+	float maxAlpha = 200;
+
+	const int boxX[4] = {2, 87, 172, 258};
+	const int boxY[4] = {2, 2, 2, 2};
+	const int boxW[4] = {59, 59, 59, 59};
+	const int boxH[4] = {36, 36, 36, 36};
+
+	const int colorR[4] = {0,255,255,0};
+	const int colorG[4] = {0,0,255,255};
+	const int colorB[4] = {255,0,0,0};
+
+	const float slotXpos[4] = {2,87,172,258};
+
+	DrumPlayerXtraDisplay() {
 
 	}
 
@@ -1182,37 +1345,97 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 				nvgTextLetterSpacing(args.vg, 0);
 				nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 
+				currTime = system::getTime();
 				switch (module->scrolling) {
 					case 0:
 						for (int i = 0; i < 4; i++)
 							//currFileDisplay[i] = module->fileDescription[i].substr(0,5);;
-							currFileDisplay[i] = module->fileDisplay[i].substr(0,5);
+							currFileDisplay[i] = module->fileDisplay[i].substr(0,7);
 					break;
 					case 1:
-						currTime = system::getTime();
 						deltaTime = currTime - prevTime;
 						for (int i = 0; i < 4; i++) {
-							if (module->scrollDisplay[i].length() > 4) {
+							if (module->scrollDisplay[i].length() > 6) {
 								if (deltaTime > 0.4f) {
 									prevTime = currTime;
-									if (fileGap[i] > int(module->scrollDisplay[i].length()) - 5 ) {
+									if (fileGap[i] > int(module->scrollDisplay[i].length()) - 7 ) {
 										fileGap[i] = 0;
 									}
-									currFileDisplay[i] = module->scrollDisplay[i].substr(fileGap[i],5);
+									currFileDisplay[i] = module->scrollDisplay[i].substr(fileGap[i],7);
 									fileGap[i]++;
 								}
 							} else {
-								currFileDisplay[i] = module->scrollDisplay[i].substr(0,5);
+								currFileDisplay[i] = module->scrollDisplay[i].substr(0,7);
 							}
 						}
 					break;
 				}
 
-				nvgTextBox(args.vg, 6, 0,120, currFileDisplay[0].c_str(), NULL);
-				nvgTextBox(args.vg, 75, 0,120, currFileDisplay[1].c_str(), NULL);
-				nvgTextBox(args.vg, 144, 0,120, currFileDisplay[2].c_str(), NULL);
-				nvgTextBox(args.vg, 214, 0,120, currFileDisplay[3].c_str(), NULL);
+				nvgTextBox(args.vg, 3, 0,120, currFileDisplay[0].c_str(), NULL);
+				nvgTextBox(args.vg, 88, 0,120, currFileDisplay[1].c_str(), NULL);
+				nvgTextBox(args.vg, 173, 0,120, currFileDisplay[2].c_str(), NULL);
+				nvgTextBox(args.vg, 259, 0,120, currFileDisplay[3].c_str(), NULL);
 				//nvgTextBox(args.vg, 2, -20,120, module->debugDisplay.c_str(), NULL);
+
+				for (int slot=0; slot < 4; slot++) {
+					nvgStrokeColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
+					{
+						nvgBeginPath(args.vg);
+						nvgMoveTo(args.vg, slotXpos[slot], 20);
+						nvgLineTo(args.vg, slotXpos[slot]+59, 20);
+						nvgClosePath(args.vg);
+					}
+					nvgStroke(args.vg);
+					
+					if (module->fileLoaded[slot]) {						
+						// Waveform
+						nvgStrokeColor(args.vg, nvgRGBA(0x22, 0x44, 0xc9, 0xc0));
+						nvgSave(args.vg);
+						//Rect b = Rect(Vec(7, 22), Vec(295, 73));
+						Rect b = Rect(Vec(slotXpos[slot], 2), Vec(59, 36));
+						nvgScissor(args.vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+						nvgBeginPath(args.vg);
+						for (unsigned int i = 0; i < module->displayBuff[slot].size(); i++) {
+							float x, y;
+							x = (float)i / (module->displayBuff[slot].size() - 1);
+							y = module->displayBuff[slot][i] / 2.0 + 0.5;	// used if playBuffer range is -1/+1
+							//y = module->displayBuff[slot][i] / 10.0 + 0.5; // used if playBuffer range is -5/+5
+							Vec p;
+							p.x = b.pos.x + b.size.x * x;
+							p.y = b.pos.y + b.size.y * (1.0 - y);
+							if (i == 0)
+								nvgMoveTo(args.vg, p.x, p.y);
+							else
+								nvgLineTo(args.vg, p.x, p.y);
+						}
+						nvgLineCap(args.vg, NVG_ROUND);
+						nvgMiterLimit(args.vg, 2.0);
+						nvgStrokeWidth(args.vg, 1.5);
+						nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
+						nvgStroke(args.vg);			
+						nvgResetScissor(args.vg);
+						nvgRestore(args.vg);	
+					}
+
+					// lightbox management
+					if (module->lightBox) {
+						if (module->slotTriggered[slot]) {
+							module->slotTriggered[slot] = false;
+							currAlpha[slot] = maxAlpha;
+							startBoxTime[slot] = currTime;
+							deltaBoxTime[slot] = 0;
+						}
+						if (currAlpha[slot] > 0) {
+							nvgBeginPath(args.vg);
+							nvgRoundedRect(args.vg, boxX[slot],boxY[slot], boxW[slot], boxH[slot], 4);
+							nvgFillColor(args.vg, nvgRGBA(colorR[module->colorBox[slot]], colorG[module->colorBox[slot]], colorB[module->colorBox[slot]], currAlpha[slot]));
+							//nvgFillColor(args.vg, nvgRGBA(boxR[slot], boxG[slot], boxB[slot], currAlpha[slot])); 
+							nvgFill(args.vg);
+							deltaBoxTime[slot] = currTime - startBoxTime[slot];
+							currAlpha[slot] = int((boxMaxTime - deltaBoxTime[slot]) * maxAlpha / boxMaxTime);
+						}
+					}
+				}
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -1220,10 +1443,10 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 };
 
 
-struct DrumPlayerPlusWidget : ModuleWidget {
-	DrumPlayerPlusWidget(DrumPlayerPlus *module) {
+struct DrumPlayerXtraWidget : ModuleWidget {
+	DrumPlayerXtraWidget(DrumPlayerXtra *module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/DrumPlayerPlus.svg")));
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/DrumPlayerXtra.svg")));
 
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
@@ -1231,39 +1454,39 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
 		{
-			dppSlot1Display *display1 = new dppSlot1Display();
+			dpxSlot1Display *display1 = new dpxSlot1Display();
 			display1->box.pos = Vec(12, 33);
-			display1->box.size = Vec(52, 14);
+			display1->box.size = Vec(65, 52);
 			display1->module = module;
 			addChild(display1);
 		}
 
 		{
-			dppSlot2Display *display2 = new dppSlot2Display();
-			display2->box.pos = Vec(82, 33);
-			display2->box.size = Vec(52, 14);
+			dpxSlot2Display *display2 = new dpxSlot2Display();
+			display2->box.pos = Vec(98, 33);
+			display2->box.size = Vec(65, 52);
 			display2->module = module;
 			addChild(display2);
 		}
 
 		{
-			dppSlot3Display *display3 = new dppSlot3Display();
-			display3->box.pos = Vec(151, 33);
-			display3->box.size = Vec(52, 14);
+			dpxSlot3Display *display3 = new dpxSlot3Display();
+			display3->box.pos = Vec(183, 33);
+			display3->box.size = Vec(65, 52);
 			display3->module = module;
 			addChild(display3);
 		}
 
 		{
-			dppSlot4Display *display4 = new dppSlot4Display();
-			display4->box.pos = Vec(221, 33);
-			display4->box.size = Vec(52, 14);
+			dpxSlot4Display *display4 = new dpxSlot4Display();
+			display4->box.pos = Vec(269, 33);
+			display4->box.size = Vec(65, 52);
 			display4->module = module;
 			addChild(display4);
 		}
 	    
 		{
-			DrumPlayerPlusDisplay *display = new DrumPlayerPlusDisplay();
+			DrumPlayerXtraDisplay *display = new DrumPlayerXtraDisplay();
 			display->box.pos = Vec(13, 45);
 			display->box.size = Vec(270, 100);
 			display->module = module;
@@ -1271,36 +1494,46 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 
 
-		float xDelta = 23.5;
+		//float xDelta = 23.5;
+		const float xDelta = 28.95;
+		const float trigPos = 8.4;
+		const float accPos = 21.5;
+
+		const float trigInputPos = 39;
+		const float trigVolPos = 49.7;
+		const float trigVolAtnvPos = 61.4;
+		const float trigVolInputPos = 70;
+
+		const float buttonsYpos = 108.05;
 
 		for (int i = 0; i < 4; i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 21)), module, DrumPlayerPlus::TRIG_INPUT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(17.9+(xDelta*i), 28.5)), module, DrumPlayerPlus::TRIGVOLATNV_PARAM+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(7.9+(xDelta*i), 32)), module, DrumPlayerPlus::TRIGVOL_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 37)), module, DrumPlayerPlus::TRIGVOL_INPUT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(trigPos+(xDelta*i), trigInputPos)), module, DrumPlayerXtra::TRIG_INPUT+i));
+			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(trigPos+(xDelta*i), trigVolPos)), module, DrumPlayerXtra::TRIGVOL_PARAM+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(trigPos+(xDelta*i), trigVolAtnvPos)), module, DrumPlayerXtra::TRIGVOLATNV_PARAM+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(trigPos+(xDelta*i), trigVolInputPos)), module, DrumPlayerXtra::TRIGVOL_INPUT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 47)), module, DrumPlayerPlus::ACC_INPUT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(17.9+(xDelta*i), 54.5)), module, DrumPlayerPlus::ACCVOLATNV_PARAM+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(7.9+(xDelta*i), 58)), module, DrumPlayerPlus::ACCVOL_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 63)), module, DrumPlayerPlus::ACCVOL_INPUT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(accPos+(xDelta*i), trigInputPos)), module, DrumPlayerXtra::ACC_INPUT+i));
+			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(accPos+(xDelta*i), trigVolPos)), module, DrumPlayerXtra::ACCVOL_PARAM+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(accPos+(xDelta*i), trigVolAtnvPos)), module, DrumPlayerXtra::ACCVOLATNV_PARAM+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(accPos+(xDelta*i), trigVolInputPos)), module, DrumPlayerXtra::ACCVOL_INPUT+i));
 
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(12.9+(xDelta*i), 78.5)), module, DrumPlayerPlus::SPEED_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 88)), module, DrumPlayerPlus::SPEED_INPUT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(17.9+(xDelta*i), 88)), module, DrumPlayerPlus::SPEEDATNV_PARAM+i));
+			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.9+(xDelta*i), 85.5)), module, DrumPlayerXtra::SPEED_PARAM+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.9+(xDelta*i), 95)), module, DrumPlayerXtra::SPEED_INPUT+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(19.9+(xDelta*i), 95)), module, DrumPlayerXtra::SPEEDATNV_PARAM+i));
 
 			if (i<3) {
-				addParam(createParamCentered<CKSS>(mm2px(Vec(7.9+(xDelta*i), 103.9)), module, DrumPlayerPlus::LIMIT_SWITCH+i));
-				addParam(createParamCentered<CKSS>(mm2px(Vec(17.9+(xDelta*i), 103.9)), module, DrumPlayerPlus::CHOKE_SWITCH+i));
+				addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(9.9+(xDelta*i), buttonsYpos)), module, DrumPlayerXtra::LIMIT_PARAMS+i, DrumPlayerXtra::LIMIT_LIGHT+i));
+				addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(19.95+(xDelta*i), buttonsYpos)), module, DrumPlayerXtra::CHOKE_PARAMS+i, DrumPlayerXtra::CHOKE_LIGHT+i));
 			} else {
-				addParam(createParamCentered<CKSS>(mm2px(Vec(5+7.9+(xDelta*i), 103.9)), module, DrumPlayerPlus::LIMIT_SWITCH+i));
+				addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(5+9.9+(xDelta*i), buttonsYpos)), module, DrumPlayerXtra::LIMIT_PARAMS+i, DrumPlayerXtra::LIMIT_LIGHT+i));
 			}
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 117)), module, DrumPlayerPlus::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.9+(xDelta*i), 117)), module, DrumPlayerXtra::OUT_OUTPUT+i));
 		}
 	}
 
 	struct ClearSlotsItem : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			for (int i = 0; i < 4; i++)
 				module->clearSlot(i);
@@ -1308,35 +1541,35 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 	};
 
 	struct ClearSlot1Item : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(0);
 		}
 	};
 
 	struct ClearSlot2Item : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(1);
 		}
 	};
 
 	struct ClearSlot3Item : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(2);
 		}
 	};
 
 	struct ClearSlot4Item : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->clearSlot(3);
 		}
 	};
 
 	struct RefreshUserFolderItem : MenuItem {
-		DrumPlayerPlus *module;
+		DrumPlayerXtra *module;
 		void onAction(const event::Action &e) override {
 			module->folderTreeData.clear();
 			module->folderTreeDisplay.clear();
@@ -1347,11 +1580,11 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 	};
 
 	void appendContextMenu(Menu *menu) override {
-	   	DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+	   	DrumPlayerXtra *module = dynamic_cast<DrumPlayerXtra*>(this->module);
 			assert(module);
 			menu->addChild(new MenuSeparator());
 
-		DrumPlayerPlusItem1 *rootDirItem1 = new DrumPlayerPlusItem1;
+		DrumPlayerXtraItem1 *rootDirItem1 = new DrumPlayerXtraItem1;
 			menu->addChild(createMenuLabel("Sample Slots"));
 			rootDirItem1->text = "1: " + module->fileDescription[0];
 			rootDirItem1->rm = module;
@@ -1359,21 +1592,21 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 
 		menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear #1", &ClearSlot1Item::module, module));
 
-		DrumPlayerPlusItem2 *rootDirItem2 = new DrumPlayerPlusItem2;
+		DrumPlayerXtraItem2 *rootDirItem2 = new DrumPlayerXtraItem2;
 			rootDirItem2->text = "2: " + module->fileDescription[1];
 			rootDirItem2->rm = module;
 			menu->addChild(rootDirItem2);
 
 		menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear #2", &ClearSlot2Item::module, module));
 		
-		DrumPlayerPlusItem3 *rootDirItem3 = new DrumPlayerPlusItem3;
+		DrumPlayerXtraItem3 *rootDirItem3 = new DrumPlayerXtraItem3;
 			rootDirItem3->text = "3: " + module->fileDescription[2];
 			rootDirItem3->rm = module;
 			menu->addChild(rootDirItem3);
 
 		menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear #3", &ClearSlot3Item::module, module));
 		
-		DrumPlayerPlusItem4 *rootDirItem4 = new DrumPlayerPlusItem4;
+		DrumPlayerXtraItem4 *rootDirItem4 = new DrumPlayerXtraItem4;
 			rootDirItem4->text = "4: " + module->fileDescription[3];
 			rootDirItem4->rm = module;
 			menu->addChild(rootDirItem4);
@@ -1384,7 +1617,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		menu->addChild(construct<ClearSlotsItem>(&MenuItem::text, "Clear ALL slots", &ClearSlotsItem::module, module));
 		menu->addChild(new MenuSeparator());
 
-		DrumPlayerPlusInitializeUserFolder *rootFolder = new DrumPlayerPlusInitializeUserFolder;
+		DrumPlayerXtraInitializeUserFolder *rootFolder = new DrumPlayerXtraInitializeUserFolder;
 			rootFolder->text = "Select Samples Root";
 			rootFolder->rm = module;
 			menu->addChild(rootFolder);
@@ -1396,7 +1629,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 
 		menu->addChild(createMenuLabel("Interpolation"));
 		struct ModeItem : MenuItem {
-			DrumPlayerPlus* module;
+			DrumPlayerXtra* module;
 			int interpolationMode;
 			void onAction(const event::Action& e) override {
 				module->interpolationMode = interpolationMode;
@@ -1417,7 +1650,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Outs mode"));
 		struct OutsItem : MenuItem {
-			DrumPlayerPlus* module;
+			DrumPlayerXtra* module;
 			int outsMode;
 			void onAction(const event::Action& e) override {
 				module->outsMode = outsMode;
@@ -1433,7 +1666,8 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Scrolling displays", "", &module->scrolling));
+		menu->addChild(createBoolPtrMenuItem("Light Boxes", "", &module->lightBox));
 	}
 };
 
-Model *modelDrumPlayerPlus = createModel<DrumPlayerPlus, DrumPlayerPlusWidget>("DrumPlayerPlus");
+Model *modelDrumPlayerXtra = createModel<DrumPlayerXtra, DrumPlayerXtraWidget>("DrumPlayerXtra");
