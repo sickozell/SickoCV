@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta9
+# SickoCV v2.5.2-beta10
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -32,10 +32,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added XFD knob  
 - moved factory presets to module context menu  
 
-# SickoCV v2.5.2-beta9
+# SickoCV v2.5.2-beta10
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/219940320-71f4c2c7-143c-4d4c-9bfc-3a288cbce11c.JPG)
+![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/220755708-b9249c76-22a8-4bbb-978f-442ca079e0ba.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -230,10 +230,10 @@ Example of Drummer4 module usage:
 - **Drummer4+ note:**  
 Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to parameter knobs.
 
-## DrumPlayer DrumPlayer+
+## DrumPlayer DrumPlayer+ DrumPlayerXtra
 ### 4 channel Drum Sample Player with accent and choke functionality
 
-![drumplayer](https://user-images.githubusercontent.com/80784296/212537149-9a38032b-694f-488e-86b5-31bdfad43c7b.JPG)
+![drumplayer](https://user-images.githubusercontent.com/80784296/220755838-70d1bd74-5917-4047-b620-1ae2d633d056.JPG)
 
 #### INSTRUCTIONS  
 Load wav samples in the slots using context menu.  
@@ -246,6 +246,8 @@ External modulation is allowed only on drumPlayer+
 
 If CHOKE switch is on when TRIG occurs, the playback of next slot is stopped with a 1ms fade out: it's commonly used to simulate a closed/open hihat.  
 LIM switch is a hard clipping limiter to ±5v on the output.  
+
+NOTE: input trigger threshold is +1v.  
 
 #### CONTEXT MENU
 **Sample Slots**  
@@ -271,10 +273,11 @@ Normalled (default): if one slot out is not connected, its output will be added 
 Solo: every slot has its own out socket  
 Unconnected on Out 4: Every unconnected out is routed to out n.4
 
-**Scrolling Displays** (drumPlayer+ only)  
+**Scrolling Displays** (drumPlayer+ and drumPlayerXtra only)  
 This option enables text scrolling on sample name displays  
 
-NOTE: input trigger threshold is +1v.  
+**Light Boxes** (drumPlayerXtra only)  
+This option enables light fading boxes on waveform displays on sample triggering. When enabled, into each slot context menu the color of light can be chosen 
 
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
