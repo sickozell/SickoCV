@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta10
+# SickoCV v2.5.2-beta13
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -12,13 +12,14 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
+- **DrumPlayerXtra (NEW!!!)**
 - **SickoSampler (NEW!!!)**
 - **SickoPlayer**
 - **DrumPlayer**
 - **DrumPlayer+**
 
 ## **to do list:** 
-- ~~add to context menu a user folder browser feature to drumPlayer, drumPlayer+, sickoPlayer, sickoSampler~~
+- nothing in queue  
 
 ## **changelog**  
 - added subfolder navigation on sample player modules  
@@ -32,10 +33,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added XFD knob  
 - moved factory presets to module context menu  
 
-# SickoCV v2.5.2-beta10
+# SickoCV v2.5.2-beta13
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/220755708-b9249c76-22a8-4bbb-978f-442ca079e0ba.JPG)
+![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/221338090-8831ad42-1a7c-4490-b4e0-2aaf9dde1db8.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -233,7 +234,7 @@ Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to para
 ## DrumPlayer DrumPlayer+ DrumPlayerXtra
 ### 4 channel Drum Sample Player with accent and choke functionality
 
-![drumplayer](https://user-images.githubusercontent.com/80784296/220755838-70d1bd74-5917-4047-b620-1ae2d633d056.JPG)
+![drumplayer](https://user-images.githubusercontent.com/80784296/221338110-d550144f-4e34-475d-9b00-00872910f331.JPG)
 
 #### INSTRUCTIONS  
 Load wav samples in the slots using context menu.  
@@ -273,11 +274,15 @@ Normalled (default): if one slot out is not connected, its output will be added 
 Solo: every slot has its own out socket  
 Unconnected on Out 4: Every unconnected out is routed to out n.4
 
-**Scrolling Displays** (drumPlayer+ and drumPlayerXtra only)  
+**Scrolling Sample Names** (drumPlayer+ and drumPlayerXtra only)  
 This option enables text scrolling on sample name displays  
 
 **Light Boxes** (drumPlayerXtra only)  
-This option enables light fading boxes on waveform displays on sample triggering. When enabled, into each slot context menu the color of light can be chosen 
+This option enables a light box over waveform displays when sample is triggered.  
+When enebled, in each slot context menu light color and fade duration can be set.
+
+**Display Triggering** (drumPlayerXtra only)  
+This option enables sample triggering by clicking over the the display area.
 
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
