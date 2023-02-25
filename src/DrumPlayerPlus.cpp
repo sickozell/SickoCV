@@ -626,7 +626,8 @@ struct DrumPlayerPlus : Module {
 				break;
 			}
 
-			if (!inputs[TRIG_INPUT+i].isConnected())
+			//if (!inputs[TRIG_INPUT+i].isConnected())
+			if (!outputs[OUT_OUTPUT+i].isConnected())
 				play[i] = false;
 		}
 	}
@@ -1432,7 +1433,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			menu->addChild(outsItem);
 		}
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Scrolling displays", "", &module->scrolling));
+		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
 	}
 };
 

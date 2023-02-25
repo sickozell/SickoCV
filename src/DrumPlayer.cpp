@@ -507,7 +507,8 @@ struct DrumPlayer : Module {
 				break;
 			}
 
-			if (!inputs[TRIG_INPUT+i].isConnected())
+			//if (!inputs[TRIG_INPUT+i].isConnected())
+			if (!outputs[OUT_OUTPUT+i].isConnected())
 				play[i] = false;
 		}
 	}

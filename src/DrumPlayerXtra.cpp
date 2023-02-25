@@ -107,8 +107,13 @@ struct DrumPlayerXtra : Module {
 	int outsMode = 0;
 	int antiAlias = 1;
 	int scrolling = 1;
+	int displayTrig = 1;
 	int lightBox = true;
 	int colorBox[4] = {0,1,2,3};
+	int colorBoxR[4] = {0,255,255,0};
+	int colorBoxG[4] = {0,0,255,255};
+	int colorBoxB[4] = {255,0,0,0};
+	int lightTime[4] = {1,1,1,1};
 
 	int zoom[4] = {0,0,0,0};
 	float displayCoeff[4];
@@ -119,6 +124,8 @@ struct DrumPlayerXtra : Module {
 	bool prevNextSample[4] = {false, false, false, false};
 	bool prevSample[4] = {false, false, false, false};
 	bool prevPrevSample[4] = {false, false, false, false};
+
+	bool uiTrig[4] = {false, false, false, false};
 
 	//std::string debugDisplay = "X";
 	//int debugCount = 0;
@@ -208,6 +215,7 @@ struct DrumPlayerXtra : Module {
 		outsMode = NORMALLED_OUTS;
 		scrolling = 1;
 		lightBox = true;
+		displayTrig = 1;
 		for (int i = 0; i < 4; i++) {
 			clearSlot(i);
 			play[i] = false;
@@ -232,10 +240,27 @@ struct DrumPlayerXtra : Module {
 		json_object_set_new(rootJ, "OutsMode", json_integer(outsMode));
 		json_object_set_new(rootJ, "Scrolling", json_integer(scrolling));
 		json_object_set_new(rootJ, "LightBox", json_integer(lightBox));
+		json_object_set_new(rootJ, "DisplayTrig", json_integer(displayTrig));
 		json_object_set_new(rootJ, "Color1", json_integer(colorBox[0]));
+		json_object_set_new(rootJ, "Color1R", json_integer(colorBoxR[0]));
+		json_object_set_new(rootJ, "Color1G", json_integer(colorBoxG[0]));
+		json_object_set_new(rootJ, "Color1B", json_integer(colorBoxB[0]));
 		json_object_set_new(rootJ, "Color2", json_integer(colorBox[1]));
+		json_object_set_new(rootJ, "Color2R", json_integer(colorBoxR[1]));
+		json_object_set_new(rootJ, "Color2G", json_integer(colorBoxG[1]));
+		json_object_set_new(rootJ, "Color2B", json_integer(colorBoxB[1]));
 		json_object_set_new(rootJ, "Color3", json_integer(colorBox[2]));
+		json_object_set_new(rootJ, "Color3R", json_integer(colorBoxR[2]));
+		json_object_set_new(rootJ, "Color3G", json_integer(colorBoxG[2]));
+		json_object_set_new(rootJ, "Color3B", json_integer(colorBoxB[2]));
 		json_object_set_new(rootJ, "Color4", json_integer(colorBox[3]));
+		json_object_set_new(rootJ, "Color4R", json_integer(colorBoxR[3]));
+		json_object_set_new(rootJ, "Color4G", json_integer(colorBoxG[3]));
+		json_object_set_new(rootJ, "Color4B", json_integer(colorBoxB[3]));
+		json_object_set_new(rootJ, "Light1", json_integer(lightTime[0]));
+		json_object_set_new(rootJ, "Light2", json_integer(lightTime[1]));
+		json_object_set_new(rootJ, "Light3", json_integer(lightTime[2]));
+		json_object_set_new(rootJ, "Light4", json_integer(lightTime[3]));
 		json_object_set_new(rootJ, "Zoom1", json_integer(zoom[0]));
 		json_object_set_new(rootJ, "Zoom2", json_integer(zoom[1]));
 		json_object_set_new(rootJ, "Zoom3", json_integer(zoom[2]));
@@ -269,21 +294,89 @@ struct DrumPlayerXtra : Module {
 		if (lightBoxJ)
 			lightBox = json_integer_value(lightBoxJ);
 
+		json_t* displayTrigJ = json_object_get(rootJ, "DisplayTrig");
+		if (displayTrigJ)
+			displayTrig = json_integer_value(displayTrigJ);
+
 		json_t* color1J = json_object_get(rootJ, "Color1");
 		if (color1J)
 			colorBox[0] = json_integer_value(color1J);
+
+		json_t* color1RJ = json_object_get(rootJ, "Color1R");
+		if (color1RJ)
+			colorBoxR[0] = json_integer_value(color1RJ);
+
+		json_t* color1GJ = json_object_get(rootJ, "Color1G");
+		if (color1GJ)
+			colorBoxG[0] = json_integer_value(color1GJ);
+
+		json_t* color1BJ = json_object_get(rootJ, "Color1B");
+		if (color1BJ)
+			colorBoxB[0] = json_integer_value(color1BJ);
 
 		json_t* color2J = json_object_get(rootJ, "Color2");
 		if (color2J)
 			colorBox[1] = json_integer_value(color2J);
 
+		json_t* color2RJ = json_object_get(rootJ, "Color2R");
+		if (color2RJ)
+			colorBoxR[1] = json_integer_value(color2RJ);
+
+		json_t* color2GJ = json_object_get(rootJ, "Color2G");
+		if (color2GJ)
+			colorBoxG[1] = json_integer_value(color2GJ);
+
+		json_t* color2BJ = json_object_get(rootJ, "Color2B");
+		if (color2BJ)
+			colorBoxB[1] = json_integer_value(color2BJ);
+
 		json_t* color3J = json_object_get(rootJ, "Color3");
 		if (color3J)
 			colorBox[2] = json_integer_value(color3J);
 
+		json_t* color3RJ = json_object_get(rootJ, "Color3R");
+		if (color3RJ)
+			colorBoxR[2] = json_integer_value(color3RJ);
+
+		json_t* color3GJ = json_object_get(rootJ, "Color3G");
+		if (color3GJ)
+			colorBoxG[2] = json_integer_value(color3GJ);
+
+		json_t* color3BJ = json_object_get(rootJ, "Color3B");
+		if (color3BJ)
+			colorBoxB[2] = json_integer_value(color3BJ);
+
 		json_t* color4J = json_object_get(rootJ, "Color4");
 		if (color4J)
 			colorBox[3] = json_integer_value(color4J);
+
+		json_t* color4RJ = json_object_get(rootJ, "Color4R");
+		if (color4RJ)
+			colorBoxR[3] = json_integer_value(color4RJ);
+
+		json_t* color4GJ = json_object_get(rootJ, "Color4G");
+		if (color4GJ)
+			colorBoxG[3] = json_integer_value(color4GJ);
+
+		json_t* color4BJ = json_object_get(rootJ, "Color4B");
+		if (color4BJ)
+			colorBoxB[3] = json_integer_value(color4BJ);
+
+		json_t* light1J = json_object_get(rootJ, "Light1");
+		if (light1J)
+			lightTime[0] = json_integer_value(light1J);
+
+		json_t* light2J = json_object_get(rootJ, "Light2");
+		if (light2J)
+			lightTime[1] = json_integer_value(light2J);
+
+		json_t* light3J = json_object_get(rootJ, "Light3");
+		if (light3J)
+			lightTime[2] = json_integer_value(light3J);
+
+		json_t* light4J = json_object_get(rootJ, "Light4");
+		if (light4J)
+			lightTime[3] = json_integer_value(light4J);
 
 		json_t* zoom1J = json_object_get(rootJ, "Zoom1");
 		if (zoom1J)
@@ -494,7 +587,6 @@ struct DrumPlayerXtra : Module {
 					displayCoeff[slot] = abs(pSampleData[i]);
 			}
 			displayCoeff[slot] *= 2;
-			//debugDisplay = to_string(displayCoeff[slot]);
 
 			totalSampleC[slot] = playBuffer[slot][0].size();
 			totalSamples[slot] = totalSampleC[slot]-1;
@@ -619,7 +711,8 @@ struct DrumPlayerXtra : Module {
 
 			trigValue[i] = inputs[TRIG_INPUT+i].getVoltage();
 
-			if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
+			if ((trigValue[i] >= 1 && prevTrigValue[i] < 1) || uiTrig[i]) {
+				uiTrig[i] = false;
 				if (play[i]) {
 					fading[i] = true;
 					fadingValue[i] = 1.f;
@@ -828,7 +921,8 @@ struct DrumPlayerXtra : Module {
 				break;
 			}
 
-			if (!inputs[TRIG_INPUT+i].isConnected())
+			//if (!inputs[TRIG_INPUT+i].isConnected())
+			if (!outputs[OUT_OUTPUT+i].isConnected())
 				play[i] = false;
 		}
 	}
@@ -964,10 +1058,122 @@ struct dpxSlot1Display : TransparentWidget {
 		}
 	};
 
+	struct LightTimeItem : MenuItem {
+		DrumPlayerXtra* module;
+		int lightTime;
+		void onAction(const event::Action& e) override {
+			module->lightTime[0] = lightTime;
+		}
+	};
+
+	struct labelTextFieldR : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldR(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxR[column] = 0;
+						else if (color > 255)
+							module->colorBoxR[column] = 255;
+						else
+							module->colorBoxR[column] = color;
+					} else {
+						module->colorBoxR[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxR[column] = 0;
+		};
+	};
+
+	struct labelTextFieldG : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldG(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxG[column] = 0;
+						else if (color > 255)
+							module->colorBoxG[column] = 255;
+						else
+							module->colorBoxG[column] = color;
+					} else {
+						module->colorBoxG[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxG[column] = 0;
+		};
+	};
+
+	struct labelTextFieldB : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldB(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxB[column] = 0;
+						else if (color > 255)
+							module->colorBoxB[column] = 255;
+						else
+							module->colorBoxB[column] = color;
+					} else {
+						module->colorBoxB[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxB[column] = 0;
+		};
+	};
 
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+			if (module->displayTrig)
+				module->uiTrig[0] = true;
 			e.consume(this);
+		}
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -1030,6 +1236,7 @@ struct dpxSlot1Display : TransparentWidget {
 				menu->addChild(rootDirItem);
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "",
 					[=](Menu* menu) {
 						module->folderTreeData.resize(1);
@@ -1049,23 +1256,13 @@ struct dpxSlot1Display : TransparentWidget {
 				));
 			}
 			if (module->fileLoaded[0]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[0]));
 				menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear", &ClearSlot1Item::module, module));
 			}
-			if (module->lightBox) {
-				menu->addChild(createSubmenuItem("Light Box Color", "",
-					[=](Menu* menu) {
-						std::string colorNames[4] = {"Blue", "Red", "Yellow", "Green"};
-						for (int i = 0; i < 4; i++) {
-							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
-							colorItem->rightText = CHECKMARK(module->colorBox[0] == i);
-							colorItem->module = module;
-							colorItem->colorBox = i;
-							menu->addChild(colorItem);
-						}
-					}));
-			}
+
+			menu->addChild(new MenuSeparator());
 			menu->addChild(createSubmenuItem("Zoom Waveform", "",
 				[=](Menu* menu) {
 					std::string zoomNames[4] = {"Full", "Half", "Quarter", "Eighth"};
@@ -1077,6 +1274,73 @@ struct dpxSlot1Display : TransparentWidget {
 						menu->addChild(zoomItem);
 					}
 				}));
+
+			if (module->lightBox) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createSubmenuItem("Light Box Color", "",
+					[=](Menu* menu) {
+						std::string colorNames[5] = {"Blue", "Red", "Yellow", "Green", "Custom"};
+						for (int i = 0; i < 5; i++) {
+							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
+							colorItem->rightText = CHECKMARK(module->colorBox[0] == i);
+							colorItem->module = module;
+							colorItem->colorBox = i;
+							menu->addChild(colorItem);
+						}
+						menu->addChild(new MenuSeparator());
+						menu->addChild(createMenuLabel("Custom Color:"));
+
+						auto holderR = new rack::Widget;
+						holderR->box.size.x = 50;
+						holderR->box.size.y = 20;
+						auto labR = new rack::Label;
+						labR->text = "R :";
+						labR->box.size = 60;
+						holderR->addChild(labR);
+						auto textfieldR = new labelTextFieldR(0);
+						textfieldR->module = module;
+						textfieldR->text = to_string(module->colorBoxR[0]);
+						holderR->addChild(textfieldR);
+						menu->addChild(holderR);
+
+						auto holderG = new rack::Widget;
+						holderG->box.size.x = 30;
+						holderG->box.size.y = 20;
+						auto labG = new rack::Label;
+						labG->text = "G :";
+						labG->box.size = 40;
+						holderG->addChild(labG);
+						auto textfieldG = new labelTextFieldG(0);
+						textfieldG->module = module;
+						textfieldG->text = to_string(module->colorBoxG[0]);
+						holderG->addChild(textfieldG);
+						menu->addChild(holderG);
+
+						auto holderB = new rack::Widget;
+						holderB->box.size.x = 30;
+						holderB->box.size.y = 20;
+						auto labB = new rack::Label;
+						labB->text = "B :";
+						labB->box.size = 40;
+						holderB->addChild(labB);
+						auto textfieldB = new labelTextFieldB(0);
+						textfieldB->module = module;
+						textfieldB->text = to_string(module->colorBoxB[0]);
+						holderB->addChild(textfieldB);
+						menu->addChild(holderB);
+					}));
+				menu->addChild(createSubmenuItem("Light Box Fade", "",
+					[=](Menu* menu) {
+						std::string timeNames[3] = {"Slow (0.5s)", "Normal (0.25s)", "Fast (0.1s)"};
+						for (int i = 0; i < 3; i++) {
+							LightTimeItem* lightTimeItem = createMenuItem<LightTimeItem>(timeNames[i]);
+							lightTimeItem->rightText = CHECKMARK(module->lightTime[0] == i);
+							lightTimeItem->module = module;
+							lightTimeItem->lightTime = i;
+							menu->addChild(lightTimeItem);
+						}
+					}));
+			}
 		}
 	}
 };
@@ -1113,9 +1377,122 @@ struct dpxSlot2Display : TransparentWidget {
 		}
 	};
 
+	struct LightTimeItem : MenuItem {
+		DrumPlayerXtra* module;
+		int lightTime;
+		void onAction(const event::Action& e) override {
+			module->lightTime[1] = lightTime;
+		}
+	};
+
+	struct labelTextFieldR : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldR(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxR[column] = 0;
+						else if (color > 255)
+							module->colorBoxR[column] = 255;
+						else
+							module->colorBoxR[column] = color;
+					} else {
+						module->colorBoxR[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxR[column] = 0;
+		};
+	};
+
+	struct labelTextFieldG : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldG(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxG[column] = 0;
+						else if (color > 255)
+							module->colorBoxG[column] = 255;
+						else
+							module->colorBoxG[column] = color;
+					} else {
+						module->colorBoxG[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxG[column] = 0;
+		};
+	};
+
+	struct labelTextFieldB : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldB(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxB[column] = 0;
+						else if (color > 255)
+							module->colorBoxB[column] = 255;
+						else
+							module->colorBoxB[column] = color;
+					} else {
+						module->colorBoxB[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxB[column] = 0;
+		};
+	};
+
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+			if (module->displayTrig)
+				module->uiTrig[1] = true;
 			e.consume(this);
+		}
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -1178,6 +1555,7 @@ struct dpxSlot2Display : TransparentWidget {
 				menu->addChild(rootDirItem);
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "",
 					[=](Menu* menu) {
 						module->folderTreeData.resize(1);
@@ -1197,23 +1575,13 @@ struct dpxSlot2Display : TransparentWidget {
 				));
 			}
 			if (module->fileLoaded[1]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[1]));
 				menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear", &ClearSlot2Item::module, module));
 			}
-			if (module->lightBox) {
-				menu->addChild(createSubmenuItem("Light Box Color", "",
-					[=](Menu* menu) {
-						std::string colorNames[4] = {"Blue", "Red", "Yellow", "Green"};
-						for (int i = 0; i < 4; i++) {
-							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
-							colorItem->rightText = CHECKMARK(module->colorBox[1] == i);
-							colorItem->module = module;
-							colorItem->colorBox = i;
-							menu->addChild(colorItem);
-						}
-					}));
-			}
+
+			menu->addChild(new MenuSeparator());
 			menu->addChild(createSubmenuItem("Zoom Waveform", "",
 				[=](Menu* menu) {
 					std::string zoomNames[4] = {"Full", "Half", "Quarter", "Eighth"};
@@ -1225,6 +1593,73 @@ struct dpxSlot2Display : TransparentWidget {
 						menu->addChild(zoomItem);
 					}
 				}));
+
+			if (module->lightBox) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createSubmenuItem("Light Box Color", "",
+					[=](Menu* menu) {
+						std::string colorNames[5] = {"Blue", "Red", "Yellow", "Green", "Custom"};
+						for (int i = 0; i < 5; i++) {
+							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
+							colorItem->rightText = CHECKMARK(module->colorBox[1] == i);
+							colorItem->module = module;
+							colorItem->colorBox = i;
+							menu->addChild(colorItem);
+						}
+						menu->addChild(new MenuSeparator());
+						menu->addChild(createMenuLabel("Custom Color:"));
+
+						auto holderR = new rack::Widget;
+						holderR->box.size.x = 50;
+						holderR->box.size.y = 20;
+						auto labR = new rack::Label;
+						labR->text = "R :";
+						labR->box.size = 60;
+						holderR->addChild(labR);
+						auto textfieldR = new labelTextFieldR(1);
+						textfieldR->module = module;
+						textfieldR->text = to_string(module->colorBoxR[1]);
+						holderR->addChild(textfieldR);
+						menu->addChild(holderR);
+
+						auto holderG = new rack::Widget;
+						holderG->box.size.x = 30;
+						holderG->box.size.y = 20;
+						auto labG = new rack::Label;
+						labG->text = "G :";
+						labG->box.size = 40;
+						holderG->addChild(labG);
+						auto textfieldG = new labelTextFieldG(1);
+						textfieldG->module = module;
+						textfieldG->text = to_string(module->colorBoxG[1]);
+						holderG->addChild(textfieldG);
+						menu->addChild(holderG);
+
+						auto holderB = new rack::Widget;
+						holderB->box.size.x = 30;
+						holderB->box.size.y = 20;
+						auto labB = new rack::Label;
+						labB->text = "B :";
+						labB->box.size = 40;
+						holderB->addChild(labB);
+						auto textfieldB = new labelTextFieldB(1);
+						textfieldB->module = module;
+						textfieldB->text = to_string(module->colorBoxB[1]);
+						holderB->addChild(textfieldB);
+						menu->addChild(holderB);
+					}));
+				menu->addChild(createSubmenuItem("Light Box Fade", "",
+					[=](Menu* menu) {
+						std::string timeNames[3] = {"Slow (0.5s)", "Normal (0.25s)", "Fast (0.1s)"};
+						for (int i = 0; i < 3; i++) {
+							LightTimeItem* lightTimeItem = createMenuItem<LightTimeItem>(timeNames[i]);
+							lightTimeItem->rightText = CHECKMARK(module->lightTime[1] == i);
+							lightTimeItem->module = module;
+							lightTimeItem->lightTime = i;
+							menu->addChild(lightTimeItem);
+						}
+					}));
+			}
 		}
 	}
 };
@@ -1261,9 +1696,122 @@ struct dpxSlot3Display : TransparentWidget {
 		}
 	};
 
+	struct LightTimeItem : MenuItem {
+		DrumPlayerXtra* module;
+		int lightTime;
+		void onAction(const event::Action& e) override {
+			module->lightTime[2] = lightTime;
+		}
+	};
+
+	struct labelTextFieldR : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldR(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxR[column] = 0;
+						else if (color > 255)
+							module->colorBoxR[column] = 255;
+						else
+							module->colorBoxR[column] = color;
+					} else {
+						module->colorBoxR[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxR[column] = 0;
+		};
+	};
+
+	struct labelTextFieldG : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldG(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxG[column] = 0;
+						else if (color > 255)
+							module->colorBoxG[column] = 255;
+						else
+							module->colorBoxG[column] = color;
+					} else {
+						module->colorBoxG[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxG[column] = 0;
+		};
+	};
+
+	struct labelTextFieldB : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldB(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxB[column] = 0;
+						else if (color > 255)
+							module->colorBoxB[column] = 255;
+						else
+							module->colorBoxB[column] = color;
+					} else {
+						module->colorBoxB[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxB[column] = 0;
+		};
+	};
+
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+			if (module->displayTrig)
+				module->uiTrig[2] = true;
 			e.consume(this);
+		}
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -1326,6 +1874,7 @@ struct dpxSlot3Display : TransparentWidget {
 				menu->addChild(rootDirItem);
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "",
 					[=](Menu* menu) {
 						module->folderTreeData.resize(1);
@@ -1345,23 +1894,13 @@ struct dpxSlot3Display : TransparentWidget {
 				));
 			}
 			if (module->fileLoaded[2]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[2]));
 				menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear", &ClearSlot3Item::module, module));
 			}
-			if (module->lightBox) {
-				menu->addChild(createSubmenuItem("Light Box Color", "",
-					[=](Menu* menu) {
-						std::string colorNames[4] = {"Blue", "Red", "Yellow", "Green"};
-						for (int i = 0; i < 4; i++) {
-							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
-							colorItem->rightText = CHECKMARK(module->colorBox[2] == i);
-							colorItem->module = module;
-							colorItem->colorBox = i;
-							menu->addChild(colorItem);
-						}
-					}));
-			}
+
+			menu->addChild(new MenuSeparator());
 			menu->addChild(createSubmenuItem("Zoom Waveform", "",
 				[=](Menu* menu) {
 					std::string zoomNames[4] = {"Full", "Half", "Quarter", "Eighth"};
@@ -1373,6 +1912,73 @@ struct dpxSlot3Display : TransparentWidget {
 						menu->addChild(zoomItem);
 					}
 				}));
+
+			if (module->lightBox) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createSubmenuItem("Light Box Color", "",
+					[=](Menu* menu) {
+						std::string colorNames[5] = {"Blue", "Red", "Yellow", "Green", "Custom"};
+						for (int i = 0; i < 5; i++) {
+							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
+							colorItem->rightText = CHECKMARK(module->colorBox[2] == i);
+							colorItem->module = module;
+							colorItem->colorBox = i;
+							menu->addChild(colorItem);
+						}
+						menu->addChild(new MenuSeparator());
+						menu->addChild(createMenuLabel("Custom Color:"));
+
+						auto holderR = new rack::Widget;
+						holderR->box.size.x = 50;
+						holderR->box.size.y = 20;
+						auto labR = new rack::Label;
+						labR->text = "R :";
+						labR->box.size = 60;
+						holderR->addChild(labR);
+						auto textfieldR = new labelTextFieldR(2);
+						textfieldR->module = module;
+						textfieldR->text = to_string(module->colorBoxR[2]);
+						holderR->addChild(textfieldR);
+						menu->addChild(holderR);
+
+						auto holderG = new rack::Widget;
+						holderG->box.size.x = 30;
+						holderG->box.size.y = 20;
+						auto labG = new rack::Label;
+						labG->text = "G :";
+						labG->box.size = 40;
+						holderG->addChild(labG);
+						auto textfieldG = new labelTextFieldG(2);
+						textfieldG->module = module;
+						textfieldG->text = to_string(module->colorBoxG[2]);
+						holderG->addChild(textfieldG);
+						menu->addChild(holderG);
+
+						auto holderB = new rack::Widget;
+						holderB->box.size.x = 30;
+						holderB->box.size.y = 20;
+						auto labB = new rack::Label;
+						labB->text = "B :";
+						labB->box.size = 40;
+						holderB->addChild(labB);
+						auto textfieldB = new labelTextFieldB(2);
+						textfieldB->module = module;
+						textfieldB->text = to_string(module->colorBoxB[2]);
+						holderB->addChild(textfieldB);
+						menu->addChild(holderB);
+					}));
+				menu->addChild(createSubmenuItem("Light Box Fade", "",
+					[=](Menu* menu) {
+						std::string timeNames[3] = {"Slow (0.5s)", "Normal (0.25s)", "Fast (0.1s)"};
+						for (int i = 0; i < 3; i++) {
+							LightTimeItem* lightTimeItem = createMenuItem<LightTimeItem>(timeNames[i]);
+							lightTimeItem->rightText = CHECKMARK(module->lightTime[2] == i);
+							lightTimeItem->module = module;
+							lightTimeItem->lightTime = i;
+							menu->addChild(lightTimeItem);
+						}
+					}));
+			}
 		}
 	}
 };
@@ -1409,9 +2015,122 @@ struct dpxSlot4Display : TransparentWidget {
 		}
 	};
 
+	struct LightTimeItem : MenuItem {
+		DrumPlayerXtra* module;
+		int lightTime;
+		void onAction(const event::Action& e) override {
+			module->lightTime[3] = lightTime;
+		}
+	};
+
+	struct labelTextFieldR : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldR(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxR[column] = 0;
+						else if (color > 255)
+							module->colorBoxR[column] = 255;
+						else
+							module->colorBoxR[column] = color;
+					} else {
+						module->colorBoxR[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxR[column] = 0;
+		};
+	};
+
+	struct labelTextFieldG : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldG(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxG[column] = 0;
+						else if (color > 255)
+							module->colorBoxG[column] = 255;
+						else
+							module->colorBoxG[column] = color;
+					} else {
+						module->colorBoxG[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxG[column] = 0;
+		};
+	};
+
+	struct labelTextFieldB : TextField {
+		DrumPlayerXtra *module;
+		unsigned int column = 0;
+		labelTextFieldB(unsigned int column) {
+			this->column = column;
+			this->box.pos.x = 30;
+			this->box.size.x = 30;
+			this->multiline = false;
+		}
+
+		void onChange(const event::Change& e) override {
+			if (text != "") {
+				if (text.length() > 3) {
+					text = text.substr(0,3);
+					rack::TextField::cursor = 3;
+					rack::TextField::selection = 3;
+				} else {
+					if (all_of(text.begin(), text.end(), ::isdigit)) {
+						int color = std::stoi(text);
+						if (color < 0 && color < 256)
+							module->colorBoxB[column] = 0;
+						else if (color > 255)
+							module->colorBoxB[column] = 255;
+						else
+							module->colorBoxB[column] = color;
+					} else {
+						module->colorBoxB[column] = 0;
+					}
+				}
+			} else 
+				module->colorBoxB[column] = 0;
+		};
+	};
+
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+			if (module->displayTrig)
+				module->uiTrig[3] = true;
 			e.consume(this);
+		}
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -1474,6 +2193,7 @@ struct dpxSlot4Display : TransparentWidget {
 				menu->addChild(rootDirItem);
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "",
 					[=](Menu* menu) {
 						module->folderTreeData.resize(1);
@@ -1493,23 +2213,13 @@ struct dpxSlot4Display : TransparentWidget {
 				));
 			}
 			if (module->fileLoaded[3]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[3]));
 				menu->addChild(construct<ClearSlot4Item>(&MenuItem::rightText, "Clear", &ClearSlot4Item::module, module));
 			}
-			if (module->lightBox) {
-				menu->addChild(createSubmenuItem("Light Box Color", "",
-					[=](Menu* menu) {
-						std::string colorNames[4] = {"Blue", "Red", "Yellow", "Green"};
-						for (int i = 0; i < 4; i++) {
-							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
-							colorItem->rightText = CHECKMARK(module->colorBox[3] == i);
-							colorItem->module = module;
-							colorItem->colorBox = i;
-							menu->addChild(colorItem);
-						}
-					}));
-			}
+
+			menu->addChild(new MenuSeparator());
 			menu->addChild(createSubmenuItem("Zoom Waveform", "",
 				[=](Menu* menu) {
 					std::string zoomNames[4] = {"Full", "Half", "Quarter", "Eighth"};
@@ -1521,6 +2231,73 @@ struct dpxSlot4Display : TransparentWidget {
 						menu->addChild(zoomItem);
 					}
 				}));
+			
+			if (module->lightBox) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createSubmenuItem("Light Box Color", "",
+					[=](Menu* menu) {
+						std::string colorNames[5] = {"Blue", "Red", "Yellow", "Green", "Custom"};
+						for (int i = 0; i < 5; i++) {
+							ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
+							colorItem->rightText = CHECKMARK(module->colorBox[3] == i);
+							colorItem->module = module;
+							colorItem->colorBox = i;
+							menu->addChild(colorItem);
+						}
+						menu->addChild(new MenuSeparator());
+						menu->addChild(createMenuLabel("Custom Color:"));
+
+						auto holderR = new rack::Widget;
+						holderR->box.size.x = 50;
+						holderR->box.size.y = 20;
+						auto labR = new rack::Label;
+						labR->text = "R :";
+						labR->box.size = 60;
+						holderR->addChild(labR);
+						auto textfieldR = new labelTextFieldR(3);
+						textfieldR->module = module;
+						textfieldR->text = to_string(module->colorBoxR[3]);
+						holderR->addChild(textfieldR);
+						menu->addChild(holderR);
+
+						auto holderG = new rack::Widget;
+						holderG->box.size.x = 30;
+						holderG->box.size.y = 20;
+						auto labG = new rack::Label;
+						labG->text = "G :";
+						labG->box.size = 40;
+						holderG->addChild(labG);
+						auto textfieldG = new labelTextFieldG(3);
+						textfieldG->module = module;
+						textfieldG->text = to_string(module->colorBoxG[3]);
+						holderG->addChild(textfieldG);
+						menu->addChild(holderG);
+
+						auto holderB = new rack::Widget;
+						holderB->box.size.x = 30;
+						holderB->box.size.y = 20;
+						auto labB = new rack::Label;
+						labB->text = "B :";
+						labB->box.size = 40;
+						holderB->addChild(labB);
+						auto textfieldB = new labelTextFieldB(3);
+						textfieldB->module = module;
+						textfieldB->text = to_string(module->colorBoxB[3]);
+						holderB->addChild(textfieldB);
+						menu->addChild(holderB);
+					}));
+				menu->addChild(createSubmenuItem("Light Box Fade", "",
+					[=](Menu* menu) {
+						std::string timeNames[3] = {"Slow (0.5s)", "Normal (0.25s)", "Fast (0.1s)"};
+						for (int i = 0; i < 3; i++) {
+							LightTimeItem* lightTimeItem = createMenuItem<LightTimeItem>(timeNames[i]);
+							lightTimeItem->rightText = CHECKMARK(module->lightTime[3] == i);
+							lightTimeItem->module = module;
+							lightTimeItem->lightTime = i;
+							menu->addChild(lightTimeItem);
+						}
+					}));
+			}
 		}
 	}
 };
@@ -1535,23 +2312,24 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 	float deltaTime;
 	float prevTime;
 
-	float boxMaxTime = 0.2f;
+	//float boxMaxTime = 0.2f;
 	float deltaBoxTime[4];
 	float startBoxTime[4];
 	int currAlpha[4] = {0,0,0,0};
-	float maxAlpha = 200;
+	float maxAlpha[4];
 
 	const int boxX[4] = {2, 87, 172, 258};
-	//const int boxY[4] = {2, 2, 2, 2};
-	const int boxY[4] = {13, 13, 13, 13};
-	const int boxW[4] = {59, 59, 59, 59};
-	const int boxH[4] = {30, 30, 30, 30};
+	const int boxY = 13;
+	const int boxW = 59;
+	const int boxH = 30;
 
 	const int colorR[4] = {0,255,255,0};
 	const int colorG[4] = {0,0,255,255};
 	const int colorB[4] = {255,0,0,0};
 
 	const float slotXpos[4] = {2,87,172,258};
+
+	const float lightTimeDur[3] = {0.5f, 0.25f, 0.1f};
 
 	DrumPlayerXtraDisplay() {
 
@@ -1622,9 +2400,7 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 						for (unsigned int i = 0; i < module->displayBuff[slot].size(); i++) {
 							float x, y;
 							x = (float)i / (module->displayBuff[slot].size() - 1);
-							//y = module->displayBuff[slot][i] / 2.0 + 0.5;	// used if playBuffer range is -1/+1
-							//y = module->displayBuff[slot][i] / 10.0 + 0.5; // used if playBuffer range is -5/+5
-							y = module->displayBuff[slot][i] / module->displayCoeff[slot] + 0.5;	// used if playBuffer range is -1/+1
+							y = module->displayBuff[slot][i] / module->displayCoeff[slot] + 0.5;
 							
 							Vec p;
 							p.x = b.pos.x + b.size.x * x;
@@ -1646,19 +2422,23 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 					// lightbox management
 					if (module->lightBox) {
 						if (module->slotTriggered[slot]) {
+							maxAlpha[slot] = 127.5f * module->level[slot];
 							module->slotTriggered[slot] = false;
-							currAlpha[slot] = maxAlpha;
+							currAlpha[slot] = maxAlpha[slot];
 							startBoxTime[slot] = currTime;
 							deltaBoxTime[slot] = 0;
 						}
 						if (currAlpha[slot] > 0) {
 							nvgBeginPath(args.vg);
-							nvgRoundedRect(args.vg, boxX[slot],boxY[slot], boxW[slot], boxH[slot], 4);
-							nvgFillColor(args.vg, nvgRGBA(colorR[module->colorBox[slot]], colorG[module->colorBox[slot]], colorB[module->colorBox[slot]], currAlpha[slot]));
-							//nvgFillColor(args.vg, nvgRGBA(boxR[slot], boxG[slot], boxB[slot], currAlpha[slot])); 
+							nvgRoundedRect(args.vg, boxX[slot],boxY, boxW, boxH, 4);
+							if (module->colorBox[slot] == 4)
+								nvgFillColor(args.vg, nvgRGBA(module->colorBoxR[slot], module->colorBoxG[slot], module->colorBoxB[slot], currAlpha[slot]));
+							else
+								nvgFillColor(args.vg, nvgRGBA(colorR[module->colorBox[slot]], colorG[module->colorBox[slot]], colorB[module->colorBox[slot]], currAlpha[slot]));
 							nvgFill(args.vg);
 							deltaBoxTime[slot] = currTime - startBoxTime[slot];
-							currAlpha[slot] = int((boxMaxTime - deltaBoxTime[slot]) * maxAlpha / boxMaxTime);
+							//currAlpha[slot] = int((boxMaxTime - deltaBoxTime[slot]) * maxAlpha[slot] / boxMaxTime);
+							currAlpha[slot] = int((lightTimeDur[module->lightTime[slot]] - deltaBoxTime[slot]) * maxAlpha[slot] / lightTimeDur[module->lightTime[slot]]);
 						}
 					}
 				}
@@ -1719,8 +2499,6 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 			addChild(display);
 		}
 
-
-		//float xDelta = 23.5;
 		const float xDelta = 28.95;
 		const float trigPos = 8.4;
 		const float accPos = 21.5;
@@ -1893,8 +2671,9 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 			menu->addChild(outsItem);
 		}
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Scrolling displays", "", &module->scrolling));
+		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
 		menu->addChild(createBoolPtrMenuItem("Light Boxes", "", &module->lightBox));
+		menu->addChild(createBoolPtrMenuItem("Display triggering", "", &module->displayTrig));
 	}
 };
 
