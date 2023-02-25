@@ -3013,8 +3013,8 @@ struct SickoSamplerDisplay : TransparentWidget {
 				nvgStrokeColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
 				{
 					nvgBeginPath(args.vg);
-					nvgMoveTo(args.vg, 7, 59.5);
-					nvgLineTo(args.vg, 302, 59.5);
+					nvgMoveTo(args.vg, 7, 58.5);
+					nvgLineTo(args.vg, 302, 58.5);
 					nvgClosePath(args.vg);
 				}
 				nvgStroke(args.vg);
@@ -3170,7 +3170,7 @@ struct SickoSamplerDisplay : TransparentWidget {
 				tempIndex = module->folderTreeData.size()-1;
 			}	
 		}
-		if (module->folderTreeData[tempIndex].size() > 2) {
+		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[tempIndex][i];
@@ -3454,7 +3454,7 @@ struct SickoSamplerWidget : ModuleWidget {
 				tempIndex = module->folderTreeData.size()-1;
 			}	
 		}
-		if (module->folderTreeData[tempIndex].size() > 2) {
+		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[tempIndex][i];

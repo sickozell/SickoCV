@@ -1,6 +1,15 @@
 checklist
 
+drumPlayerXtra
+- sistemare i bug del display samplename. Su nuovo modulo e caricamento, non mostra i nomi.
+- verificare funzionamento del browser
+- fare un menu reset
+- (fatto)far funzionare insieme il display triggering con gli output modes
+
 sickosampler
+- fare un menu reset
+- verificare funzionamento del browser
+-verificare bug sul browser
 - METTERE CURRENT FOLDER DOPO IL SALVATAGGIO
 - sistemare il salvataggio cue/loop region per il phase scan
 - registrazione senza overdub mentre si fa playback

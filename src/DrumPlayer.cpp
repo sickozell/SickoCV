@@ -507,8 +507,8 @@ struct DrumPlayer : Module {
 				break;
 			}
 
-			//if (!inputs[TRIG_INPUT+i].isConnected())
-			if (!outputs[OUT_OUTPUT+i].isConnected())
+			if (!inputs[TRIG_INPUT+i].isConnected())
+			//if (!outputs[OUT_OUTPUT+i].isConnected())
 				play[i] = false;
 		}
 	}
@@ -663,7 +663,7 @@ struct dpSlot1Display : TransparentWidget {
 				tempIndex = module->folderTreeData.size()-1;
 			}	
 		}
-		if (module->folderTreeData[tempIndex].size() > 2) {
+		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[tempIndex][i];
@@ -770,7 +770,7 @@ struct dpSlot2Display : TransparentWidget {
 				tempIndex = module->folderTreeData.size()-1;
 			}	
 		}
-		if (module->folderTreeData[tempIndex].size() > 2) {
+		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[tempIndex][i];
@@ -877,7 +877,7 @@ struct dpSlot3Display : TransparentWidget {
 				tempIndex = module->folderTreeData.size()-1;
 			}	
 		}
-		if (module->folderTreeData[tempIndex].size() > 2) {
+		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[tempIndex][i];
@@ -999,7 +999,7 @@ struct dpSlot4Display : TransparentWidget {
 				tempIndex = module->folderTreeData.size()-1;
 			}	
 		}
-		if (module->folderTreeData[tempIndex].size() > 2) {
+		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[tempIndex][i];
@@ -1124,7 +1124,7 @@ struct DrumPlayerWidget : ModuleWidget {
 				module->clearSlot(i);
 		}
 	};
-
+	/*
 	struct ClearSlot1Item : MenuItem {
 		DrumPlayer *module;
 		void onAction(const event::Action &e) override {
@@ -1152,6 +1152,7 @@ struct DrumPlayerWidget : ModuleWidget {
 			module->clearSlot(3);
 		}
 	};
+	*/
 
 	struct RefreshUserFolderItem : MenuItem {
 		DrumPlayer *module;
@@ -1175,28 +1176,28 @@ struct DrumPlayerWidget : ModuleWidget {
 			rootDirItem1->rm = module;
 			menu->addChild(rootDirItem1);
 
-		menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear #1", &ClearSlot1Item::module, module));
+		//menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear #1", &ClearSlot1Item::module, module));
 
 		DrumPlayerItem2 *rootDirItem2 = new DrumPlayerItem2;
 			rootDirItem2->text = std::to_string(2) + ": " + module->fileDescription[1];
 			rootDirItem2->rm = module;
 			menu->addChild(rootDirItem2);
 
-		menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear #2", &ClearSlot2Item::module, module));
+		//menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear #2", &ClearSlot2Item::module, module));
 		
 		DrumPlayerItem3 *rootDirItem3 = new DrumPlayerItem3;
 			rootDirItem3->text = std::to_string(3) + ": " + module->fileDescription[2];
 			rootDirItem3->rm = module;
 			menu->addChild(rootDirItem3);
 
-		menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear #3", &ClearSlot3Item::module, module));
+		//menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear #3", &ClearSlot3Item::module, module));
 		
 		DrumPlayerItem4 *rootDirItem4 = new DrumPlayerItem4;
 			rootDirItem4->text = std::to_string(4) + ": " + module->fileDescription[3];
 			rootDirItem4->rm = module;
 			menu->addChild(rootDirItem4);
 
-		menu->addChild(construct<ClearSlot4Item>(&MenuItem::rightText, "Clear #4", &ClearSlot4Item::module, module));
+		//menu->addChild(construct<ClearSlot4Item>(&MenuItem::rightText, "Clear #4", &ClearSlot4Item::module, module));
 			
 		menu->addChild(new MenuSeparator());
 		menu->addChild(construct<ClearSlotsItem>(&MenuItem::text, "Clear ALL slots", &ClearSlotsItem::module, module));
