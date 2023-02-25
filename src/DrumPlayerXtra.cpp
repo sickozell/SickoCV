@@ -2231,7 +2231,7 @@ struct dpxSlot4Display : TransparentWidget {
 						menu->addChild(zoomItem);
 					}
 				}));
-			
+
 			if (module->lightBox) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Light Box Color", "",
@@ -2422,7 +2422,7 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 					// lightbox management
 					if (module->lightBox) {
 						if (module->slotTriggered[slot]) {
-							maxAlpha[slot] = 127.5f * module->level[slot];
+							maxAlpha[slot] = 55 + (100 * module->level[slot]);
 							module->slotTriggered[slot] = false;
 							currAlpha[slot] = maxAlpha[slot];
 							startBoxTime[slot] = currTime;
