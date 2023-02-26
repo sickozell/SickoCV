@@ -2449,16 +2449,45 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 				module->folderTreeDisplay.clear();
 				module->userFolder = "";
 			}));
+
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Reset Lightboxes Colors", "", [=]() {
+			menu->addChild(createMenuLabel("Zoom All Samples"));
+			menu->addChild(createMenuItem("Reset to Full", "", [=]() {
+				for (int i = 0; i < 4; i++) {
+					module->zoom[i] = 0;
+					module->displayRecalc(0, i);
+				}
+			}));
+			menu->addChild(createMenuItem("Set to Half", "", [=]() {
+				for (int i = 0; i < 4; i++) {
+					module->zoom[i] = 1;
+					module->displayRecalc(1, i);
+				}
+			}));
+			menu->addChild(createMenuItem("Set to Quarter", "", [=]() {
+				for (int i = 0; i < 4; i++) {
+					module->zoom[i] = 2;
+					module->displayRecalc(2, i);
+				}
+			}));
+			menu->addChild(createMenuItem("Set to Eighth", "", [=]() {
+				for (int i = 0; i < 4; i++) {
+					module->zoom[i] = 3;
+					module->displayRecalc(3, i);
+				}
+			}));
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("Lightboxes Color"));
+			menu->addChild(createMenuItem("Reset standard Colors", "", [=]() {
 				for (int i = 0; i < 4; i++)
 					module->colorBox[i] = i;
 			}));
-			menu->addChild(createMenuItem("Set ALL Custom Colors", "", [=]() {
+			menu->addChild(createMenuItem("Set All to Custom Colors", "", [=]() {
 				for (int i = 0; i < 4; i++)
 					module->colorBox[i] = 4;
 			}));
-			menu->addChild(createMenuItem("Clear Custom Colors", "", [=]() {
+			menu->addChild(createMenuItem("Clear All Custom Colors", "", [=]() {
 				module->colorBoxR[0] = 0;
 				module->colorBoxR[1] = 255;
 				module->colorBoxR[2] = 255;
@@ -2472,43 +2501,20 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 				module->colorBoxB[2] = 0;
 				module->colorBoxB[3] = 0;
 			}));
+			
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Reset Lightboxes fading to Normal", "", [=]() {
-				for (int i = 0; i < 4; i++)
-					module->lightTime[i] = 1;
-			}));
-			menu->addChild(createMenuItem("Set Lightboxes fading to Slow", "", [=]() {
+			menu->addChild(createMenuLabel("Lightboxes Fade Time"));
+			menu->addChild(createMenuItem("Set All to Slow", "", [=]() {
 				for (int i = 0; i < 4; i++)
 					module->lightTime[i] = 0;
 			}));
-			menu->addChild(createMenuItem("Set Lightboxes fading to Fast", "", [=]() {
+			menu->addChild(createMenuItem("Reset All to Normal", "", [=]() {
+				for (int i = 0; i < 4; i++)
+					module->lightTime[i] = 1;
+			}));
+			menu->addChild(createMenuItem("Set All to Fast", "", [=]() {
 				for (int i = 0; i < 4; i++)
 					module->lightTime[i] = 2;
-			}));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Reset Zooms to Full", "", [=]() {
-				for (int i = 0; i < 4; i++) {
-					module->zoom[i] = 0;
-					module->displayRecalc(0, i);
-				}
-			}));
-			menu->addChild(createMenuItem("Set Zooms to Half", "", [=]() {
-				for (int i = 0; i < 4; i++) {
-					module->zoom[i] = 1;
-					module->displayRecalc(1, i);
-				}
-			}));
-			menu->addChild(createMenuItem("Set Zooms to Quarter", "", [=]() {
-				for (int i = 0; i < 4; i++) {
-					module->zoom[i] = 2;
-					module->displayRecalc(2, i);
-				}
-			}));
-			menu->addChild(createMenuItem("Set Zooms to Eighth", "", [=]() {
-				for (int i = 0; i < 4; i++) {
-					module->zoom[i] = 3;
-					module->displayRecalc(3, i);
-				}
 			}));
 		}));
 	}
