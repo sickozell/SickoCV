@@ -292,6 +292,20 @@ This option enables sample triggering by clicking over the the display area, to 
 In this menu there are options to clear all the slots or the root folder.  
 It is also used to apply settings to all the slots: Zoom, Lightboxes color and time fading.  
 
+#### SLOT CONTEXT MENU
+Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) opens slot context menu with following options:
+- Load Sample (opens file dialog to load a sample in the slot)
+- Samples Browser (if a root sample folder is set on the general context menu, this submenu is enabled to navigate through directories)
+- Current sample (shows sample name when a sample is loaded)
+- Clear (clears slot)
+- Swap Slot with (swaps slot sample with the selected one)
+- Copy Slot to (duplicates slot sample to the selected one)  
+
+**drumPlayerXtra** further options:
+- Zoom Waveform (zooms the waveform from start to end (full), half, quarter, eighth of the sample length)
+- Light Box color (if Light Boxes option is enabled in the general context menu, a predefined color or a custom one can be set here)
+- Light Box Fade (Fade time of Light Boxes is set here: Slow (0.5s), Normal (0.25s), Fast (0.1s)
+
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
 
