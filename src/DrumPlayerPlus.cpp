@@ -357,6 +357,20 @@ struct DrumPlayerPlus : Module {
 		}
 	};
 
+	void swapSlot(int slot1, int slot2) {
+		std::string tempPath1 = storedPath[slot1];
+		std::string tempPath2 = storedPath[slot2];
+		clearSlot(slot2);
+		loadSample(tempPath1, slot2);
+		clearSlot(slot1);
+		loadSample(tempPath2, slot1);
+	}
+
+	void copySlot(int slot1, int slot2) {
+		std::string tempPath = storedPath[slot1];
+		loadSample(tempPath, slot2);
+	}
+
 	void menuLoadSample(int slot) {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
@@ -438,6 +452,8 @@ struct DrumPlayerPlus : Module {
 			storedPath[slot] = "";
 			fileDescription[slot] = "--none--";
 			fileDisplay[slot] = "-----";
+			scrollDisplay[slot] = "-----";
+			currFileDisplay[slot] = "-----";
 		}
 	};
 	
@@ -446,6 +462,7 @@ struct DrumPlayerPlus : Module {
 		fileDescription[slot] = "--none--";
 		fileDisplay[slot] = "-----";
 		scrollDisplay[slot] = "-----";
+		currFileDisplay[slot] = "-----";
 		fileLoaded[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
@@ -750,6 +767,17 @@ struct dppSlot1Display : TransparentWidget {
 				menu->addChild(createMenuLabel(module->fileDescription[0]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(0);}));
 			}
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createSubmenuItem("Swap Slot with", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->swapSlot(0, 1);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->swapSlot(0, 2);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->swapSlot(0, 3);}));
+			}));
+			menu->addChild(createSubmenuItem("Copy Slot to", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->copySlot(0, 1);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->copySlot(0, 2);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->copySlot(0, 3);}));
+			}));
 		}
 	}
 };
@@ -843,6 +871,17 @@ struct dppSlot2Display : TransparentWidget {
 				menu->addChild(createMenuLabel(module->fileDescription[1]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(1);}));
 			}
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createSubmenuItem("Swap Slot with", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->swapSlot(1, 0);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->swapSlot(1, 2);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->swapSlot(1, 3);}));
+			}));
+			menu->addChild(createSubmenuItem("Copy Slot to", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->copySlot(1, 0);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->copySlot(1, 2);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->copySlot(1, 3);}));
+			}));
 		}
 	}
 };
@@ -936,6 +975,17 @@ struct dppSlot3Display : TransparentWidget {
 				menu->addChild(createMenuLabel(module->fileDescription[2]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(2);}));
 			}
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createSubmenuItem("Swap Slot with", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->swapSlot(2, 0);}));
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->swapSlot(2, 1);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->swapSlot(2, 3);}));
+			}));
+			menu->addChild(createSubmenuItem("Copy Slot to", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->copySlot(2, 0);}));
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->copySlot(2, 1);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->copySlot(2, 3);}));
+			}));
 		}
 	}
 };
@@ -1029,6 +1079,17 @@ struct dppSlot4Display : TransparentWidget {
 				menu->addChild(createMenuLabel(module->fileDescription[3]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(3);}));
 			}
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createSubmenuItem("Swap Slot with", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->swapSlot(3, 0);}));
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->swapSlot(3, 1);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->swapSlot(3, 2);}));
+			}));
+			menu->addChild(createSubmenuItem("Copy Slot to", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->copySlot(3, 0);}));
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->copySlot(3, 1);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->copySlot(3, 2);}));
+			}));
 		}
 	}
 };

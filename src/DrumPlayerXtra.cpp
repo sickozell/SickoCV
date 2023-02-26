@@ -573,13 +573,17 @@ struct DrumPlayerXtra : Module {
 	}
 
 	void swapSlot(int slot1, int slot2) {
-		std::string tempPath = storedPath[slot2];
-		loadSample(storedPath[slot1], slot2);
-		loadSample(tempPath, slot1);
+		std::string tempPath1 = storedPath[slot1];
+		std::string tempPath2 = storedPath[slot2];
+		clearSlot(slot2);
+		loadSample(tempPath1, slot2);
+		clearSlot(slot1);
+		loadSample(tempPath2, slot1);
 	}
 
 	void copySlot(int slot1, int slot2) {
-		loadSample(storedPath[slot1], slot2);
+		std::string tempPath = storedPath[slot1];
+		loadSample(tempPath, slot2);
 	}
 
 	void menuLoadSample(int slot) {
@@ -680,6 +684,7 @@ struct DrumPlayerXtra : Module {
 			fileDescription[slot] = "--none--";
 			fileDisplay[slot] = "-------";
 			currFileDisplay[slot] = "-------";
+			scrollDisplay[slot] = "-------";
 		}
 	};
 	
