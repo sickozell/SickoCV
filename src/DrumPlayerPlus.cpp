@@ -747,6 +747,7 @@ struct dppSlot1Display : TransparentWidget {
 			menu->addChild(createMenuItem("Load Sample Slot #1", "", [=]() {module->menuLoadSample(0);}));
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
 					module->folderTreeData.resize(1);
 					module->folderTreeDisplay.resize(1);
@@ -763,6 +764,7 @@ struct dppSlot1Display : TransparentWidget {
 				}));
 			}
 			if (module->fileLoaded[0]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[0]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(0);}));
@@ -851,6 +853,7 @@ struct dppSlot2Display : TransparentWidget {
 			menu->addChild(createMenuItem("Load Sample Slot #2", "", [=]() {module->menuLoadSample(1);}));
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
 					module->folderTreeData.resize(1);
 					module->folderTreeDisplay.resize(1);
@@ -867,6 +870,7 @@ struct dppSlot2Display : TransparentWidget {
 				}));
 			}
 			if (module->fileLoaded[1]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[1]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(1);}));
@@ -955,6 +959,7 @@ struct dppSlot3Display : TransparentWidget {
 			menu->addChild(createMenuItem("Load Sample Slot #3", "", [=]() {module->menuLoadSample(2);}));
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
 					module->folderTreeData.resize(1);
 					module->folderTreeDisplay.resize(1);
@@ -971,6 +976,7 @@ struct dppSlot3Display : TransparentWidget {
 				}));
 			}
 			if (module->fileLoaded[2]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[2]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(2);}));
@@ -1059,6 +1065,7 @@ struct dppSlot4Display : TransparentWidget {
 			menu->addChild(createMenuItem("Load Sample Slot #4", "", [=]() {module->menuLoadSample(3);}));
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
 					module->folderTreeData.resize(1);
 					module->folderTreeDisplay.resize(1);
@@ -1075,6 +1082,7 @@ struct dppSlot4Display : TransparentWidget {
 				}));
 			}
 			if (module->fileLoaded[3]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[3]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(3);}));
@@ -1239,6 +1247,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			assert(module);
 		
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Slots"));
 		menu->addChild(createMenuItem("1: " + module->fileDescription[0], "", [=]() {module->menuLoadSample(0);}));
 		menu->addChild(createMenuItem("2: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
 		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {module->menuLoadSample(2);}));

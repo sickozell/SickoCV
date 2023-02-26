@@ -2433,19 +2433,12 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 			assert(module);
 		
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Slots"));
 		menu->addChild(createMenuItem("1: " + module->fileDescription[0], "", [=]() {module->menuLoadSample(0);}));
 		menu->addChild(createMenuItem("2: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
 		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {module->menuLoadSample(2);}));
 		menu->addChild(createMenuItem("4: " + module->fileDescription[3], "", [=]() {module->menuLoadSample(3);}));
 
-		/*
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Clear ALL slots", "", [=]() {
-			for (int i = 0; i < 4; i++)
-				module->clearSlot(i);
-		}));
-		*/
-		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
 

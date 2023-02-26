@@ -632,6 +632,7 @@ struct dpSlot1Display : TransparentWidget {
 			menu->addChild(createMenuItem("Load Sample Slot #1", "", [=]() {module->menuLoadSample(0);}));
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
 					module->folderTreeData.resize(1);
 					module->folderTreeDisplay.resize(1);
@@ -648,6 +649,7 @@ struct dpSlot1Display : TransparentWidget {
 				}));
 			}
 			if (module->fileLoaded[0]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[0]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(0);}));
@@ -736,6 +738,7 @@ struct dpSlot2Display : TransparentWidget {
 			menu->addChild(createMenuItem("Load Sample Slot #2", "", [=]() {module->menuLoadSample(1);}));
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
 					module->folderTreeData.resize(1);
 					module->folderTreeDisplay.resize(1);
@@ -752,6 +755,7 @@ struct dpSlot2Display : TransparentWidget {
 				}));
 			}
 			if (module->fileLoaded[1]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[1]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(1);}));
@@ -840,6 +844,7 @@ struct dpSlot3Display : TransparentWidget {
 			menu->addChild(createMenuItem("Load Sample Slot #3", "", [=]() {module->menuLoadSample(2);}));
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
 					module->folderTreeData.resize(1);
 					module->folderTreeDisplay.resize(1);
@@ -856,6 +861,7 @@ struct dpSlot3Display : TransparentWidget {
 				}));
 			}
 			if (module->fileLoaded[2]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[2]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(2);}));
@@ -944,6 +950,7 @@ struct dpSlot4Display : TransparentWidget {
 			menu->addChild(createMenuItem("Load Sample Slot #4", "", [=]() {module->menuLoadSample(3);}));
 
 			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
 					module->folderTreeData.resize(1);
 					module->folderTreeDisplay.resize(1);
@@ -960,6 +967,7 @@ struct dpSlot4Display : TransparentWidget {
 				}));
 			}
 			if (module->fileLoaded[3]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[3]));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(3);}));
@@ -994,7 +1002,7 @@ struct DrumPlayerWidget : ModuleWidget {
 
 		{
 			dpSlot1Display *display = new dpSlot1Display();
-			display->box.pos = Vec(6, 21);
+			display->box.pos = Vec(6, 15);
 			display->box.size = Vec(41, 24);
 			display->module = module;
 			addChild(display);
@@ -1002,7 +1010,7 @@ struct DrumPlayerWidget : ModuleWidget {
 
 		{
 			dpSlot2Display *display = new dpSlot2Display();
-			display->box.pos = Vec(54, 21);
+			display->box.pos = Vec(54, 15);
 			display->box.size = Vec(41, 24);
 			display->module = module;
 			addChild(display);
@@ -1010,7 +1018,7 @@ struct DrumPlayerWidget : ModuleWidget {
 
 		{
 			dpSlot3Display *display = new dpSlot3Display();
-			display->box.pos = Vec(101, 21);
+			display->box.pos = Vec(101, 15);
 			display->box.size = Vec(41, 24);
 			display->module = module;
 			addChild(display);
@@ -1018,7 +1026,7 @@ struct DrumPlayerWidget : ModuleWidget {
 
 		{
 			dpSlot4Display *display = new dpSlot4Display();
-			display->box.pos = Vec(148, 21);
+			display->box.pos = Vec(148, 15);
 			display->box.size = Vec(41, 24);
 			display->module = module;
 			addChild(display);
@@ -1047,6 +1055,7 @@ struct DrumPlayerWidget : ModuleWidget {
 			assert(module);
 		
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Slots"));
 		menu->addChild(createMenuItem("1: " + module->fileDescription[0], "", [=]() {module->menuLoadSample(0);}));
 		menu->addChild(createMenuItem("2: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
 		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {module->menuLoadSample(2);}));
