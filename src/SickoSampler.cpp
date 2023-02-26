@@ -164,8 +164,6 @@ struct SickoSampler : Module {
 	double scanLoopStartSample;
 	double scanLoopEndSample;
 
-	//bool searchingRestartPhase = false; // used only for trig start/restart mode
-
 	double prevSampleWeight[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double currSampleWeight[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double prevSamplePos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -254,9 +252,6 @@ struct SickoSampler : Module {
 
 	bool reverseStart = false;
 	int reversePlaying[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	//int revButt = 0;
-	//int prevRevButt = 0;
-	//bool manualReverse = false;
 	int pingpong;
 
 	float clippingValue = 0;
@@ -377,7 +372,6 @@ struct SickoSampler : Module {
 		configSwitch(REC_PARAM, 0.f, 1.f, 0.f, "REC", {"OFF", "ON"});
 		configInput(REC_INPUT,"Rec Toggle");
 		configParam(GAIN_PARAM, 0.f, 2.0f, 1.0f, "REC Gain", "%", 0, 100);
-		//configParam(RECFADE_PARAM, 0.0001f, 10.0f, 0.0001f, "REC Fade in/out", "ms", 0, 1000);
 		configParam(RECFADE_PARAM, 0.f, 10.0f, 0.f, "REC Fade in/out", "ms", 0, 1000);
 		configSwitch(STARTREC_SWITCH, 0.f, 2.f, 0.f, "Start REC Position", {"Cue Start", "Loop Start", "Current Position"});
 		configSwitch(OVERDUB_SWITCH, 0.f, 1.f, 0.f, "OVerDub", {"Off", "On"});
@@ -442,23 +436,18 @@ struct SickoSampler : Module {
 		json_t* trimOnSaveJ = json_object_get(rootJ, "TrimOnSave");
 		if (trimOnSaveJ)
 			trimOnSave = json_boolean_value(trimOnSaveJ);
-
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
 			antiAlias = json_integer_value(antiAliasJ);
-
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
-
 		json_t* phaseScanJ = json_object_get(rootJ, "PhaseScan");
 		if (phaseScanJ)
 			phaseScan = json_boolean_value(phaseScanJ);
-
 		json_t* uceCueStartJ = json_object_get(rootJ, "UceCueStart");
 		if (uceCueStartJ)
 			uceCueStart = json_boolean_value(uceCueStartJ);
-
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
@@ -509,6 +498,28 @@ struct SickoSampler : Module {
 		double c2 = x0 - (2.5F * x1) + (2 * x2) - (.5F * x3);
 		double c3 = (.5F * (x3 - x0)) + (1.5F * (x1 - x2));
 		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
+	}
+
+	void selectRootFolder() {
+		const char* prevFolder = userFolder.c_str();
+		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+		if (path) {
+			folderTreeData.clear();
+			folderTreeDisplay.clear();
+			userFolder = std::string(path);
+			createFolder(userFolder);
+			folderTreeData.push_back(tempTreeData);
+			folderTreeDisplay.push_back(tempTreeDisplay);
+		}
+		free(path);
+	};
+
+	void refreshRootFolder() {
+		folderTreeData.clear();
+		folderTreeDisplay.clear();
+		createFolder(userFolder);
+		folderTreeData.push_back(tempTreeData);
+		folderTreeDisplay.push_back(tempTreeDisplay);
 	}
 
 	void createFolder(std::string dir_path) {
@@ -738,8 +749,26 @@ struct SickoSampler : Module {
 																							██████╔╝██║░░██║░░╚██╔╝░░███████╗
 																							╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
 */
-	void saveSample(std::string path) {
+	void menuSaveSample(int mode) {
+		fileLoaded = false;
+		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+		if (path) {
+			saveMode = mode;
+			saveSample(path);
+			storedPath = std::string(path);
+		} else {
+			fileLoaded = true;
+		}
+		if (storedPath == "") {
+			fileLoaded = false;
+		}
+		free(path);
+	};
 
+	void saveSample(std::string path) {
 		drwav_uint64 samples;
 		drwav_uint64 saveStartSamplePos = 0;
 		drwav_uint64 saveEndSamplePos = 0;
@@ -848,8 +877,15 @@ struct SickoSampler : Module {
 
 			params[CUESTART_PARAM].setValue(0);
 			params[CUEEND_PARAM].setValue(1);
-			params[LOOPSTART_PARAM].setValue(tempKnobLoopStartPos);
-			params[LOOPEND_PARAM].setValue(tempKnobLoopEndPos);
+
+			if (tempKnobLoopStartPos < 0)
+				params[LOOPSTART_PARAM].setValue(0);
+			else				
+				params[LOOPSTART_PARAM].setValue(tempKnobLoopStartPos);
+			if (tempKnobLoopEndPos > 1)
+				params[LOOPEND_PARAM].setValue(1);
+			else
+				params[LOOPEND_PARAM].setValue(tempKnobLoopEndPos);
 		}
 
 		fileLoaded = true;
@@ -863,11 +899,27 @@ struct SickoSampler : Module {
 																					███████╗╚█████╔╝██║░░██║██████╔╝
 																					╚══════╝░╚════╝░╚═╝░░╚═╝╚═════╝░
 */
+	void menuLoadSample() {
+		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+		fileLoaded = false;
+		if (path) {
+			loadSample(path);
+			storedPath = std::string(path);
+		} else {
+			fileLoaded = true;
+		}
+		if (storedPath == "") {
+			fileLoaded = false;
+		}
+		free(path);
+	}
+
 	void loadSample(std::string path) {
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
-		//tempBuffer[0].resize(0);
-		//tempBuffer[1].resize(0);
 		tempBuffer[0].clear();
 		tempBuffer[1].clear();
 
@@ -895,11 +947,9 @@ struct SickoSampler : Module {
 
 			if (sr == APP->engine->getSampleRate()) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
-					//playBuffer[LEFT][0].push_back(pSampleData[i]);
 					playBuffer[LEFT][0].push_back(pSampleData[i] * 5);
 					playBuffer[LEFT][0].push_back(0);
 					if (channels == 2) {
-						//playBuffer[RIGHT][0].push_back(pSampleData[i+1]);
 						playBuffer[RIGHT][0].push_back(pSampleData[i+1] * 5);
 						playBuffer[RIGHT][0].push_back(0);
 					}
@@ -922,11 +972,9 @@ struct SickoSampler : Module {
 
 			} else {											// ***************** RESAMPLE ****************************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
-					//tempBuffer[LEFT].push_back(pSampleData[i]);
 					tempBuffer[LEFT].push_back(pSampleData[i] * 5);
 					tempBuffer[LEFT].push_back(0);
 					if (channels == 2) {
-						//tempBuffer[RIGHT].push_back(pSampleData[i+1]);
 						tempBuffer[RIGHT].push_back(pSampleData[i+1] * 5);
 						tempBuffer[RIGHT].push_back(0);
 					}
@@ -1162,26 +1210,6 @@ struct SickoSampler : Module {
 				prevKnobLoopStartPos = -1;
 				prevKnobLoopEndPos = 2;
 			break;
-			case 2:	// drums
-				phaseScan = false;
-				params[TRIGGATEMODE_SWITCH].setValue(1);
-				params[TRIGMODE_SWITCH].setValue(1);
-				params[XFADE_PARAM].setValue(0);
-				params[LOOP_PARAM].setValue(0);
-				params[PINGPONG_PARAM].setValue(0);
-				params[ATTACK_PARAM].setValue(0);
-				params[DECAY_PARAM].setValue(0);
-				params[SUSTAIN_PARAM].setValue(1);
-				params[RELEASE_PARAM].setValue(0);
-				params[CUESTART_PARAM].setValue(0);
-				params[CUEEND_PARAM].setValue(1);
-				params[LOOPSTART_PARAM].setValue(0);
-				params[LOOPEND_PARAM].setValue(1);
-				prevKnobCueStartPos = -1;
-				prevKnobCueEndPos = 2;
-				prevKnobLoopStartPos = -1;
-				prevKnobLoopEndPos = 2;
-			break;
 		}
 	}
 
@@ -1383,25 +1411,6 @@ struct SickoSampler : Module {
 				
 			} 
 
-			/*
-			if (searchingRestartPhase) {  		// *** *** on PLAY/RESTART trig mode this continues playing until phase is reached (attack value must be set to 0)
-				if (playBuffer[LEFT][antiAlias][floor(samplePos)-1] <= 0 && playBuffer[LEFT][antiAlias][floor(samplePos)] > 0) {
-					searchingRestartPhase = false;
-					fading = true;
-					fadingValue = 1.f;
-					fadedPosition = samplePos;
-
-					samplePos = floor(cueStartPos+1);
-					currSampleWeight = sampleCoeff;
-					prevSamplePos = floor(cueStartPos);
-					prevSampleWeight = 0;
-					stage = ATTACK_STAGE;
-					currentStageSample = 0;
-					lastStageLevel = 0;
-				} 
-			}
-			*/
-
 			trigMode = params[TRIGGATEMODE_SWITCH].getValue();
 			trigType = params[TRIGMODE_SWITCH].getValue();
 
@@ -1544,27 +1553,6 @@ struct SickoSampler : Module {
 									}
 								break;
 								
-								/*
-								case START_RESTART:									// trig type: Start/Restart
-									if (play[c]) {
-										if (!searchingRestartPhase)
-											searchingRestartPhase = true;
-										//restartSample = samplePos;
-										//fading[c] = true;
-										//fadingValue[c] = 1.f;
-										//fadedPosition[c] = samplePos;
-									} else {
-										play[c] = true;
-										samplePos[c] = floor(cueStartPos+1);
-										currSampleWeight[c] = sampleCoeff;
-										prevSamplePos[c] = floor(cueStartPos);
-										prevSampleWeight[c] = 0;
-										stage[c] = ATTACK_STAGE;
-										currentStageSample[c] = 0;
-										lastStageLevel[c] = 0;
-									}
-								break;
-								*/
 								case PLAY_PAUSE:									// trig type: Play/Pause
 									if (play[c]) {
 										if (stage[c] != RELEASE_STAGE) {
@@ -1906,16 +1894,12 @@ struct SickoSampler : Module {
 						}
 
 						if (reversePlaying[c]) {
-							//currentOutput *= stageLevel[c] * masterLevel * -5;
 							currentOutput *= stageLevel[c] * masterLevel * -1;
 							if (channels == 2)
-								//currentOutputR *= stageLevel[c] * masterLevel * -5;
 								currentOutputR *= stageLevel[c] * masterLevel * -1;
 						} else {
-							//currentOutput *= stageLevel[c] * masterLevel * 5;
 							currentOutput *= stageLevel[c] * masterLevel;
 							if (channels == 2)
-								//currentOutputR *= stageLevel[c] * masterLevel * 5;
 								currentOutputR *= stageLevel[c] * masterLevel;
 						}
 
@@ -1938,11 +1922,9 @@ struct SickoSampler : Module {
 									switch (reversePlaying[c]) {
 										case FORWARD:
 											currentOutput *= 1 - fadingValue[c];
-											//currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c]);
 											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												//currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c]);
 												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
 											}
 											fadedPosition[c] += distancePos[c];
@@ -1951,11 +1933,9 @@ struct SickoSampler : Module {
 										break;
 										case REVERSE:
 											currentOutput *= 1 - fadingValue[c];
-											//currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c] * -1);
 											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												//currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c] * -1);
 												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
 											}
 											fadedPosition[c] -= distancePos[c];
@@ -1983,11 +1963,9 @@ struct SickoSampler : Module {
 									switch (reversePlaying[c]) {
 										case FORWARD:
 											currentOutput *= 1 - fadingValue[c];
-											//currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c] * -1);
 											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												//currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c] * -1);
 												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
 											}
 											fadedPosition[c] -= distancePos[c];
@@ -1996,11 +1974,9 @@ struct SickoSampler : Module {
 										break;
 										case REVERSE:
 											currentOutput *= 1 - fadingValue[c];
-											//currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c]);
 											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												//currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c]);
 												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
 											}
 											fadedPosition[c] += distancePos[c];
@@ -2191,8 +2167,6 @@ struct SickoSampler : Module {
 					currRecPosition = 0;
 					playBuffer[LEFT][0].clear();
 					playBuffer[LEFT][1].clear();
-					//playBuffer[LEFT][0].resize(0);
-					//playBuffer[LEFT][1].resize(0);
 					playBuffer[LEFT][0].push_back(0);
 					playBuffer[LEFT][1].push_back(0);
 					playBuffer[LEFT][0].push_back(0);
@@ -2200,8 +2174,6 @@ struct SickoSampler : Module {
 					if (recChannels == 2) {
 						playBuffer[RIGHT][0].clear();
 						playBuffer[RIGHT][1].clear();
-						//playBuffer[RIGHT][0].resize(0);
-						//playBuffer[RIGHT][1].resize(0);
 						playBuffer[RIGHT][0].push_back(0);
 						playBuffer[RIGHT][1].push_back(0);
 						playBuffer[RIGHT][0].push_back(0);
@@ -2337,7 +2309,7 @@ struct SickoSampler : Module {
 				
 				vector<double>().swap(displayBuff);
 				for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/300))
-						displayBuff.push_back(playBuffer[0][0][i]);
+					displayBuff.push_back(playBuffer[0][0][i]);
 
 				seconds = totalSampleC * 0.5 / (APP->engine->getSampleRate());
 				minutes = (seconds / 60) % 60;
@@ -2373,7 +2345,6 @@ struct SickoSampler : Module {
 						recFadeOut = false;
 					}
 				}
-
 
 				int rc = 0;
 				currRecValue[rc] = inputs[IN_INPUT+rc].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
@@ -2474,25 +2445,13 @@ struct SickoSampler : Module {
 						tempKnob = loopStartPos / totalSampleC;
 						params[LOOPSTART_PARAM].setValue(tempKnob);
 						prevKnobLoopStartPos = tempKnob;
-						/*
-						if (updateCursors) {
-							cueEndPos = recKnobCueEndPos * totalSampleC;
-							tempKnob = cueEndPos / totalSampleC;
-							params[CUEEND_PARAM].setValue(tempKnob);
-							prevKnobCueEndPos = tempKnob;
-							tempKnob = loopEndPos / totalSampleC;
-							loopEndPos = recKnobLoopEndPos * totalSampleC;
-							params[LOOPEND_PARAM].setValue(tempKnob);
-							prevKnobLoopEndPos = tempKnob;
-						} else {
-						*/
-							tempKnob = cueEndPos / totalSampleC;
-							params[CUEEND_PARAM].setValue(tempKnob);
-							prevKnobCueEndPos = tempKnob;
-							tempKnob = loopEndPos / totalSampleC;
-							params[LOOPEND_PARAM].setValue(tempKnob);
-							prevKnobLoopEndPos = tempKnob;
-						//}
+
+						tempKnob = cueEndPos / totalSampleC;
+						params[CUEEND_PARAM].setValue(tempKnob);
+						prevKnobCueEndPos = tempKnob;
+						tempKnob = loopEndPos / totalSampleC;
+						params[LOOPEND_PARAM].setValue(tempKnob);
+						prevKnobLoopEndPos = tempKnob;
 					}
 				}
 				if (currRecPosition > 52428800) {
@@ -2599,10 +2558,8 @@ struct SickoSampler : Module {
 				if (recordingState == 1) {
 					switch (polyOuts) {
 						case MONOPHONIC:										// monophonic CABLES
-							//sumOutput += currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel * 5;
 						sumOutput += currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
 							if (channels == 2)
-								//sumOutputR += currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel * 5;
 								sumOutputR += currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
 							// *** HARD CLIP ***
 							if (limiter) {
@@ -2648,9 +2605,7 @@ struct SickoSampler : Module {
 						break;
 
 						case POLYPHONIC:
-							//currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel * 5);
 							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel);
-							//currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel * 5);
 							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel);
 							// *** HARD CLIP ***
 							if (limiter) {
@@ -2820,147 +2775,15 @@ struct SickoSampler : Module {
 
 */
 
-struct SickoSamplerInitializeUserFolder : MenuItem {
-	SickoSampler *rm ;
-	void onAction(const event::Action &e) override {
-		const char* prevFolder = rm->userFolder.c_str();
-		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
-		if (path) {
-			rm->folderTreeData.clear();
-			rm->folderTreeDisplay.clear();
-			rm->userFolder = std::string(path);
-			rm->createFolder(rm->userFolder);
-			rm->folderTreeData.push_back(rm->tempTreeData);
-			rm->folderTreeDisplay.push_back(rm->tempTreeDisplay);
-		}
-		free(path);
-	}
-};
-
-struct SickoSamplerItem : MenuItem {
-	SickoSampler *rm ;
-	void onAction(const event::Action &e) override {
-		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
-		rm->fileLoaded = false;
-		if (path) {
-			rm->loadSample(path);
-			rm->storedPath = std::string(path);
-		} else {
-			rm->fileLoaded = true;
-		}
-		if (rm->storedPath == "") {
-			rm->fileLoaded = false;
-		}
-		free(path);
-	}
-};
-
-struct SaveFullSamplerItem : MenuItem {
-	SickoSampler *rm ;
-	void onAction(const event::Action &e) override {
-		rm->fileLoaded = false;
-		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
-		if (path) {
-			rm->saveMode = SAVE_FULL;
-			rm->saveSample(path);
-			rm->storedPath = std::string(path);
-		} else {
-			rm->fileLoaded = true;
-		}
-		if (rm->storedPath == "") {
-			rm->fileLoaded = false;
-		}
-		free(path);
-	}
-};
-
-struct SaveCueSamplerItem : MenuItem {
-	SickoSampler *rm ;
-	void onAction(const event::Action &e) override {
-		rm->fileLoaded = false;
-		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
-		if (path) {
-			rm->saveMode = SAVE_CUE;
-			rm->saveSample(path);
-			rm->storedPath = std::string(path);
-		} else {
-			rm->fileLoaded = true;
-		}
-		if (rm->storedPath == "") {
-			rm->fileLoaded = false;
-		}
-		free(path);
-	}
-};
-
-struct SaveLoopSamplerItem : MenuItem {
-	SickoSampler *rm ;
-	void onAction(const event::Action &e) override {
-		rm->fileLoaded = false;
-		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
-		if (path) {
-			rm->saveMode = SAVE_LOOP;
-			rm->saveSample(path);
-			rm->storedPath = std::string(path);
-		} else {
-			rm->fileLoaded = true;
-		}
-		if (rm->storedPath == "") {
-			rm->fileLoaded = false;
-		}
-		free(path);
-	}
-};
-
 struct SickoSamplerDisplay : TransparentWidget {
 	SickoSampler *module;
 	int frame = 0;
 	SickoSamplerDisplay() {
 	}
 
-	struct ClearSlotItem : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot();
-		}
-	};
-
-	struct ResetCursorsItem : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->resetCursors();
-		}
-	};
-
-	struct SetPreset0 : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(0);
-		}
-	};
-
-	struct SetPreset1 : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(1);
-		}
-	};
-
 	void onButton(const event::Button &e) override {
-		//if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
-		//	e.consume(this);
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+			e.consume(this);
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -3173,11 +2996,10 @@ struct SickoSamplerDisplay : TransparentWidget {
 		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
-						module->tempDir = module->folderTreeData[tempIndex][i];
-						menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "",
-							[=](Menu* menu) {
-								loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
-							}));
+					module->tempDir = module->folderTreeData[tempIndex][i];
+					menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "", [=](Menu* menu) {
+						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+					}));
 				} else {
 					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
@@ -3192,76 +3014,57 @@ struct SickoSamplerDisplay : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			SickoSamplerItem *rootDirItem = new SickoSamplerItem;
-				rootDirItem->text = "Load Sample";
-				rootDirItem->rm = module;
-				menu->addChild(rootDirItem);
+			menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
 
-				if (module->folderTreeData.size() > 0) {
-					menu->addChild(createSubmenuItem("Samples Browser", "",
-						[=](Menu* menu) {
-							module->folderTreeData.resize(1);
-							module->folderTreeDisplay.resize(1);
-							for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
-								if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
-										module->tempDir = module->folderTreeData[0][i];
-										menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "",
-											[=](Menu* menu) {
-												loadSubfolder(menu, module->folderTreeData[0][i]);
-											}));
-								} else {
-									menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
-								}
-							}
+			if (module->folderTreeData.size() > 0) {
+				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
+					module->folderTreeData.resize(1);
+					module->folderTreeDisplay.resize(1);
+					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+							module->tempDir = module->folderTreeData[0][i];
+							menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+								loadSubfolder(menu, module->folderTreeData[0][i]);
+							}));
+						} else {
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
 						}
-					));
+					}
+				}));
 				}
 
 			if (module->fileLoaded) {
-					menu->addChild(new MenuSeparator());
-					menu->addChild(createMenuLabel("Current Sample:"));
-					menu->addChild(createMenuLabel(module->fileDescription));
-					menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
-					std::string tempDisplay = " ";
-					if (module->resampled) {
-						tempDisplay += "resampled to " + std::to_string(int(APP->engine->getSampleRate()));
-						if (module->toSave)
-							tempDisplay += " - ";
-					}
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createMenuLabel("Current Sample:"));
+				menu->addChild(createMenuLabel(module->fileDescription));
+				menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
+				std::string tempDisplay = " ";
+				if (module->resampled) {
+					tempDisplay += "resampled to " + std::to_string(int(APP->engine->getSampleRate()));
 					if (module->toSave)
-						tempDisplay += "to SAVE";
-					if (tempDisplay != " ") {
-						menu->addChild(createMenuLabel(tempDisplay));
-					}
+						tempDisplay += " - ";
+				}
+				if (module->toSave)
+					tempDisplay += "to SAVE";
+				if (tempDisplay != " ")
+					menu->addChild(createMenuLabel(tempDisplay));
 
-				menu->addChild(construct<ClearSlotItem>(&MenuItem::rightText, "Clear", &ClearSlotItem::module, module));
+				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
 
-				SaveFullSamplerItem *saveFullItem = new SaveFullSamplerItem;
-					saveFullItem->text = "Save FULL Sample";
-					saveFullItem->rm = module;
-					menu->addChild(saveFullItem);
-
-				SaveCueSamplerItem *saveCueItem = new SaveCueSamplerItem;
-					saveCueItem->text = "Save CUE REGION";
-					saveCueItem->rm = module;
-					menu->addChild(saveCueItem);
-
-				SaveLoopSamplerItem *saveLoopItem = new SaveLoopSamplerItem;
-					saveLoopItem->text = "Save LOOP REGION";
-					saveLoopItem->rm = module;
-					menu->addChild(saveLoopItem);
+				menu->addChild(createMenuItem("Save FULL Sample", "", [=]() {module->menuSaveSample(SAVE_FULL);}));
+				menu->addChild(createMenuItem("Save CUE Region", "", [=]() {module->menuSaveSample(SAVE_CUE);}));
+				menu->addChild(createMenuItem("Save LOOP Region", "", [=]() {module->menuSaveSample(SAVE_LOOP);}));
 
 				menu->addChild(createBoolPtrMenuItem("Trim Sample after Save", "", &module->trimOnSave));
 			}
 
 			menu->addChild(new MenuSeparator());
-			menu->addChild(construct<ResetCursorsItem>(&MenuItem::text, "Reset Cursors", &ResetCursorsItem::module, module));
+			menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
 
-			menu->addChild(createSubmenuItem("Presets", "",
-				[ = ](Menu * menu) {
-					menu->addChild(construct<SetPreset0>(&MenuItem::text, "Wavetable", &SetPreset0::module, module));
-					menu->addChild(construct<SetPreset1>(&MenuItem::text, "Triggered Sample with Envelope", &SetPreset1::module, module));
-				}));
+			menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));
+				menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
+			}));
 		}
 	}
 };
@@ -3388,45 +3191,6 @@ struct SickoSamplerWidget : ModuleWidget {
 
 	}
 
-	struct ClearSlotItem : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot();
-		}
-	};
-
-	struct ResetCursorsItem : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->resetCursors();
-		}
-	};
-
-	struct SetPreset0 : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(0);
-		}
-	};
-
-	struct SetPreset1 : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(1);
-		}
-	};
-
-	struct RefreshUserFolderItem : MenuItem {
-		SickoSampler *module;
-		void onAction(const event::Action &e) override {
-			module->folderTreeData.clear();
-			module->folderTreeDisplay.clear();
-			module->createFolder(module->userFolder);
-			module->folderTreeData.push_back(module->tempTreeData);
-			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
-		}
-	};
-
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
 		SickoSampler *module = dynamic_cast<SickoSampler*>(this->module);
 			assert(module);
@@ -3458,10 +3222,9 @@ struct SickoSamplerWidget : ModuleWidget {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[tempIndex][i];
-						menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "",
-							[=](Menu* menu) {
+						menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "", [=](Menu* menu) {
 								loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
-							}));
+						}));
 				} else {
 					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
@@ -3472,32 +3235,26 @@ struct SickoSamplerWidget : ModuleWidget {
 	void appendContextMenu(Menu *menu) override {
 	   	SickoSampler *module = dynamic_cast<SickoSampler*>(this->module);
 			assert(module);
-			menu->addChild(new MenuSeparator());
 
-		SickoSamplerItem *rootDirItem = new SickoSamplerItem;
-			rootDirItem->text = "Load Sample";
-			rootDirItem->rm = module;
-			menu->addChild(rootDirItem);
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
 
-			if (module->folderTreeData.size() > 0) {
-				menu->addChild(createSubmenuItem("Samples Browser", "",
-					[=](Menu* menu) {
-						module->folderTreeData.resize(1);
-						module->folderTreeDisplay.resize(1);
-						for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
-							if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
-									module->tempDir = module->folderTreeData[0][i];
-									menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "",
-										[=](Menu* menu) {
-											loadSubfolder(menu, module->folderTreeData[0][i]);
-										}));
-							} else {
-								menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
-							}
-						}
+		if (module->folderTreeData.size() > 0) {
+			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
+				module->folderTreeData.resize(1);
+				module->folderTreeDisplay.resize(1);
+				for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+					if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+						module->tempDir = module->folderTreeData[0][i];
+						menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+							loadSubfolder(menu, module->folderTreeData[0][i]);
+						}));
+					} else {
+						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
 					}
-				));
-			}
+				}
+			}));
+		}
 
 		if (module->fileLoaded) {
 			menu->addChild(new MenuSeparator());
@@ -3516,36 +3273,23 @@ struct SickoSamplerWidget : ModuleWidget {
 				menu->addChild(createMenuLabel(tempDisplay));
 			}
 
-			menu->addChild(construct<ClearSlotItem>(&MenuItem::rightText, "Clear", &ClearSlotItem::module, module));
+			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
 
 			menu->addChild(new MenuSeparator());
-
-			SaveFullSamplerItem *saveFullItem = new SaveFullSamplerItem;
-				saveFullItem->text = "Save FULL Sample";
-				saveFullItem->rm = module;
-				menu->addChild(saveFullItem);
-
-			SaveCueSamplerItem *saveCueItem = new SaveCueSamplerItem;
-				saveCueItem->text = "Save CUE REGION";
-				saveCueItem->rm = module;
-				menu->addChild(saveCueItem);
-
-			SaveLoopSamplerItem *saveLoopItem = new SaveLoopSamplerItem;
-				saveLoopItem->text = "Save LOOP REGION";
-				saveLoopItem->rm = module;
-				menu->addChild(saveLoopItem);
+			
+			menu->addChild(createMenuItem("Save FULL Sample", "", [=]() {module->menuSaveSample(SAVE_FULL);}));
+			menu->addChild(createMenuItem("Save CUE Region", "", [=]() {module->menuSaveSample(SAVE_CUE);}));
+			menu->addChild(createMenuItem("Save LOOP Region", "", [=]() {module->menuSaveSample(SAVE_LOOP);}));
 
 			menu->addChild(createBoolPtrMenuItem("Trim Sample after Save", "", &module->trimOnSave));
 		}
 
 		menu->addChild(new MenuSeparator());
-		SickoSamplerInitializeUserFolder *rootFolder = new SickoSamplerInitializeUserFolder;
-			rootFolder->text = "Select Samples Root";
-			rootFolder->rm = module;
-			menu->addChild(rootFolder);
+		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
+
 		if (module->userFolder != "") {
 			menu->addChild(createMenuLabel(module->userFolder));
-			menu->addChild(construct<RefreshUserFolderItem>(&MenuItem::rightText, "Refresh", &RefreshUserFolderItem::module, module));
+			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
 		}
 
 		menu->addChild(new MenuSeparator());
@@ -3558,14 +3302,13 @@ struct SickoSamplerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Phase scan", "", &module->phaseScan));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(construct<ResetCursorsItem>(&MenuItem::text, "Reset Cursors", &ResetCursorsItem::module, module));
+		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
 		menu->addChild(createBoolPtrMenuItem("UCE updates also Cue Start", "", &module->uceCueStart));
 
-		menu->addChild(createSubmenuItem("Presets", "",
-			[ = ](Menu * menu) {
-				menu->addChild(construct<SetPreset0>(&MenuItem::text, "Wavetable", &SetPreset0::module, module));
-				menu->addChild(construct<SetPreset1>(&MenuItem::text, "Triggered Sample with Envelope", &SetPreset1::module, module));
-			}));
+		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
+			menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));
+			menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
+		}));
 	}
 };
 

@@ -146,8 +146,6 @@ struct SickoPlayer : Module {
 	double scanLoopStartSample;
 	double scanLoopEndSample;
 
-	//bool searchingRestartPhase = false; // used only for trig start/restart mode
-
 	double prevSampleWeight[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double currSampleWeight[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double prevSamplePos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -428,6 +426,28 @@ struct SickoPlayer : Module {
 	}
 	*/
 
+	void selectRootFolder() {
+		const char* prevFolder = userFolder.c_str();
+		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+		if (path) {
+			folderTreeData.clear();
+			folderTreeDisplay.clear();
+			userFolder = std::string(path);
+			createFolder(userFolder);
+			folderTreeData.push_back(tempTreeData);
+			folderTreeDisplay.push_back(tempTreeDisplay);
+		}
+		free(path);
+	};
+
+	void refreshRootFolder() {
+		folderTreeData.clear();
+		folderTreeDisplay.clear();
+		createFolder(userFolder);
+		folderTreeData.push_back(tempTreeData);
+		folderTreeDisplay.push_back(tempTreeDisplay);
+	}
+
 	void createFolder(std::string dir_path) {
 		vector <std::string> browserList;
 		vector <std::string> browserListDisplay;
@@ -519,6 +539,24 @@ struct SickoPlayer : Module {
 		}
 	};
 
+	void menuLoadSample() {
+		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+		fileLoaded = false;
+		if (path) {
+			loadSample(path);
+			storedPath = std::string(path);
+		} else {
+			fileLoaded = true;
+		}
+		if (storedPath == "") {
+			fileLoaded = false;
+		}
+		free(path);
+	}
+
 	void loadSample(std::string path) {
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 		unsigned int c;
@@ -541,11 +579,9 @@ struct SickoPlayer : Module {
 				tsc = 52428800;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
 
 			for (unsigned int i=0; i < tsc; i = i + c) {
-				//playBuffer[LEFT][0].push_back(pSampleData[i]);
 				playBuffer[LEFT][0].push_back(pSampleData[i] * 5);
 				playBuffer[LEFT][0].push_back(0);
 				if (channels == 2) {
-					//playBuffer[RIGHT][0].push_back(pSampleData[i+1]);
 					playBuffer[RIGHT][0].push_back(pSampleData[i+1] * 5);
 					playBuffer[RIGHT][0].push_back(0);
 				}
@@ -651,7 +687,6 @@ struct SickoPlayer : Module {
 		playBuffer[RIGHT][1].clear();
 		totalSampleC = 0;
 		totalSamples = 0;
-		
 	}
 
 	void resetCursors() {
@@ -691,26 +726,6 @@ struct SickoPlayer : Module {
 				params[DECAY_PARAM].setValue(0);
 				params[SUSTAIN_PARAM].setValue(1);
 				params[RELEASE_PARAM].setValue(0.2f);
-				prevKnobCueStartPos = -1;
-				prevKnobCueEndPos = 2;
-				prevKnobLoopStartPos = -1;
-				prevKnobLoopEndPos = 2;
-			break;
-			case 2:	// drums
-				phaseScan = false;
-				params[TRIGGATEMODE_SWITCH].setValue(1);
-				params[TRIGMODE_SWITCH].setValue(1);
-				params[XFADE_PARAM].setValue(0);
-				params[LOOP_PARAM].setValue(0);
-				params[PINGPONG_PARAM].setValue(0);
-				params[ATTACK_PARAM].setValue(0);
-				params[DECAY_PARAM].setValue(0);
-				params[SUSTAIN_PARAM].setValue(1);
-				params[RELEASE_PARAM].setValue(0);
-				params[CUESTART_PARAM].setValue(0);
-				params[CUEEND_PARAM].setValue(1);
-				params[LOOPSTART_PARAM].setValue(0);
-				params[LOOPEND_PARAM].setValue(1);
 				prevKnobCueStartPos = -1;
 				prevKnobCueEndPos = 2;
 				prevKnobLoopStartPos = -1;
@@ -887,26 +902,6 @@ struct SickoPlayer : Module {
 				}
 			} 
 
-			/*
-			if (searchingRestartPhase) {  		// *** *** on PLAY/RESTART trig mode this continues playing until phase is reached (attack value must be set to 0)
-				if (playBuffer[LEFT][antiAlias][floor(samplePos)-1] <= 0 && playBuffer[LEFT][antiAlias][floor(samplePos)] > 0) {
-					searchingRestartPhase = false;
-					fading = true;
-					fadingValue = 1.f;
-					fadedPosition = samplePos;
-
-					samplePos = floor(cueStartPos+1);
-					currSampleWeight = sampleCoeff;
-					prevSamplePos = floor(cueStartPos);
-					prevSampleWeight = 0;
-					stage = ATTACK_STAGE;
-					currentStageSample = 0;
-					lastStageLevel = 0;
-					fadeStageLevel = stageLevel;
-				} 
-			}
-			*/
-
 			trigMode = params[TRIGGATEMODE_SWITCH].getValue();
 			trigType = params[TRIGMODE_SWITCH].getValue();
 
@@ -1060,28 +1055,6 @@ struct SickoPlayer : Module {
 									}
 								break;
 								
-								/*
-								case START_RESTART:									// trig type: Start/Restart
-									if (play[c]) {
-										if (!searchingRestartPhase)
-											searchingRestartPhase = true;
-										//restartSample = samplePos;
-										//fading[c] = true;
-										//fadingValue[c] = 1.f;
-										//fadedPosition[c] = samplePos;
-									} else {
-										play[c] = true;
-										samplePos[c] = floor(cueStartPos+1);
-										currSampleWeight[c] = sampleCoeff;
-										prevSamplePos[c] = floor(cueStartPos);
-										prevSampleWeight[c] = 0;
-										stage[c] = ATTACK_STAGE;
-										currentStageSample[c] = 0;
-										lastStageLevel[c] = 0;
-										//fadeStageLevel[c] = stageLevel[c];
-									}
-								break;
-								*/
 								case PLAY_PAUSE:									// trig type: Play/Pause
 									if (play[c]) {
 										if (stage[c] != RELEASE_STAGE) {
@@ -1476,16 +1449,12 @@ struct SickoPlayer : Module {
 						}
 
 						if (reversePlaying[c]) {
-							//currentOutput *= stageLevel[c] * masterLevel * -5;
 							currentOutput *= stageLevel[c] * masterLevel * -1;
 							if (channels == 2)
-								//currentOutputR *= stageLevel[c] * masterLevel * -5;
 								currentOutputR *= stageLevel[c] * masterLevel * -1;
 						} else {
-							//currentOutput *= stageLevel[c] * masterLevel * 5;
 							currentOutput *= stageLevel[c] * masterLevel;
 							if (channels == 2)
-								//currentOutputR *= stageLevel[c] * masterLevel * 5;
 								currentOutputR *= stageLevel[c] * masterLevel;
 						}
 
@@ -1499,11 +1468,9 @@ struct SickoPlayer : Module {
 									switch (reversePlaying[c]) {
 										case FORWARD:
 											currentOutput *= 1 - fadingValue[c];
-											//currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c]);
 											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												//currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c]);
 												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
 											}
 											fadedPosition[c] += distancePos[c];
@@ -1512,11 +1479,9 @@ struct SickoPlayer : Module {
 										break;
 										case REVERSE:
 											currentOutput *= 1 - fadingValue[c];
-											//currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c] * -1);
 											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												//currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c] * -1);
 												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
 											}
 											fadedPosition[c] -= distancePos[c];
@@ -1544,11 +1509,9 @@ struct SickoPlayer : Module {
 									switch (reversePlaying[c]) {
 										case FORWARD:
 											currentOutput *= 1 - fadingValue[c];
-											//currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c] * -1);
 											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												//currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c] * -1);
 												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
 											}
 											fadedPosition[c] -= distancePos[c];
@@ -1557,11 +1520,9 @@ struct SickoPlayer : Module {
 										break;
 										case REVERSE:
 											currentOutput *= 1 - fadingValue[c];
-											//currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c]);
 											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												//currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * 5 * masterLevel * stageLevel[c]);
 												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
 											}
 											fadedPosition[c] += distancePos[c];
@@ -1619,10 +1580,8 @@ struct SickoPlayer : Module {
 							clippingValue = 1;
 						}
 
-						if (outputs[OUT_OUTPUT].isConnected()) {
+						if (outputs[OUT_OUTPUT].isConnected())
 							outputs[OUT_OUTPUT].setVoltage(currentOutput, c);
-							//outputs[OUT_OUTPUT+1].setVoltage(currentOutputR);           // ********** FOR FADE DEBUG
-						}
 
 						if (outputs[OUT_OUTPUT+1].isConnected()) {
 							if (channels == 2)
@@ -1714,77 +1673,11 @@ struct SickoPlayer : Module {
 	}
 };
 
-struct SickoPlayerInitializeUserFolder : MenuItem {
-	SickoPlayer *rm ;
-	void onAction(const event::Action &e) override {
-		const char* prevFolder = rm->userFolder.c_str();
-		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
-		if (path) {
-			rm->folderTreeData.clear();
-			rm->folderTreeDisplay.clear();
-			rm->userFolder = std::string(path);
-			rm->createFolder(rm->userFolder);
-			rm->folderTreeData.push_back(rm->tempTreeData);
-			rm->folderTreeDisplay.push_back(rm->tempTreeDisplay);
-		}
-		free(path);
-	}
-};
-
-struct SickoPlayerItem : MenuItem {
-	SickoPlayer *rm ;
-	void onAction(const event::Action &e) override {
-		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
-		rm->fileLoaded = false;
-		if (path) {
-			rm->loadSample(path);
-			rm->storedPath = std::string(path);
-		} else {
-			rm->fileLoaded = true;
-		}
-		if (rm->storedPath == "") {
-			rm->fileLoaded = false;
-		}
-		free(path);
-	}
-};
-
 struct SickoPlayerDisplay : TransparentWidget {
 	SickoPlayer *module;
 	int frame = 0;
 	SickoPlayerDisplay() {
 	}
-
-	struct ClearSlotItem : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot();
-		}
-	};
-
-	struct ResetCursorsItem : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->resetCursors();
-		}
-	};
-
-	struct SetPreset0 : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(0);
-		}
-	};
-
-	struct SetPreset1 : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(1);
-		}
-	};
 
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
@@ -1844,7 +1737,6 @@ struct SickoPlayerDisplay : TransparentWidget {
 						nvgClosePath(args.vg);
 					}
 					nvgStroke(args.vg);
-
 
 					// Cue Start line
 					nvgStrokeColor(args.vg, nvgRGBA(0x00, 0xf0, 0x00, 0xf0));
@@ -1956,11 +1848,10 @@ struct SickoPlayerDisplay : TransparentWidget {
 		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
-						module->tempDir = module->folderTreeData[tempIndex][i];
-						menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "",
-							[=](Menu* menu) {
-								loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
-							}));
+					module->tempDir = module->folderTreeData[tempIndex][i];
+					menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "", [=](Menu* menu) {
+						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+					}));
 				} else {
 					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
@@ -1975,50 +1866,41 @@ struct SickoPlayerDisplay : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			SickoPlayerItem *rootDirItem = new SickoPlayerItem;
-				rootDirItem->text = "Load Sample";
-				rootDirItem->rm = module;
-				menu->addChild(rootDirItem);
+			menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
 
-				if (module->folderTreeData.size() > 0) {
-					menu->addChild(createSubmenuItem("Samples Browser", "",
-						[=](Menu* menu) {
-							module->folderTreeData.resize(1);
-							module->folderTreeDisplay.resize(1);
-							for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
-								if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
-										module->tempDir = module->folderTreeData[0][i];
-										menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "",
-											[=](Menu* menu) {
-												loadSubfolder(menu, module->folderTreeData[0][i]);
-											}));
-								} else {
-									menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
-								}
-							}
+			if (module->folderTreeData.size() > 0) {
+				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
+					module->folderTreeData.resize(1);
+					module->folderTreeDisplay.resize(1);
+					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+							module->tempDir = module->folderTreeData[0][i];
+							menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+								loadSubfolder(menu, module->folderTreeData[0][i]);
+							}));
+						} else {
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
 						}
-					));
-				}
+					}
+				}));
+			}
 
-				if (module->fileLoaded) {
-					menu->addChild(new MenuSeparator());
-					menu->addChild(createMenuLabel("Current Sample:"));
-					menu->addChild(createMenuLabel(module->fileDescription));
-					menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
-					menu->addChild(construct<ClearSlotItem>(&MenuItem::rightText, "Clear", &ClearSlotItem::module, module));
-				}
-
-
+			if (module->fileLoaded) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createMenuLabel("Current Sample:"));
+				menu->addChild(createMenuLabel(module->fileDescription));
+				menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
+				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
+			}
 
 			menu->addChild(new MenuSeparator());
-			menu->addChild(construct<ResetCursorsItem>(&MenuItem::text, "Reset Cursors", &ResetCursorsItem::module, module));
+			menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
 
-			menu->addChild(createSubmenuItem("Presets", "",
-				[ = ](Menu * menu) {
-					menu->addChild(construct<SetPreset0>(&MenuItem::text, "Wavetable", &SetPreset0::module, module));
-					menu->addChild(construct<SetPreset1>(&MenuItem::text, "Triggered Sample with Envelope", &SetPreset1::module, module));
-				}));
-		}
+			menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));
+				menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
+			}));
+	}
 	}
 };
 
@@ -2121,45 +2003,6 @@ struct SickoPlayerWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(80.2, 117.5)), module, SickoPlayer::EOR_OUTPUT));
 	}
 
-	struct ClearSlotItem : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot();
-		}
-	};
-
-	struct ResetCursorsItem : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->resetCursors();
-		}
-	};
-
-	struct SetPreset0 : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(0);
-		}
-	};
-
-	struct SetPreset1 : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->setPreset(1);
-		}
-	};
-
-	struct RefreshUserFolderItem : MenuItem {
-		SickoPlayer *module;
-		void onAction(const event::Action &e) override {
-			module->folderTreeData.clear();
-			module->folderTreeDisplay.clear();
-			module->createFolder(module->userFolder);
-			module->folderTreeData.push_back(module->tempTreeData);
-			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
-		}
-	};
-
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
 		SickoPlayer *module = dynamic_cast<SickoPlayer*>(this->module);
 			assert(module);
@@ -2190,11 +2033,10 @@ struct SickoPlayerWidget : ModuleWidget {
 		if (module->folderTreeData[tempIndex].size() > 1) {
 			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
 				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
-						module->tempDir = module->folderTreeData[tempIndex][i];
-						menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "",
-							[=](Menu* menu) {
-								loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
-							}));
+					module->tempDir = module->folderTreeData[tempIndex][i];
+					menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "", [=](Menu* menu) {
+						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+					}));
 				} else {
 					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
@@ -2205,49 +2047,42 @@ struct SickoPlayerWidget : ModuleWidget {
 	void appendContextMenu(Menu *menu) override {
 	   	SickoPlayer *module = dynamic_cast<SickoPlayer*>(this->module);
 			assert(module);
-			menu->addChild(new MenuSeparator());
+		
+		menu->addChild(new MenuSeparator());
 
-		SickoPlayerItem *rootDirItem = new SickoPlayerItem;
-			rootDirItem->text = "Load Sample";
-			rootDirItem->rm = module;
-			menu->addChild(rootDirItem);
+		menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
 
-			if (module->folderTreeData.size() > 0) {
-				menu->addChild(createSubmenuItem("Samples Browser", "",
-					[=](Menu* menu) {
-						module->folderTreeData.resize(1);
-						module->folderTreeDisplay.resize(1);
-						for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
-							if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
-									module->tempDir = module->folderTreeData[0][i];
-									menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "",
-										[=](Menu* menu) {
-											loadSubfolder(menu, module->folderTreeData[0][i]);
-										}));
-							} else {
-								menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
-							}
-						}
+		if (module->folderTreeData.size() > 0) {
+			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
+				module->folderTreeData.resize(1);
+				module->folderTreeDisplay.resize(1);
+				for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+					if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+						module->tempDir = module->folderTreeData[0][i];
+						menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+							loadSubfolder(menu, module->folderTreeData[0][i]);
+						}));
+					} else {
+						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
 					}
-				));
-			}
+				}
+			}));
+		}
 
-			if (module->fileLoaded) {
-				menu->addChild(new MenuSeparator());
-				menu->addChild(createMenuLabel("Current Sample:"));
-				menu->addChild(createMenuLabel(module->fileDescription));
-				menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
-				menu->addChild(construct<ClearSlotItem>(&MenuItem::rightText, "Clear", &ClearSlotItem::module, module));
-			}
+		if (module->fileLoaded) {
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("Current Sample:"));
+			menu->addChild(createMenuLabel(module->fileDescription));
+			menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
+			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
+		}
 
 		menu->addChild(new MenuSeparator());
-		SickoPlayerInitializeUserFolder *rootFolder = new SickoPlayerInitializeUserFolder;
-			rootFolder->text = "Select Samples Root";
-			rootFolder->rm = module;
-			menu->addChild(rootFolder);
+		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
+
 		if (module->userFolder != "") {
 			menu->addChild(createMenuLabel(module->userFolder));
-			menu->addChild(construct<RefreshUserFolderItem>(&MenuItem::rightText, "Refresh", &RefreshUserFolderItem::module, module));
+			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
 		}
 
 		menu->addChild(new MenuSeparator());
@@ -2279,13 +2114,12 @@ struct SickoPlayerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Phase scan", "", &module->phaseScan));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(construct<ResetCursorsItem>(&MenuItem::text, "Reset Cursors", &ResetCursorsItem::module, module));
+		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
 		
-		menu->addChild(createSubmenuItem("Presets", "",
-			[ = ](Menu * menu) {
-				menu->addChild(construct<SetPreset0>(&MenuItem::text, "Wavetable", &SetPreset0::module, module));
-				menu->addChild(construct<SetPreset1>(&MenuItem::text, "Triggered Sample with Envelope", &SetPreset1::module, module));
-			}));
+		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
+			menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));
+			menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));;
+		}));
 	}
 };
 

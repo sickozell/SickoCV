@@ -75,7 +75,6 @@ struct DrumPlayerXtra : Module {
 	std::string fileDescription[4] = {"--none--","--none--","--none--","--none--"};
 	std::string fileDisplay[4] = {"-------","-------","-------","-------"};
 	std::string scrollDisplay[4] = {"-------","-------","-------","-------"};
-	std::string currFileDisplay[4] = {"-------","-------","-------","-------"};
 	std::string userFolder = "";
 
 	std::string currentFolder[4] = {"", "", "", ""};
@@ -292,75 +291,99 @@ struct DrumPlayerXtra : Module {
 		json_t* interpolationJ = json_object_get(rootJ, "Interpolation");
 		if (interpolationJ)
 			interpolationMode = json_integer_value(interpolationJ);
+
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
 			antiAlias = json_integer_value(antiAliasJ);
+
 		json_t* outsModeJ = json_object_get(rootJ, "OutsMode");
 		if (outsModeJ)
 			outsMode = json_integer_value(outsModeJ);
+
 		json_t* scrollingJ = json_object_get(rootJ, "Scrolling");
 		if (scrollingJ)
 			scrolling = json_integer_value(scrollingJ);
+
 		json_t* lightBoxJ = json_object_get(rootJ, "LightBox");
 		if (lightBoxJ)
 			lightBox = json_integer_value(lightBoxJ);
+
 		json_t* displayTrigJ = json_object_get(rootJ, "DisplayTrig");
 		if (displayTrigJ)
 			displayTrig = json_integer_value(displayTrigJ);
+
 		json_t* color1J = json_object_get(rootJ, "Color1");
 		if (color1J)
 			colorBox[0] = json_integer_value(color1J);
+
 		json_t* color1RJ = json_object_get(rootJ, "Color1R");
 		if (color1RJ)
 			colorBoxR[0] = json_integer_value(color1RJ);
+
 		json_t* color1GJ = json_object_get(rootJ, "Color1G");
 		if (color1GJ)
 			colorBoxG[0] = json_integer_value(color1GJ);
+
 		json_t* color1BJ = json_object_get(rootJ, "Color1B");
 		if (color1BJ)
 			colorBoxB[0] = json_integer_value(color1BJ);
+
 		json_t* color2J = json_object_get(rootJ, "Color2");
 		if (color2J)
 			colorBox[1] = json_integer_value(color2J);
+
 		json_t* color2RJ = json_object_get(rootJ, "Color2R");
 		if (color2RJ)
 			colorBoxR[1] = json_integer_value(color2RJ);
+
 		json_t* color2GJ = json_object_get(rootJ, "Color2G");
 		if (color2GJ)
 			colorBoxG[1] = json_integer_value(color2GJ);
+
 		json_t* color2BJ = json_object_get(rootJ, "Color2B");
 		if (color2BJ)
 			colorBoxB[1] = json_integer_value(color2BJ);
+
 		json_t* color3J = json_object_get(rootJ, "Color3");
 		if (color3J)
 			colorBox[2] = json_integer_value(color3J);
+
 		json_t* color3RJ = json_object_get(rootJ, "Color3R");
 		if (color3RJ)
 			colorBoxR[2] = json_integer_value(color3RJ);
+
 		json_t* color3GJ = json_object_get(rootJ, "Color3G");
 		if (color3GJ)
 			colorBoxG[2] = json_integer_value(color3GJ);
+
 		json_t* color3BJ = json_object_get(rootJ, "Color3B");
 		if (color3BJ)
 			colorBoxB[2] = json_integer_value(color3BJ);
+
 		json_t* color4J = json_object_get(rootJ, "Color4");
 		if (color4J)
 			colorBox[3] = json_integer_value(color4J);
+
 		json_t* color4RJ = json_object_get(rootJ, "Color4R");
 		if (color4RJ)
 			colorBoxR[3] = json_integer_value(color4RJ);
+
 		json_t* color4GJ = json_object_get(rootJ, "Color4G");
 		if (color4GJ)
 			colorBoxG[3] = json_integer_value(color4GJ);
+
 		json_t* color4BJ = json_object_get(rootJ, "Color4B");
 		if (color4BJ)
 			colorBoxB[3] = json_integer_value(color4BJ);
+
 		json_t* light1J = json_object_get(rootJ, "Light1");
 		if (light1J)
 			lightTime[0] = json_integer_value(light1J);
+
 		json_t* light2J = json_object_get(rootJ, "Light2");
 		if (light2J)
 			lightTime[1] = json_integer_value(light2J);
+
 		json_t* light3J = json_object_get(rootJ, "Light3");
 		if (light3J)
 			lightTime[2] = json_integer_value(light3J);
@@ -368,18 +391,23 @@ struct DrumPlayerXtra : Module {
 		json_t* light4J = json_object_get(rootJ, "Light4");
 		if (light4J)
 			lightTime[3] = json_integer_value(light4J);
+
 		json_t* zoom1J = json_object_get(rootJ, "Zoom1");
 		if (zoom1J)
 			zoom[0] = json_integer_value(zoom1J);
+
 		json_t* zoom2J = json_object_get(rootJ, "Zoom2");
 		if (zoom2J)
 			zoom[1] = json_integer_value(zoom2J);
+
 		json_t* zoom3J = json_object_get(rootJ, "Zoom3");
 		if (zoom3J)
 			zoom[2] = json_integer_value(zoom3J);
+
 		json_t* zoom4J = json_object_get(rootJ, "Zoom4");
 		if (zoom4J)
 			zoom[3] = json_integer_value(zoom4J);
+
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
@@ -556,6 +584,7 @@ struct DrumPlayerXtra : Module {
 
 	void displayRecalc(int zoom, int slot) {
 		int div = 1;
+		//vector<double>().swap(displayBuff[slot]);
 		displayBuff[slot].clear();
 		switch (zoom) {
 			case 1:
@@ -627,10 +656,18 @@ struct DrumPlayerXtra : Module {
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
 
+			/*
+			vector<double>().swap(displayBuff[slot]);
+			for (int i = 0; i < floor(totalSampleC[slot]); i = i + floor(totalSampleC[slot]/59))
+				displayBuff[slot].push_back(playBuffer[slot][0][i]);
+			*/
 			displayRecalc(zoom[slot], slot);
 
+			//char* pathDup = strdup(path.c_str());
 			fileDescription[slot] = system::getFilename(std::string(path));
 			fileDescription[slot] = fileDescription[slot].substr(0,fileDescription[slot].length()-4);
+			//fileDisplay[slot] = fileDescription[slot].substr(0,5);
+			//free(pathDup);
 
 			currentFolder[slot] = system::getDirectory(path);
 			createCurrentFolder(currentFolder[slot], slot);
@@ -642,6 +679,7 @@ struct DrumPlayerXtra : Module {
 					i = currentFolderV[slot].size();
 				}
 			}
+
 
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription[slot];
@@ -669,7 +707,6 @@ struct DrumPlayerXtra : Module {
 			storedPath[slot] = "";
 			fileDescription[slot] = "--none--";
 			fileDisplay[slot] = "-------";
-			currFileDisplay[slot] = "-------";
 		}
 	};
 	
@@ -678,7 +715,6 @@ struct DrumPlayerXtra : Module {
 		fileDescription[slot] = "--none--";
 		fileDisplay[slot] = "-------";
 		scrollDisplay[slot] = "-------";
-		currFileDisplay[slot] = "-------";
 		fileLoaded[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
@@ -711,6 +747,7 @@ struct DrumPlayerXtra : Module {
 				currentFile[i]++;
 				if (currentFile[i] >= int(currentFolderV[i].size()))
 					currentFile[i] = 0;
+				//loadSample(currentFolderV[i][currentFile], i);
 				loadSample(currentFolderV[i][currentFile[i]], i);
 			}
 			prevNextSample[i] = nextSample[i];
@@ -721,6 +758,7 @@ struct DrumPlayerXtra : Module {
 				currentFile[i]--;
 				if (currentFile[i] < 0)
 					currentFile[i] = currentFolderV[i].size()-1;
+				//loadSample(currentFolderV[i][currentFile], i);
 				loadSample(currentFolderV[i][currentFile[i]], i);
 			}
 			prevPrevSample[i] = prevSample[i];
@@ -741,7 +779,7 @@ struct DrumPlayerXtra : Module {
 				currSampleWeight[i] = sampleCoeff[i];
 				prevSamplePos[i] = 0;
 				prevSampleWeight[i] = 0;
-
+				//debugDisplay = "X";
 				if (inputs[ACC_INPUT+i].getVoltage() > 1)
 					level[i] = params[ACCVOL_PARAM+i].getValue() + (inputs[ACCVOL_INPUT+i].getVoltage() * params[ACCVOLATNV_PARAM+i].getValue() * 0.1);
 				else
@@ -752,6 +790,7 @@ struct DrumPlayerXtra : Module {
 				else if (level[i] < 0)
 					level[i] = 0;
 				
+				//if (i < 3 && params[CHOKE_PARAMS+i].getValue()) {
 				if (i < 3 && choke[i]) {
 					choking[i+1] = true;
 					chokeValue[i+1] = 1.f;
@@ -760,6 +799,7 @@ struct DrumPlayerXtra : Module {
 			prevTrigValue[i] = trigValue[i];
 			currentOutput = 0;
 
+			//if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i] && floor(samplePos[i]) >= 0) {
 			if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i]) {
 				switch (interpolationMode) {
 					case NO_INTERP:
@@ -864,10 +904,20 @@ struct DrumPlayerXtra : Module {
 				fading[i] = false;
 			}
 
+			/*
+			if (params[LIMIT_PARAMS+i].getValue()) {
+				if (currentOutput > 5)
+					currentOutput = 5;
+				else if (currentOutput < -5)
+					currentOutput = -5;
+			}
+			*/
+
 			switch (outsMode) {
 				case NORMALLED_OUTS:
 					summedOutput += currentOutput;
 
+					//if (params[LIMIT_PARAMS+i].getValue()) {
 					if (limit[i]) {
 						if (summedOutput > 5)
 							summedOutput = 5;
@@ -1132,20 +1182,22 @@ struct dpxSlot1Display : TransparentWidget {
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
-				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
-					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
-						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
-							module->tempDir = module->folderTreeData[0][i];
-							menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
-								loadSubfolder(menu, module->folderTreeData[0][i]);
-							}));
-						} else {
-							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],0);}));
+				menu->addChild(createSubmenuItem("Samples Browser", "",
+					[=](Menu* menu) {
+						module->folderTreeData.resize(1);
+						module->folderTreeDisplay.resize(1);
+						for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+							if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+								module->tempDir = module->folderTreeData[0][i];
+								menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+									loadSubfolder(menu, module->folderTreeData[0][i]);
+								}));
+							} else {
+								menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],0);}));
+							}
 						}
 					}
-				}));
+				));
 			}
 			if (module->fileLoaded[0]) {
 				menu->addChild(new MenuSeparator());
@@ -1439,10 +1491,10 @@ struct dpxSlot2Display : TransparentWidget {
 					module->folderTreeDisplay.resize(1);
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
-							module->tempDir = module->folderTreeData[0][i];
-							menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
-								loadSubfolder(menu, module->folderTreeData[0][i]);
-							}));
+								module->tempDir = module->folderTreeData[0][i];
+								menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+									loadSubfolder(menu, module->folderTreeData[0][i]);
+								}));
 						} else {
 							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],1);}));
 						}
@@ -1471,8 +1523,8 @@ struct dpxSlot2Display : TransparentWidget {
 			if (module->lightBox) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Light Box Color", "", [=](Menu* menu) {
-					std::string colorNames[5] = {"Blue", "Red", "Yellow", "Green", "Custom"};
-					for (int i = 0; i < 5; i++) {
+						std::string colorNames[5] = {"Blue", "Red", "Yellow", "Green", "Custom"};
+						for (int i = 0; i < 5; i++) {
 						ColorItem* colorItem = createMenuItem<ColorItem>(colorNames[i]);
 						colorItem->rightText = CHECKMARK(module->colorBox[1] == i);
 						colorItem->module = module;
@@ -2144,11 +2196,13 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 	DrumPlayerXtra *module;
 	int frame = 0;
 
+	std::string currFileDisplay[4] = {"-------","-------","-------","-------"};
 	int fileGap[4] = {0,0,0,0};
 	float currTime;
 	float deltaTime;
 	float prevTime;
 
+	//float boxMaxTime = 0.2f;
 	float deltaBoxTime[4];
 	float startBoxTime[4];
 	int currAlpha[4] = {0,0,0,0};
@@ -2184,9 +2238,9 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 				currTime = system::getTime();
 				switch (module->scrolling) {
 					case 0:
-						for (int i = 0; i < 4; i++) {
-							module->currFileDisplay[i] = module->fileDisplay[i].substr(0,7);
-						}
+						for (int i = 0; i < 4; i++)
+							//currFileDisplay[i] = module->fileDescription[i].substr(0,5);;
+							currFileDisplay[i] = module->fileDisplay[i].substr(0,7);
 					break;
 					case 1:
 						deltaTime = currTime - prevTime;
@@ -2194,28 +2248,31 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 							if (module->scrollDisplay[i].length() > 6) {
 								if (deltaTime > 0.4f) {
 									prevTime = currTime;
-									if (fileGap[i] > int(module->scrollDisplay[i].length())-7)
+									if (fileGap[i] > int(module->scrollDisplay[i].length()) - 7 ) {
 										fileGap[i] = 0;
-									module->currFileDisplay[i] = module->scrollDisplay[i].substr(fileGap[i],7);
+									}
+									currFileDisplay[i] = module->scrollDisplay[i].substr(fileGap[i],7);
 									fileGap[i]++;
 								}
 							} else {
-								module->currFileDisplay[i] = module->scrollDisplay[i].substr(0,7);
+								currFileDisplay[i] = module->scrollDisplay[i].substr(0,7);
 							}
 						}
 					break;
 				}
 
-				nvgTextBox(args.vg, 3, 12,120, module->currFileDisplay[0].c_str(), NULL);
-				nvgTextBox(args.vg, 88, 12,120, module->currFileDisplay[1].c_str(), NULL);
-				nvgTextBox(args.vg, 173, 12,120, module->currFileDisplay[2].c_str(), NULL);
-				nvgTextBox(args.vg, 259, 12,120, module->currFileDisplay[3].c_str(), NULL);
+				nvgTextBox(args.vg, 3, 12,120, currFileDisplay[0].c_str(), NULL);
+				nvgTextBox(args.vg, 88, 12,120, currFileDisplay[1].c_str(), NULL);
+				nvgTextBox(args.vg, 173, 12,120, currFileDisplay[2].c_str(), NULL);
+				nvgTextBox(args.vg, 259, 12,120, currFileDisplay[3].c_str(), NULL);
 				//nvgTextBox(args.vg, 2, -20,120, module->debugDisplay.c_str(), NULL);
 
 				for (int slot=0; slot < 4; slot++) {
 					nvgStrokeColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
 					{
 						nvgBeginPath(args.vg);
+						//nvgMoveTo(args.vg, slotXpos[slot], 20);
+						//nvgLineTo(args.vg, slotXpos[slot]+59, 20);
 						nvgMoveTo(args.vg, slotXpos[slot], 28);
 						nvgLineTo(args.vg, slotXpos[slot]+59, 28);
 						nvgClosePath(args.vg);
@@ -2226,6 +2283,7 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 						// Waveform
 						nvgStrokeColor(args.vg, nvgRGBA(0x22, 0x44, 0xc9, 0xc0));
 						nvgSave(args.vg);
+						//Rect b = Rect(Vec(slotXpos[slot], 2), Vec(59, 36));
 						Rect b = Rect(Vec(slotXpos[slot], 13), Vec(59, 30));
 						nvgScissor(args.vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
 						nvgBeginPath(args.vg);
@@ -2269,6 +2327,7 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 								nvgFillColor(args.vg, nvgRGBA(colorR[module->colorBox[slot]], colorG[module->colorBox[slot]], colorB[module->colorBox[slot]], currAlpha[slot]));
 							nvgFill(args.vg);
 							deltaBoxTime[slot] = currTime - startBoxTime[slot];
+							//currAlpha[slot] = int((boxMaxTime - deltaBoxTime[slot]) * maxAlpha[slot] / boxMaxTime);
 							currAlpha[slot] = int((lightTimeDur[module->lightTime[slot]] - deltaBoxTime[slot]) * maxAlpha[slot] / lightTimeDur[module->lightTime[slot]]);
 						}
 					}
@@ -2379,13 +2438,11 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {module->menuLoadSample(2);}));
 		menu->addChild(createMenuItem("4: " + module->fileDescription[3], "", [=]() {module->menuLoadSample(3);}));
 
-		/*
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Clear ALL slots", "", [=]() {
 			for (int i = 0; i < 4; i++)
 				module->clearSlot(i);
 		}));
-		*/
 		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
@@ -2437,80 +2494,6 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
 		menu->addChild(createBoolPtrMenuItem("Light Boxes", "", &module->lightBox));
 		menu->addChild(createBoolPtrMenuItem("Display triggering", "", &module->displayTrig));
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Global settings", "", [=](Menu* menu) {
-			menu->addChild(createMenuItem("Clear ALL samples", "", [=]() {
-				for (int i = 0; i < 4; i++)
-					module->clearSlot(i);
-			}));
-			menu->addChild(createMenuItem("Clear Root Folder", "", [=]() {
-				module->folderTreeData.clear();
-				module->folderTreeDisplay.clear();
-				module->userFolder = "";
-			}));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Reset Lightboxes Colors", "", [=]() {
-				for (int i = 0; i < 4; i++)
-					module->colorBox[i] = i;
-			}));
-			menu->addChild(createMenuItem("Set ALL Custom Colors", "", [=]() {
-				for (int i = 0; i < 4; i++)
-					module->colorBox[i] = 4;
-			}));
-			menu->addChild(createMenuItem("Clear Custom Colors", "", [=]() {
-				module->colorBoxR[0] = 0;
-				module->colorBoxR[1] = 255;
-				module->colorBoxR[2] = 255;
-				module->colorBoxR[3] = 0;
-				module->colorBoxG[0] = 0;
-				module->colorBoxG[1] = 0;
-				module->colorBoxG[2] = 255;
-				module->colorBoxG[3] = 255;
-				module->colorBoxB[0] = 255;
-				module->colorBoxB[1] = 0;
-				module->colorBoxB[2] = 0;
-				module->colorBoxB[3] = 0;
-			}));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Reset Lightboxes fading to Normal", "", [=]() {
-				for (int i = 0; i < 4; i++)
-					module->lightTime[i] = 1;
-			}));
-			menu->addChild(createMenuItem("Set Lightboxes fading to Slow", "", [=]() {
-				for (int i = 0; i < 4; i++)
-					module->lightTime[i] = 0;
-			}));
-			menu->addChild(createMenuItem("Set Lightboxes fading to Fast", "", [=]() {
-				for (int i = 0; i < 4; i++)
-					module->lightTime[i] = 2;
-			}));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Reset Zooms to Full", "", [=]() {
-				for (int i = 0; i < 4; i++) {
-					module->zoom[i] = 0;
-					module->displayRecalc(0, i);
-				}
-			}));
-			menu->addChild(createMenuItem("Set Zooms to Half", "", [=]() {
-				for (int i = 0; i < 4; i++) {
-					module->zoom[i] = 1;
-					module->displayRecalc(1, i);
-				}
-			}));
-			menu->addChild(createMenuItem("Set Zooms to Quarter", "", [=]() {
-				for (int i = 0; i < 4; i++) {
-					module->zoom[i] = 2;
-					module->displayRecalc(2, i);
-				}
-			}));
-			menu->addChild(createMenuItem("Set Zooms to Eighth", "", [=]() {
-				for (int i = 0; i < 4; i++) {
-					module->zoom[i] = 3;
-					module->displayRecalc(3, i);
-				}
-			}));
-		}));
 	}
 };
 
