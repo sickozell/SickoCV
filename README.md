@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta13
+# SickoCV v2.5.2-beta15
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -33,7 +33,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added XFD knob  
 - moved factory presets to module context menu  
 
-# SickoCV v2.5.2-beta13
+# SickoCV v2.5.2-beta15
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/221338090-8831ad42-1a7c-4490-b4e0-2aaf9dde1db8.JPG)
@@ -282,7 +282,11 @@ This option enables a light box over waveform displays when sample is triggered.
 When enebled, in each slot context menu light color and fade duration can be set.
 
 **Display Triggering** (drumPlayerXtra only)  
-This option enables sample triggering by clicking over the the display area.
+This option enables sample triggering by clicking over the the display area, to play samples live or just to test them while navigating sample folders  
+
+**Global Settings**  (drumPlayerXtra only)  
+In this menu there are options to clear all the slots or the root folder.  
+It is also used to apply settings to all the slots: Zoom, Lightboxes color and time fading.  
 
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
