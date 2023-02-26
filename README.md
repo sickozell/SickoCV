@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta16
+# SickoCV v2.5.2-beta18
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -33,7 +33,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added XFD knob  
 - moved factory presets to module context menu  
 
-# SickoCV v2.5.2-beta16
+# SickoCV v2.5.2-beta18
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/221338090-8831ad42-1a7c-4490-b4e0-2aaf9dde1db8.JPG)
