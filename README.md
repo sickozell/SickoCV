@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta21
+# SickoCV v2.5.2-beta22
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -12,6 +12,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
+- **Wavetabler (NEW!!!)**
 - **DrumPlayerXtra (NEW!!!)**
 - **SickoSampler (NEW!!!)**
 - **SickoPlayer**
@@ -32,12 +33,13 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added swap and copy slot option to slot context menu  
 
 **sickoPlayer**  
+- fixed bug when switching from poly to monophonic out  
 - fixed some bugs on cursors repositioning
 - moved REV button to cursor knobs area. Now it selects next playback direction   
 - added XFD knob  
 - moved factory presets to module context menu  
 
-# SickoCV v2.5.2-beta21
+# SickoCV v2.5.2-beta22
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/221338090-8831ad42-1a7c-4490-b4e0-2aaf9dde1db8.JPG)
