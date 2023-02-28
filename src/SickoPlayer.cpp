@@ -71,8 +71,8 @@ struct SickoPlayer : Module {
 		VOL_INPUT,
 		TUNE_INPUT,
 		VO_INPUT,
-		LOOPSTART_INPUT,
-		LOOPEND_INPUT,
+		//LOOPSTART_INPUT,
+		//LOOPEND_INPUT,
 		ATTACK_INPUT,
 		DECAY_INPUT,
 		SUSTAIN_INPUT,
@@ -1635,12 +1635,14 @@ struct SickoPlayer : Module {
 
 					if (outputs[OUT_OUTPUT].isConnected()) {
 						outputs[OUT_OUTPUT].setVoltage(sumOutput);
+						outputs[OUT_OUTPUT].setChannels(1);
 					}
 					if (outputs[OUT_OUTPUT+1].isConnected()) {
 						if (channels == 2)
 							outputs[OUT_OUTPUT+1].setVoltage(sumOutputR);
 						else
 							outputs[OUT_OUTPUT+1].setVoltage(sumOutput);
+						outputs[OUT_OUTPUT+1].setChannels(1);
 					}
 
 				break;

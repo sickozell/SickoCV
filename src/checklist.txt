@@ -1,5 +1,9 @@
 checklist
 
+waveTabler
+- aggiungere modo per il drag&drop del module sul display
+- aggiustare il sample display
+
 drumPlayerXtra
 - sistemare i bug del display samplename. Su nuovo modulo e caricamento, non mostra i nomi.
 - verificare funzionamento del browser

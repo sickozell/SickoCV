@@ -24,15 +24,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.4142135"
-     inkscape:cx="133.99674"
-     inkscape:cy="235.46657"
+     inkscape:zoom="2.828427"
+     inkscape:cx="77.958526"
+     inkscape:cy="337.28995"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g20493"
+     inkscape:current-layer="g21465"
      showguides="true" /><defs
      id="defs2"><rect
        x="22.799086"
@@ -1763,7 +1763,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Etichette Testo"
-     style="display:inline"><text
+     style="display:none"><text
        xml:space="preserve"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#cc3333;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        x="10.127775"
@@ -3913,7 +3913,7 @@
        id="g21047"
        style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="TRIG1"
-       transform="translate(0,0.50020336)"><path
+       transform="translate(3.3333335e-8,0.50020336)"><path
          d="m 5.0933108,34.178135 v -2.38125 h -0.79375 V 31.40001 h 2.38125 v 0.396875 h -0.79375 v 2.38125 z"
          style="stroke-width:0.265"
          id="path21041" /><path

@@ -77,8 +77,8 @@ struct SickoSampler : Module {
 		VOL_INPUT,
 		TUNE_INPUT,
 		VO_INPUT,
-		LOOPSTART_INPUT,
-		LOOPEND_INPUT,
+		//LOOPSTART_INPUT,
+		//LOOPEND_INPUT,
 		ATTACK_INPUT,
 		DECAY_INPUT,
 		SUSTAIN_INPUT,
@@ -2092,12 +2092,14 @@ struct SickoSampler : Module {
 
 					if (outputs[OUT_OUTPUT].isConnected()) {
 						outputs[OUT_OUTPUT].setVoltage(sumOutput);
+						outputs[OUT_OUTPUT].setChannels(1);
 					}
 					if (outputs[OUT_OUTPUT+1].isConnected()) {
 						if (channels == 2)
 							outputs[OUT_OUTPUT+1].setVoltage(sumOutputR);
 						else
 							outputs[OUT_OUTPUT+1].setVoltage(sumOutput);
+						outputs[OUT_OUTPUT+1].setChannels(1);
 					}
 
 				break;
@@ -2509,14 +2511,17 @@ struct SickoSampler : Module {
 								}
 							}
 
-							if (outputs[OUT_OUTPUT].isConnected())
+							if (outputs[OUT_OUTPUT].isConnected()){
 								outputs[OUT_OUTPUT].setVoltage(sumOutput);
+								outputs[OUT_OUTPUT].setChannels(1);
+							}
 
 							if (outputs[OUT_OUTPUT+1].isConnected()) {
 								if (channels == 2)
 									outputs[OUT_OUTPUT+1].setVoltage(sumOutputR);
 								else
 									outputs[OUT_OUTPUT+1].setVoltage(sumOutput);
+								outputs[OUT_OUTPUT+1].setChannels(1);
 							}
 						break;
 
@@ -2558,7 +2563,7 @@ struct SickoSampler : Module {
 				if (recordingState == 1) {
 					switch (polyOuts) {
 						case MONOPHONIC:										// monophonic CABLES
-						sumOutput += currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
+							sumOutput += currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
 							if (channels == 2)
 								sumOutputR += currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
 							// *** HARD CLIP ***
@@ -2593,14 +2598,17 @@ struct SickoSampler : Module {
 								clippingValue = 1;
 							}
 
-							if (outputs[OUT_OUTPUT].isConnected())
+							if (outputs[OUT_OUTPUT].isConnected()) {
 								outputs[OUT_OUTPUT].setVoltage(sumOutput);
+								outputs[OUT_OUTPUT].setChannels(1);
+							}
 
 							if (outputs[OUT_OUTPUT+1].isConnected()) {
 								if (channels == 2)
 									outputs[OUT_OUTPUT+1].setVoltage(sumOutputR);
 								else
 									outputs[OUT_OUTPUT+1].setVoltage(sumOutput);
+								outputs[OUT_OUTPUT+1].setChannels(1);
 							}
 						break;
 
@@ -2693,14 +2701,17 @@ struct SickoSampler : Module {
 							clippingValue = 1;
 						}
 
-						if (outputs[OUT_OUTPUT].isConnected())
+						if (outputs[OUT_OUTPUT].isConnected()) {
 							outputs[OUT_OUTPUT].setVoltage(sumOutput);
+							outputs[OUT_OUTPUT].setChannels(1);
+						}
 
 						if (outputs[OUT_OUTPUT+1].isConnected()) {
 							if (channels == 2)
 								outputs[OUT_OUTPUT+1].setVoltage(sumOutputR);
 							else
 								outputs[OUT_OUTPUT+1].setVoltage(sumOutput);
+							outputs[OUT_OUTPUT+1].setChannels(1);
 						}
 					break;
 

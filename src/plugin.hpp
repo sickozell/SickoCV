@@ -30,3 +30,4 @@ extern Model *modelSickoPlayer;
 extern Model* modelDrummer4Plus;
 extern Model* modelSickoSampler;
 extern Model* modelDrumPlayerXtra;
+extern Model* modelWavetabler;
