@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta22
+# SickoCV v2.5.2-beta24
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -34,15 +34,16 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 **sickoPlayer**  
 - fixed bug when switching from poly to monophonic out  
+- added polyphony to EOC/EOR outputs  
 - fixed some bugs on cursors repositioning
 - moved REV button to cursor knobs area. Now it selects next playback direction   
 - added XFD knob  
 - moved factory presets to module context menu  
 
-# SickoCV v2.5.2-beta22
+# SickoCV v2.5.2-beta24
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/221338090-8831ad42-1a7c-4490-b4e0-2aaf9dde1db8.JPG)
+![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/222262353-bda4ce93-5fb6-431e-abf4-2ee5f7c482bc.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -405,7 +406,7 @@ There are 3 different interpolation algorithms, that are engaged during playback
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
 **Polyphonic Outs**  
-When this option is enabled the outs reflect v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out.
+When this option is enabled the audio and EOC/EOR outputs reflect v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out.
 
 **Phase scan**  
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
@@ -543,6 +544,30 @@ If Release is set to 0 (and attack is set greater than 0) and a new GATE or Togg
 
 These behaviors are more understandable connecting a scope on the output.
 
+## Wavetabler
+### wavetable sample player
+
+![wavetabler](https://user-images.githubusercontent.com/80784296/222262680-e902b65f-53a7-4bcb-b34c-467d10e256a5.JPG)
+
+#### - DESCRIPTION
+- 1-cycle waveforms player
+- ±24 semitones tuning and v/oct input with polyphony
+- envelope generator, reverse, pingpong
+- anti-aliasing filter
+
+#### - INSTRUCTIONS
+Load sample using context menu or right-click in the waveform display area to access quick load menu.  
+Once a sample is loaded you can browse samples in the same folder using Previous and Next buttons below the display.  
+
+REV button changes the playback start direction.
+
+PNG button enables PingPong mode: playback direction is inverted when sample reaches its edges.  
+
+The envelope knobs can be external modulated with attenuverted CVinputs.
+
+Tune knob with its attenuverted CVinput, can tune up or down the sample with a ±2 octave range (semitone scale).  
+
+Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range. A led clip light warns of clipping.  
 
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
