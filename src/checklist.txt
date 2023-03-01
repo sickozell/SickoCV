@@ -11,9 +11,7 @@ drumPlayerXtra
 - (fatto)far funzionare insieme il display triggering con gli output modes
 
 sickosampler
-- fare un menu reset
-- verificare funzionamento del browser
--verificare bug sul browser
+- migliorare il context menu su POLYOUTS
 - METTERE CURRENT FOLDER DOPO IL SALVATAGGIO
 - sistemare il salvataggio cue/loop region per il phase scan
 - registrazione senza overdub mentre si fa playback
@@ -59,13 +57,14 @@ sickosampler
 - (fatto) impostare limite di memoria alla registrazione e caricamento file
 - (fatto, ok) controllare adeguatezza del calcolo sui sample pari che non hanno bisogno di interpolazione (controllo weight)
 - (ok, non si può salvare un file vuoto) eliminare disegno forma d'onda quando si salva un file vuoto.
-
+- (fatto) fare un menu reset
+- (fatto)verificare funzionamento del browser
 
 sickoplayer
+- migliorare il context menu su POLYOUTS
 - aggiungre nota nelle istruzioni per eliminare i factory preset
 - togliere "rm->storedPath = std::string(path);" da "struct SickoPlayerItem : MenuItem {"
 - verificare durata clipping light
-- sistemare ordine di calcolo CueStartPos e LoopStartPos come su sickosampler
 - verificare se è il caso di cambiare la disattivazione del PLAY prima del LoadSample da  "fileloaded = false" in "play = false"
 
 - (fatto, da verificare) verificare il lowpassfilter su sampleload per lo stereo
@@ -74,6 +73,7 @@ sickoplayer
 - (fatto) impostare limite di memoria alla registrazione e caricamento file
 - (fatto, da decidere se migliorarlo per rapporti di samplerate > 2, tipo da 44100 a 11025) verificare quando sampleweight funziona per davvero
 - (fatto, verificare tutti i funzionamenti, fade ecc) decidere se registrare la forma d'onda moltiplicata per 5 per evitare il ricalcolo ogni sample
+- (fatto) sistemare ordine di calcolo CueStartPos e LoopStartPos come su sickosampler
 
 drumplayer
 drumplayer+
