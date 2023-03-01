@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta24
+# SickoCV v2.5.2-beta25
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -40,10 +40,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added XFD knob  
 - moved factory presets to module context menu  
 
-# SickoCV v2.5.2-beta24
+# SickoCV v2.5.2-beta25
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/222262353-bda4ce93-5fb6-431e-abf4-2ee5f7c482bc.JPG)
+![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/222272562-25293b41-d252-42d5-8345-c911cf7f56af.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -547,7 +547,7 @@ These behaviors are more understandable connecting a scope on the output.
 ## Wavetabler
 ### wavetable sample player
 
-![wavetabler](https://user-images.githubusercontent.com/80784296/222262680-e902b65f-53a7-4bcb-b34c-467d10e256a5.JPG)
+![wavetabler](https://user-images.githubusercontent.com/80784296/222272709-33ee0e06-bcfa-4f20-8428-6579940f1f0f.JPG)
 
 #### - DESCRIPTION
 - 1-cycle waveforms player
