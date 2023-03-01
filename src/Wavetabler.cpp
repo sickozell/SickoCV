@@ -492,7 +492,7 @@ struct Wavetabler : Module {
 					fileDisplay += tempFileChar;
 			}
 
-			fileDisplay = fileDisplay.substr(0, 19);
+			fileDisplay = fileDisplay.substr(0, 20);
 			samplerateDisplay = std::to_string(int(sampleRate * .5));
 			//channelsDisplay = std::to_string(channels) + "Ch";
 
