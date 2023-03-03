@@ -77,8 +77,6 @@ struct SickoSampler : Module {
 		VOL_INPUT,
 		TUNE_INPUT,
 		VO_INPUT,
-		//LOOPSTART_INPUT,
-		//LOOPEND_INPUT,
 		ATTACK_INPUT,
 		DECAY_INPUT,
 		SUSTAIN_INPUT,
@@ -204,6 +202,7 @@ struct SickoSampler : Module {
 	bool trimOnSave = true;
 	int antiAlias = 1;
 	int polyOuts = POLYPHONIC;
+	int polyMaster = POLYPHONIC;
 	bool phaseScan = true;
 	
 	//float fadeCoeff[7] = {APP->engine->getSampleRate(), 2000.f, 1000.f, 200.f, 100.f, 50.f, 20.f};	// None, 0.5ms, 1ms, 5ms, 10ms, 20ms, 50ms fading
@@ -235,10 +234,15 @@ struct SickoSampler : Module {
 	float currentStageSample[16];
 	float maxStageSample[16];
 	
+	/*
 	bool eoc = false;
 	bool eor = false;
 	float eocTime;
-	float eorTime;
+	float eorTime;*/
+	bool eoc[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool eor[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	float eocTime[16];
+	float eorTime[16];
 	float eocEorTime = (APP->engine->getSampleRate()) / 2000;
 
 	int chan;
@@ -247,7 +251,7 @@ struct SickoSampler : Module {
 	float decayValue;
 	float sustainValue;
 	float releaseValue;
-	float masterLevel;
+	float masterLevel[16];
 	int limiter;
 
 	bool reverseStart = false;
@@ -391,6 +395,7 @@ struct SickoSampler : Module {
 		trimOnSave = true;
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
+		polyMaster = POLYPHONIC;
 		phaseScan = true;
 		uceCueStart = false;
 		clearSlot();
@@ -425,6 +430,7 @@ struct SickoSampler : Module {
 		json_object_set_new(rootJ, "TrimOnSave", json_boolean(trimOnSave));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
+		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
 		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
 		json_object_set_new(rootJ, "UceCueStart", json_boolean(uceCueStart));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
@@ -442,6 +448,9 @@ struct SickoSampler : Module {
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
+		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
+		if (polyMasterJ)
+			polyMaster = json_integer_value(polyMasterJ);
 		json_t* phaseScanJ = json_object_get(rootJ, "PhaseScan");
 		if (phaseScanJ)
 			phaseScan = json_boolean_value(phaseScanJ);
@@ -1213,6 +1222,22 @@ struct SickoSampler : Module {
 		}
 	}
 
+	bool isPolyOuts() {
+		return polyOuts;
+	}
+
+	void setPolyOuts(bool poly) {
+		if (poly) 
+			polyOuts = 1;
+		else {
+			polyOuts = 0;
+			outputs[OUT_OUTPUT].setChannels(1);
+			outputs[OUT_OUTPUT+1].setChannels(1);
+			outputs[EOC_OUTPUT].setChannels(1);
+			outputs[EOR_OUTPUT].setChannels(1);
+		}
+	}
+
 /*
 																				██████╗░██████╗░░█████╗░░█████╗░███████╗░██████╗░██████╗
 																				██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝
@@ -1267,11 +1292,13 @@ struct SickoSampler : Module {
 		currRecValue[LEFT] = 0;
 		currRecValue[RIGHT] = 0;
 
+		/*
 		masterLevel = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage() * params[VOLATNV_PARAM].getValue() * 0.1);
 		if (masterLevel > 2)
 			masterLevel = 2;
 		else if (masterLevel < 0)
 			masterLevel = 0;
+		*/
 		
 		limiter = params[LIMIT_SWITCH].getValue();
 		
@@ -1449,6 +1476,16 @@ struct SickoSampler : Module {
 			voctDisplay = 100.f;
 
 			for (int c = 0; c < chan; c++) {
+
+				if (polyMaster) 
+					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(c) * params[VOLATNV_PARAM].getValue() * 0.2);
+				else
+					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(0) * params[VOLATNV_PARAM].getValue() * 0.2);
+				
+				if (masterLevel[c] > 2)
+					masterLevel[c] = 2;
+				else if (masterLevel[c] < 0)
+					masterLevel[c] = 0;
 
 				trigValue[c] = inputs[TRIG_INPUT].getVoltage(c);
 
@@ -1642,9 +1679,19 @@ struct SickoSampler : Module {
 									prevSamplePos[c] = floor(loopStartPos);
 									prevSampleWeight[c] = 0;
 								}
+								/*
 								if (c == currentDisplay) {
 									eoc = true;
 									eocTime = eocEorTime;
+								}*/
+								if (polyOuts) {
+									eoc[c] = true;
+									eocTime[c] = eocEorTime;
+								} else {
+									if (c == currentDisplay) {
+										eoc[0] = true;
+										eocTime[0] = eocEorTime;
+									}
 								}
 							} else if (!fadingType[c] && floor(samplePos[c]) > (totalSamples - (fadeSamples * distancePos[c]))) {
 								fadingType[c] = FADE_OUT;
@@ -1657,9 +1704,19 @@ struct SickoSampler : Module {
 							} else if (floor(samplePos[c]) > totalSamples) {	// *** REACHED END OF SAMPLE ***
 								play[c] = false;
 								inPause[c] = false;
+								/*
 								if (c == currentDisplay) {
 									eoc = true;
 									eocTime = eocEorTime;
+								}*/
+								if (polyOuts) {
+									eoc[c] = true;
+									eocTime[c] = eocEorTime;
+								} else {
+									if (c == currentDisplay) {
+										eoc[0] = true;
+										eocTime[0] = eocEorTime;
+									}
 								}
 							} else if (samplePos[c] > cueEndPos) {				// *** REACHED CUE END ***
 								if (stage[c] != RELEASE_STAGE) {
@@ -1684,9 +1741,19 @@ struct SickoSampler : Module {
 										prevSampleWeight[c] = 0;
 									}
 								}
+								/*
 								if (c == currentDisplay) {
 									eoc = true;
 									eocTime = eocEorTime;
+								}*/
+								if (polyOuts) {
+									eoc[c] = true;
+									eocTime[c] = eocEorTime;
+								} else {
+									if (c == currentDisplay) {
+										eoc[0] = true;
+										eocTime[0] = eocEorTime;
+									}
 								}
 							} 
 						break;
@@ -1714,9 +1781,19 @@ struct SickoSampler : Module {
 									prevSamplePos[c] = floor(loopEndPos);
 									prevSampleWeight[c] = 0;
 								}
+								/*
 								if (c == currentDisplay) {
 									eoc = true;
 									eocTime = eocEorTime;
+								}*/
+								if (polyOuts) {
+									eoc[c] = true;
+									eocTime[c] = eocEorTime;
+								} else {
+									if (c == currentDisplay) {
+										eoc[0] = true;
+										eocTime[0] = eocEorTime;
+									}
 								}
 							} else if (!fadingType[c] && floor(samplePos[c]) < (fadeSamples * distancePos[c])) {
 								fadingType[c] = FADE_OUT;
@@ -1729,9 +1806,19 @@ struct SickoSampler : Module {
 							} else if (floor(samplePos[c]) < 0) {				// *** REACHED START OF SAMPLE ***
 								play[c] = false;
 								inPause[c] = false;
+								/*
 								if (c == currentDisplay) {
 									eoc = true;
 									eocTime = eocEorTime;
+								}*/
+								if (polyOuts) {
+									eoc[c] = true;
+									eocTime[c] = eocEorTime;
+								} else {
+									if (c == currentDisplay) {
+										eoc[0] = true;
+										eocTime[0] = eocEorTime;
+									}
 								}
 							} else if (samplePos[c] < cueStartPos) {			// *** REACHED CUE START ***
 								if (stage[c] != RELEASE_STAGE) {
@@ -1756,9 +1843,19 @@ struct SickoSampler : Module {
 										prevSampleWeight[c] = 0;
 									}
 								}
+								/*
 								if (c == currentDisplay) {
 									eoc = true;
 									eocTime = eocEorTime;
+								}*/
+								if (polyOuts) {
+									eoc[c] = true;
+									eocTime[c] = eocEorTime;
+								} else {
+									if (c == currentDisplay) {
+										eoc[0] = true;
+										eocTime[0] = eocEorTime;
+									}
 								}
 							}
 						break;
@@ -1772,10 +1869,21 @@ struct SickoSampler : Module {
 								currentStageSample[c] = 0;
 								lastStageLevel[c] = 1-stageLevel[c];
 							}
+							/*
 							if (c == currentDisplay) {
 								eoc = true;
 								eocTime = eocEorTime;
+							}*/
+							if (polyOuts) {
+								eoc[c] = true;
+								eocTime[c] = eocEorTime;
+							} else {
+								if (c == currentDisplay) {
+									eoc[0] = true;
+									eocTime[0] = eocEorTime;
+								}
 							}
+						
 						}
 						prevStopValue[c] = stopValue[c];
 
@@ -1879,9 +1987,19 @@ struct SickoSampler : Module {
 									stage[c] = STOP_STAGE;
 									play[c] = false;
 									lastStageLevel[c] = 0;
+									/*
 									if (c == currentDisplay) {
 										eor = true;
 										eorTime = eocEorTime;
+									}*/
+									if (polyOuts) {
+										eor[c] = true;
+										eorTime[c] = eocEorTime;
+									} else {
+										if (c == currentDisplay) {
+											eor[0] = true;
+											eocTime[0] = eocEorTime;
+										}
 									}
 									if (trigType == PLAY_PAUSE) {
 										if (samplePos[c] > cueEndPos) {
@@ -1894,13 +2012,13 @@ struct SickoSampler : Module {
 						}
 
 						if (reversePlaying[c]) {
-							currentOutput *= stageLevel[c] * masterLevel * -1;
+							currentOutput *= stageLevel[c] * masterLevel[c] * -1;
 							if (channels == 2)
-								currentOutputR *= stageLevel[c] * masterLevel * -1;
+								currentOutputR *= stageLevel[c] * masterLevel[c] * -1;
 						} else {
-							currentOutput *= stageLevel[c] * masterLevel;
+							currentOutput *= stageLevel[c] * masterLevel[c];
 							if (channels == 2)
-								currentOutputR *= stageLevel[c] * masterLevel;
+								currentOutputR *= stageLevel[c] * masterLevel[c];
 						}
 
 /*
@@ -1922,10 +2040,10 @@ struct SickoSampler : Module {
 									switch (reversePlaying[c]) {
 										case FORWARD:
 											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
+											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
+												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
 											}
 											fadedPosition[c] += distancePos[c];
 											if (fadedPosition[c] > totalSamples)
@@ -1933,10 +2051,10 @@ struct SickoSampler : Module {
 										break;
 										case REVERSE:
 											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
+											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
+												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
 											}
 											fadedPosition[c] -= distancePos[c];
 											if (fadedPosition[c] < 0)
@@ -1963,10 +2081,10 @@ struct SickoSampler : Module {
 									switch (reversePlaying[c]) {
 										case FORWARD:
 											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
+											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c] * -1);
+												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
 											}
 											fadedPosition[c] -= distancePos[c];
 											if (fadedPosition[c] < 0)
@@ -1974,10 +2092,10 @@ struct SickoSampler : Module {
 										break;
 										case REVERSE:
 											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
+											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
 											if (channels == 2) {
 												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel * stageLevel[c]);
+												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
 											}
 											fadedPosition[c] += distancePos[c];
 											if (fadedPosition[c] > totalSamples)
@@ -2054,6 +2172,26 @@ struct SickoSampler : Module {
 					fadingType[c] = NO_FADE;
 				}
 
+				if (polyOuts) {
+					if (eoc[c]) {
+						eocTime[c]--;
+						if (eocTime[c] < 0) {
+							eoc[c] = false;
+							outputs[EOC_OUTPUT].setVoltage(0.f, c);
+						} else
+							outputs[EOC_OUTPUT].setVoltage(10.f, c);
+					}
+
+					if (eor[c]) {
+						eorTime[c]--;
+						if (eorTime[c] < 0) {
+							eor[c] = false;
+							outputs[EOR_OUTPUT].setVoltage(0.f, c);
+						} else
+							outputs[EOR_OUTPUT].setVoltage(10.f, c);
+					}
+				}
+
 			} // END OF CHANNEL MANAGEMENT
 
 			switch (polyOuts) {
@@ -2109,7 +2247,7 @@ struct SickoSampler : Module {
 					outputs[OUT_OUTPUT+1].setChannels(chan);
 				break;
 			}
-
+			/*
 			if (eoc) {
 				eocTime--;
 				if (eocTime < 0) {
@@ -2127,6 +2265,7 @@ struct SickoSampler : Module {
 				} else
 					outputs[EOR_OUTPUT].setVoltage(10.f);
 			}
+			*/
 		}
 
 /*
@@ -2229,7 +2368,6 @@ struct SickoSampler : Module {
 				lights[REC_LIGHT].setBrightness(1);
 
 			} else {				// **** if rec is pressed or triggered and no left cabile is plugged, do nothing
-				//recordingState = 0;	// ************ non dovrebbe servire
 				params[REC_PARAM].setValue(0);
 				recButton = 0;
 				lights[REC_LIGHT].setBrightness(0);
@@ -2494,9 +2632,9 @@ struct SickoSampler : Module {
 				if (monitorFade) {
 					switch (polyOuts) {
 						case MONOPHONIC:										// monophonic CABLES
-							sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel;
+							sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
 							if (channels == 2)
-								sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel;
+								sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
 							// *** HARD CLIP ***
 							if (limiter) {
 								if (sumOutput > 5)
@@ -2526,8 +2664,8 @@ struct SickoSampler : Module {
 						break;
 
 						case POLYPHONIC:
-							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel);
-							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel);
+							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
+							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
 							// *** HARD CLIP ***
 							if (limiter) {
 								if (currentOutput > 5)
@@ -2563,9 +2701,9 @@ struct SickoSampler : Module {
 				if (recordingState == 1) {
 					switch (polyOuts) {
 						case MONOPHONIC:										// monophonic CABLES
-							sumOutput += currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
+							sumOutput += currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 							if (channels == 2)
-								sumOutputR += currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
+								sumOutputR += currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 							// *** HARD CLIP ***
 							if (limiter) {
 								if (sumOutput > 5)
@@ -2613,8 +2751,8 @@ struct SickoSampler : Module {
 						break;
 
 						case POLYPHONIC:
-							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel);
-							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel);
+							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
+							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
 							// *** HARD CLIP ***
 							if (limiter) {
 								if (currentOutput > 5)
@@ -2666,9 +2804,9 @@ struct SickoSampler : Module {
 			case 2:								// *** ALWAYS MONITORING ***
 				switch (polyOuts) {
 					case MONOPHONIC:										// monophonic CABLES
-						sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
+						sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 						if (channels == 2)
-							sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel;
+							sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 						// *** HARD CLIP ***
 						if (limiter) {
 							if (sumOutput > 5)
@@ -2716,8 +2854,8 @@ struct SickoSampler : Module {
 					break;
 
 					case POLYPHONIC:
-						currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel);
-						currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel);
+						currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
+						currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
 						// *** HARD CLIP ***
 						if (limiter) {
 							if (currentOutput > 5)
@@ -2771,6 +2909,30 @@ struct SickoSampler : Module {
 		// ******************************************************************************************************
 		// *****************************  R E C O R D I N G        E N D  ***************************************
 		// ******************************************************************************************************
+
+		if (polyOuts) {
+			outputs[EOC_OUTPUT].setChannels(chan);
+			outputs[EOR_OUTPUT].setChannels(chan);
+		} else {
+			if (eoc[0]) {
+				eocTime[0]--;
+				if (eocTime[0] < 0) {
+					eoc[0] = false;
+					outputs[EOC_OUTPUT].setVoltage(0.f, 0);
+				} else
+					outputs[EOC_OUTPUT].setVoltage(10.f, 0);
+			}
+
+			if (eor[0]) {
+				eorTime[0]--;
+				if (eorTime[0] < 0) {
+					eor[0] = false;
+					outputs[EOR_OUTPUT].setVoltage(0.f, 0);
+				} else
+					outputs[EOR_OUTPUT].setVoltage(10.f, 0);
+			}
+		}
+
 	}
 };
 
@@ -3310,7 +3472,12 @@ struct SickoSamplerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Phase scan", "", &module->phaseScan));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
+		//menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
+		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
+				return module->isPolyOuts();
+			}, [=](bool poly) {
+				module->setPolyOuts(poly);
+		}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));

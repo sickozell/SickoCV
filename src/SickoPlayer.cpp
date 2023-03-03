@@ -71,8 +71,6 @@ struct SickoPlayer : Module {
 		VOL_INPUT,
 		TUNE_INPUT,
 		VO_INPUT,
-		//LOOPSTART_INPUT,
-		//LOOPEND_INPUT,
 		ATTACK_INPUT,
 		DECAY_INPUT,
 		SUSTAIN_INPUT,
@@ -131,7 +129,7 @@ struct SickoPlayer : Module {
 	float knobTune = 0.f;
 	float prevKnobTune = 9.f;
 	float tune;
-
+	
 	float voct[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevVoct[16] = {11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f};
 	float speedVoct[16];
@@ -181,7 +179,7 @@ struct SickoPlayer : Module {
 	int interpolationMode = HERMITE_INTERP;
 	int antiAlias = 1;
 	int polyOuts = POLYPHONIC;
-	//int polyEocEor = 1;
+	int polyMaster = POLYPHONIC;
 	bool phaseScan = true;
 	
 	//float fadeCoeff[7] = {APP->engine->getSampleRate(), 2000.f, 1000.f, 200.f, 100.f, 50.f, 20.f};	// None, 0.5ms, 1ms, 5ms, 10ms, 20ms, 50ms fading
@@ -208,15 +206,10 @@ struct SickoPlayer : Module {
 	int trigType;
 	int stage[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float stageLevel[16];
-	//float fadeStageLevel[16];
 	float lastStageLevel[16];
 	float currentStageSample[16];
 	float maxStageSample[16];
 	
-	//bool eoc = false;
-	//bool eor = false;
-	//float eocTime;
-	//float eorTime;
 	bool eoc[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	bool eor[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	float eocTime[16];
@@ -229,7 +222,6 @@ struct SickoPlayer : Module {
 	float decayValue;
 	float sustainValue;
 	float releaseValue;
-	//float masterLevel;
 	float masterLevel[16];
 	int limiter;
 
@@ -322,7 +314,7 @@ struct SickoPlayer : Module {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
-		//polyEocEor = 1;
+		polyMaster = POLYPHONIC;
 		phaseScan = true;
 		clearSlot();
 		for (int i = 0; i < 16; i++) {
@@ -357,7 +349,7 @@ struct SickoPlayer : Module {
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
-		//json_object_set_new(rootJ, "PolyEocEor", json_integer(polyEocEor));
+		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
 		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
@@ -376,11 +368,11 @@ struct SickoPlayer : Module {
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
-		/*
-		json_t* polyEocEorJ = json_object_get(rootJ, "PolyEocEor");
-		if (polyEocEorJ)
-			polyEocEor = json_integer_value(polyEocEorJ);
-		*/
+
+		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
+		if (polyMasterJ)
+			polyMaster = json_integer_value(polyMasterJ);
+
 		json_t* phaseScanJ = json_object_get(rootJ, "PhaseScan");
 		if (phaseScanJ)
 			phaseScan = json_boolean_value(phaseScanJ);
@@ -745,21 +737,6 @@ struct SickoPlayer : Module {
 			break;
 		}
 	}
-	/*
-	bool isPolyEocEor() {
-		return polyEocEor;
-	}
-
-	void setPolyEocEor(bool poly) {
-		if (poly) 
-			polyEocEor = 1;
-		else {
-			polyEocEor = 0;
-			outputs[EOC_OUTPUT].setChannels(1);
-			outputs[EOR_OUTPUT].setChannels(1);
-		}
-	}
-	*/
 
 	bool isPolyOuts() {
 		return polyOuts;
@@ -960,14 +937,6 @@ struct SickoPlayer : Module {
 
 			releaseValue = params[RELEASE_PARAM].getValue() + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
 			
-			/*
-			masterLevel = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage() * params[VOLATNV_PARAM].getValue() * 0.1);
-			if (masterLevel > 2)
-				masterLevel = 2;
-			else if (masterLevel < 0)
-				masterLevel = 0;
-			*/
-			
 			limiter = params[LIMIT_SWITCH].getValue();
 
 			knobTune = params[TUNE_PARAM].getValue();
@@ -997,7 +966,10 @@ struct SickoPlayer : Module {
 
 			for (int c = 0; c < chan; c++) {
 				
-				masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(c) * params[VOLATNV_PARAM].getValue() * 0.1);
+				if (polyMaster) 
+					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(c) * params[VOLATNV_PARAM].getValue() * 0.2);
+				else
+					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(0) * params[VOLATNV_PARAM].getValue() * 0.2);
 				
 				if (masterLevel[c] > 2)
 					masterLevel[c] = 2;
@@ -1197,17 +1169,7 @@ struct SickoPlayer : Module {
 									prevSamplePos[c] = floor(loopStartPos);
 									prevSampleWeight[c] = 0;
 								}
-								/*
-								if (polyEocEor) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
-									}
-								}
-								*/
+
 								if (polyOuts) {
 									eoc[c] = true;
 									eocTime[c] = eocEorTime;
@@ -1228,16 +1190,7 @@ struct SickoPlayer : Module {
 							} else if (floor(samplePos[c]) > totalSamples) {	// *** REACHED END OF SAMPLE ***
 								play[c] = false;
 								inPause[c] = false;
-								/*
-								if (polyEocEor) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
-									}
-								}*/
+
 								if (polyOuts) {
 									eoc[c] = true;
 									eocTime[c] = eocEorTime;
@@ -1270,16 +1223,7 @@ struct SickoPlayer : Module {
 										prevSampleWeight[c] = 0;
 									}
 								}
-								/*
-								if (polyEocEor) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
-									}
-								}*/
+
 								if (polyOuts) {
 									eoc[c] = true;
 									eocTime[c] = eocEorTime;
@@ -1293,7 +1237,6 @@ struct SickoPlayer : Module {
 						break;
 
 						case REVERSE:		// REVERSE PLAYBACK
-							//if (loop && samplePos[c] < floor(loopStartPos)) {	// *** REACHED BEGIN OF LOOP ***
 							if (loop && samplePos[c] < floor(loopStartPos + (fadeSamples * distancePos[c]))) {	// *** REACHED BEGIN OF LOOP ***
 								fadingValue[c] = 1.f;
 								fadedPosition[c] = samplePos[c];
@@ -1317,16 +1260,7 @@ struct SickoPlayer : Module {
 									prevSamplePos[c] = floor(loopEndPos);
 									prevSampleWeight[c] = 0;
 								}
-								/*
-								if (polyEocEor) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
-									}
-								}*/
+
 								if (polyOuts) {
 									eoc[c] = true;
 									eocTime[c] = eocEorTime;
@@ -1347,16 +1281,7 @@ struct SickoPlayer : Module {
 							} else if (floor(samplePos[c]) < 0) {				// *** REACHED START OF SAMPLE ***
 								play[c] = false;
 								inPause[c] = false;
-								/*
-								if (polyEocEor) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
-									}
-								}*/
+
 								if (polyOuts) {
 									eoc[c] = true;
 									eocTime[c] = eocEorTime;
@@ -1390,16 +1315,7 @@ struct SickoPlayer : Module {
 										prevSampleWeight[c] = 0;
 									}
 								}
-								/*
-								if (polyEocEor) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
-									}
-								}*/
+
 								if (polyOuts) {
 									eoc[c] = true;
 									eocTime[c] = eocEorTime;
@@ -1421,16 +1337,7 @@ struct SickoPlayer : Module {
 								currentStageSample[c] = 0;
 								lastStageLevel[c] = 1-stageLevel[c];
 							}
-							/*
-							if (polyEocEor) {
-								eoc[c] = true;
-								eocTime[c] = eocEorTime;
-							} else {
-								if (c == currentDisplay) {
-									eoc[0] = true;
-									eocTime[0] = eocEorTime;
-								}
-							}*/
+
 							if (polyOuts) {
 								eoc[c] = true;
 								eocTime[c] = eocEorTime;
@@ -1592,16 +1499,7 @@ struct SickoPlayer : Module {
 									stage[c] = STOP_STAGE;
 									play[c] = false;
 									lastStageLevel[c] = 0;
-									/*
-									if (polyEocEor) {
-										eor[c] = true;
-										eorTime[c] = eocEorTime;
-									} else {
-										if (c == currentDisplay) {
-											eor[0] = true;
-											eorTime[0] = eocEorTime;
-										}
-									}*/
+
 									if (polyOuts) {
 										eor[c] = true;
 										eorTime[c] = eocEorTime;
@@ -1772,7 +1670,6 @@ struct SickoPlayer : Module {
 					fadingType[c] = NO_FADE;
 				}
 
-				//if (polyEocEor) {
 				if (polyOuts) {
 					if (eoc[c]) {
 						eocTime[c]--;
@@ -1830,14 +1727,12 @@ struct SickoPlayer : Module {
 
 					if (outputs[OUT_OUTPUT].isConnected()) {
 						outputs[OUT_OUTPUT].setVoltage(sumOutput);
-						//outputs[OUT_OUTPUT].setChannels(1);
 					}
 					if (outputs[OUT_OUTPUT+1].isConnected()) {
 						if (channels == 2)
 							outputs[OUT_OUTPUT+1].setVoltage(sumOutputR);
 						else
 							outputs[OUT_OUTPUT+1].setVoltage(sumOutput);
-						//outputs[OUT_OUTPUT+1].setChannels(1);
 					}
 
 				break;
@@ -1848,7 +1743,6 @@ struct SickoPlayer : Module {
 				break;
 			}
 
-			//if (polyEocEor) {
 			if (polyOuts) {
 				outputs[EOC_OUTPUT].setChannels(chan);
 				outputs[EOR_OUTPUT].setChannels(chan);
@@ -1860,7 +1754,6 @@ struct SickoPlayer : Module {
 						outputs[EOC_OUTPUT].setVoltage(0.f, 0);
 					} else
 						outputs[EOC_OUTPUT].setVoltage(10.f, 0);
-					//outputs[EOC_OUTPUT].setChannels(1);
 				}
 
 				if (eor[0]) {
@@ -1870,7 +1763,6 @@ struct SickoPlayer : Module {
 						outputs[EOR_OUTPUT].setVoltage(0.f, 0);
 					} else
 						outputs[EOR_OUTPUT].setVoltage(10.f, 0);
-					//outputs[EOR_OUTPUT].setChannels(1);
 				}
 			}
 		}
@@ -2127,25 +2019,25 @@ struct SickoPlayerWidget : ModuleWidget {
 			addChild(display);
 		}
 
-		float xTrig1 = 11;
-		float xTrig2 = 29;
-		float yTrig1 = 50;
-		float yTrig2 = 64; 
-		float xStart1 = 50;
-		float xStart2 = 62;
-		float yStart1 = 53.5;
-		float yStart2 = 63.5;
+		const float xTrig1 = 11;
+		const float xTrig2 = 29;
+		const float yTrig1 = 50;
+		const float yTrig2 = 64; 
+		const float xStart1 = 50;
+		const float xStart2 = 62;
+		const float yStart1 = 53.5;
+		const float yStart2 = 63.5;
 
-		float xEnv1 = 11.5f;
-		float xEnv1Add = 21.f;
-		float xEnv2 = 6.5f;
-		float xEnv2Add = 10.f;
-		float xEnv2Skip = 21.f;
-		float yEnv1 = 81.f;
-		float yEnv2 = 90.f;
+		const float xEnv1 = 11.5f;
+		const float xEnv1Add = 21.f;
+		const float xEnv2 = 6.5f;
+		const float xEnv2Add = 10.f;
+		const float xEnv2Skip = 21.f;
+		const float yEnv1 = 81.f;
+		const float yEnv2 = 90.f;
 		
-		float yTunVol = 108;
-		float yTunVol2 = 117.5;
+		const float yTunVol = 108;
+		const float yTunVol2 = 117.5;
 
 		addParam(createParamCentered<VCVButton>(mm2px(Vec(12, 4)), module, SickoPlayer::PREVSAMPLE_PARAM));
 		addParam(createParamCentered<VCVButton>(mm2px(Vec(74.4, 4)), module, SickoPlayer::NEXTSAMPLE_PARAM));
@@ -2316,20 +2208,12 @@ struct SickoPlayerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Phase scan", "", &module->phaseScan));
 
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("Polyphonic OUTs", "", &module->polyOuts));
-		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "",	[=]() {
+		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
 				return module->isPolyOuts();
 			}, [=](bool poly) {
 				module->setPolyOuts(poly);
 		}));
-		/*
-		//menu->addChild(createBoolPtrMenuItem("Polyphonic EOC/EOR", "", &module->polyEocEor));
-		menu->addChild(createBoolMenuItem("Polyphonic EOC/EOR", "",	[=]() {
-				return module->isPolyEocEor();
-			}, [=](bool poly) {
-				module->setPolyEocEor(poly);
-		}));
-		*/
+		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));

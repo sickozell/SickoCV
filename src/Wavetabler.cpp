@@ -122,6 +122,7 @@ struct Wavetabler : Module {
 
 	int antiAlias = 1;
 	int polyOuts = POLYPHONIC;
+	int polyMaster = POLYPHONIC;
 
 	float currentOutput;
 	float sumOutput;
@@ -145,7 +146,8 @@ struct Wavetabler : Module {
 	float decayValue;
 	float sustainValue;
 	float releaseValue;
-	float masterLevel;
+	//float masterLevel;
+	float masterLevel[16];
 	int limiter;
 
 	bool reverseStart = false;
@@ -209,7 +211,7 @@ struct Wavetabler : Module {
 
 		//******************************************************************************
 		
-		configOutput(OUT_OUTPUT,"Left");
+		configOutput(OUT_OUTPUT,"Output");
 		playBuffer[0].resize(0);
 		playBuffer[1].resize(0);
 	}
@@ -217,6 +219,7 @@ struct Wavetabler : Module {
 	void onReset() override {
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
+		polyMaster = POLYPHONIC;
 		clearSlot();
 		for (int i = 0; i < 16; i++) {
 			play[i] = false;
@@ -243,6 +246,7 @@ struct Wavetabler : Module {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
+		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
 		return rootJ;
@@ -255,6 +259,9 @@ struct Wavetabler : Module {
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
+		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
+		if (polyMasterJ)
+			polyMaster = json_integer_value(polyMasterJ);
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
@@ -533,6 +540,19 @@ struct Wavetabler : Module {
 		totalSamples = 0;
 	}
 
+	bool isPolyOuts() {
+		return polyOuts;
+	}
+
+	void setPolyOuts(bool poly) {
+		if (poly) 
+			polyOuts = 1;
+		else {
+			polyOuts = 0;
+			outputs[OUT_OUTPUT].setChannels(1);
+		}
+	}
+
 	void process(const ProcessArgs &args) override {
 
 		nextSample = params[NEXTSAMPLE_PARAM].getValue();
@@ -594,14 +614,15 @@ struct Wavetabler : Module {
 
 			releaseValue = params[RELEASE_PARAM].getValue() + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
 			
+			/*
 			masterLevel = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage() * params[VOLATNV_PARAM].getValue() * 0.1);
 			if (masterLevel > 2)
 				masterLevel = 2;
 			else if (masterLevel < 0)
 				masterLevel = 0;
+			*/
 			
 			limiter = params[LIMIT_SWITCH].getValue();
-			//limiter = params[LIMIT_PARAM].getValue();
 
 			knobTune = params[TUNE_PARAM].getValue();
 			if (knobTune != prevKnobTune) {
@@ -627,6 +648,16 @@ struct Wavetabler : Module {
 
 			for (int c = 0; c < chan; c++) {
 				
+				if (polyMaster) 
+					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(c) * params[VOLATNV_PARAM].getValue() * 0.2);
+				else
+					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(0) * params[VOLATNV_PARAM].getValue() * 0.2);
+				
+				if (masterLevel[c] > 2)
+					masterLevel[c] = 2;
+				else if (masterLevel[c] < 0)
+					masterLevel[c] = 0;
+
 				trigValue[c] = inputs[TRIG_INPUT].getVoltage(c);
 
 				if (trigValue[c] >= 1) {
@@ -678,12 +709,6 @@ struct Wavetabler : Module {
 					} else
 						distancePos[c] = currentSpeed * sampleCoeff;
 
-					/*
-					if (play[c] && voct[c] < voctDisplay) {
-						currentDisplay = c;
-						voctDisplay = voct[c];
-					}
-					*/
 
 					switch (reversePlaying[c]) {
 						case FORWARD:		// FORWARD PLAYBACK
@@ -759,7 +784,6 @@ struct Wavetabler : Module {
 
 						switch (stage[c]) {
 							case ATTACK_STAGE:
-								//debugDisplay = "ATTACK";
 								if (attackValue > 10) {
 									attackValue = 10;
 								} else 	if (attackValue < 0.0001f) {
@@ -777,7 +801,6 @@ struct Wavetabler : Module {
 							break;
 
 							case DECAY_STAGE:
-								//debugDisplay = "DECAY";
 								if (decayValue > 10) {
 									decayValue = 10;
 								} else 	if (decayValue < 0.0001f) {
@@ -795,7 +818,6 @@ struct Wavetabler : Module {
 							break;
 
 							case SUSTAIN_STAGE:
-								//debugDisplay = "SUSTAIN";
 								if (sustainValue > 1) {
 									sustainValue = 1;
 								} else 	if (sustainValue < 0) {
@@ -805,7 +827,6 @@ struct Wavetabler : Module {
 							break;
 
 							case RELEASE_STAGE:
-								//debugDisplay = "RELEASE";
 								if (releaseValue > 10) {
 									releaseValue = 10;
 								} else 	if (releaseValue < 0.0001f) {
@@ -824,9 +845,9 @@ struct Wavetabler : Module {
 						}
 
 						if (reversePlaying[c]) {
-							currentOutput *= stageLevel[c] * masterLevel * -1;
+							currentOutput *= stageLevel[c] * masterLevel[c] * -1;
 						} else {
-							currentOutput *= stageLevel[c] * masterLevel;
+							currentOutput *= stageLevel[c] * masterLevel[c];
 						}
 					}
 
@@ -1234,7 +1255,13 @@ struct WavetablerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
+		//menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
+		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
+				return module->isPolyOuts();
+			}, [=](bool poly) {
+				module->setPolyOuts(poly);
+		}));
+		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
 	}
 };
 
