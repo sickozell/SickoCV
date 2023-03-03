@@ -126,9 +126,8 @@ struct SickoPlayer : Module {
 	float prevKnobLoopStartPos = -1.f;
 	float prevKnobLoopEndPos = 2.f;
 
-	float knobTune = 0.f;
-	float prevKnobTune = 9.f;
-	float tune;
+	float tune = 0.f;
+	float prevTune = -1.f;
 	
 	float voct[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevVoct[16] = {11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f};
@@ -331,7 +330,7 @@ struct SickoPlayer : Module {
 		prevKnobCueEndPos = 2.f;
 		prevKnobLoopStartPos = -1.f;
 		prevKnobLoopEndPos = 2.f;
-		prevKnobTune = -1.f;
+		prevTune = -1.f;
 		reverseStart = false;
 		totalSampleC = 0;
 		totalSamples = 0;
@@ -939,20 +938,14 @@ struct SickoPlayer : Module {
 			
 			limiter = params[LIMIT_SWITCH].getValue();
 
-			knobTune = params[TUNE_PARAM].getValue();
-			if (knobTune != prevKnobTune) {
-				tune = powf(2,knobTune);
-				knobTune = prevKnobTune;
-			}
-
-			if (inputs[TUNE_INPUT].isConnected()) {
-				currentSpeed = double(tune + (inputs[TUNE_INPUT].getVoltage() * params[TUNEATNV_PARAM].getValue() * 0.1));
+			tune = params[TUNE_PARAM].getValue() + (inputs[TUNE_INPUT].getVoltage() * params[TUNEATNV_PARAM].getValue() * 0.2);
+			if (tune != prevTune) {
+				prevTune = tune;
+				currentSpeed = double(powf(2,tune));
 				if (currentSpeed > 4)
 					currentSpeed = 4;
 				else if (currentSpeed < 0.25)
-						currentSpeed = 0.25;
-			} else {
-				currentSpeed = double(tune);
+					currentSpeed = 0.25;
 			}
 
 			sumOutput = 0;

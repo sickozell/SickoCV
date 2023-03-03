@@ -87,9 +87,8 @@ struct Wavetabler : Module {
 	double currentSpeed = 0.0;
 	double distancePos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	float knobTune = 0.f;
-	float prevKnobTune = 9.f;
-	float tune;
+	float tune = 0.f;
+	float prevTune = -1.f;
 
 	float voct[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevVoct[16] = {11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f};
@@ -146,7 +145,6 @@ struct Wavetabler : Module {
 	float decayValue;
 	float sustainValue;
 	float releaseValue;
-	//float masterLevel;
 	float masterLevel[16];
 	int limiter;
 
@@ -229,7 +227,7 @@ struct Wavetabler : Module {
 			prevVoct[i] = 11.f;
 			reversePlaying[i] = FORWARD;
 		}
-		prevKnobTune = -1.f;
+		prevTune = -1.f;
 		reverseStart = false;
 		totalSampleC = 0;
 		totalSamples = 0;
@@ -614,30 +612,16 @@ struct Wavetabler : Module {
 
 			releaseValue = params[RELEASE_PARAM].getValue() + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
 			
-			/*
-			masterLevel = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage() * params[VOLATNV_PARAM].getValue() * 0.1);
-			if (masterLevel > 2)
-				masterLevel = 2;
-			else if (masterLevel < 0)
-				masterLevel = 0;
-			*/
-			
 			limiter = params[LIMIT_SWITCH].getValue();
 
-			knobTune = params[TUNE_PARAM].getValue();
-			if (knobTune != prevKnobTune) {
-				tune = powf(2,knobTune);
-				knobTune = prevKnobTune;
-			}
-
-			if (inputs[TUNE_INPUT].isConnected()) {
-				currentSpeed = double(tune + (inputs[TUNE_INPUT].getVoltage() * params[TUNEATNV_PARAM].getValue() * 0.1));
+			tune = params[TUNE_PARAM].getValue() + (inputs[TUNE_INPUT].getVoltage() * params[TUNEATNV_PARAM].getValue() * 0.2);
+			if (tune != prevTune) {
+				prevTune = tune;
+				currentSpeed = double(powf(2,tune));
 				if (currentSpeed > 4)
 					currentSpeed = 4;
 				else if (currentSpeed < 0.25)
-						currentSpeed = 0.25;
-			} else {
-				currentSpeed = double(tune);
+					currentSpeed = 0.25;
 			}
 
 			sumOutput = 0;
