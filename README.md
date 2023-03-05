@@ -287,7 +287,7 @@ Once a folder is set, 'Samples browser' option is activated in the quick load me
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
 - 'No interpolation' can be used when sample rates match and speed is 100% constant  
 - 'Linear 1' and 'Linear 2' interpolate the samples with different weighted averages  
-- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default)  
+- 'Hermite' uses a Cubic Hermite interpolation that offers a better result (default)  
 
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
@@ -413,13 +413,13 @@ As described before, just right-click over the waveform display area to access t
 When a sample is loaded, file sample rate and number of channels are shown here.  
 
 **Set samples root folder**  
-Once a folder is set, 'Samples browser' option is activated here and in the quick load menu (right click on display) to quickly choose samples from the selected folder.  
+Once a folder is set, 'Samples browser' option is activated here and in the quick load menu (right click on display) to quickly choose samples from the selected folder and subfolders.    
 
 **Interpolation**  
-There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
+There are 3 different interpolation algorithms that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
 - 'No interpolation' can be used when sample rates match and tune is set to zero  
 - 'Linear 1' and 'Linear 2' interpolate the samples with different weighted averages  
-- 'Hermite' uses a Cubic Hermite spline interpolation that usually offers a better result (default)  
+- 'Hermite' uses a Cubic Hermite interpolation that usually offers a better result (default)  
 
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
@@ -432,7 +432,7 @@ When this option is enabled the Master CV input accepts polyphonic cables accord
 
 **Phase scan**  
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
-Be sure to disable it when using one-cycle waveforms.  
+Be sure to disable it when using one-cycle waveforms, or simply use the specific preset (see below)  
 
 **Reset Cursors**
 Reset Cue/Loop Start/stop to 0 and 100%.  
@@ -442,7 +442,7 @@ There are some factory presets stored in the context menu for common using setti
 
 #### USING ONE-CYCLE WAVEFORMS
 One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
-Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100%.  
+Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100% and enable loop button.  
 
 ## SickoSampler
 ### wav sample player and sampler
@@ -464,7 +464,7 @@ In sickoSampler the display shows also the recording time and a yellow "S" if sa
 In the context menu, along file infos, it's shown if the sample was resampled on loading and if it has to be saved because a recording occurred.  
 Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
 Record starts/stops if RecButton is pressed or if a toggle trig input is detected.  
-GAIN knob adjusts the volume of inputs.  
+GAIN knob adjusts the volume of the inputs.  
 FD knob sets the fade in/out time when recording starts or stops.  
 OVD button overdubs existing sample.  
 UCE button updates Cue End cursor at the end of recording when it is stopped. Note that there is an "UCE update also Cue Start" option in the general context menu.  
@@ -491,7 +491,7 @@ Switcher or SwitcherSt (used for stereo signals) are multifunction modules that 
 **TOGGLE/GATE modes**  
 When the MODE switch is in 'TOGGLE' position functions are activated by triggers in a toggle style.  
 When in 'GATE' position functions are gate sensitive, so they stay active until 'T/G' input receives a high gate.  
-Functions will be activated by Trigger/Gates with voltages above +1v.
+Functions will be activated by Triggers/Gates with voltages above +1v.
 
 **Function types**  
 The function type is automatically detected depending on connected cables.  
@@ -520,7 +520,7 @@ Green leds close to the in/out sockets show which input signal is switched or to
 When used as a swapper the OUT1 led on shows that signals are normally routed, otherwise the OUT2 led on shows when signals are swapped.  
 
 **Fader**  
-Fader knob sets the crossfade time (up to 10s) between the switched/routed/swapped signals.  
+Fader knob sets the crossfade time (up to 10s) between the switched/routed/swapped signals. Set the knob to minimum (1ms) to have no fade.
 CV input is added to Fade knob value and the sum will be clamped in the range of 0-10v.  
 
 #### Context Menu
@@ -564,15 +564,14 @@ NOTE2: input trigger and gate threshold is +1v.
 
 **SPECIAL BEHAVIORS**
 
-If Attack is set to 1 (and release is set greater than 1) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
+If Attack is set to 1ms (and release is set greater than 1ms) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
 
-If Release is set to 1 (and attack is set greater than 1) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
+If Release is set to 1ms (and attack is set greater than 1ms) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
 These behaviors are more understandable connecting a scope on the output.
 
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
-- Disable Unarm: this disables unarm feature
 
 ## Wavetabler
 ### wavetable sample player
@@ -605,5 +604,5 @@ Please refer to sickoPlayer documentation.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
-Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and AuxMux for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
+Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [AuxMux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
