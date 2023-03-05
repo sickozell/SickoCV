@@ -187,7 +187,7 @@ The same of the previous one, plus following features.
 When 'armed on' or 'armed off', the WRN (warning) output will provide a sequence of pulses until next clock is detected.  
 Then it will act as the OUT output (the routed signal) if the FADE knob is set to 1ms, else it will act as the GATE output (high gate).  
 So, if 'bToggler8+' is receiving triggers from a sequencer, the FADE knob will be set to 1ms and the led will light up the same as sequencers trigs.  
-Otherwise, if fade knob is set different from 1ms, it is supposed that an audio signal is routed, so you'll see a fixed led light on the controller.
+Otherwise, if fade knob is set different from 1ms, it is supposed that an audio signal is routed, so a fixed led light on the controller will be seen.
 
 WA and WR knobs set the attack (arm on) and release (arm off) pulserate up to 200 ms of the warning pulses. These are two independent settings because it can be helpful to notice if the routing is going to start or stop.
 
