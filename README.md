@@ -245,7 +245,7 @@ Example of Drummer module usage:
 [Download example](./examples/drummer%20example.vcvs?raw=true) (right-click -> save link as)
 
 - **Drummer4 note:**  
-If one slot OUT is not connected, the audio signal will be added to the next one. For example if you connect only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if you connect only out #4, this socket will output all the channels.
+If one slot OUT is not connected, the audio signal will be added to the next one. For example if connecting only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if connecting only out #4, this socket will output all the channels.
 
 Example of Drummer4 module usage:
 
@@ -331,7 +331,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ![parking](https://user-images.githubusercontent.com/80784296/204013230-cda01462-92c9-4013-8599-c0ba9d798ae0.JPG)
 
 #### - INSTRUCTIONS
-This module doesn't do anything. It's just a place to connect your temporarily unused cables when you don't want to forget to where they were wired.  
+This module doesn't do anything. It's just a place to connect temporarily unused cables to not forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
 
 ## Shifter
@@ -368,7 +368,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
-Once a sample is loaded you can browse samples in the same folder using Previous and Next buttons above the display.  
+Once a sample is loaded samples in the same folder can be browsed using Previous and Next buttons above the display.  
 
 The display shows the waveform, filename, sample duration and number of channels (1-2 channels wav file are allowed).  
 
@@ -586,7 +586,7 @@ These behaviors are more understandable connecting a scope on the output.
 
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
-Once a sample is loaded you can browse samples in the same folder using Previous and Next buttons below the display.  
+Once a sample is loaded samples in the same folder can be browser using Previous and Next buttons below the display.  
 
 REV button changes the playback start direction.
 
