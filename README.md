@@ -150,7 +150,8 @@ When ARM input is triggered (arm on) the IN input will start to be routed to OUT
 
 Then, with another ARM triggering (arm off) the routing will stop on next clock detection and GATE output will go low.
 
-FADE knob up to 10s can be used to avoid attack or release clicks when audio signals are connected to IN input.
+FADE knob up to 10s can be used to avoid attack or release clicks when audio signals are connected to IN input.  
+Be sure to set Fade knob to minimum (1ms) when inputs are feeded by triggers.  
 
 If ARM is triggered again before clock detection it will abort arming (unarm).
 
@@ -260,25 +261,24 @@ Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to para
 ![drumplayer](https://user-images.githubusercontent.com/80784296/221338110-d550144f-4e34-475d-9b00-00872910f331.JPG)
 
 #### INSTRUCTIONS  
-Load wav samples in the slots using context menu.  
+Load wav samples in the slots using general or slot context menu.  
 
 When TRIG input is triggered the sample will be played at the volume percentage set by to "Standard Level" knob + its relative attenuverted CVinput.  
 If ACCENT input is HIGH when TRIG occurs, the sample will be played at "Accent Level" knob + its attenuverted CVinput.  
 
 Playing speed can be set by SPD knob from 1 to 200% and modulated with its attenuverted CVinput. Speed can be modified during sample playback.  
-External modulation is allowed only on drumPlayer+  
+External modulation is allowed only on drumPlayer+ or drumPlayerXtra.  
 
 If CHOKE switch is on when TRIG occurs, the playback of next slot is stopped with a 1ms fade out: it's commonly used to simulate a closed/open hihat.  
-LIM switch is a hard clipping limiter to ±5v on the output.  
+LIM switch enables hard clipping limiter set to ±5v on the output.  
 
 NOTE: input trigger threshold is +1v.  
 
 #### CONTEXT MENU
 **Sample Slots**  
 Click on the slot number to open dialog.  
-When the sample is loaded the green led on the panel is turned on (drumPlayer), or the small 7segment display will show the first 5 chars of the filename (drumPlayer+).  
-Use Clear options to unload samples from slots.  
-Just right-click over the led areas or the displays to access the quick-load menus.  
+When the sample is loaded the green led on the panel is turned on (drumPlayer), or the small 7segment display will show the first chars of the filename (drumPlayer+ drumPlayerXtra).  
+
 
 **Set samples root folder**  
 Once a folder is set, 'Samples browser' option is activated in the quick load menu (right click in the relative led slot area/display) to quickly choose samples from the selected folder.  
@@ -293,26 +293,26 @@ There are 3 different interpolation algorithms, that are engaged during playback
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
 **Outs mode**  
-Normalled (default): if one slot out is not connected, its output will be added to the next slot  
+Normalled (default): if one out is not connected, the output of its slot is added to the next one  
 Solo: every slot has its own out socket  
-Unconnected on Out 4: Every unconnected out is routed to out n.4
+Unconnected on Out 4: Every unconnected out is added to out n.4
 
 **Scrolling Sample Names** (drumPlayer+ and drumPlayerXtra only)  
 This option enables text scrolling on sample name displays  
 
 **Light Boxes** (drumPlayerXtra only)  
 This option enables a light box over waveform displays when sample is triggered.  
-When enebled, in each slot context menu light color and fade duration can be set.
+When enebled, in each slot context menu, the color of light and fade duration can be set.
 
 **Display Triggering** (drumPlayerXtra only)  
 This option enables sample triggering by clicking over the the display area, to play samples live or just to test them while navigating sample folders  
 
-**Global Settings**  (drumPlayerXtra only)  
+**Global Settings** (drumPlayerXtra only)  
 In this menu there are options to clear all the slots or the root folder.  
-It is also used to apply settings to all the slots: Zoom, Lightboxes color and time fading.  
+It is also used to apply settings to all the slots: Zoom, Lightboxes color and time fading.   
 
 #### SLOT CONTEXT MENU
-Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) opens slot context menu with following options:
+Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) the slot context menu is open with following options:  
 - Load Sample (opens file dialog to load a sample in the slot)
 - Samples Browser (if a root sample folder is set on the general context menu, this submenu is enabled to navigate through directories)
 - Current sample (shows sample name when a sample is loaded)
@@ -347,7 +347,7 @@ Shifter module can be useful to shift back and fotrth a sequencer output on the 
 Stage can be controlled via the stage knob, or the 0-10v StageCV input with its attenuverter.  
 If StageCV input is not connected, the attenuverter reduces the range of the Stage knob.  
 Note that the Stage knob and StageCV are added together.  
-The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when you're triggering the sequencer with the same clock of Shifter module, and the input would be sampled before the sequencer advance.  
+The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when triggering the sequencer with the same clock of Shifter module, TRIG DELAY avoids that the input is sampled before the sequencer advances.  
 
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
