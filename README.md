@@ -1,4 +1,4 @@
-# SickoCV v2.5.2-beta25
+# SickoCV v2.6.0-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -18,12 +18,17 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - **SickoPlayer**
 - **DrumPlayer**
 - **DrumPlayer+**
+- **toggler, togglerCompact**
+- **bToggler, bTogglerCompact**
+- **bToggler8 bToggler8+**
+- **switcher switcherSt**
 
 ## **to do list:** 
 - nothing in queue  
 
 ## **changelog**  
 - added subfolder navigation on sample player modules  
+- changed all time related knobs to exponential scale in all modules  
 
 **drumPlayer**  
 - added swap and copy slot option to slot context menu  
@@ -40,10 +45,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added XFD knob  
 - moved factory presets to module context menu  
 
-# SickoCV v2.5.2-beta25
+# SickoCV v2.6.0-beta1
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/222272562-25293b41-d252-42d5-8345-c911cf7f56af.JPG)
+![SickoCV modules 2 6 0](https://user-images.githubusercontent.com/80784296/222956871-752874ce-efff-482c-a86e-387bf57ff16e.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
