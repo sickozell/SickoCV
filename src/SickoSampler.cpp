@@ -3476,6 +3476,7 @@ struct SickoSamplerWidget : ModuleWidget {
 			}, [=](bool poly) {
 				module->setPolyOuts(poly);
 		}));
+		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
