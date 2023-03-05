@@ -114,9 +114,13 @@ Attack, Sustain and Release knobs set the envelope of the routed signals.
 
 A, S, R CVinputs are added to respective knob values, bToggler module has attenuverters.
 
-If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
+If L or (R) inputs are not connected, relative outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
 A trigger on RESET input will reset the toggle state.
+
+#### Context Menu
+- Initialize On Start: discards previous module state on VCV restart
+- Disable Unarm: this disables unarm feature
 
 NOTE: input trigger threshold is +1v.
 
@@ -146,13 +150,17 @@ When ARM input is triggered (arm on) the IN input will start to be routed to OUT
 
 Then, with another ARM triggering (arm off) the routing will stop on next clock detection and GATE output will go low.
 
-FADE knob (up to 50ms) can be used to avoid attack or release clicks when audio signals are connected to IN input.
+FADE knob up to 10s can be used to avoid attack or release clicks when audio signals are connected to IN input.
 
 If ARM is triggered again before clock detection it will abort arming (unarm).
 
 Triggering RESET input will immediately stop the routing.
 
 Triggering RESETALL input will immediately stop all the 8 routings.
+
+#### **Context Menu**
+- Initialize On Start: discards previous module state on VCV restart
+- Disable Unarm: this disables unarm feature
 
 NOTE: input trigger threshold is +1v.  
  
@@ -173,20 +181,23 @@ So when pressing buttons on controller, 'bToggler8+' will actually play/stop the
 ![btoggler8plus](https://user-images.githubusercontent.com/80784296/201516811-40c75bb5-84d2-411b-b9ed-fa876e178258.JPG)
 
 #### - INSTRUCTIONS
-The same of the previous one, plus:
+The same of the previous one, plus following features.
 
 When 'armed on' or 'armed off', the WRN (warning) output will provide a sequence of pulses until next clock is detected.  
-Then it will act as the OUT output (the routed signal) if the FADE knob is set to 0ms, else it will act as the GATE output (high gate).  
-This is because if 'bToggler8+' is receiving signals from sequencers, the FADE knob will be set to 0 and the led will light up the same as sequencers trigs.  
-Otherwise, if fade knob is set different from 0, it is supposed that an audio signal is routed, so you'll see a fixed led light on the controller.
+Then it will act as the OUT output (the routed signal) if the FADE knob is set to 1ms, else it will act as the GATE output (high gate).  
+So, if 'bToggler8+' is receiving triggers from a sequencer, the FADE knob will be set to 1ms and the led will light up the same as sequencers trigs.  
+Otherwise, if fade knob is set different from 1ms, it is supposed that an audio signal is routed, so you'll see a fixed led light on the controller.
 
-WA and WR knobs set the attack (arm on) and release (arm off) pulserate up to 200 ms of the warning pulses. These are two independent settings because you would like to notice if the routing is going to start or stop.
+WA and WR knobs set the attack (arm on) and release (arm off) pulserate up to 200 ms of the warning pulses. These are two independent settings because it can be helpful to notice if the routing is going to start or stop.
 
 If WA or WR are set to 0ms, WRN will output a low gate during warning time and if set to to max (200ms) it will output a high gate.  
 As to say: if WA is set to 0 and WR is set to max(200), WRN output will act like the GATE output.  
 Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
-In the context menu there is the option to invert WRN output when used with triggers. It can be useful when used with a Led Controller, so when a channel is 'toggled on', leds will stay turned on until a trig is received and they will be turned off for 100ms.  
+#### Context Menu
+- Initialize On Start: discards previous module state on VCV restart
+- Disable Unarm: this disables unarm feature
+- WRN Inversion (trigs only): inverts WRN output behavior when used with triggers. It can be useful when INs are feeded by sequencers trigs and WRN Outs connected to a led midi controller. With this option enabled when there's no routing leds will stay off, when routing leds will stay on and whenn a trig is received led will be turned off for 100ms.
 
 NOTE: input trigger threshold is +1v.  
 
@@ -338,6 +349,9 @@ If StageCV input is not connected, the attenuverter reduces the range of the Sta
 Note that the Stage knob and StageCV are added together.  
 The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when you're triggering the sequencer with the same clock of Shifter module, and the input would be sampled before the sequencer advance.  
 
+#### Context Menu
+- Initialize On Start: discards previous module state on VCV restart
+
 ![shifter example](https://user-images.githubusercontent.com/80784296/212531455-776e3110-78ef-4bec-a3f8-64180fe4ca53.JPG)  
 [Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
 
@@ -410,8 +424,11 @@ There are 3 different interpolation algorithms, that are engaged during playback
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
-**Polyphonic Outs**  
+**Polyphonic OUTs**  
 When this option is enabled the audio and EOC/EOR outputs reflect v/oct input polyphony. Otherwise polyphonic outputs are mixed in one monophonic out.
+
+**Polyphonic Master INs**  
+When this option is enabled the Master CV input accepts polyphonic cables according to V/Oct input polyphony. For example this can be used for velocity control.
 
 **Phase scan**  
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
@@ -506,7 +523,11 @@ When used as a swapper the OUT1 led on shows that signals are normally routed, o
 Fader knob sets the crossfade time (up to 10s) between the switched/routed/swapped signals.  
 CV input is added to Fade knob value and the sum will be clamped in the range of 0-10v.  
 
+#### Context Menu
+- Initialize On Start: discards previous module state on VCV restart
+
 **NOTES**  
+- If Fader knob is set to 1ms it won't do any fade.
 - In FlipFLop and ToggleGate function types the output will consist in a 'fixed' AR envelope
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
 - On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones.
@@ -543,11 +564,15 @@ NOTE2: input trigger and gate threshold is +1v.
 
 **SPECIAL BEHAVIORS**
 
-If Attack is set to 0 (and release is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
+If Attack is set to 1 (and release is set greater than 1) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
 
-If Release is set to 0 (and attack is set greater than 0) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
+If Release is set to 1 (and attack is set greater than 1) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
 These behaviors are more understandable connecting a scope on the output.
+
+#### Context Menu
+- Initialize On Start: discards previous module state on VCV restart
+- Disable Unarm: this disables unarm feature
 
 ## Wavetabler
 ### wavetable sample player
@@ -573,6 +598,9 @@ The envelope knobs can be external modulated with attenuverted CVinputs.
 Tune knob with its attenuverted CVinput, can tune up or down the sample with a ±2 octave range (semitone scale).  
 
 Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range. A led clip light warns of clipping.  
+
+#### Context Menu
+Please refer to sickoPlayer documentation.
 
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
