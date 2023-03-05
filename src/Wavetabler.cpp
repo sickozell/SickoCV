@@ -37,7 +37,6 @@ struct Wavetabler : Module {
 		RELEASE_PARAM,
 		RELEASEATNV_PARAM,
 		LIMIT_SWITCH,
-		//LIMIT_PARAM,
 		REV_PARAM,
 		PINGPONG_PARAM,
 		PREVSAMPLE_PARAM,
@@ -63,11 +62,9 @@ struct Wavetabler : Module {
 		REV_LIGHT,
 		PINGPONG_LIGHT,
 		CLIPPING_LIGHT,
-		//LIMIT_LIGHT,
 		NUM_LIGHTS
 	};
   
-	//unsigned int channels;
 	unsigned int sampleRate;
 	drwav_uint64 totalSampleC;
 	drwav_uint64 totalSamples;
@@ -101,8 +98,6 @@ struct Wavetabler : Module {
 	std::string storedPath = "";
 	std::string fileDescription = "--none--";
 	std::string fileDisplay = "";
-	//std::string channelsDisplay = "";
-	//std::string timeDisplay = "";
 	std::string samplerateDisplay = "";
 
 	std::string userFolder = "";
@@ -135,16 +130,13 @@ struct Wavetabler : Module {
 	int stage[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float stageLevel[16];
 
-	float lastStageLevel[16];
-	float currentStageSample[16];
-	float maxStageSample[16];
-	
 	int chan;
 
 	float attackValue;
 	float decayValue;
 	float sustainValue;
 	float releaseValue;
+	float stageCoeff[16];
 	float masterLevel[16];
 	int limiter;
 
@@ -161,6 +153,11 @@ struct Wavetabler : Module {
 	bool prevSample = false;
 	bool prevPrevSample = false;
 
+	static constexpr float minStageTime = 1.f;  // in milliseconds
+	static constexpr float maxStageTime = 10000.f;  // in milliseconds
+	const float maxAdsrTime = 10.f;
+	const float minAdsrTime = 0.001f;
+
 	Wavetabler() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -176,11 +173,11 @@ struct Wavetabler : Module {
 
 		//******************************************************************************
 
-		configParam(ATTACK_PARAM, 0.0001f, 10.f, 0.0001f, "Attack", "ms", 0, 1000);
+		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
 		configInput(ATTACK_INPUT,"Attack CV");
 		configParam(ATTACKATNV_PARAM, -1.0f, 1.0f, 0.0f, "Attack CV Attenuv.");
 
-		configParam(DECAY_PARAM, 0.0001f, 10.f, 0.0001f, "Decay", "ms", 0, 1000);
+		configParam(DECAY_PARAM, 0.f, 1.f, 0.f, "Decay", " ms", maxStageTime / minStageTime, minStageTime);
 		configInput(DECAY_INPUT,"Decay CV");
 		configParam(DECAYATNV_PARAM, -1.0f, 1.0f, 0.0f, "Decay CV Attenuv.");
 
@@ -188,7 +185,7 @@ struct Wavetabler : Module {
 		configInput(SUSTAIN_INPUT,"Sustain CV");
 		configParam(SUSTAINATNV_PARAM, -1.0f, 1.0f, 0.0f, "Sustain CV Attenuv.");
 
-		configParam(RELEASE_PARAM, 0.0001f, 10.f, 0.0001f, "Release", "ms", 0, 1000);
+		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
 		configInput(RELEASE_INPUT,"Release CV");
 		configParam(RELEASEATNV_PARAM, -1.0f, 1.0f, 0.0f, "Release CV Attenuv.");
 
@@ -205,13 +202,16 @@ struct Wavetabler : Module {
 		configParam(VOLATNV_PARAM, -1.f, 1.0f, 0.f, "Master Volume CV Attenuv.", "%", 0, 100);
 
 		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "±5v"});
-		//configSwitch(LIMIT_PARAM, 0.f, 1.f, 0.f, "Limit", {"Off", "±5v"});
 
 		//******************************************************************************
 		
 		configOutput(OUT_OUTPUT,"Output");
 		playBuffer[0].resize(0);
 		playBuffer[1].resize(0);
+	}
+
+	static float convertCVToSeconds(float cv) {		
+		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}
 
 	void onReset() override {
@@ -234,7 +234,6 @@ struct Wavetabler : Module {
 	}
 
 	void onSampleRateChange() override {
-		//eocEorTime = (APP->engine->getSampleRate())/2000;			// number of samples for 1 ms used for output triggers
 		clippingCoeff = 5 / (APP->engine->getSampleRate());	// decrement for 200 ms clipping light (1/0.2)
 		if (fileLoaded)
 			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at speed 1x
@@ -478,7 +477,6 @@ struct Wavetabler : Module {
 			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at speed 1x
 
 			vector<double>().swap(displayBuff);
-			//for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/240))
 			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/160))
 				displayBuff.push_back(playBuffer[0][i]);
 
@@ -499,7 +497,6 @@ struct Wavetabler : Module {
 
 			fileDisplay = fileDisplay.substr(0, 20);
 			samplerateDisplay = std::to_string(int(sampleRate * .5));
-			//channelsDisplay = std::to_string(channels) + "Ch";
 
 			free(pathDup);
 			storedPath = path;
@@ -520,8 +517,6 @@ struct Wavetabler : Module {
 			storedPath = "";
 			fileDescription = "--none--";
 			fileDisplay = "";
-			//timeDisplay = "";
-			//channelsDisplay = "";
 		}
 	};
 	
@@ -529,8 +524,6 @@ struct Wavetabler : Module {
 		storedPath = "";
 		fileDescription = "--none--";
 		fileDisplay = "";
-		//timeDisplay = "";
-		//channelsDisplay = "";
 		fileLoaded = false;
 		playBuffer[0].clear();
 		playBuffer[1].clear();
@@ -582,10 +575,6 @@ struct Wavetabler : Module {
 		lights[PINGPONG_LIGHT].setBrightness(pingpong);
 
 		chan = std::max(1, inputs[VO_INPUT].getChannels());
-		//chan = std::max(inputs[VO_INPUT].getChannels(),1);
-
-		//limiter = params[LIMIT_PARAM].getValue();
-		//lights[LIMIT_LIGHT].setBrightness(limiter);
 		
 		if (!fileLoaded) {
 
@@ -600,18 +589,12 @@ struct Wavetabler : Module {
 			
 		} else {
 	
-			attackValue = params[ATTACK_PARAM].getValue() + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
-
-			decayValue = params[DECAY_PARAM].getValue() + (inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue());
-			
 			sustainValue = params[SUSTAIN_PARAM].getValue() + (inputs[SUSTAIN_INPUT].getVoltage() * params[SUSTAINATNV_PARAM].getValue() * 0.1);
 			if (sustainValue > 1)
 				sustainValue = 1;
 			else if (sustainValue < 0)
 				sustainValue = 0;
 
-			releaseValue = params[RELEASE_PARAM].getValue() + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
-			
 			limiter = params[LIMIT_SWITCH].getValue();
 
 			tune = params[TUNE_PARAM].getValue() + (inputs[TUNE_INPUT].getVoltage() * params[TUNEATNV_PARAM].getValue() * 0.2);
@@ -661,21 +644,36 @@ struct Wavetabler : Module {
 							prevSampleWeight[c] = 0;
 						}
 						stage[c] = ATTACK_STAGE;
-						currentStageSample[c] = 0;
-						lastStageLevel[c] = 0;
+						attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+						if (attackValue > maxAdsrTime) {
+							attackValue = maxAdsrTime;
+						} else if (attackValue < minAdsrTime) {
+							attackValue = minAdsrTime;
+						}
+						stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 					} else {
 						if (stage[c] == RELEASE_STAGE) {
 							stage[c] = ATTACK_STAGE;
-							currentStageSample[c] = 0;
-							lastStageLevel[c] = stageLevel[c];
+							attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+							if (attackValue > maxAdsrTime) {
+								attackValue = maxAdsrTime;
+							} else if (attackValue < minAdsrTime) {
+								attackValue = minAdsrTime;
+							}
+							stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 						}
 					}
 				} else {
 					if (play[c]) {
 						if (stage[c] != RELEASE_STAGE) {
 							stage[c]=RELEASE_STAGE;
-							currentStageSample[c] = 0;
-							lastStageLevel[c] = 1-stageLevel[c];
+							releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+							if (releaseValue > maxAdsrTime) {
+								releaseValue = maxAdsrTime;
+							} else 	if (releaseValue < minAdsrTime) {
+								releaseValue = minAdsrTime;
+							}
+							stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 						}
 					}
 				}
@@ -768,63 +766,39 @@ struct Wavetabler : Module {
 
 						switch (stage[c]) {
 							case ATTACK_STAGE:
-								if (attackValue > 10) {
-									attackValue = 10;
-								} else 	if (attackValue < 0.0001f) {
-									attackValue = 0.0001f;
-								}
-								maxStageSample[c] = args.sampleRate * attackValue;
-								stageLevel[c] = (currentStageSample[c] / maxStageSample[c]) + lastStageLevel[c];
+								stageLevel[c] += stageCoeff[c];
 								if (stageLevel[c] > 1) {
 									stageLevel[c] = 1;
 									stage[c] = DECAY_STAGE;
-									currentStageSample[c] = 0;
-									lastStageLevel[c] = 0;
+									decayValue = convertCVToSeconds(params[DECAY_PARAM].getValue()) + (inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue());
+									if (decayValue > maxAdsrTime) {
+										decayValue = maxAdsrTime;
+									} else 	if (decayValue < minAdsrTime) {
+										decayValue = minAdsrTime;
+									}
+									stageCoeff[c] = (1-sustainValue) / (args.sampleRate * decayValue);
 								}
-								currentStageSample[c]++;
 							break;
 
 							case DECAY_STAGE:
-								if (decayValue > 10) {
-									decayValue = 10;
-								} else 	if (decayValue < 0.0001f) {
-									decayValue = 0.0001f;
-								}
-								maxStageSample[c] = args.sampleRate * decayValue / (1-sustainValue);
-								stageLevel[c] = 1-(currentStageSample[c] / maxStageSample[c]) + lastStageLevel[c];
-								if (stageLevel[c] < sustainValue) {
+								stageLevel[c] -= stageCoeff[c];
+								if (stageLevel[c] <= sustainValue) {
 									stageLevel[c] = sustainValue;
 									stage[c] = SUSTAIN_STAGE;
-									currentStageSample[c] = 0;
-									lastStageLevel[c] = 0;
 								}
-								currentStageSample[c]++;
 							break;
 
 							case SUSTAIN_STAGE:
-								if (sustainValue > 1) {
-									sustainValue = 1;
-								} else 	if (sustainValue < 0) {
-									sustainValue = 0;
-								}
 								stageLevel[c] = sustainValue;
 							break;
 
 							case RELEASE_STAGE:
-								if (releaseValue > 10) {
-									releaseValue = 10;
-								} else 	if (releaseValue < 0.0001f) {
-									releaseValue = 0.0001f;
-								}
-								maxStageSample[c] = args.sampleRate * releaseValue;
-								stageLevel[c] = 1-(currentStageSample[c] / maxStageSample[c]) - lastStageLevel[c];
+								stageLevel[c] -= stageCoeff[c];
 								if (stageLevel[c] < 0) {
 									stageLevel[c] = 0;
 									stage[c] = STOP_STAGE;
 									play[c] = false;
-									lastStageLevel[c] = 0;
 								}
-								currentStageSample[c]++;
 							break;
 						}
 
@@ -947,12 +921,6 @@ struct WavetablerDisplay : TransparentWidget {
 				nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				nvgTextBox(args.vg, 7, 16,247, module->fileDisplay.c_str(), NULL);
 				
-				//nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-				//nvgTextBox(args.vg, 186, 16,97, module->timeDisplay.c_str(), NULL);
-
-				//nvgFillColor(args.vg, nvgRGBA(0x88, 0xaa, 0xff, 0xff)); 
-				//nvgTextBox(args.vg, 218, 16,97, module->channelsDisplay.c_str(), NULL);
-
 				//nvgTextBox(args.vg, 9, 26,120, module->debugDisplay.c_str(), NULL);
 				//nvgTextBox(args.vg, 109, 26,120, module->debugDisplay2.c_str(), NULL);
 

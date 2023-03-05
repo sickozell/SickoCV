@@ -1,4 +1,4 @@
-git tag v2.5.2-beta27 -m "create v2.5.2-beta27"  
+git tag v2.6.0-beta1 -m "create v2.6.0-beta1"  
 git push origin --tags
 
 

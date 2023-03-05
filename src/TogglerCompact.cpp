@@ -1,11 +1,21 @@
+#define GATE_MODE 0
+#define TOGGLE_MODE 1
+#define IDLE 0
+#define GATING 1
+#define STOP_STAGE 0
+#define ATTACK_STAGE 1
+#define DECAY_STAGE 2
+#define SUSTAIN_STAGE 3
+#define RELEASE_STAGE 4
+
 #include "plugin.hpp"
 
 struct TogglerCompact : Module {
 	enum ParamId {
 		MODE_SWITCH,
-		ATTACK_PARAMS,
-		SUSTAIN_PARAMS,
-		RELEASE_PARAMS,
+		ATTACK_PARAM,
+		SUSTAIN_PARAM,
+		RELEASE_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -28,8 +38,7 @@ struct TogglerCompact : Module {
 	};
 
 	bool initStart = false;
-	bool trigConnection = false;
-	bool prevTrigConnection = false;
+	bool prevGating = false;
 	int mode = 1;
 	int internalState = 0;
 	bool trigState = false;
@@ -39,22 +48,25 @@ struct TogglerCompact : Module {
 	float rst = 0;
 	float prevRst = 0;
 
-	float maxFadeSample = 0;
-	float currentFadeSample = 0;
-	bool fading = false;
-	float startFade = 0;
-	float lastFade = 0;
-
 	float attack;
 	float sustain;
 	float release;
 
+	int stage = STOP_STAGE;
+	float stageLevel = 0;
+	float stageCoeff;
+
+	static constexpr float minStageTime = 1.f;  // in milliseconds
+	static constexpr float maxStageTime = 10000.f;  // in milliseconds
+	const float maxAdsrTime = 10.f;
+	const float noEnvTime = 0.00101;
+
 	TogglerCompact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
-		configParam(ATTACK_PARAMS, 0.f, 10.f, 0.f, "Attack", "ms", 0, 1000);
-		configParam(SUSTAIN_PARAMS, 0.f, 1.f, 1.f, "Level", "%", 0, 100);
-		configParam(RELEASE_PARAMS, 0.f, 10.f, 0.f, "Release", "ms", 0, 1000);
+		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
+		configParam(SUSTAIN_PARAM, 0.f, 1.f, 1.f, "Level", "%", 0, 100);
+		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
 		configInput(TRIG_INPUT, "Trig/Gate");
 		configInput(RST_INPUT, "Reset");
 		configInput(IN_INPUT, "L");
@@ -69,8 +81,7 @@ struct TogglerCompact : Module {
 
 	void onReset(const ResetEvent &e) override {
 		initStart = false;
-		trigConnection = false;
-		prevTrigConnection = false;
+		prevGating = false;
 		mode = 1;
 		internalState = 0;
 		trigState = false;
@@ -78,11 +89,6 @@ struct TogglerCompact : Module {
 		prevTrigValue = 0;
 		rst = 0;
 		prevRst = 0;
-		maxFadeSample = 0;
-		currentFadeSample = 0;
-		fading = false;
-		startFade = 0;
-		lastFade = 0;
 
 		outputs[GATE_OUTPUT].setVoltage(0);
 		outputs[OUT_OUTPUT].setVoltage(0);
@@ -105,376 +111,146 @@ struct TogglerCompact : Module {
 
 		if (!initStart) {
 			json_t* jsonState = json_object_get(rootJ, "State");
-			if (jsonState)
+			if (jsonState){
 				internalState = json_integer_value(jsonState);
+				prevGating = true;
+			}
 		}
+	}
+
+	static float convertCVToSeconds(float cv) {		
+		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}
 	
 	void process(const ProcessArgs& args) override {
-		attack = params[ATTACK_PARAMS].getValue() + inputs[ATTACK_INPUT].getVoltage();
-		if (attack > 10)
-			attack = 10;
-		else if (attack < 0)
-			attack = 0;
 
-		sustain = params[SUSTAIN_PARAMS].getValue() + (inputs[SUSTAIN_INPUT].getVoltage() * 0.1);
+		sustain = params[SUSTAIN_PARAM].getValue() + inputs[SUSTAIN_INPUT].getVoltage();
 		if (sustain > 1)
 			sustain = 1;
 		else if (sustain < 0)
 			sustain = 0;
 
-		release = params[RELEASE_PARAMS].getValue() + inputs[RELEASE_INPUT].getVoltage();
-		if (release > 10)
-			release = 10;
-		else if (release < 0)
-			release = 0;
-
 		mode = params[MODE_SWITCH].getValue();
+		trigValue = inputs[TRIG_INPUT].getVoltage();
 		switch (mode) {
-			// ************************************** GATE MODE **********
-			case 0:
-				trigConnection = inputs[TRIG_INPUT].isConnected();
-				if (trigConnection) {
-					trigValue = inputs[TRIG_INPUT].getVoltage();
-					if (trigValue >= 1 && prevTrigValue < 1)
-						trigState = true;
-					else if (trigValue < 1 && prevTrigValue >= 1)
-						trigState = false;
-					prevTrigValue = trigValue;
-
-					switch (internalState) {
-						case 0: 									// waiting for TRIG
-							if (trigState) {					// if GATE goes HIGH
-								outputs[GATE_OUTPUT].setVoltage(10);
-								lights[OUT_LIGHT].setBrightness(1.f);
-								internalState = 1;
-								if (attack != 0) {
-									if (fading) {
-										startFade = lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							} else if (release != 0) {
-								if (fading == true) {		// if it's fading
-									if (inputs[IN_INPUT].isConnected() || inputs[IN_INPUT+1].isConnected()) { // if fading and ONE input connected
-										maxFadeSample = args.sampleRate * release;
-										lastFade = -(currentFadeSample / maxFadeSample) + startFade;
-										if (lastFade < 0) {
-											fading = false;
-											currentFadeSample = 0;
-											outputs[OUT_OUTPUT].setVoltage(0);
-											outputs[OUT_OUTPUT+1].setVoltage(0);
-											startFade = 0;
-											lastFade = 0;
-										} else {
-											for (int i=0; i<2; i++) {
-												if (inputs[IN_INPUT+i].isConnected())
-													outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * lastFade * sustain);
-												else
-													outputs[OUT_OUTPUT+i].setVoltage(10 * lastFade * sustain); // send envelope
-											}
-										}
-									} else {	// if fading and BOTH inputs are not connected
-										maxFadeSample = args.sampleRate * release;
-										lastFade = -(currentFadeSample / maxFadeSample) + startFade;
-										if (lastFade < 0) {
-											fading = false;
-											currentFadeSample = 0;
-											outputs[OUT_OUTPUT].setVoltage(0);
-											outputs[OUT_OUTPUT+1].setVoltage(0);
-											startFade = 0;
-											lastFade = 0;
-										} else {
-											outputs[OUT_OUTPUT].setVoltage(10 * lastFade * sustain); // send envelope
-											outputs[OUT_OUTPUT+1].setVoltage(10 * lastFade * sustain); // send envelope
-										}
-									}
-									currentFadeSample++;
-								} else {									// if fading RELEASE has ended (fade = false)
-									startFade = 0;
-									outputs[OUT_OUTPUT].setVoltage(0);
-									outputs[OUT_OUTPUT+1].setVoltage(0);
-								}
-							} else {  // if RELEASE has not set
-								outputs[OUT_OUTPUT].setVoltage(0);
-								outputs[OUT_OUTPUT+1].setVoltage(0);
-							}
-						break;
-
-						case 1: 									// gating
-							outputs[GATE_OUTPUT].setVoltage(10);
-							if (!trigState) { 					// if GATE goes LOW
-								outputs[GATE_OUTPUT].setVoltage(0);
-								lights[OUT_LIGHT].setBrightness(0.f);
-								internalState = 0;
-								if (release != 0) {
-									if (fading) {
-										startFade = lastFade;
-									} else {
-										fading = true;
-										startFade = 1;
-									}
-									currentFadeSample = 0;
-								}
-							} else 	if (attack != 0) {
-								if (fading == true) {
-									if (inputs[IN_INPUT].isConnected() || inputs[IN_INPUT+1].isConnected()) {		// if fading attack and ONE input is connected
-										maxFadeSample = args.sampleRate * attack;										
-										lastFade = (currentFadeSample / maxFadeSample) + startFade;
-										if (lastFade > 1) {
-											fading = false;
-											currentFadeSample = 0;
-											startFade = 0;
-											lastFade = 0;
-										} else {
-											for (int i=0; i<2; i++) {
-												if (inputs[IN_INPUT+i].isConnected())
-													outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * lastFade * sustain);
-												else
-													outputs[OUT_OUTPUT+i].setVoltage(10 * lastFade * sustain); // send envelope
-											}
-										}
-									} else {									// if fading attack and input is not connected
-										maxFadeSample = args.sampleRate * attack;
-										lastFade = (currentFadeSample / maxFadeSample) + startFade;
-										if (lastFade > 1) {
-											fading = false;
-											currentFadeSample = 0;
-											startFade = 0;
-											lastFade = 0;
-										} else {
-											outputs[OUT_OUTPUT].setVoltage(10 * lastFade * sustain); // send envelope on left
-											outputs[OUT_OUTPUT+1].setVoltage(10 * lastFade * sustain); // send envelope on right
-										}
-									}
-									currentFadeSample++;
-								} else { // if fading ATTACK  has ended (fade=false)
-									if (inputs[IN_INPUT].isConnected() || inputs[IN_INPUT+1].isConnected()) {		// if GATING and ONE input is connected
-										for (int i=0; i<2; i++) {
-											if (inputs[IN_INPUT+i].isConnected())
-												outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * sustain);
-											else
-												outputs[OUT_OUTPUT+i].setVoltage(10 * sustain);	// send envelope
-										}
-									} else {											// if GATING and input is not connected
-										outputs[OUT_OUTPUT].setVoltage(10 * sustain); // send envelope on left and right channel
-										outputs[OUT_OUTPUT+1].setVoltage(10 * sustain); // send envelope on right channel
-									}
-								}
-							} else if (inputs[IN_INPUT].isConnected() || inputs[IN_INPUT+1].isConnected()) {  // if fade Attack parameters are not set and ONE input is connected
-								for (int i=0; i<2; i++) {
-									if (inputs[IN_INPUT+i].isConnected())
-										outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * sustain);
-									else
-										outputs[OUT_OUTPUT+i].setVoltage(10 * sustain);
-								}
-							} else {	// if fade Attack parameters are not set and BOTH input are not connected
-								outputs[OUT_OUTPUT].setVoltage(10 * sustain); // send envelope on left and right channel
-								outputs[OUT_OUTPUT+1].setVoltage(10 * sustain);
-							}
-						break;
-					}
-				} else {
-					if (prevTrigConnection) {
-						internalState = 0;
-						outputs[OUT_OUTPUT].setVoltage(0);
-						outputs[OUT_OUTPUT+1].setVoltage(0);
-						outputs[GATE_OUTPUT].setVoltage(0);
-						lights[OUT_LIGHT].setBrightness(0.f);
-					}
-				}
-				prevTrigConnection = trigConnection;
+			case GATE_MODE:
+				if (trigValue >= 1 && prevTrigValue < 1)
+					trigState = true;
+				else if (trigValue < 1 && prevTrigValue >= 1)
+					trigState = false;
 			break;
-			// ********************************** TOGGLER MODE ***************************************************
-			case 1:		
+
+			case TOGGLE_MODE:
 				if (inputs[RST_INPUT].isConnected()) {
 					rst = inputs[RST_INPUT].getVoltage();
 					if (rst >= 1 && prevRst < 1) {
-						// next lines are duplicated from case 1
 						outputs[GATE_OUTPUT].setVoltage(0.f);
 						lights[OUT_LIGHT].setBrightness(0.f);
-						// below is different from original: if internalState is 0 or 1
-						// it will not do the fade 
-						if (release != 0 && internalState == 1) {
-							if (fading) {
-								startFade = lastFade;
-							} else {
-								fading = true;
-								startFade = 1;
-							}
-							currentFadeSample = 0;
-						}
+						stage = STOP_STAGE;
+						stageLevel = 0;
 						internalState = 0;
-						// end of duplicated lines
 					}
 					prevRst = rst; 
 				}
-				
-				trigConnection = inputs[TRIG_INPUT].isConnected();
-				if (trigConnection) {
-					if (!prevTrigConnection && internalState == 1)
-						lights[OUT_LIGHT].setBrightness(1.f);
 
-					trigValue = inputs[TRIG_INPUT].getVoltage();
-					if (trigValue >= 1 && prevTrigValue < 1)
-						trigState = true;
-					else
-						trigState = false;
-					prevTrigValue = trigValue;
-
-					switch (internalState) {
-						case 0: 									// waiting for TRIG
-							if (trigState) {					// if TRIG occurs
-								outputs[GATE_OUTPUT].setVoltage(10);
-								lights[OUT_LIGHT].setBrightness(1.f);
-								internalState = 1;
-								if (attack != 0) {
-									if (fading) {
-										startFade = lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							} else if (release != 0) {
-								if (fading == true) {
-									if (inputs[IN_INPUT].isConnected() || inputs[IN_INPUT+1].isConnected()) {
-										maxFadeSample = args.sampleRate * release;
-										lastFade = -(currentFadeSample / maxFadeSample) + startFade;
-										if (lastFade < 0) {
-											fading = false;
-											currentFadeSample = 0;
-											outputs[OUT_OUTPUT].setVoltage(0);
-											outputs[OUT_OUTPUT+1].setVoltage(0);
-											startFade = 0;
-											lastFade = 0;
-										} else {
-											for (int i=0; i<2; i++) {
-												if (inputs[IN_INPUT+i].isConnected())
-													outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * lastFade * sustain);
-												else
-													outputs[OUT_OUTPUT+i].setVoltage(10 * lastFade * sustain); // send envelope
-											}
-										}
-									} else { // if fading and BOTH input are not connected
-										
-										maxFadeSample = args.sampleRate * attack;
-										lastFade = -(currentFadeSample / maxFadeSample) + startFade;
-
-										if (lastFade < 0) {
-											fading = false;
-											currentFadeSample = 0;
-											outputs[OUT_OUTPUT].setVoltage(0);
-											outputs[OUT_OUTPUT+1].setVoltage(0);
-											startFade = 0;
-											lastFade = 0;
-										} else {
-											outputs[OUT_OUTPUT].setVoltage(10 * lastFade * sustain); // send envelope
-											outputs[OUT_OUTPUT+1].setVoltage(10 * lastFade * sustain); // send envelope
-										}
-									}
-									currentFadeSample++;
-								} else {									// if RELEASING has ended
-									outputs[OUT_OUTPUT].setVoltage(0);
-									outputs[OUT_OUTPUT+1].setVoltage(0);
-								}
-							} else {  // if RELEASE has not set
-								outputs[OUT_OUTPUT].setVoltage(0);
-								outputs[OUT_OUTPUT+1].setVoltage(0);
-							}
-						break;
-
-						case 1: 									// gating
-							outputs[GATE_OUTPUT].setVoltage(10);
-							if (trigState) { 					// if TRIG occurs
-								outputs[GATE_OUTPUT].setVoltage(0);
-								lights[OUT_LIGHT].setBrightness(0.f);
-								internalState = 0;
-								if (release != 0) {
-									if (fading) {
-										startFade = lastFade;
-									} else {
-										fading = true;
-										startFade = 1;
-									}
-									currentFadeSample = 0;
-								}
-							} else 	if (attack != 0){
-								if (fading == true) {
-									if (inputs[IN_INPUT].isConnected() || inputs[IN_INPUT+1].isConnected()) {	// if fading attack and ONE input connected
-										
-										maxFadeSample = args.sampleRate * attack;
-										lastFade = (currentFadeSample / maxFadeSample) + startFade;
-
-										if (lastFade > 1) {
-											fading = false;
-											currentFadeSample = 0;
-											startFade = 0;
-											lastFade = 0;
-										} else {
-											for (int i=0; i<2; i++){
-												if (inputs[IN_INPUT+i].isConnected())
-													outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * lastFade * sustain);
-												else
-													outputs[OUT_OUTPUT+i].setVoltage(10 * lastFade * sustain); // send envelope
-											}
-										}
-									} else {					// if fading attack and BOTH input are not connected
-
-										maxFadeSample = args.sampleRate * attack;
-										lastFade = (currentFadeSample / maxFadeSample) + startFade;
-
-										if (lastFade > 1) {
-											fading = false;
-											currentFadeSample = 0;
-											startFade = 0;
-											lastFade = 0;
-										} else {
-											outputs[OUT_OUTPUT].setVoltage(10 * lastFade * sustain); // send envelope on left
-											outputs[OUT_OUTPUT+1].setVoltage(10 * lastFade * sustain); // send envelope on right
-										}
-									}
-									currentFadeSample++;
-								} else if (inputs[IN_INPUT].isConnected() || inputs[IN_INPUT+1].isConnected()) { 	// if not fading attack and ONE input connected
-									for (int i=0; i<2; i++) {
-										if (inputs[IN_INPUT+i].isConnected())
-											outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * sustain);
-										else
-											outputs[OUT_OUTPUT+i].setVoltage(10.f * sustain);	// send envelope
-									}
-								} else {		// if not fading attack and BOTH input are not connected
-									outputs[OUT_OUTPUT].setVoltage(10 * sustain); // send envelope on left and right channel
-									outputs[OUT_OUTPUT+1].setVoltage(10 * sustain); // send envelope on right channel
-								}
-							} else if (inputs[IN_INPUT].isConnected() || inputs[IN_INPUT+1].isConnected()) { // if attack parameters are not set and input is connected
-								for (int i=0; i<2; i++) {
-									if (inputs[IN_INPUT+i].isConnected())
-										outputs[OUT_OUTPUT+i].setVoltage(inputs[IN_INPUT+i].getVoltage() * sustain);
-									else
-										outputs[OUT_OUTPUT+i].setVoltage(10 * sustain);
-								}
-							} else {									// if attack parameters are not set and BOTH input are not connected
-								outputs[OUT_OUTPUT].setVoltage(10 * sustain); // send envelope on left and right channel
-								outputs[OUT_OUTPUT+1].setVoltage(10 * sustain);
-							}
-						break;
-					}
-				} else {
-					if (prevTrigConnection) {
-						internalState = 0;
-						outputs[OUT_OUTPUT].setVoltage(0);
-						outputs[OUT_OUTPUT+1].setVoltage(0);
-						outputs[GATE_OUTPUT].setVoltage(0);
-						lights[OUT_LIGHT].setBrightness(0.f);
+				if (prevGating && internalState == GATING) {	// this control starts attack if vcv was closed while gating
+					prevGating = false;
+					outputs[GATE_OUTPUT].setVoltage(10);
+					lights[OUT_LIGHT].setBrightness(1.f);
+					attack = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + inputs[ATTACK_INPUT].getVoltage();
+					if (attack < noEnvTime) {
+						stage = SUSTAIN_STAGE;
+					} else {
+						stage = ATTACK_STAGE;
+						if (attack > maxAdsrTime)
+							attack = maxAdsrTime;
+						stageCoeff = (1-stageLevel) / (args.sampleRate * attack);
 					}
 				}
-				prevTrigConnection = trigConnection;
+
+				if (trigValue >= 1 && prevTrigValue < 1)
+					trigState = true;
+				else
+					trigState = false;
+				
+			break;			
+		}
+		prevTrigValue = trigValue;
+
+		switch (internalState) {
+			case IDLE:
+				if (trigState) {
+					outputs[GATE_OUTPUT].setVoltage(10);
+					lights[OUT_LIGHT].setBrightness(1.f);
+					internalState = 1;
+
+					attack = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + inputs[ATTACK_INPUT].getVoltage();
+					if (attack < noEnvTime) {
+						stage = SUSTAIN_STAGE;
+					} else {
+						stage = ATTACK_STAGE;
+						if (attack > maxAdsrTime)
+							attack = maxAdsrTime;
+						stageCoeff = (1-stageLevel) / (args.sampleRate * attack);
+					}
+				}
+			break;
+
+			case GATING:
+				outputs[GATE_OUTPUT].setVoltage(10);
+				if ((mode == GATE_MODE && !trigState) || (mode == TOGGLE_MODE && trigState)) {
+					outputs[GATE_OUTPUT].setVoltage(0);
+					lights[OUT_LIGHT].setBrightness(0.f);
+					internalState = 0;
+
+					release = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + inputs[RELEASE_INPUT].getVoltage();
+					if (release < noEnvTime) {
+						stage = STOP_STAGE;
+					} else {
+						stage = RELEASE_STAGE;
+						if (release > maxAdsrTime)
+							release = maxAdsrTime;
+						stageCoeff = stageLevel / (args.sampleRate * release);
+					}
+				} 
 			break;
 		}
+
+		switch (stage) {
+			case STOP_STAGE:
+				stageLevel = 0;
+			break;
+
+			case ATTACK_STAGE:
+				stageLevel += stageCoeff;
+				if (stageLevel >= sustain) {
+					stageLevel = sustain;
+					stage = SUSTAIN_STAGE;
+				}
+			break;
+
+			case SUSTAIN_STAGE:
+				stageLevel = sustain;
+			break;
+
+			case RELEASE_STAGE:
+				stageLevel -= stageCoeff;
+				if (stageLevel < 0) {
+					stageLevel = 0;
+					stage = STOP_STAGE;
+				}
+			break;
+		}
+
+		if (inputs[IN_INPUT].isConnected())
+			outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage() * stageLevel);
+		else
+			outputs[OUT_OUTPUT].setVoltage(10 * stageLevel);
+
+		if (inputs[IN_INPUT+1].isConnected())
+			outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage() * stageLevel);
+		else
+			outputs[OUT_OUTPUT+1].setVoltage(10 * stageLevel);
 	}
 };
 
@@ -493,13 +269,13 @@ struct TogglerCompactWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.2, 52.8)), module, TogglerCompact::IN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 52.8)), module, TogglerCompact::IN_INPUT+1));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.32, 62)), module, TogglerCompact::ATTACK_PARAMS));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.32, 62)), module, TogglerCompact::ATTACK_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.32, 69)), module, TogglerCompact::ATTACK_INPUT));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(14.32, 73)), module, TogglerCompact::SUSTAIN_PARAMS));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(14.32, 73)), module, TogglerCompact::SUSTAIN_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.32, 80)), module, TogglerCompact::SUSTAIN_INPUT));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.32, 84)), module, TogglerCompact::RELEASE_PARAMS));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.32, 84)), module, TogglerCompact::RELEASE_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.32, 91)), module, TogglerCompact::RELEASE_INPUT));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.2, 107.5)), module, TogglerCompact::OUT_OUTPUT));

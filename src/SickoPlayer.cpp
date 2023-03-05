@@ -205,9 +205,6 @@ struct SickoPlayer : Module {
 	int trigType;
 	int stage[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float stageLevel[16];
-	float lastStageLevel[16];
-	float currentStageSample[16];
-	float maxStageSample[16];
 	
 	bool eoc[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	bool eor[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
@@ -221,6 +218,7 @@ struct SickoPlayer : Module {
 	float decayValue;
 	float sustainValue;
 	float releaseValue;
+	float stageCoeff[16];
 	float masterLevel[16];
 	int limiter;
 
@@ -231,12 +229,17 @@ struct SickoPlayer : Module {
 	float clippingValue = 0;
 	//float clippingCoeff = 2 / (APP->engine->getSampleRate());
 	float clippingCoeff = 5 / (APP->engine->getSampleRate());	// nr of samples of 200 ms (1/0.2)
-	bool clipping = false;
+	bool clipping = fadeSamples;
 
 	bool nextSample = false;
 	bool prevNextSample = false;
 	bool prevSample = false;
 	bool prevPrevSample = false;
+
+	static constexpr float minStageTime = 1.f;  // in milliseconds
+	static constexpr float maxStageTime = 10000.f;  // in milliseconds
+	const float maxAdsrTime = 10.f;
+	const float minAdsrTime = 0.001f;
 
 	SickoPlayer() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -266,11 +269,11 @@ struct SickoPlayer : Module {
 
 		//******************************************************************************
 
-		configParam(ATTACK_PARAM, 0.0001f, 10.f, 0.0001f, "Attack", "ms", 0, 1000);
+		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
 		configInput(ATTACK_INPUT,"Attack CV");
 		configParam(ATTACKATNV_PARAM, -1.0f, 1.0f, 0.0f, "Attack CV Attenuv.");
 
-		configParam(DECAY_PARAM, 0.0001f, 10.f, 0.0001f, "Decay", "ms", 0, 1000);
+		configParam(DECAY_PARAM, 0.f, 1.f, 0.f, "Decay", " ms", maxStageTime / minStageTime, minStageTime);
 		configInput(DECAY_INPUT,"Decay CV");
 		configParam(DECAYATNV_PARAM, -1.0f, 1.0f, 0.0f, "Decay CV Attenuv.");
 
@@ -278,7 +281,7 @@ struct SickoPlayer : Module {
 		configInput(SUSTAIN_INPUT,"Sustain CV");
 		configParam(SUSTAINATNV_PARAM, -1.0f, 1.0f, 0.0f, "Sustain CV Attenuv.");
 
-		configParam(RELEASE_PARAM, 0.0001f, 10.f, 0.0001f, "Release", "ms", 0, 1000);
+		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
 		configInput(RELEASE_INPUT,"Release CV");
 		configParam(RELEASEATNV_PARAM, -1.0f, 1.0f, 0.0f, "Release CV Attenuv.");
 
@@ -307,6 +310,10 @@ struct SickoPlayer : Module {
 		playBuffer[0][1].resize(0);
 		playBuffer[1][0].resize(0);
 		playBuffer[1][1].resize(0);
+	}
+
+	static float convertCVToSeconds(float cv) {		
+		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}
 
 	void onReset() override {
@@ -923,18 +930,12 @@ struct SickoPlayer : Module {
 
 			trigMode = params[TRIGGATEMODE_SWITCH].getValue();
 			trigType = params[TRIGMODE_SWITCH].getValue();
-
-			attackValue = params[ATTACK_PARAM].getValue() + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
-
-			decayValue = params[DECAY_PARAM].getValue() + (inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue());
 			
 			sustainValue = params[SUSTAIN_PARAM].getValue() + (inputs[SUSTAIN_INPUT].getVoltage() * params[SUSTAINATNV_PARAM].getValue() * 0.1);
 			if (sustainValue > 1)
 				sustainValue = 1;
 			else if (sustainValue < 0)
 				sustainValue = 0;
-
-			releaseValue = params[RELEASE_PARAM].getValue() + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
 			
 			limiter = params[LIMIT_SWITCH].getValue();
 
@@ -990,21 +991,36 @@ struct SickoPlayer : Module {
 									prevSampleWeight[c] = 0;
 								}
 								stage[c] = ATTACK_STAGE;
-								currentStageSample[c] = 0;
-								lastStageLevel[c] = 0;
+								attackValue =  convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+								if (attackValue > maxAdsrTime) {
+									attackValue = maxAdsrTime;
+								} else if (attackValue < minAdsrTime) {
+									attackValue = minAdsrTime;
+								}
+								stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 							} else {
 								if (stage[c] == RELEASE_STAGE) {
 									stage[c] = ATTACK_STAGE;
-									currentStageSample[c] = 0;
-									lastStageLevel[c] = stageLevel[c];
+									attackValue =  convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+									if (attackValue > maxAdsrTime) {
+										attackValue = maxAdsrTime;
+									} else if (attackValue < minAdsrTime) {
+										attackValue = minAdsrTime;
+									}
+									stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 								}
 							}
 						} else {
 							if (play[c]) {
 								if (stage[c] != RELEASE_STAGE) {
 									stage[c]=RELEASE_STAGE;
-									currentStageSample[c] = 0;
-									lastStageLevel[c] = 1-stageLevel[c];
+									releaseValue =  convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+									if (releaseValue > maxAdsrTime) {
+										releaseValue = maxAdsrTime;
+									} else 	if (releaseValue < minAdsrTime) {
+										releaseValue = minAdsrTime;
+									}
+									stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 								}
 							}
 						}
@@ -1017,12 +1033,22 @@ struct SickoPlayer : Module {
 									if (play[c]) {
 										if (stage[c] != RELEASE_STAGE) {
 											stage[c]=RELEASE_STAGE;
-											currentStageSample[c] = 0;
-											lastStageLevel[c] = 1-stageLevel[c];
+											releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+											if (releaseValue > maxAdsrTime) {
+												releaseValue = maxAdsrTime;
+											} else 	if (releaseValue < minAdsrTime) {
+												releaseValue = minAdsrTime;
+											}
+											stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 										} else {
 											stage[c] = ATTACK_STAGE;
-											currentStageSample[c] = 0;
-											lastStageLevel[c] = stageLevel[c];
+											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+											if (attackValue > maxAdsrTime) {
+												attackValue = maxAdsrTime;
+											} else if (attackValue < minAdsrTime) {
+												attackValue = minAdsrTime;
+											}
+											stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 										}
 									} else {
 										play[c] = true;
@@ -1040,8 +1066,13 @@ struct SickoPlayer : Module {
 											prevSampleWeight[c] = 0;
 										}
 										stage[c] = ATTACK_STAGE;
-										currentStageSample[c] = 0;
-										lastStageLevel[c] = 0;
+										attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+										if (attackValue > maxAdsrTime) {
+											attackValue = maxAdsrTime;
+										} else if (attackValue < minAdsrTime) {
+											attackValue = minAdsrTime;
+										}
+										stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 									}
 								break;
 
@@ -1062,13 +1093,23 @@ struct SickoPlayer : Module {
 											prevSampleWeight[c] = 0;
 										}
 										stage[c] = ATTACK_STAGE;
-										currentStageSample[c] = 0;
-										lastStageLevel[c] = 0;
+										attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+										if (attackValue > maxAdsrTime) {
+											attackValue = maxAdsrTime;
+										} else if (attackValue < minAdsrTime) {
+											attackValue = minAdsrTime;
+										}
+										stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 									} else if (stage[c] == RELEASE_STAGE) {
 										play[c] = true;
 										stage[c] = ATTACK_STAGE;
-										currentStageSample[c] = 0;
-										lastStageLevel[c] = stageLevel[c];
+										attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+										if (attackValue > maxAdsrTime) {
+											attackValue = maxAdsrTime;
+										} else if (attackValue < minAdsrTime) {
+											attackValue = minAdsrTime;
+										}
+										stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 									}
 								break;
 								
@@ -1077,20 +1118,35 @@ struct SickoPlayer : Module {
 										if (stage[c] != RELEASE_STAGE) {
 											inPause[c] = true;
 											stage[c] = RELEASE_STAGE;
-											currentStageSample[c] = 0;
-											lastStageLevel[c] = 1-stageLevel[c];
+											releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+											if (releaseValue > maxAdsrTime) {
+												releaseValue = maxAdsrTime;
+											} else 	if (releaseValue < minAdsrTime) {
+												releaseValue = minAdsrTime;
+											}
+											stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 										} else {
 											stage[c] = ATTACK_STAGE;
-											currentStageSample[c] = 0;
-											lastStageLevel[c] = stageLevel[c];
+											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+											if (attackValue > maxAdsrTime) {
+												attackValue = maxAdsrTime;
+											} else if (attackValue < minAdsrTime) {
+												attackValue = minAdsrTime;
+											}
+											stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 										}
 									} else {
 										if (inPause[c]) {
 											play[c] = true;
 											inPause[c] = false;
 											stage[c] = ATTACK_STAGE;
-											currentStageSample[c] = 0;
-											lastStageLevel[c] = 0;
+											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+											if (attackValue > maxAdsrTime) {
+												attackValue = maxAdsrTime;
+											} else if (attackValue < minAdsrTime) {
+												attackValue = minAdsrTime;
+											}
+											stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 										} else {
 											play[c] = true;
 											if (reverseStart) {
@@ -1107,8 +1163,13 @@ struct SickoPlayer : Module {
 												prevSampleWeight[c] = 0;
 											}
 											stage[c] = ATTACK_STAGE;
-											currentStageSample[c] = 0;
-											lastStageLevel[c] = 0;
+											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+											if (attackValue > maxAdsrTime) {
+												attackValue = maxAdsrTime;
+											} else if (attackValue < minAdsrTime) {
+												attackValue = minAdsrTime;
+											}
+											stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 										}
 									}
 								break;
@@ -1196,8 +1257,13 @@ struct SickoPlayer : Module {
 							} else if (samplePos[c] > cueEndPos) {				// *** REACHED CUE END ***
 								if (stage[c] != RELEASE_STAGE) {
 									stage[c] = RELEASE_STAGE;
-									currentStageSample[c] = 0;
-									lastStageLevel[c] = 1-stageLevel[c];
+									releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+									if (releaseValue > maxAdsrTime) {
+										releaseValue = maxAdsrTime;
+									} else 	if (releaseValue < minAdsrTime) {
+										releaseValue = minAdsrTime;
+									}
+									stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 								}
 								if (trigMode == GATE_MODE) {
 									if (pingpong) {
@@ -1287,8 +1353,13 @@ struct SickoPlayer : Module {
 							} else if (samplePos[c] < cueStartPos) {			// *** REACHED CUE START ***
 								if (stage[c] != RELEASE_STAGE) {
 									stage[c] = RELEASE_STAGE;
-									currentStageSample[c] = 0;
-									lastStageLevel[c] = 1-stageLevel[c];
+									releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+									if (releaseValue > maxAdsrTime) {
+										releaseValue = maxAdsrTime;
+									} else 	if (releaseValue < minAdsrTime) {
+										releaseValue = minAdsrTime;
+									}
+									stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 								}
 								if (trigMode == GATE_MODE) {
 									if (pingpong) {
@@ -1327,8 +1398,13 @@ struct SickoPlayer : Module {
 						if (stopValue[c] >= 1 && prevStopValue[c] < 1 && trigMode) {
 							if (stage[c] != RELEASE_STAGE) {
 								stage[c] = RELEASE_STAGE;
-								currentStageSample[c] = 0;
-								lastStageLevel[c] = 1-stageLevel[c];
+								releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+								if (releaseValue > maxAdsrTime) {
+									releaseValue = maxAdsrTime;
+								} else 	if (releaseValue < minAdsrTime) {
+									releaseValue = minAdsrTime;
+								}
+								stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 							}
 
 							if (polyOuts) {
@@ -1437,61 +1513,38 @@ struct SickoPlayer : Module {
 
 						switch (stage[c]) {
 							case ATTACK_STAGE:
-								if (attackValue > 10) {
-									attackValue = 10;
-								} else 	if (attackValue < 0.0001f) {
-									attackValue = 0.0001f;
-								}
-								maxStageSample[c] = args.sampleRate * attackValue;
-								stageLevel[c] = (currentStageSample[c] / maxStageSample[c]) + lastStageLevel[c];
+								stageLevel[c] += stageCoeff[c];
 								if (stageLevel[c] > 1) {
 									stageLevel[c] = 1;
 									stage[c] = DECAY_STAGE;
-									currentStageSample[c] = 0;
-									lastStageLevel[c] = 0;
+									decayValue = convertCVToSeconds(params[DECAY_PARAM].getValue()) + (inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue());
+									if (decayValue > maxAdsrTime) {
+										decayValue = maxAdsrTime;
+									} else 	if (decayValue < minAdsrTime) {
+										decayValue = minAdsrTime;
+									}
+									stageCoeff[c] = (1-sustainValue) / (args.sampleRate * decayValue);
 								}
-								currentStageSample[c]++;
 							break;
 
 							case DECAY_STAGE:
-								if (decayValue > 10) {
-									decayValue = 10;
-								} else 	if (decayValue < 0.0001f) {
-									decayValue = 0.0001f;
-								}
-								maxStageSample[c] = args.sampleRate * decayValue / (1-sustainValue);
-								stageLevel[c] = 1-(currentStageSample[c] / maxStageSample[c]) + lastStageLevel[c];
-								if (stageLevel[c] < sustainValue) {
+								stageLevel[c] -= stageCoeff[c];
+								if (stageLevel[c] <= sustainValue) {
 									stageLevel[c] = sustainValue;
 									stage[c] = SUSTAIN_STAGE;
-									currentStageSample[c] = 0;
-									lastStageLevel[c] = 0;
 								}
-								currentStageSample[c]++;
 							break;
 
 							case SUSTAIN_STAGE:
-								if (sustainValue > 1) {
-									sustainValue = 1;
-								} else 	if (sustainValue < 0) {
-									sustainValue = 0;
-								}
 								stageLevel[c] = sustainValue;
 							break;
 
 							case RELEASE_STAGE:
-								if (releaseValue > 10) {
-									releaseValue = 10;
-								} else 	if (releaseValue < 0.0001f) {
-									releaseValue = 0.0001f;
-								}
-								maxStageSample[c] = args.sampleRate * releaseValue;
-								stageLevel[c] = 1-(currentStageSample[c] / maxStageSample[c]) - lastStageLevel[c];
+								stageLevel[c] -= stageCoeff[c];
 								if (stageLevel[c] < 0) {
 									stageLevel[c] = 0;
 									stage[c] = STOP_STAGE;
 									play[c] = false;
-									lastStageLevel[c] = 0;
 
 									if (polyOuts) {
 										eor[c] = true;
@@ -1509,7 +1562,6 @@ struct SickoPlayer : Module {
 										}
 									}
 								}
-								currentStageSample[c]++;
 							break;
 						}
 
