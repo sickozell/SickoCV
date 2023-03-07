@@ -94,6 +94,20 @@ struct Blender : Module {
 			polyOuts = json_integer_value(polyOutsJ);
 	}
 
+	bool isPolyOuts() {
+		return polyOuts;
+	}
+
+	void setPolyOuts(bool poly) {
+		if (poly) 
+			polyOuts = 1;
+		else {
+			polyOuts = 0;
+			outputs[OUT_OUTPUT].setChannels(1);
+			outputs[OUT_OUTPUT+1].setChannels(1);
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
 		
 		limit = params[LIMIT_PARAMS].getValue();
@@ -287,7 +301,12 @@ struct BlenderWidget : ModuleWidget {
 	   	Blender *module = dynamic_cast<Blender*>(this->module);
 		assert(module);
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
+		//menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
+		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
+				return module->isPolyOuts();
+			}, [=](bool poly) {
+				module->setPolyOuts(poly);
+		}));
 	}
 };
 

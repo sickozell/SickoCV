@@ -323,8 +323,8 @@ struct Drummer4Widget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));		
 
-		float x = 13.46;
-		float xs = 7.75;
+		const float x = 13.46;
+		const float xs = 7.75;
 
 		for (int i=0; i<4; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), 20)), module, Drummer4::TRIG_INPUT+i));

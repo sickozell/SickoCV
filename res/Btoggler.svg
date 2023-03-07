@@ -25,14 +25,14 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="4.0000004"
-     inkscape:cx="82.624992"
-     inkscape:cy="387.49996"
+     inkscape:cx="78.624992"
+     inkscape:cy="87.499991"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="1272"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g12491"
      showguides="true" />
   <defs
      id="defs2">
@@ -391,18 +391,18 @@
        y="16.668739"
        id="text2570"
        inkscape:label="RESET ALL"
-       transform="translate(-11.895628,-2.8520671)"><tspan
+       transform="translate(-12.895628,-2.8520671)"><tspan
          x="50.800026"
          y="16.668739"
-         id="tspan39345"><tspan
+         id="tspan2333"><tspan
            style="stroke-width:0.265"
-           id="tspan39343">RST
+           id="tspan2331">RST
 </tspan></tspan><tspan
          x="50.800026"
          y="19.773192"
-         id="tspan39349"><tspan
+         id="tspan2337"><tspan
            style="stroke-width:0.265"
-           id="tspan39347">ALL</tspan></tspan></text>
+           id="tspan2335">ALL</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
@@ -418,20 +418,20 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
-       x="6.9734373"
+       x="7.9731641"
        y="15.58125"
        id="text2453"
        inkscape:label="clock"><tspan
          sodipodi:role="line"
          id="tspan2451"
          style="font-size:2.82222px;text-align:center;text-anchor:middle;stroke:none;stroke-width:0.265"
-         x="6.9734373"
+         x="7.9731641"
          y="15.58125">CLK</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="g12491"
-     inkscape:label="Etichette Path copy"
+     inkscape:label="Etichette Path nere"
      style="display:inline;fill:#000000;stroke:none"
      transform="translate(0.3003226,0.399779)">
     <g
@@ -528,7 +528,7 @@
     </g>
     <g
        aria-label="RST ALL"
-       transform="translate(-11.895628,-2.852067)"
+       transform="translate(-12.895628,-2.852067)"
        id="g12471"
        style="font-size:2.82223px;line-height:1.1;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;white-space:pre;inline-size:8.11391;display:inline;fill:#000000;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="RESET ALL">
@@ -583,7 +583,8 @@
        aria-label="CLK"
        id="g12489"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#000000;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
-       inkscape:label="clock">
+       inkscape:label="clock"
+       transform="translate(0.9997266)">
       <path
          d="M 3.622051,15.58125 V 15.228473 H 3.2692734 V 13.464585 H 3.622051 v -0.352777 h 1.41111 v 0.352777 h 0.3527775 v 0.352778 h -0.705555 v -0.352778 h -0.705555 v 1.763888 h 0.705555 v -0.352778 h 0.705555 v 0.352778 H 5.033161 v 0.352777 z"
          style="fill:#000000;stroke:none;stroke-width:0.265"
@@ -697,7 +698,7 @@
     </g>
     <g
        aria-label="RST ALL"
-       transform="translate(-11.895628,-2.852067)"
+       transform="translate(-12.895628,-2.852067)"
        id="text16972"
        style="font-size:2.82223px;line-height:1.1;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;white-space:pre;inline-size:8.11391;display:inline;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="RESET ALL">
@@ -752,7 +753,8 @@
        aria-label="CLK"
        id="text16980"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
-       inkscape:label="clock">
+       inkscape:label="clock"
+       transform="translate(0.9997266)">
       <path
          d="M 3.622051,15.58125 V 15.228473 H 3.2692734 V 13.464585 H 3.622051 v -0.352777 h 1.41111 v 0.352777 h 0.3527775 v 0.352778 h -0.705555 v -0.352778 h -0.705555 v 1.763888 h 0.705555 v -0.352778 h 0.705555 v 0.352778 H 5.033161 v 0.352777 z"
          style="stroke-width:0.265"

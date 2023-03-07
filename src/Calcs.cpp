@@ -183,7 +183,7 @@ struct CalcsWidget : ModuleWidget {
 		float xc = 20.7;
 
 		float yStart = 12;
-		float yIncrement = 8;
+		const float yIncrement = 8;
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(27.5, 11)), module, Calcs::RANGE_SWITCH));
 		

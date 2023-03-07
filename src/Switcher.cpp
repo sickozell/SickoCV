@@ -3,7 +3,7 @@
 struct Switcher : Module {
 	enum ParamId {
 		MODE_SWITCH,
-		FADE_PARAMS,
+		FADE_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -53,10 +53,15 @@ struct Switcher : Module {
 	float startFade = 0;
 	float lastFade = 0;
 
+	static constexpr float minStageTime = 1.f;  // in milliseconds
+	static constexpr float maxStageTime = 10000.f;  // in milliseconds
+	const float maxAdsrTime = 10.f;
+	const float noEnvTime = 0.00101;
+
 	Switcher() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
-		configParam(FADE_PARAMS, 0.f, 10.f, 0.f, "Fade Time", "ms", 0, 1000);
+		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", " ms", maxStageTime / minStageTime, minStageTime);
 		configInput(TRIG_INPUT, "Trig/Gate");
 		configInput(RST_INPUT, "Reset");
 		configInput(IN1_INPUT, "IN 1");
@@ -105,6 +110,10 @@ struct Switcher : Module {
 		}
 	}
 
+	static float convertCVToSeconds(float cv) {		
+		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
+	}
+
 	void process(const ProcessArgs& args) override {
 		trigConnection = inputs[TRIG_INPUT].isConnected();
 		if (!trigConnection) {
@@ -119,8 +128,7 @@ struct Switcher : Module {
 				currentSwitch = false;
 				prevConnection = -1;
 			}
-		} else {	
-			fadeValue = params[FADE_PARAMS].getValue() + inputs[FADECV_INPUT].getVoltage();
+		} else {
 
 			connection = 0;
 			if (inputs[IN1_INPUT].isConnected())
@@ -176,7 +184,8 @@ struct Switcher : Module {
 					prevTrigValue = trigValue;
 
 					if (trigState) {
-						if (fadeValue != 0) {
+						fadeValue = convertCVToSeconds(params[FADE_PARAM].getValue()) + inputs[FADECV_INPUT].getVoltage();
+						if (fadeValue > noEnvTime) {
 							if (fading) {
 								startFade = 1-lastFade;
 							} else {
@@ -200,7 +209,8 @@ struct Switcher : Module {
 					if (trigState) {
 						currentSwitch = !currentSwitch;
 						connectionChange = true;
-						if (fadeValue != 0) {
+						fadeValue = convertCVToSeconds(params[FADE_PARAM].getValue()) + inputs[FADECV_INPUT].getVoltage();
+						if (fadeValue > noEnvTime) {
 							if (fading) {
 								startFade = 1-lastFade;
 							} else {
@@ -221,7 +231,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -295,7 +305,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -369,7 +379,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -447,7 +457,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -521,7 +531,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -595,7 +605,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -669,7 +679,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -743,7 +753,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -817,7 +827,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -891,7 +901,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -969,7 +979,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -1047,7 +1057,7 @@ struct Switcher : Module {
 							if (currentSwitch) {
 								currentSwitch = 0;
 								connectionChange = true;
-								if (fadeValue != 0) {
+								if (fadeValue > noEnvTime) {
 									if (fading) {
 										startFade = 1-lastFade;
 									} else {
@@ -1153,7 +1163,7 @@ struct SwitcherWidget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(12, 52)), module, Switcher::IN1_LIGHT));
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(12, 61)), module, Switcher::IN2_LIGHT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 82.9)), module, Switcher::FADE_PARAMS));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 82.9)), module, Switcher::FADE_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 92.5)), module, Switcher::FADECV_INPUT));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 109)), module, Switcher::OUT1_OUTPUT));

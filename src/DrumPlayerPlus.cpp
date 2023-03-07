@@ -14,6 +14,8 @@
 #include "cmath"
 #include <dirent.h>
 #include <libgen.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -67,6 +69,15 @@ struct DrumPlayerPlus : Module {
 	std::string storedPath[4] = {"","","",""};
 	std::string fileDescription[4] = {"--none--","--none--","--none--","--none--"};
 	std::string fileDisplay[4] = {"-----","-----","-----","-----"};
+	std::string scrollDisplay[4] = {"-----","-----","-----","-----"};
+	std::string currFileDisplay[4] = {"-----","-----","-----","-----"};
+	std::string userFolder = "";
+
+	std::string tempDir = "";
+	vector<vector<std::string>> folderTreeData;
+	vector<vector<std::string>> folderTreeDisplay;
+	vector<std::string> tempTreeData;
+	vector<std::string> tempTreeDisplay;
 
 	float trigValue[4] = {0.f, 0.f, 0.f, 0.f};
 	float prevTrigValue[4] = {0.f, 0.f, 0.f, 0.f};
@@ -84,6 +95,7 @@ struct DrumPlayerPlus : Module {
 	int interpolationMode = HERMITE_INTERP;
 	int outsMode = 0;
 	int antiAlias = 1;
+	int scrolling = 1;
 
 	//std::string debugDisplay = "X";
 
@@ -161,7 +173,8 @@ struct DrumPlayerPlus : Module {
 	void onReset() override {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
-		outsMode = 0;
+		outsMode = NORMALLED_OUTS;
+		scrolling = 1;
 		for (int i = 0; i < 4; i++) {
 			clearSlot(i);
 			play[i] = false;
@@ -183,10 +196,12 @@ struct DrumPlayerPlus : Module {
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "OutsMode", json_integer(outsMode));
+		json_object_set_new(rootJ, "Scrolling", json_integer(scrolling));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		json_object_set_new(rootJ, "Slot3", json_string(storedPath[2].c_str()));
 		json_object_set_new(rootJ, "Slot4", json_string(storedPath[3].c_str()));
+		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
 		return rootJ;
 	}
 
@@ -194,15 +209,15 @@ struct DrumPlayerPlus : Module {
 		json_t* interpolationJ = json_object_get(rootJ, "Interpolation");
 		if (interpolationJ)
 			interpolationMode = json_integer_value(interpolationJ);
-
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
 			antiAlias = json_integer_value(antiAliasJ);
-
 		json_t* outsModeJ = json_object_get(rootJ, "OutsMode");
 		if (outsModeJ)
 			outsMode = json_integer_value(outsModeJ);
-
+		json_t* scrollingJ = json_object_get(rootJ, "Scrolling");
+		if (scrollingJ)
+			scrolling = json_integer_value(scrollingJ);
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
@@ -222,6 +237,15 @@ struct DrumPlayerPlus : Module {
 		if (slot4J) {
 			storedPath[3] = json_string_value(slot4J);
 			loadSample(storedPath[3], 3);
+		}
+		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
+		if (userFolderJ) {
+			userFolder = json_string_value(userFolderJ);
+			if (userFolder != "") {
+				createFolder(userFolder);
+				folderTreeData.push_back(tempTreeData);
+				folderTreeDisplay.push_back(tempTreeDisplay);
+			}
 		}
 	}
 	
@@ -253,7 +277,117 @@ struct DrumPlayerPlus : Module {
 		double c3 = (.5F * (x3 - x0)) + (1.5F * (x1 - x2));
 		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
 	}
-	*/ 
+	*/
+
+	void selectRootFolder() {
+		const char* prevFolder = userFolder.c_str();
+		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+		if (path) {
+			folderTreeData.clear();
+			folderTreeDisplay.clear();
+			userFolder = std::string(path);
+			createFolder(userFolder);
+			folderTreeData.push_back(tempTreeData);
+			folderTreeDisplay.push_back(tempTreeDisplay);
+		}
+		free(path);
+	};
+
+	void refreshRootFolder() {
+		folderTreeData.clear();
+		folderTreeDisplay.clear();
+		createFolder(userFolder);
+		folderTreeData.push_back(tempTreeData);
+		folderTreeDisplay.push_back(tempTreeDisplay);
+	}
+
+	void createFolder(std::string dir_path) {
+		vector <std::string> browserList;
+		vector <std::string> browserListDisplay;
+		vector <std::string> browserDir;
+		vector <std::string> browserDirDisplay;
+		vector <std::string> browserFiles;
+		vector <std::string> browserFilesDisplay;
+
+		tempTreeData.clear();
+		tempTreeDisplay.clear();
+
+		std::string lastChar = dir_path.substr(dir_path.length()-1,dir_path.length()-1);
+		if (lastChar != "/")
+			dir_path += "/";
+
+		DIR *dir = opendir(dir_path.c_str());
+		struct dirent *d;
+		while ((d = readdir(dir))) {
+			std::string filename = d->d_name;
+			if (filename != "." && filename != "..") {
+				std::string filepath = std::string(dir_path) + filename;
+				struct stat statbuf;
+				if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
+					browserDir.push_back(filepath + "/");
+					browserDirDisplay.push_back(filename);
+				} else {
+					std::size_t found = filename.find(".wav",filename.length()-5);
+					if (found==std::string::npos)
+						found = filename.find(".WAV",filename.length()-5);
+					if (found!=std::string::npos) {
+						browserFiles.push_back(filepath);
+						browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+					}
+				}
+			}
+   		}
+   		closedir(dir);
+
+		sort(browserDir.begin(), browserDir.end());
+		sort(browserDirDisplay.begin(), browserDirDisplay.end());
+		sort(browserFiles.begin(), browserFiles.end());
+		sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+		
+		tempTreeData.push_back(dir_path);
+		tempTreeDisplay.push_back(dir_path);
+
+		for (unsigned int i = 0; i < browserDir.size(); i++) {
+			tempTreeData.push_back(browserDir[i]);
+			tempTreeDisplay.push_back(browserDirDisplay[i]);
+		}
+		for (unsigned int i = 0; i < browserFiles.size(); i++) {
+			tempTreeData.push_back(browserFiles[i]);
+			tempTreeDisplay.push_back(browserFilesDisplay[i]);
+		}
+	};
+
+	void swapSlot(int slot1, int slot2) {
+		std::string tempPath1 = storedPath[slot1];
+		std::string tempPath2 = storedPath[slot2];
+		clearSlot(slot2);
+		loadSample(tempPath1, slot2);
+		clearSlot(slot1);
+		loadSample(tempPath2, slot1);
+	}
+
+	void copySlot(int slot1, int slot2) {
+		std::string tempPath = storedPath[slot1];
+		loadSample(tempPath, slot2);
+	}
+
+	void menuLoadSample(int slot) {
+		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+		fileLoaded[slot] = false;
+		if (path) {
+			loadSample(path, slot);
+			storedPath[slot] = std::string(path);
+		} else {
+			fileLoaded[slot] = true;
+		}
+		if (storedPath[slot] == "") {
+			fileLoaded[slot] = false;
+		}
+		free(path);
+	}
 
 	void loadSample(std::string path, int slot) {
 		unsigned int c;
@@ -286,10 +420,25 @@ struct DrumPlayerPlus : Module {
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
 
-			char* pathDup = strdup(path.c_str());
-			fileDescription[slot] = basename(pathDup);
-			fileDisplay[slot] = fileDescription[slot].substr(0,5);
-			free(pathDup);
+			fileDescription[slot] = system::getFilename(std::string(path));
+			fileDescription[slot] = fileDescription[slot].substr(0,fileDescription[slot].length()-4);
+
+			// *** CHARs CHECK according to font
+			std::string tempFileDisplay = fileDescription[slot];
+			char tempFileChar;
+			fileDisplay[slot] = "";
+			for (int i = 0; i < int(tempFileDisplay.length()); i++) {
+				tempFileChar = tempFileDisplay.at(i);
+				if ( (int(tempFileChar) > 47 && int(tempFileChar) < 58)
+					|| (int(tempFileChar) > 64 && int(tempFileChar) < 123)
+					|| int(tempFileChar) == 45 || int(tempFileChar) == 46 || int(tempFileChar) == 95 )
+					fileDisplay[slot] += tempFileChar;
+			}
+
+			if (fileDisplay[slot].length() > 5)
+				scrollDisplay[slot] = "!!!!!" + fileDisplay[slot] + "!!!!";
+			else
+				scrollDisplay[slot] = fileDisplay[slot];
 
 			storedPath[slot] = path;
 
@@ -300,6 +449,8 @@ struct DrumPlayerPlus : Module {
 			storedPath[slot] = "";
 			fileDescription[slot] = "--none--";
 			fileDisplay[slot] = "-----";
+			scrollDisplay[slot] = "-----";
+			currFileDisplay[slot] = "-----";
 		}
 	};
 	
@@ -307,6 +458,8 @@ struct DrumPlayerPlus : Module {
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
 		fileDisplay[slot] = "-----";
+		scrollDisplay[slot] = "-----";
+		currFileDisplay[slot] = "-----";
 		fileLoaded[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
@@ -349,7 +502,6 @@ struct DrumPlayerPlus : Module {
 			prevTrigValue[i] = trigValue[i];
 			currentOutput = 0;
 
-			//if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i] && floor(samplePos[i]) >= 0) {
 			if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i]) {
 				switch (interpolationMode) {
 					case NO_INTERP:
@@ -454,15 +606,6 @@ struct DrumPlayerPlus : Module {
 				fading[i] = false;
 			}
 
-			/*
-			if (params[LIMIT_SWITCH+i].getValue()) {
-				if (currentOutput > 5)
-					currentOutput = 5;
-				else if (currentOutput < -5)
-					currentOutput = -5;
-			}
-			*/
-
 			switch (outsMode) {
 				case NORMALLED_OUTS:
 					summedOutput += currentOutput;
@@ -525,79 +668,11 @@ struct DrumPlayerPlus : Module {
 			}
 
 			if (!inputs[TRIG_INPUT+i].isConnected())
+			//if (!outputs[OUT_OUTPUT+i].isConnected())
 				play[i] = false;
 		}
 	}
 };
-
-struct DrumPlayerPlusItem1 : MenuItem {
-	DrumPlayerPlus *rm ;
-	void onAction(const event::Action &e) override {
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, NULL);
-		int i = 0;
-		rm->fileLoaded[i] = false;
-		if (path) {
-			rm->loadSample(path, i);
-			rm->storedPath[i] = std::string(path);
-			free(path);
-		} else if (rm->storedPath[i] == "")
-			rm->fileLoaded[i] = false;
-		else
-			rm->fileLoaded[i] = true;
-	}
-};
-
-struct DrumPlayerPlusItem2 : MenuItem {
-	DrumPlayerPlus *rm ;
-	void onAction(const event::Action &e) override {
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, NULL);
-		int i = 1;
-		rm->fileLoaded[i] = false;
-		if (path) {
-			rm->loadSample(path, i);
-			rm->storedPath[i] = std::string(path);
-			free(path);
-		} else if (rm->storedPath[i] == "")
-			rm->fileLoaded[i] = false;
-		else
-			rm->fileLoaded[i] = true;
-	}
-};
-
-struct DrumPlayerPlusItem3 : MenuItem {
-	DrumPlayerPlus *rm ;
-	void onAction(const event::Action &e) override {
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, NULL);
-		int i = 2;
-		rm->fileLoaded[i] = false;
-		if (path) {
-			rm->loadSample(path, i);
-			rm->storedPath[i] = std::string(path);
-			free(path);
-		} else if (rm->storedPath[i] == "")
-			rm->fileLoaded[i] = false;
-		else
-			rm->fileLoaded[i] = true;
-	}
-};
-
-struct DrumPlayerPlusItem4 : MenuItem {
-	DrumPlayerPlus *rm ;
-	void onAction(const event::Action &e) override {
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, NULL);
-		int i = 3;
-		rm->fileLoaded[i] = false;
-		if (path) {
-			rm->loadSample(path, i);
-			rm->storedPath[i] = std::string(path);
-			free(path);
-		} else if (rm->storedPath[i] == "")
-			rm->fileLoaded[i] = false;
-		else
-			rm->fileLoaded[i] = true;
-	}
-};
-
 
 struct dppSlot1Display : TransparentWidget {
 	DrumPlayerPlus *module;
@@ -606,14 +681,6 @@ struct dppSlot1Display : TransparentWidget {
 	dppSlot1Display() {
 
 	}
-
-	struct ClearSlot1Item : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot(0);
-			//module->fileDescription[0] = "abcde";
-		}
-	};
 
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
@@ -625,6 +692,47 @@ struct dppSlot1Display : TransparentWidget {
 		}
 	}
 
+	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
+		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+			assert(module);
+		std::string currentDir = path;
+		int tempIndex = 1;
+		if (module->folderTreeData.size() < 2) {
+			module->createFolder(currentDir.substr(0,currentDir.length()-1));
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+			module->folderTreeData[1][0] = currentDir;
+			module->folderTreeDisplay[1][0] = currentDir;
+		} else {
+			bool exited = false;
+			for (unsigned int i = 1 ; i < module->folderTreeData.size(); i++) {
+				if (module->folderTreeData[i][0] == currentDir) {
+					tempIndex = i;
+					i = module->folderTreeData.size();
+					exited = true;
+				} 
+			}
+			if (!exited) {
+				module->createFolder(currentDir);
+				module->folderTreeData.push_back(module->tempTreeData);
+				module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+				tempIndex = module->folderTreeData.size()-1;
+			}	
+		}
+		if (module->folderTreeData[tempIndex].size() > 1) {
+			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
+				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
+					module->tempDir = module->folderTreeData[tempIndex][i];
+					menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "", [=](Menu* menu) {
+						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+					}));
+				} else {
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i],0);}));
+				}
+			}
+		}
+	}
+
 	void createContextMenu() {
 		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus *>(this->module);
 		assert(module);
@@ -632,15 +740,42 @@ struct dppSlot1Display : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			DrumPlayerPlusItem1 *rootDirItem = new DrumPlayerPlusItem1;
-				rootDirItem->text = "Load Sample Slot #1";
-				rootDirItem->rm = module;
-				menu->addChild(rootDirItem);
+			menu->addChild(createMenuItem("Load Sample Slot #1", "", [=]() {module->menuLoadSample(0);}));
+
+			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
+					module->folderTreeData.resize(1);
+					module->folderTreeDisplay.resize(1);
+					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+							module->tempDir = module->folderTreeData[0][i];
+							menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+								loadSubfolder(menu, module->folderTreeData[0][i]);
+							}));
+						} else {
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],0);}));
+						}
+					}
+				}));
+			}
+			if (module->fileLoaded[0]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[0]));
-
-			menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear", &ClearSlot1Item::module, module));
-
+				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(0);}));
+			}
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createSubmenuItem("Swap Slot with", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->swapSlot(0, 1);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->swapSlot(0, 2);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->swapSlot(0, 3);}));
+			}));
+			menu->addChild(createSubmenuItem("Copy Slot to", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->copySlot(0, 1);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->copySlot(0, 2);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->copySlot(0, 3);}));
+			}));
 		}
 	}
 };
@@ -653,13 +788,6 @@ struct dppSlot2Display : TransparentWidget {
 
 	}
 
-	struct ClearSlot2Item : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot(1);
-		}
-	};
-
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
 			e.consume(this);
@@ -670,6 +798,47 @@ struct dppSlot2Display : TransparentWidget {
 		}
 	}
 
+	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
+		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+			assert(module);
+		std::string currentDir = path;
+		int tempIndex = 1;
+		if (module->folderTreeData.size() < 2) {
+			module->createFolder(currentDir.substr(0,currentDir.length()-1));
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+			module->folderTreeData[1][0] = currentDir;
+			module->folderTreeDisplay[1][0] = currentDir;
+		} else {
+			bool exited = false;
+			for (unsigned int i = 1 ; i < module->folderTreeData.size(); i++) {
+				if (module->folderTreeData[i][0] == currentDir) {
+					tempIndex = i;
+					i = module->folderTreeData.size();
+					exited = true;
+				} 
+			}
+			if (!exited) {
+				module->createFolder(currentDir);
+				module->folderTreeData.push_back(module->tempTreeData);
+				module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+				tempIndex = module->folderTreeData.size()-1;
+			}	
+		}
+		if (module->folderTreeData[tempIndex].size() > 1) {
+			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
+				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
+					module->tempDir = module->folderTreeData[tempIndex][i];
+					menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "", [=](Menu* menu) {
+						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+					}));
+				} else {
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i],1);}));
+				}
+			}
+		}
+	}
+
 	void createContextMenu() {
 		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus *>(this->module);
 		assert(module);
@@ -677,15 +846,42 @@ struct dppSlot2Display : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			DrumPlayerPlusItem2 *rootDirItem = new DrumPlayerPlusItem2;
-				rootDirItem->text = "Load Sample Slot #2";
-				rootDirItem->rm = module;
-				menu->addChild(rootDirItem);
+			menu->addChild(createMenuItem("Load Sample Slot #2", "", [=]() {module->menuLoadSample(1);}));
+
+			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
+					module->folderTreeData.resize(1);
+					module->folderTreeDisplay.resize(1);
+					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+							module->tempDir = module->folderTreeData[0][i];
+							menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+								loadSubfolder(menu, module->folderTreeData[0][i]);
+							}));
+						} else {
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],1);}));
+						}
+					}
+				}));
+			}
+			if (module->fileLoaded[1]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[1]));
-
-			menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear", &ClearSlot2Item::module, module));
-
+				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(1);}));
+			}
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createSubmenuItem("Swap Slot with", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->swapSlot(1, 0);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->swapSlot(1, 2);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->swapSlot(1, 3);}));
+			}));
+			menu->addChild(createSubmenuItem("Copy Slot to", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->copySlot(1, 0);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->copySlot(1, 2);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->copySlot(1, 3);}));
+			}));
 		}
 	}
 };
@@ -698,13 +894,6 @@ struct dppSlot3Display : TransparentWidget {
 
 	}
 
-	struct ClearSlot3Item : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot(2);
-		}
-	};
-
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
 			e.consume(this);
@@ -715,6 +904,47 @@ struct dppSlot3Display : TransparentWidget {
 		}
 	}
 
+	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
+		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+			assert(module);
+		std::string currentDir = path;
+		int tempIndex = 1;
+		if (module->folderTreeData.size() < 2) {
+			module->createFolder(currentDir.substr(0,currentDir.length()-1));
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+			module->folderTreeData[1][0] = currentDir;
+			module->folderTreeDisplay[1][0] = currentDir;
+		} else {
+			bool exited = false;
+			for (unsigned int i = 1 ; i < module->folderTreeData.size(); i++) {
+				if (module->folderTreeData[i][0] == currentDir) {
+					tempIndex = i;
+					i = module->folderTreeData.size();
+					exited = true;
+				} 
+			}
+			if (!exited) {
+				module->createFolder(currentDir);
+				module->folderTreeData.push_back(module->tempTreeData);
+				module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+				tempIndex = module->folderTreeData.size()-1;
+			}	
+		}
+		if (module->folderTreeData[tempIndex].size() > 1) {
+			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
+				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
+					module->tempDir = module->folderTreeData[tempIndex][i];
+					menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "", [=](Menu* menu) {
+						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+					}));
+				} else {
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i],2);}));
+				}
+			}
+		}
+	}
+
 	void createContextMenu() {
 		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus *>(this->module);
 		assert(module);
@@ -722,15 +952,42 @@ struct dppSlot3Display : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			DrumPlayerPlusItem3 *rootDirItem = new DrumPlayerPlusItem3;
-				rootDirItem->text = "Load Sample Slot #3";
-				rootDirItem->rm = module;
-				menu->addChild(rootDirItem);
+			menu->addChild(createMenuItem("Load Sample Slot #3", "", [=]() {module->menuLoadSample(2);}));
+
+			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
+					module->folderTreeData.resize(1);
+					module->folderTreeDisplay.resize(1);
+					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+							module->tempDir = module->folderTreeData[0][i];
+							menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+								loadSubfolder(menu, module->folderTreeData[0][i]);
+							}));
+						} else {
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],2);}));
+						}
+					}
+				}));
+			}
+			if (module->fileLoaded[2]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[2]));
-
-			menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear", &ClearSlot3Item::module, module));
-
+				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(2);}));
+			}
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createSubmenuItem("Swap Slot with", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->swapSlot(2, 0);}));
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->swapSlot(2, 1);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->swapSlot(2, 3);}));
+			}));
+			menu->addChild(createSubmenuItem("Copy Slot to", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->copySlot(2, 0);}));
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->copySlot(2, 1);}));
+				menu->addChild(createMenuItem("Slot 4", "", [=]() {module->copySlot(2, 3);}));
+			}));
 		}
 	}
 };
@@ -743,13 +1000,6 @@ struct dppSlot4Display : TransparentWidget {
 
 	}
 
-	struct ClearSlot4Item : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot(3);
-		}
-	};
-
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
 			e.consume(this);
@@ -760,6 +1010,47 @@ struct dppSlot4Display : TransparentWidget {
 		}
 	}
 
+	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
+		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
+			assert(module);
+		std::string currentDir = path;
+		int tempIndex = 1;
+		if (module->folderTreeData.size() < 2) {
+			module->createFolder(currentDir.substr(0,currentDir.length()-1));
+			module->folderTreeData.push_back(module->tempTreeData);
+			module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+			module->folderTreeData[1][0] = currentDir;
+			module->folderTreeDisplay[1][0] = currentDir;
+		} else {
+			bool exited = false;
+			for (unsigned int i = 1 ; i < module->folderTreeData.size(); i++) {
+				if (module->folderTreeData[i][0] == currentDir) {
+					tempIndex = i;
+					i = module->folderTreeData.size();
+					exited = true;
+				} 
+			}
+			if (!exited) {
+				module->createFolder(currentDir);
+				module->folderTreeData.push_back(module->tempTreeData);
+				module->folderTreeDisplay.push_back(module->tempTreeDisplay);
+				tempIndex = module->folderTreeData.size()-1;
+			}	
+		}
+		if (module->folderTreeData[tempIndex].size() > 1) {
+			for (unsigned int i = 1; i < module->folderTreeData[tempIndex].size(); i++) {
+				if (module->folderTreeData[tempIndex][i].substr(module->folderTreeData[tempIndex][i].length()-1,module->folderTreeData[tempIndex][i].length()-1) == "/")  {
+					module->tempDir = module->folderTreeData[tempIndex][i];
+					menu->addChild(createSubmenuItem(module->folderTreeDisplay[tempIndex][i], "", [=](Menu* menu) {
+						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
+					}));
+				} else {
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i],3);}));
+				}
+			}
+		}
+	}
+
 	void createContextMenu() {
 		DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus *>(this->module);
 		assert(module);
@@ -767,24 +1058,55 @@ struct dppSlot4Display : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			DrumPlayerPlusItem4 *rootDirItem = new DrumPlayerPlusItem4;
-				rootDirItem->text = "Load Sample Slot #4";
-				rootDirItem->rm = module;
-				menu->addChild(rootDirItem);
+			menu->addChild(createMenuItem("Load Sample Slot #4", "", [=]() {module->menuLoadSample(3);}));
+
+			if (module->folderTreeData.size() > 0) {
+				menu->addChild(new MenuSeparator());
+				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
+					module->folderTreeData.resize(1);
+					module->folderTreeDisplay.resize(1);
+					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
+						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
+								module->tempDir = module->folderTreeData[0][i];
+								menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
+									loadSubfolder(menu, module->folderTreeData[0][i]);
+								}));
+						} else {
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],3);}));
+						}
+					}
+				}));
+			}
+			if (module->fileLoaded[3]) {
+				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription[3]));
-
-			menu->addChild(construct<ClearSlot4Item>(&MenuItem::rightText, "Clear", &ClearSlot4Item::module, module));
-
+				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(3);}));
+			}
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createSubmenuItem("Swap Slot with", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->swapSlot(3, 0);}));
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->swapSlot(3, 1);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->swapSlot(3, 2);}));
+			}));
+			menu->addChild(createSubmenuItem("Copy Slot to", "", [=](Menu* menu) {
+				menu->addChild(createMenuItem("Slot 1", "", [=]() {module->copySlot(3, 0);}));
+				menu->addChild(createMenuItem("Slot 2", "", [=]() {module->copySlot(3, 1);}));
+				menu->addChild(createMenuItem("Slot 3", "", [=]() {module->copySlot(3, 2);}));
+			}));
 		}
 	}
-
-	
 };
 
 struct DrumPlayerPlusDisplay : TransparentWidget {
 	DrumPlayerPlus *module;
 	int frame = 0;
+
+	//std::string currFileDisplay[4];
+	int fileGap[4] = {0,0,0,0};
+	float currTime;
+	float deltaTime;
+	float prevTime;
 
 	DrumPlayerPlusDisplay() {
 
@@ -794,14 +1116,41 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 		if (module) {
 			if (layer ==1) {
 				shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf"));
+				//shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
 				nvgFontSize(args.vg, 10);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
 				nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-				nvgTextBox(args.vg, 6, 0,120, module->fileDisplay[0].c_str(), NULL);
-				nvgTextBox(args.vg, 75, 0,120, module->fileDisplay[1].c_str(), NULL);
-				nvgTextBox(args.vg, 144, 0,120, module->fileDisplay[2].c_str(), NULL);
-				nvgTextBox(args.vg, 214, 0,120, module->fileDisplay[3].c_str(), NULL);
+
+				switch (module->scrolling) {
+					case 0:
+						for (int i = 0; i < 4; i++)
+							module->currFileDisplay[i] = module->fileDisplay[i].substr(0,5);
+					break;
+					case 1:
+						currTime = system::getTime();
+						deltaTime = currTime - prevTime;
+						for (int i = 0; i < 4; i++) {
+							if (module->scrollDisplay[i].length() > 4) {
+								if (deltaTime > 0.4f) {
+									prevTime = currTime;
+									if (fileGap[i] > int(module->scrollDisplay[i].length()) - 5 ) {
+										fileGap[i] = 0;
+									}
+									module->currFileDisplay[i] = module->scrollDisplay[i].substr(fileGap[i],5);
+									fileGap[i]++;
+								}
+							} else {
+								module->currFileDisplay[i] = module->scrollDisplay[i].substr(0,5);
+							}
+						}
+					break;
+				}
+
+				nvgTextBox(args.vg, 6, 0,120, module->currFileDisplay[0].c_str(), NULL);
+				nvgTextBox(args.vg, 75, 0,120, module->currFileDisplay[1].c_str(), NULL);
+				nvgTextBox(args.vg, 144, 0,120, module->currFileDisplay[2].c_str(), NULL);
+				nvgTextBox(args.vg, 214, 0,120, module->currFileDisplay[3].c_str(), NULL);
 				//nvgTextBox(args.vg, 2, -20,120, module->debugDisplay.c_str(), NULL);
 			}
 		}
@@ -861,7 +1210,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 
 
-		float xDelta = 23.5;
+		const float xDelta = 23.5;
 
 		for (int i = 0; i < 4; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 21)), module, DrumPlayerPlus::TRIG_INPUT+i));
@@ -889,80 +1238,31 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 	}
 
-	struct ClearSlotsItem : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			for (int i = 0; i < 4; i++)
-				module->clearSlot(i);
-		}
-	};
-
-	struct ClearSlot1Item : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot(0);
-		}
-	};
-
-	struct ClearSlot2Item : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot(1);
-		}
-	};
-
-	struct ClearSlot3Item : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot(2);
-		}
-	};
-
-	struct ClearSlot4Item : MenuItem {
-		DrumPlayerPlus *module;
-		void onAction(const event::Action &e) override {
-			module->clearSlot(3);
-		}
-	};
-
 	void appendContextMenu(Menu *menu) override {
 	   	DrumPlayerPlus *module = dynamic_cast<DrumPlayerPlus*>(this->module);
 			assert(module);
-			menu->addChild(new MenuSeparator());
-
-		DrumPlayerPlusItem1 *rootDirItem1 = new DrumPlayerPlusItem1;
-			menu->addChild(createMenuLabel("Sample Slots"));
-			rootDirItem1->text = "1: " + module->fileDescription[0];
-			rootDirItem1->rm = module;
-			menu->addChild(rootDirItem1);
-
-		menu->addChild(construct<ClearSlot1Item>(&MenuItem::rightText, "Clear #1", &ClearSlot1Item::module, module));
-
-		DrumPlayerPlusItem2 *rootDirItem2 = new DrumPlayerPlusItem2;
-			rootDirItem2->text = "2: " + module->fileDescription[1];
-			rootDirItem2->rm = module;
-			menu->addChild(rootDirItem2);
-
-		menu->addChild(construct<ClearSlot2Item>(&MenuItem::rightText, "Clear #2", &ClearSlot2Item::module, module));
 		
-		DrumPlayerPlusItem3 *rootDirItem3 = new DrumPlayerPlusItem3;
-			rootDirItem3->text = "3: " + module->fileDescription[2];
-			rootDirItem3->rm = module;
-			menu->addChild(rootDirItem3);
-
-		menu->addChild(construct<ClearSlot3Item>(&MenuItem::rightText, "Clear #3", &ClearSlot3Item::module, module));
-		
-		DrumPlayerPlusItem4 *rootDirItem4 = new DrumPlayerPlusItem4;
-			rootDirItem4->text = "4: " + module->fileDescription[3];
-			rootDirItem4->rm = module;
-			menu->addChild(rootDirItem4);
-
-		menu->addChild(construct<ClearSlot4Item>(&MenuItem::rightText, "Clear #4", &ClearSlot4Item::module, module));
-			
 		menu->addChild(new MenuSeparator());
-		menu->addChild(construct<ClearSlotsItem>(&MenuItem::text, "Clear ALL slots", &ClearSlotsItem::module, module));
-		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Slots"));
+		menu->addChild(createMenuItem("1: " + module->fileDescription[0], "", [=]() {module->menuLoadSample(0);}));
+		menu->addChild(createMenuItem("2: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
+		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {module->menuLoadSample(2);}));
+		menu->addChild(createMenuItem("4: " + module->fileDescription[3], "", [=]() {module->menuLoadSample(3);}));
 
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Clear ALL slots", "", [=]() {
+				for (int i = 0; i < 4; i++)
+					module->clearSlot(i);
+			}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
+		if (module->userFolder != "") {
+			menu->addChild(createMenuLabel(module->userFolder));
+			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+		}
+
+		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Interpolation"));
 		struct ModeItem : MenuItem {
 			DrumPlayerPlus* module;
@@ -1000,6 +1300,8 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			outsItem->outsMode = i;
 			menu->addChild(outsItem);
 		}
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
 	}
 };
 
