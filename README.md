@@ -1,7 +1,7 @@
 # SickoCV v2.5.2
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 0](https://user-images.githubusercontent.com/80784296/222956871-752874ce-efff-482c-a86e-387bf57ff16e.JPG)
+![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/223517306-7a597609-2ca2-4f94-b1e8-a044cfead03f.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -531,5 +531,5 @@ Please refer to sickoPlayer documentation.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
-Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and AuxMux for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
+Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) [and auxmux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
