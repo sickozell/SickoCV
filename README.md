@@ -13,13 +13,15 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## Current modules in beta testing:
 - **SickoSampler (NEW!!!)**
+- **SickoPlayer**
 
 ## **to do list:** 
-- change recording position to playhead
-- evaluate to add a playhead position knob and modify play triggering
+- reverse recording
+- crossfade control improvement when recording
 
 ## **changelog**  
 - added SickoSampler module
+- SickoPlayer: fixed bug on phasescan when scanning through silence  
 
 # SickoCV v2.5.3
 VCV Rack plugin modules
@@ -440,11 +442,11 @@ In sickoSampler the display shows also the recording time and a yellow "S" if sa
 In the context menu, along file infos, it's shown if the sample was resampled on loading and if it has to be saved because a recording occurred.  
 Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
 Record starts/stops if RecButton is pressed or if a toggle trig input is detected.  
+If a sample is previously recorded or loaded, record button and its trig input are enabled only if playback is running.  
 GAIN knob adjusts the volume of the inputs.  
 FD knob sets the fade in/out time when recording starts or stops.  
 OVD button overdubs existing sample.  
 UCE button updates Cue End cursor at the end of recording when it is stopped. Note that there is an "UCE update also Cue Start" option in the general context menu.  
-STRT switch selects recording starting point: Cue Start [CS], Loop Start [LS], Current Position [CP] (if used while playing back).  
 MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
 
 ## Switcher / SwitcherSt
