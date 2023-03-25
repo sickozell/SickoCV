@@ -853,7 +853,7 @@ struct SickoPlayer : Module {
 			if (phaseScan) {
 				float tempKnob;
 				if (searchingCueStartPhase) {
-					if (playBuffer[LEFT][antiAlias][scanCueStartSample+1] >= 0 && playBuffer[LEFT][antiAlias][scanCueStartSample] < 0) {
+					if (playBuffer[LEFT][antiAlias][scanCueStartSample+1] >= 0 && playBuffer[LEFT][antiAlias][scanCueStartSample] <= 0) {
 						cueStartPos = scanCueStartSample;
 						searchingCueStartPhase = false;
 						tempKnob = cueStartPos/totalSamples;
@@ -872,7 +872,7 @@ struct SickoPlayer : Module {
 				}
 
 				if (searchingCueEndPhase) {
-					if (playBuffer[LEFT][antiAlias][scanCueEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanCueEndSample] > 0) {
+					if (playBuffer[LEFT][antiAlias][scanCueEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanCueEndSample] >= 0) {
 						cueEndPos = scanCueEndSample;
 						searchingCueEndPhase = false;
 						tempKnob = cueEndPos/totalSamples;
@@ -890,7 +890,7 @@ struct SickoPlayer : Module {
 					}
 				}
 				if (searchingLoopStartPhase) {
-					if (playBuffer[LEFT][antiAlias][scanLoopStartSample+1] >= 0 && playBuffer[LEFT][antiAlias][scanLoopStartSample] < 0) {
+					if (playBuffer[LEFT][antiAlias][scanLoopStartSample+1] >= 0 && playBuffer[LEFT][antiAlias][scanLoopStartSample] <= 0) {
 						loopStartPos = scanLoopStartSample;
 						searchingLoopStartPhase = false;
 						tempKnob = loopStartPos/totalSamples;
@@ -909,7 +909,7 @@ struct SickoPlayer : Module {
 				}
 
 				if (searchingLoopEndPhase) {
-					if (playBuffer[LEFT][antiAlias][scanLoopEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanLoopEndSample] > 0) {
+					if (playBuffer[LEFT][antiAlias][scanLoopEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanLoopEndSample] >= 0) {
 						loopEndPos = scanLoopEndSample;
 						searchingLoopEndPhase = false;
 						tempKnob = loopEndPos/totalSamples;

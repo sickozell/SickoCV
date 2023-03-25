@@ -1,3 +1,11 @@
+### 2.5.3 (2023-xx-xx)
+
+added following modules:
+- sickoSampler  
+
+**sickoPlayer**  
+- fixed bug on phasescan when scanning through silence  
+
 ### 2.5.1 (2023-01-15)
 added following modules:  
 - Drummer4+  
