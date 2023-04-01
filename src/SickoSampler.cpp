@@ -66,7 +66,6 @@ struct SickoSampler : Module {
 		REC_PARAM,
 		GAIN_PARAM,
 		RECFADE_PARAM,
-		//STARTREC_SWITCH,
 		XTND_SWITCH,
 		OVERDUB_SWITCH,
 		UPDATECURSORS_SWITCH,
@@ -3805,18 +3804,16 @@ struct SickoSamplerWidget : ModuleWidget {
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(91.88, yStartRec+11)), module, SickoSampler::GAIN_PARAM));
 
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(100.88, yStartRec+13.35)), module, SickoSampler::RECFADE_PARAM));
+		
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(91.1, yStartRec+25.5)), module, SickoSampler::REC_INPUT));
+		addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(100.8, yStartRec+25.5)), module, SickoSampler::REC_PARAM, SickoSampler::REC_LIGHT));
+		
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(100.8, yStartRec+35.1)), module, SickoSampler::RECSTOP_INPUT));
 
-		addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(91.1, yStartRec+25.9)), module, SickoSampler::REC_PARAM, SickoSampler::REC_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(100.8, yStartRec+25.9)), module, SickoSampler::REC_INPUT));
-
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(100.8, yStartRec+34.9)), module, SickoSampler::RECSTOP_INPUT));
-
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(91.9, yStartRec+41.6)), module, SickoSampler::XTND_SWITCH, SickoSampler::XTND_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(92.5, yStartRec+41.6)), module, SickoSampler::XTND_SWITCH, SickoSampler::XTND_LIGHT));
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(91.5, yStartRec+52.1)), module, SickoSampler::OVERDUB_SWITCH, SickoSampler::OVERDUB_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(100.4, yStartRec+52.1)), module, SickoSampler::UPDATECURSORS_SWITCH, SickoSampler::UPDATECURSORS_LIGHT));
-		
-
 		
 		addParam(createParamCentered<CKSSThree>(mm2px(Vec(94, yStartRec+62.3)), module, SickoSampler::MONITOR_SWITCH));
 
@@ -3942,7 +3939,7 @@ struct SickoSamplerWidget : ModuleWidget {
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
 		menu->addChild(createBoolPtrMenuItem("UCE updates also Cue Start", "", &module->uceCueStart));
 		menu->addChild(createBoolPtrMenuItem("Record Release Stage", "", &module->recordRelease));
-		menu->addChild(createBoolPtrMenuItem("Disable Sample Nav Buttons", "", &module->disableNav));
+		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {

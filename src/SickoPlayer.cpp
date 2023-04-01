@@ -2265,7 +2265,7 @@ struct SickoPlayerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
-		menu->addChild(createBoolPtrMenuItem("Disable Sample Nav Buttons", "", &module->disableNav));
+		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 		
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
 			menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));

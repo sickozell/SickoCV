@@ -2494,7 +2494,7 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 			menu->addChild(outsItem);
 		}
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Disable Sample Nav Buttons", "", &module->disableNav));
+		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
 		menu->addChild(createBoolPtrMenuItem("Light Boxes", "", &module->lightBox));
 		menu->addChild(createBoolPtrMenuItem("Display triggering", "", &module->displayTrig));
