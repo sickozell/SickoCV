@@ -14,14 +14,16 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## Current modules in beta testing:
 - **SickoSampler (NEW!!!)**
 - **SickoPlayer**
+- **Wavetabler DrumPlayer+ DrumPlayerXtra**
 
 ## **to do list:** 
-- reverse recording
-- crossfade control improvement when recording
+- nothing in queue
 
 ## **changelog**  
 - added SickoSampler module
 - SickoPlayer: fixed bug on phasescan when scanning through silence  
+- DrumPlayer+ DrumPlayerXtra: changed default "Text Scrolling" context menu option to disabled
+- all sample player modules: added "Disable Nav Buttons" option to general context menu
 
 # SickoCV v2.5.3
 VCV Rack plugin modules

@@ -6,6 +6,34 @@ added following modules:
 **sickoPlayer**  
 - fixed bug on phasescan when scanning through silence  
 
+**all sample player modules**
+- added "Disable Nav Buttons" option to general context menu
+
+### 2.5.2 (2023-03-07)
+added following modules:
+- wavetabler
+- drumPlayerXtra
+
+**COMMON CHANGES**
+- added subfolder navigation on all sample player modules  
+- changed all time related knobs to exponential scale in all modules  
+
+**drumPlayer**  
+- added swap and copy slot option to slot context menu  
+
+**drumPlayer+**  
+- added text scrolling to sample name displays and a context menu option to disable it  
+- added swap and copy slot option to slot context menu  
+
+**sickoPlayer**  
+- fixed bug when switching from poly to monophonic out  
+- added polyphony to EOC/EOR outputs  
+- added polyphony on master CV input  
+- fixed some bugs on cursors repositioning  
+- moved REV button to cursor knobs area. Now it selects next playback direction   
+- added XFD knob and removed crossfade submenu from context menu  
+- moved factory presets to module context menu  
+
 ### 2.5.1 (2023-01-15)
 added following modules:  
 - Drummer4+  

@@ -180,6 +180,7 @@ struct SickoPlayer : Module {
 	int polyOuts = POLYPHONIC;
 	int polyMaster = POLYPHONIC;
 	bool phaseScan = true;
+	bool disableNav = false;
 	
 	//float fadeCoeff[7] = {APP->engine->getSampleRate(), 2000.f, 1000.f, 200.f, 100.f, 50.f, 20.f};	// None, 0.5ms, 1ms, 5ms, 10ms, 20ms, 50ms fading
 	float fadeCoeff = 0.f;
@@ -322,6 +323,7 @@ struct SickoPlayer : Module {
 		polyOuts = POLYPHONIC;
 		polyMaster = POLYPHONIC;
 		phaseScan = true;
+		disableNav = false;
 		clearSlot();
 		for (int i = 0; i < 16; i++) {
 			play[i] = false;
@@ -357,6 +359,7 @@ struct SickoPlayer : Module {
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
 		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
 		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
+		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
 		return rootJ;
@@ -366,23 +369,21 @@ struct SickoPlayer : Module {
 		json_t* interpolationJ = json_object_get(rootJ, "Interpolation");
 		if (interpolationJ)
 			interpolationMode = json_integer_value(interpolationJ);
-
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
 			antiAlias = json_integer_value(antiAliasJ);
-
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
-
 		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
 		if (polyMasterJ)
 			polyMaster = json_integer_value(polyMasterJ);
-
 		json_t* phaseScanJ = json_object_get(rootJ, "PhaseScan");
 		if (phaseScanJ)
 			phaseScan = json_boolean_value(phaseScanJ);
-
+		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
+		if (disableNavJ)
+			disableNav = json_boolean_value(disableNavJ);
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
@@ -762,27 +763,29 @@ struct SickoPlayer : Module {
 	
 	void process(const ProcessArgs &args) override {
 
-		nextSample = params[NEXTSAMPLE_PARAM].getValue();
-		if (fileLoaded && nextSample && !prevNextSample) {
-			for (int i = 0; i < 16; i++)
-				play[i] = false;
-			currentFile++;
-			if (currentFile >= int(currentFolderV.size()))
-				currentFile = 0;
-			loadSample(currentFolderV[currentFile]);
-		}
-		prevNextSample = nextSample;
+		if (!disableNav) {
+			nextSample = params[NEXTSAMPLE_PARAM].getValue();
+			if (fileLoaded && nextSample && !prevNextSample) {
+				for (int i = 0; i < 16; i++)
+					play[i] = false;
+				currentFile++;
+				if (currentFile >= int(currentFolderV.size()))
+					currentFile = 0;
+				loadSample(currentFolderV[currentFile]);
+			}
+			prevNextSample = nextSample;
 
-		prevSample = params[PREVSAMPLE_PARAM].getValue();
-		if (fileLoaded && prevSample && !prevPrevSample) {
-			for (int i = 0; i < 16; i++)
-				play[i] = false;
-			currentFile--;
-			if (currentFile < 0)
-				currentFile = currentFolderV.size()-1;
-			loadSample(currentFolderV[currentFile]);
+			prevSample = params[PREVSAMPLE_PARAM].getValue();
+			if (fileLoaded && prevSample && !prevPrevSample) {
+				for (int i = 0; i < 16; i++)
+					play[i] = false;
+				currentFile--;
+				if (currentFile < 0)
+					currentFile = currentFolderV.size()-1;
+				loadSample(currentFolderV[currentFile]);
+			}
+			prevPrevSample = prevSample;
 		}
-		prevPrevSample = prevSample;
 
 		reverseStart = params[REV_PARAM].getValue();
 		lights[REV_LIGHT].setBrightness(reverseStart);
@@ -2262,6 +2265,7 @@ struct SickoPlayerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
+		menu->addChild(createBoolPtrMenuItem("Disable Sample Nav Buttons", "", &module->disableNav));
 		
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
 			menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));

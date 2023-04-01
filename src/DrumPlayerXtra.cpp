@@ -107,7 +107,8 @@ struct DrumPlayerXtra : Module {
 	int interpolationMode = HERMITE_INTERP;
 	int outsMode = 0;
 	int antiAlias = 1;
-	int scrolling = 1;
+	bool disableNav = false;
+	int scrolling = 0;
 	int displayTrig = 1;
 	int lightBox = true;
 	int colorBox[4] = {0,1,2,3};
@@ -214,7 +215,8 @@ struct DrumPlayerXtra : Module {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		outsMode = NORMALLED_OUTS;
-		scrolling = 1;
+		scrolling = 0;
+		disableNav = false;
 		lightBox = true;
 		displayTrig = 1;
 		for (int i = 0; i < 4; i++) {
@@ -253,6 +255,7 @@ struct DrumPlayerXtra : Module {
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "OutsMode", json_integer(outsMode));
+		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
 		json_object_set_new(rootJ, "Scrolling", json_integer(scrolling));
 		json_object_set_new(rootJ, "LightBox", json_integer(lightBox));
 		json_object_set_new(rootJ, "DisplayTrig", json_integer(displayTrig));
@@ -298,6 +301,9 @@ struct DrumPlayerXtra : Module {
 		json_t* outsModeJ = json_object_get(rootJ, "OutsMode");
 		if (outsModeJ)
 			outsMode = json_integer_value(outsModeJ);
+		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
+		if (disableNavJ)
+			disableNav = json_boolean_value(disableNavJ);
 		json_t* scrollingJ = json_object_get(rootJ, "Scrolling");
 		if (scrollingJ)
 			scrolling = json_integer_value(scrollingJ);
@@ -720,25 +726,27 @@ struct DrumPlayerXtra : Module {
 		summedOutput = 0;
 		for (int i = 0; i < 4; i++){
 
-			nextSample[i] = params[NEXTSAMPLE_PARAM+i].getValue();
-			if (fileLoaded[i] && nextSample[i] && !prevNextSample[i]) {
-				play[i] = false;
-				currentFile[i]++;
-				if (currentFile[i] >= int(currentFolderV[i].size()))
-					currentFile[i] = 0;
-				loadSample(currentFolderV[i][currentFile[i]], i);
-			}
-			prevNextSample[i] = nextSample[i];
+			if (!disableNav) {
+				nextSample[i] = params[NEXTSAMPLE_PARAM+i].getValue();
+				if (fileLoaded[i] && nextSample[i] && !prevNextSample[i]) {
+					play[i] = false;
+					currentFile[i]++;
+					if (currentFile[i] >= int(currentFolderV[i].size()))
+						currentFile[i] = 0;
+					loadSample(currentFolderV[i][currentFile[i]], i);
+				}
+				prevNextSample[i] = nextSample[i];
 
-			prevSample[i] = params[PREVSAMPLE_PARAM+i].getValue();
-			if (fileLoaded[i] && prevSample[i] && !prevPrevSample[i]) {
-				play[i] = false;
-				currentFile[i]--;
-				if (currentFile[i] < 0)
-					currentFile[i] = currentFolderV[i].size()-1;
-				loadSample(currentFolderV[i][currentFile[i]], i);
+				prevSample[i] = params[PREVSAMPLE_PARAM+i].getValue();
+				if (fileLoaded[i] && prevSample[i] && !prevPrevSample[i]) {
+					play[i] = false;
+					currentFile[i]--;
+					if (currentFile[i] < 0)
+						currentFile[i] = currentFolderV[i].size()-1;
+					loadSample(currentFolderV[i][currentFile[i]], i);
+				}
+				prevPrevSample[i] = prevSample[i];
 			}
-			prevPrevSample[i] = prevSample[i];
 
 			trigValue[i] = inputs[TRIG_INPUT+i].getVoltage();
 
@@ -2486,6 +2494,7 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 			menu->addChild(outsItem);
 		}
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Disable Sample Nav Buttons", "", &module->disableNav));
 		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
 		menu->addChild(createBoolPtrMenuItem("Light Boxes", "", &module->lightBox));
 		menu->addChild(createBoolPtrMenuItem("Display triggering", "", &module->displayTrig));

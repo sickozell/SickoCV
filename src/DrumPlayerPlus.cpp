@@ -95,7 +95,7 @@ struct DrumPlayerPlus : Module {
 	int interpolationMode = HERMITE_INTERP;
 	int outsMode = 0;
 	int antiAlias = 1;
-	int scrolling = 1;
+	int scrolling = 0;
 
 	//std::string debugDisplay = "X";
 
@@ -174,7 +174,7 @@ struct DrumPlayerPlus : Module {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		outsMode = NORMALLED_OUTS;
-		scrolling = 1;
+		scrolling = 0;
 		for (int i = 0; i < 4; i++) {
 			clearSlot(i);
 			play[i] = false;

@@ -3,7 +3,10 @@ checklist
 
 
 sickosampler
+- rec. ottimizzare  tutti gli if reversePlaying == FORWARD REVERSE
+- valutare se eliminare tutti i sampleCoeff o almeno metterli come "const"
 - rec. REGISTRAZIONE REVERSE
+- rec. ARMING RECORDING
 - rec: controllare a fine registrazione il cursore CUE END 
 - rec: aggiornare il phase scan alla fine del pingpong
 - rec: solo con trigger o anche con gate
