@@ -17,7 +17,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - **Wavetabler DrumPlayer+ DrumPlayerXtra**
 
 ## **to do list:** 
-- nothing in queue
+- sickoSampler gate and play/pause recording
+- sickoSampler overall testing
 
 ## **changelog**  
 - added SickoSampler module
@@ -28,7 +29,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.5.3
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/224530029-20434ed1-9df3-4198-8e19-261b3d7fede6.JPG)
+![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/229273862-ccbcbc47-4019-4600-b30b-06ff3db90bf3.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -277,6 +278,9 @@ Normalled (default): if one out is not connected, the output of its slot is adde
 Solo: every slot has its own out socket  
 Unconnected on Out 4: Every unconnected out is added to out n.4
 
+**Disable NAV buttons** (drumPlayerXtra only)  
+Disables panel Sample Navigation buttons to avoid utilizing mistakes.
+
 **Scrolling Sample Names** (drumPlayer+ and drumPlayerXtra only)  
 This option enables text scrolling on sample name displays  
 
@@ -415,7 +419,10 @@ This feature automatically sets Cue and Loop Start/Stop positions at zero crossi
 Be sure to disable it when using one-cycle waveforms, or simply use the specific preset (see below)  
 
 **Reset Cursors**
-Reset Cue/Loop Start/stop to 0 and 100%.  
+Resets Cue/Loop Start/stop to 0 and 100%.  
+
+**Disable NAV buttons**
+Disables panel Sample Navigation buttons to avoid utilizing mistakes.
 
 **Presets**
 There are some factory presets stored in the context menu for common using settings.  
@@ -427,7 +434,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 ## SickoSampler
 ### wav sample player and sampler
 
-![sickosampler](https://user-images.githubusercontent.com/80784296/219940349-6f7162dd-7363-4906-b779-63b29c97b91d.JPG)
+![sickosampler](https://user-images.githubusercontent.com/80784296/229273880-091d39ca-0c23-49eb-9eef-c6a1729d0e34.JPG)
 
 #### - DESCRIPTION
 - mono/stereo sample recorder  
@@ -443,13 +450,20 @@ About player functionalities please follow sickoPlayer instructions. Please note
 In sickoSampler the display shows also the recording time and a yellow "S" if sample is not saved yet. 
 In the context menu, along file infos, it's shown if the sample was resampled on loading and if it has to be saved because a recording occurred.  
 Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
-Record starts/stops if RecButton is pressed or if a toggle trig input is detected.  
+Record button starts/stops recording.  
+Record trig input toggles start/stop recording, but if "STOP REC" trig input is connected it only starts recording.  
 If a sample is previously recorded or loaded, record button and its trig input are enabled only if playback is running.  
+XTN button enables extended recording. In forward recording, it continues recording when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record normally.  
+Please note that when loop recording XFD knob is overridden, and it will not do any crossfade.  
+
 GAIN knob adjusts the volume of the inputs.  
 FD knob sets the fade in/out time when recording starts or stops.  
 OVD button overdubs existing sample.  
 UCE button updates Cue End cursor at the end of recording when it is stopped. Note that there is an "UCE update also Cue Start" option in the general context menu.  
+
 MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
+
+Recording speed follows v/oct and tune settings, but as the recording is not polyphonic, the record playhead will follow only channel nr 0 on the polyphonic cables connected to v/oct.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
