@@ -421,7 +421,7 @@ Be sure to disable it when using one-cycle waveforms, or simply use the specific
 **Reset Cursors**
 Resets Cue/Loop Start/stop to 0 and 100%.  
 
-**Disable NAV buttons**
+**Disable NAV buttons**  
 Disables panel Sample Navigation buttons to avoid utilizing mistakes.
 
 **Presets**
