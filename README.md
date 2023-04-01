@@ -29,7 +29,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.5.3
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/229273862-ccbcbc47-4019-4600-b30b-06ff3db90bf3.JPG)
+![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/229277672-9bf6a4fc-2ea0-4531-88bf-f14eac43be42.JPG)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -434,7 +434,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 ## SickoSampler
 ### wav sample player and sampler
 
-![sickosampler](https://user-images.githubusercontent.com/80784296/229273880-091d39ca-0c23-49eb-9eef-c6a1729d0e34.JPG)
+![sickosampler](https://user-images.githubusercontent.com/80784296/229277696-dbc888f4-d2e0-4706-941a-ddc2cc724175.JPG)
 
 #### - DESCRIPTION
 - mono/stereo sample recorder  
