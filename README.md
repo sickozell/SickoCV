@@ -477,6 +477,8 @@ MON switch selects inputs routing to the outs: always [ON], while recording only
 
 Recording speed follows v/oct and tune settings, but as the recording is not polyphonic, the record playhead will follow only channel nr 0 on the polyphonic cables connected to v/oct.
 
+In the context menu there is a "Record Release Stage" option that keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).
+
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - DESCRIPTION
