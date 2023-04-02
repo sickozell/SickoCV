@@ -386,8 +386,8 @@ v/oct input accepts polyphonic cable usually combined with a polyphonic gate in 
 Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range. A led clip light warns of clipping.  
 
 If sample file is mono, left out is duplicated to right out.  
-EOC outputs a 1ms pulse when sample reaches CueEnd or LoopEnd if Loop is enabled (or when Start positions are reached when in reverse playback).  
-EOR outputs a 1ms pulse when sample reaches the end of release stage.
+EOC outputs a 1ms pulse when the sample reaches certain point according to a specific context menu (see below).  
+EOR outputs a 1ms pulse when the sample reaches the end of release stage.
 
 NOTE: input trigger threshold is +1v.  
 
