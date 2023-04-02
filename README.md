@@ -444,7 +444,7 @@ One-cycle waveforms can be used in GATE mode with LOOP mode enabled.
 Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100% and enable loop button.  
 
 ## SickoSampler
-### wav sample player and sampler
+### wav sample player and recorder
 
 ![sickosampler](https://user-images.githubusercontent.com/80784296/229277696-dbc888f4-d2e0-4706-941a-ddc2cc724175.JPG)
 
