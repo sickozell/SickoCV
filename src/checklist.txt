@@ -1,12 +1,15 @@
 checklist
 
-
-
 sickosampler
+- fare un menu reset
+- controllare UCE update anche da coontext menu
+- controllare i clip sopra i +-10volt
+- ricontrollare il phasescan
+- (fatto) IMPORTANTE : TEST EOC
 - rec. ottimizzare  tutti gli if reversePlaying == FORWARD REVERSE
-- valutare se eliminare tutti i sampleCoeff o almeno metterli come "const"
-- rec. REGISTRAZIONE REVERSE
-- rec. ARMING RECORDING
+- (fatto) valutare se eliminare tutti i sampleCoeff o almeno metterli come "const"
+- (fatto) rec. REGISTRAZIONE REVERSE
+- (fatto) rec. ARMING RECORDING
 - rec: controllare a fine registrazione il cursore CUE END 
 - rec: aggiornare il phase scan alla fine del pingpong
 - rec: solo con trigger o anche con gate
@@ -29,6 +32,9 @@ sickosampler
 - verificare se è il caso di cambiare la disattivazione del PLAY prima del LoadSample da "fileloaded = false" in "play = false"
 
 sickoplayer
+- ricontrollare il phasescan
+- (fatto) IMPORTANTE TEST EOC
+- (fatto) IMPORTANTE spostare il controllo dello STOPTRIG sul controllo del trig mode, come su sickosampler
 - (fatto, verificare) settare il phase scan >= <= su tutti i controlli per evitare di aggiornare con i silenzi
 - aggiungere modo per il drag&drop del module sul display
 - aggiungre nota nelle istruzioni per eliminare i factory preset

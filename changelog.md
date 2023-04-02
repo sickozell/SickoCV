@@ -5,6 +5,7 @@ added following modules:
 
 **sickoPlayer**  
 - fixed bug on phasescan when scanning through silence  
+- added context menu options about "EOC pulses"
 
 **all sample player modules**
 - added "Disable Nav Buttons" option to general context menu

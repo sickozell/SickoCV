@@ -213,6 +213,15 @@ struct SickoPlayer : Module {
 	float eorTime[16];
 	float eocEorTime = (APP->engine->getSampleRate()) / 2000;
 
+	bool eocFromTrg = false;
+	bool eocFromStop = false;
+	bool eocFromCueEnd = true;
+	bool eocFromCueStart = true;
+	bool eocFromLoopEnd = true;
+	bool eocFromLoopStart = true;
+	bool eocFromPing = true;
+	bool eocFromPong = true;
+
 	int chan;
 
 	float attackValue;
@@ -323,6 +332,14 @@ struct SickoPlayer : Module {
 		polyOuts = POLYPHONIC;
 		polyMaster = POLYPHONIC;
 		phaseScan = true;
+		eocFromTrg = false;
+		eocFromStop = false;
+		eocFromCueEnd = true;
+		eocFromCueStart = true;
+		eocFromLoopEnd = true;
+		eocFromLoopStart = true;
+		eocFromPing = true;
+		eocFromPong = true;
 		disableNav = false;
 		clearSlot();
 		for (int i = 0; i < 16; i++) {
@@ -359,6 +376,14 @@ struct SickoPlayer : Module {
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
 		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
 		json_object_set_new(rootJ, "PhaseScan", json_boolean(phaseScan));
+		json_object_set_new(rootJ, "EocFromTrg", json_boolean(eocFromTrg));
+		json_object_set_new(rootJ, "EocFromStop", json_boolean(eocFromStop));
+		json_object_set_new(rootJ, "EocFromCueEnd", json_boolean(eocFromCueEnd));
+		json_object_set_new(rootJ, "EocFromCueStart", json_boolean(eocFromCueStart));
+		json_object_set_new(rootJ, "EocFromLoopEnd", json_boolean(eocFromLoopEnd));
+		json_object_set_new(rootJ, "EocFromLoopStart", json_boolean(eocFromLoopStart));
+		json_object_set_new(rootJ, "EocFromPing", json_boolean(eocFromPing));
+		json_object_set_new(rootJ, "EocFromPong", json_boolean(eocFromPong));
 		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
@@ -381,6 +406,30 @@ struct SickoPlayer : Module {
 		json_t* phaseScanJ = json_object_get(rootJ, "PhaseScan");
 		if (phaseScanJ)
 			phaseScan = json_boolean_value(phaseScanJ);
+		json_t* eocFromTrgJ = json_object_get(rootJ, "EocFromTrg");
+		if (eocFromTrgJ)
+			eocFromTrg = json_boolean_value(eocFromTrgJ);
+		json_t* eocFromStopJ = json_object_get(rootJ, "EocFromStop");
+		if (eocFromStopJ)
+			eocFromStop = json_boolean_value(eocFromStopJ);
+		json_t* eocFromCueEndJ = json_object_get(rootJ, "EocFromCueEnd");
+		if (eocFromCueEndJ)
+			eocFromCueEnd = json_boolean_value(eocFromCueEndJ);
+		json_t* eocFromCueStartJ = json_object_get(rootJ, "EocFromCueStart");
+		if (eocFromCueStartJ)
+			eocFromCueStart = json_boolean_value(eocFromCueStartJ);
+		json_t* eocFromLoopEndJ = json_object_get(rootJ, "EocFromLoopEnd");
+		if (eocFromLoopEndJ)
+			eocFromLoopEnd = json_boolean_value(eocFromLoopEndJ);
+		json_t* eocFromLoopStartJ = json_object_get(rootJ, "EocFromLoopStart");
+		if (eocFromLoopStartJ)
+			eocFromLoopStart = json_boolean_value(eocFromLoopStartJ);
+		json_t* eocFromPingJ = json_object_get(rootJ, "EocFromPing");
+		if (eocFromPingJ)
+			eocFromPing = json_boolean_value(eocFromPingJ);
+		json_t* eocFromPongJ = json_object_get(rootJ, "EocFromPong");
+		if (eocFromPongJ)
+			eocFromPong = json_boolean_value(eocFromPongJ);
 		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
 		if (disableNavJ)
 			disableNav = json_boolean_value(disableNavJ);
@@ -822,7 +871,6 @@ struct SickoPlayer : Module {
 				if (cueEndPos < cueStartPos)
 					cueEndPos = cueStartPos;
 			}
-
 			knobCueStartPos = params[CUESTART_PARAM].getValue();
 			if (knobCueStartPos != prevKnobCueStartPos) {
 				prevKnobCueStartPos = knobCueStartPos;
@@ -832,7 +880,6 @@ struct SickoPlayer : Module {
 				if (cueStartPos > cueEndPos)
 					cueStartPos = cueEndPos;
 			}
-			
 			knobLoopEndPos = params[LOOPEND_PARAM].getValue();
 			if (knobLoopEndPos != prevKnobLoopEndPos) {
 				prevKnobLoopEndPos = knobLoopEndPos;
@@ -842,7 +889,6 @@ struct SickoPlayer : Module {
 				if (loopEndPos < loopStartPos)
 					loopEndPos = loopStartPos;
 			}
-
 			knobLoopStartPos = params[LOOPSTART_PARAM].getValue();
 			if (knobLoopStartPos != prevKnobLoopStartPos) {
 				prevKnobLoopStartPos = knobLoopStartPos;
@@ -873,7 +919,6 @@ struct SickoPlayer : Module {
 						}
 					}
 				}
-
 				if (searchingCueEndPhase) {
 					if (playBuffer[LEFT][antiAlias][scanCueEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanCueEndSample] >= 0) {
 						cueEndPos = scanCueEndSample;
@@ -910,7 +955,6 @@ struct SickoPlayer : Module {
 						}
 					}
 				}
-
 				if (searchingLoopEndPhase) {
 					if (playBuffer[LEFT][antiAlias][scanLoopEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanLoopEndSample] >= 0) {
 						loopEndPos = scanLoopEndSample;
@@ -1024,6 +1068,18 @@ struct SickoPlayer : Module {
 										releaseValue = minAdsrTime;
 									}
 									stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+
+									if (eocFromTrg) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = eocEorTime;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = eocEorTime;
+											}
+										}
+									}
 								}
 							}
 						}
@@ -1043,6 +1099,18 @@ struct SickoPlayer : Module {
 												releaseValue = minAdsrTime;
 											}
 											stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+											
+											if (eocFromTrg) {
+												if (polyOuts) {
+													eoc[c] = true;
+													eocTime[c] = eocEorTime;
+												} else {
+													if (c == currentDisplay) {
+														eoc[0] = true;
+														eocTime[0] = eocEorTime;
+													}
+												}
+											}
 										} else {
 											stage[c] = ATTACK_STAGE;
 											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
@@ -1128,6 +1196,18 @@ struct SickoPlayer : Module {
 												releaseValue = minAdsrTime;
 											}
 											stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+
+											if (eocFromTrg) {
+												if (polyOuts) {
+													eoc[c] = true;
+													eocTime[c] = eocEorTime;
+												} else {
+													if (c == currentDisplay) {
+														eoc[0] = true;
+														eocTime[0] = eocEorTime;
+													}
+												}
+											}
 										} else {
 											stage[c] = ATTACK_STAGE;
 											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
@@ -1179,6 +1259,39 @@ struct SickoPlayer : Module {
 							}
 						}
 						prevTrigValue[c] = trigValue[c];
+
+						// ************************************************* STOP INPUT MANAGEMENT
+
+						stopValue[c] = inputs[STOP_INPUT].getVoltage(c);
+						if (stopValue[c] >= 1 && prevStopValue[c] < 1 && trigMode) {
+
+							if (trigType == PLAY_PAUSE)
+								inPause[c] = false;
+
+							if (stage[c] != RELEASE_STAGE) {
+								stage[c] = RELEASE_STAGE;
+								releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+								if (releaseValue > maxAdsrTime) {
+									releaseValue = maxAdsrTime;
+								} else 	if (releaseValue < minAdsrTime) {
+									releaseValue = minAdsrTime;
+								}
+								stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+							}
+							if (eocFromStop && play[c]) {
+								if (polyOuts) {
+									eoc[c] = true;
+									eocTime[c] = eocEorTime;
+								} else {
+									if (c == currentDisplay) {
+										eoc[0] = true;
+										eocTime[0] = eocEorTime;
+									}
+								}
+							}
+						}
+						prevStopValue[c] = stopValue[c];
+
 					break;
 				}
 
@@ -1219,23 +1332,36 @@ struct SickoPlayer : Module {
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = floor(loopEndPos);
 									prevSampleWeight[c] = 0;
+									if (eocFromPing) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = eocEorTime;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = eocEorTime;
+											}
+										}
+									}
 								} else {
 									fadingType[c] = CROSS_FADE;
 									samplePos[c] = floor(loopStartPos)+1;
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = floor(loopStartPos);
 									prevSampleWeight[c] = 0;
-								}
-
-								if (polyOuts) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
+									if (eocFromLoopEnd) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = eocEorTime;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = eocEorTime;
+											}
+										}
 									}
 								}
+
 							} else if (!fadingType[c] && floor(samplePos[c]) > (totalSamples - (fadeSamples * distancePos[c]))) {
 								fadingType[c] = FADE_OUT;
 								fadingValue[c] = 1.f;
@@ -1244,19 +1370,11 @@ struct SickoPlayer : Module {
 									fadeCoeff =  1 / params[XFADE_PARAM].getValue() / args.sampleRate;
 								else
 									fadeCoeff = 1;
+	
 							} else if (floor(samplePos[c]) > totalSamples) {	// *** REACHED END OF SAMPLE ***
 								play[c] = false;
 								inPause[c] = false;
 
-								if (polyOuts) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
-									}
-								}
 							} else if (samplePos[c] > cueEndPos) {				// *** REACHED CUE END ***
 								if (stage[c] != RELEASE_STAGE) {
 									stage[c] = RELEASE_STAGE;
@@ -1267,6 +1385,17 @@ struct SickoPlayer : Module {
 										releaseValue = minAdsrTime;
 									}
 									stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+									if (eocFromCueEnd) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = eocEorTime;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = eocEorTime;
+											}
+										}
+									}
 								}
 								if (trigMode == GATE_MODE) {
 									if (pingpong) {
@@ -1276,6 +1405,17 @@ struct SickoPlayer : Module {
 										currSampleWeight[c] = sampleCoeff;
 										prevSamplePos[c] = floor(cueEndPos);
 										prevSampleWeight[c] = 0;
+										if (eocFromPing) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = eocEorTime;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = eocEorTime;
+												}
+											}
+										}
 									} else {
 										fadingType[c] = CROSS_FADE;
 										fadingValue[c] = 1.f;
@@ -1283,16 +1423,17 @@ struct SickoPlayer : Module {
 										currSampleWeight[c] = sampleCoeff;
 										prevSamplePos[c] = floor(cueStartPos);
 										prevSampleWeight[c] = 0;
-									}
-								}
-
-								if (polyOuts) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
+										if (eocFromCueEnd) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = eocEorTime;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = eocEorTime;
+												}
+											}
+										}
 									}
 								}
 							} 
@@ -1315,23 +1456,36 @@ struct SickoPlayer : Module {
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = floor(loopStartPos);
 									prevSampleWeight[c] = 0;
+									if (eocFromPong) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = eocEorTime;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = eocEorTime;
+											}
+										}
+									}
 								} else {
 									fadingType[c] = CROSS_FADE;
 									samplePos[c] = floor(loopEndPos)-1;
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = floor(loopEndPos);
 									prevSampleWeight[c] = 0;
-								}
-
-								if (polyOuts) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
+									if (eocFromLoopStart) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = eocEorTime;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = eocEorTime;
+											}
+										}
 									}
 								}
+
 							} else if (!fadingType[c] && floor(samplePos[c]) < (fadeSamples * distancePos[c])) {
 								fadingType[c] = FADE_OUT;
 								fadingValue[c] = 1.f;
@@ -1340,19 +1494,11 @@ struct SickoPlayer : Module {
 									fadeCoeff =  1 / params[XFADE_PARAM].getValue() / args.sampleRate;
 								else
 									fadeCoeff = 1;
+
 							} else if (floor(samplePos[c]) < 0) {				// *** REACHED START OF SAMPLE ***
 								play[c] = false;
 								inPause[c] = false;
 
-								if (polyOuts) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
-									}
-								}
 							} else if (samplePos[c] < cueStartPos) {			// *** REACHED CUE START ***
 								if (stage[c] != RELEASE_STAGE) {
 									stage[c] = RELEASE_STAGE;
@@ -1363,6 +1509,17 @@ struct SickoPlayer : Module {
 										releaseValue = minAdsrTime;
 									}
 									stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+									if (eocFromCueStart) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = eocEorTime;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = eocEorTime;
+											}
+										}
+									}
 								}
 								if (trigMode == GATE_MODE) {
 									if (pingpong) {
@@ -1371,7 +1528,18 @@ struct SickoPlayer : Module {
 										samplePos[c] = floor(cueStartPos)+1;
 										currSampleWeight[c] = sampleCoeff;
 										prevSamplePos[c] = floor(cueStartPos);
-										prevSampleWeight[c] = 0;										
+										prevSampleWeight[c] = 0;
+										if (eocFromPong) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = eocEorTime;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = eocEorTime;
+												}
+											}
+										}
 									} else {
 										fadingType[c] = CROSS_FADE;
 										fadingValue[c] = 1.f;
@@ -1380,16 +1548,17 @@ struct SickoPlayer : Module {
 										currSampleWeight[c] = sampleCoeff;
 										prevSamplePos[c] = floor(cueEndPos);
 										prevSampleWeight[c] = 0;
-									}
-								}
-
-								if (polyOuts) {
-									eoc[c] = true;
-									eocTime[c] = eocEorTime;
-								} else {
-									if (c == currentDisplay) {
-										eoc[0] = true;
-										eocTime[0] = eocEorTime;
+										if (eocFromCueStart) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = eocEorTime;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = eocEorTime;
+												}
+											}
+										}
 									}
 								}
 							}
@@ -1397,30 +1566,6 @@ struct SickoPlayer : Module {
 					}
 
 					if (play[c]) {									// it's false only if end of sample has reached, see above
-						stopValue[c] = inputs[STOP_INPUT].getVoltage(c);
-						if (stopValue[c] >= 1 && prevStopValue[c] < 1 && trigMode) {
-							if (stage[c] != RELEASE_STAGE) {
-								stage[c] = RELEASE_STAGE;
-								releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
-								if (releaseValue > maxAdsrTime) {
-									releaseValue = maxAdsrTime;
-								} else 	if (releaseValue < minAdsrTime) {
-									releaseValue = minAdsrTime;
-								}
-								stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
-							}
-
-							if (polyOuts) {
-								eoc[c] = true;
-								eocTime[c] = eocEorTime;
-							} else {
-								if (c == currentDisplay) {
-									eoc[0] = true;
-									eocTime[0] = eocEorTime;
-								}
-							}
-						}
-						prevStopValue[c] = stopValue[c];
 
 						switch (interpolationMode) {
 							case NO_INTERP:
@@ -2265,6 +2410,16 @@ struct SickoPlayerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
+		menu->addChild(createSubmenuItem("EOC pulse from", "", [=](Menu* menu) {
+			menu->addChild(createBoolPtrMenuItem("TRG/GATE (stop)", "", &module->eocFromTrg));
+			menu->addChild(createBoolPtrMenuItem("STOP trig", "", &module->eocFromStop));
+			menu->addChild(createBoolPtrMenuItem("CUE END", "", &module->eocFromCueEnd));
+			menu->addChild(createBoolPtrMenuItem("CUE START", "", &module->eocFromCueStart));
+			menu->addChild(createBoolPtrMenuItem("LOOP END", "", &module->eocFromLoopEnd));
+			menu->addChild(createBoolPtrMenuItem("LOOP START", "", &module->eocFromLoopStart));
+			menu->addChild(createBoolPtrMenuItem("PING", "", &module->eocFromPing));
+			menu->addChild(createBoolPtrMenuItem("PONG", "", &module->eocFromPong));
+		}));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 		
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {

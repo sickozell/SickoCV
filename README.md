@@ -17,12 +17,13 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - **Wavetabler DrumPlayer+ DrumPlayerXtra**
 
 ## **to do list:** 
-- sickoSampler gate and play/pause recording
+- sickoSampler gate recording
 - sickoSampler overall testing
 
 ## **changelog**  
 - added SickoSampler module
 - SickoPlayer: fixed bug on phasescan when scanning through silence  
+- SickoPlayer: added context menu options about "EOC pulses"
 - DrumPlayer+ DrumPlayerXtra: changed default "Text Scrolling" context menu option to disabled
 - all sample player modules: added "Disable Nav Buttons" option to general context menu
 
@@ -418,8 +419,19 @@ When this option is enabled the Master CV input accepts polyphonic cables accord
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
 Be sure to disable it when using one-cycle waveforms, or simply use the specific preset (see below)  
 
-**Reset Cursors**
+**Reset Cursors**  
 Resets Cue/Loop Start/stop to 0 and 100%.  
+
+**EOC pulse from**  
+This submenu sets whene the EOC pulses are triggered:  
+- TRG/GATE when is triggered to stop
+- STOP triggering
+- reached CUE END (on forward playback)
+- reached CUE START (on reverse playback)
+- reached LOOP END (on forward playback)
+- reached LOOP START (on reverse playback)
+- PING: reached LOOP END (when pingpong looping on forward playback)
+- PONG: reached LOOP START (when pingpong looping on reverse playback)
 
 **Disable NAV buttons**
 Disables panel Sample Navigation buttons to avoid utilizing mistakes.
