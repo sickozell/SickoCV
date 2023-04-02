@@ -462,7 +462,7 @@ About player functionalities please follow sickoPlayer instructions. Please note
 In sickoSampler the display shows also the recording time and a yellow "S" if sample is not saved yet. 
 In the context menu, along file infos, it's shown if the sample was resampled on loading and if it has to be saved because a recording occurred.  
 Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
-Record button starts/stops recording when no sample is loaded otherwise arms/unarms recording waiting a playback trigger.  
+Record button starts/stops recording when no sample is loaded or when a sample is playing back, otherwise arms/unarms recording waiting a playback trigger.  
 Record trig input toggles start/stop or arm/unarm recording, but if "STOP REC" trig input is connected it only starts recording.  
 
 XTN button enables extended recording. In forward recording, it continues recording when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record normally.  
