@@ -29,7 +29,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.5.3
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/229277672-9bf6a4fc-2ea0-4531-88bf-f14eac43be42.JPG)
+![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/233154821-4eebd86d-fd6c-48a5-90f4-6c5a220dfce7.JPG)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
@@ -439,7 +439,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 ## SickoSampler
 ### wav sample player and recorder
 
-![sickosampler](https://user-images.githubusercontent.com/80784296/229277696-dbc888f4-d2e0-4706-941a-ddc2cc724175.JPG)
+![sickosampler](https://user-images.githubusercontent.com/80784296/233155542-cba808ac-8470-48b4-aa8b-aba71cac1f25.JPG)
 
 #### - DESCRIPTION
 - mono/stereo sample recorder  
