@@ -7,6 +7,7 @@
 #define DECAY_STAGE 2
 #define SUSTAIN_STAGE 3
 #define RELEASE_STAGE 4
+#define SUSTAIN 1.f
 
 #include "plugin.hpp"
 
@@ -44,8 +45,6 @@ struct BtogglerPlus : Module {
 	bool inverting[8] = {false,false,false,false,false,false,false,false};
 	int invertTime[8] = {0,0,0,0,0,0,0,0};
 
-	//bool clockConnection = false;
-	//bool prevClockConnection = false;
 	bool clockState = false;
 	float clock = 0;
 	float prevClock = 0;
@@ -63,9 +62,9 @@ struct BtogglerPlus : Module {
 	float prevRstAll = 0;
 
 	float attack[8];
-	const float sustain = 1.f;
+	//const float sustain = 1.f;
 	float release[8];
-
+	
 	int warnCounter[8] = {0,0,0,0,0,0,0,0};
 	int warnInOn = 0;
 	int warnInOff = 0;
@@ -75,26 +74,25 @@ struct BtogglerPlus : Module {
 	float warnInValue;
 	float warnOutValue;
 
-	//float maxFadeSample = 0;
-	//float currentFadeSample[8] = {0,0,0,0,0,0,0,0};
-	//bool fading[8] = {false,false,false,false,false,false,false,false};
-
 	int stage[8] = {0,0,0,0,0,0,0,0};
 	float stageLevel[8] = {0,0,0,0,0,0,0,0};
 	float stageCoeff[8];
 
-	static constexpr float minStageTime = 1.f;  // in milliseconds
+	/*static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	const float maxAdsrTime = 10.f;
-	const float noEnvTime = 0.00101;
+	const float noEnvTime = 0.00101f;*/
 
 	BtogglerPlus() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configInput(CLOCK_INPUT, "Clock");
-		//configParam(FADE_PARAM, 0.f, 50.f, 0.f, "Fade (ms)");
-		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade", " ms", maxStageTime / minStageTime, minStageTime);
-		configParam(WARNIN_PARAM, 0.f, 200.f, 25.f, "Warn Attack pulse rate (ms)");
-		configParam(WARNOUT_PARAM, 0.f, 200.f, 25.f, "Warn Release pulse rate (ms)");
+		//configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade", " ms", maxStageTime / minStageTime, minStageTime);
+		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade", "ms", 10000.f, 1.f);
+		configParam(WARNIN_PARAM, 0.f, 200.f, 25.f, "Warn Attack pulse rate", "ms", 0, 1);
+		paramQuantities[WARNIN_PARAM]->snapEnabled = true;
+		//configParam(WARNOUT_PARAM, 0.f, 200.f, 25.f, "Warn Release pulse rate (ms)");
+		configParam(WARNOUT_PARAM, 0.f, 200.f, 25.f, "Warn Release pulse rate", "ms", 0, 1);
+		paramQuantities[WARNOUT_PARAM]->snapEnabled = true;
 		configInput(RSTALL_INPUT, "Reset all toggles");
 		configInput(ARM_INPUT, "Arm #1");
 		configInput(ARM_INPUT+1, "Arm #2");
@@ -150,12 +148,9 @@ struct BtogglerPlus : Module {
 		initStart = false;
 		disableUnarm = false;
 		wrnInvert = false;
-		//clockConnection = false;
-		//prevClockConnection = false;
 		clockState = false;
 		clock = 0;
 		prevClock = 0;
-		//maxFadeSample = 0;
 		rstAll = 0;
 		prevRstAll = 0;
 
@@ -171,8 +166,6 @@ struct BtogglerPlus : Module {
 			prevTrigValue[i] = 0;
 			rst[i] = 0;
 			prevRst[i] = 0;
-			//currentFadeSample[i] = 0;
-			//fading[i] = false;
 			warnCounter[i] = 0;
 			outputs[GATE_OUTPUT+i].setVoltage(0);
 			outputs[OUT_OUTPUT+i].setVoltage(0);
@@ -287,14 +280,12 @@ struct BtogglerPlus : Module {
 		}
 	}
 
-	static float convertCVToSeconds(float cv) {		
-		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
-	}
+	/*static float convertCVToMs(float cv) {		
+		//return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
+		return std::pow(10000.f, cv) / 1000;
+	}*/
 
 	void process(const ProcessArgs& args) override {
-
-		//warnInValue = params[WARNIN_PARAM].getValue();
-		//warnOutValue = params[WARNOUT_PARAM].getValue();
 
 		clock = inputs[CLOCK_INPUT].getVoltage();
 		if (clock >= 1 && prevClock < 1)
@@ -343,7 +334,7 @@ struct BtogglerPlus : Module {
 				lights[OUT_LIGHT+i].setBrightness(1.f);
 				lights[WRN_LIGHT+i].setBrightness(0.f);
 
-				attack[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
+				/*attack[i] = convertCVToMs(params[FADE_PARAM].getValue());
 				if (attack[i] < noEnvTime) {
 					stage[i] = SUSTAIN_STAGE;
 					stageLevel[i] = sustain;
@@ -352,7 +343,19 @@ struct BtogglerPlus : Module {
 					if (attack[i] > maxAdsrTime)
 						attack[i] = maxAdsrTime;
 					stageCoeff[i] = (1-stageLevel[i]) / (args.sampleRate * attack[i]);
+				}*/
+
+				attack[i] = params[FADE_PARAM].getValue();
+				if (attack[i] == 0) {
+					stage[i] = SUSTAIN_STAGE;
+					stageLevel[i] = SUSTAIN;
+				} else {
+					//attack[i] = convertCVToMs(attack[i]);
+					attack[i] = std::pow(10000.f, attack[i]) / 1000;
+					stage[i] = ATTACK_STAGE;
+					stageCoeff[i] = (1-stageLevel[i]) / (args.sampleRate * attack[i]);
 				}
+
 			}
 
 			trigValue[i] = inputs[ARM_INPUT+i].getVoltage();
@@ -386,7 +389,7 @@ struct BtogglerPlus : Module {
 						lights[WRN_LIGHT+i].setBrightness(0.f);
 						internalState[i] = GATING;
 
-						attack[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
+						/*attack[i] = convertCVToMs(params[FADE_PARAM].getValue());
 						if (attack[i] < noEnvTime) {
 							stage[i] = SUSTAIN_STAGE;
 							stageLevel[i] = sustain;
@@ -394,6 +397,16 @@ struct BtogglerPlus : Module {
 							stage[i] = ATTACK_STAGE;
 							if (attack[i] > maxAdsrTime)
 								attack[i] = maxAdsrTime;
+							stageCoeff[i] = (1-stageLevel[i]) / (args.sampleRate * attack[i]);
+						}*/
+						attack[i] = params[FADE_PARAM].getValue();
+						if (attack[i] == 0) {
+							stage[i] = SUSTAIN_STAGE;
+							stageLevel[i] = SUSTAIN;
+						} else {
+							//attack[i] = convertCVToMs(attack[i]);
+							attack[i] = std::pow(10000.f, attack[i]) / 1000;
+							stage[i] = ATTACK_STAGE;
 							stageCoeff[i] = (1-stageLevel[i]) / (args.sampleRate * attack[i]);
 						}
 					} else if (params[WARNIN_PARAM].getValue() == 0) {	// if clock has not reached and it's still warning
@@ -420,7 +433,8 @@ struct BtogglerPlus : Module {
 						warnOutOn = args.sampleRate / 2000 * params[WARNOUT_PARAM].getValue();
 						warnOutOff = warnOutOn + warnOutOn;
 					}
-					if (wrnInvert && attack[i] < noEnvTime) {
+					//if (wrnInvert && attack[i] < noEnvTime) {
+					if (wrnInvert && attack[i] == 0) {
 						if (inverting[i]) {
 							invertTime[i]--;
 							if (invertTime[i] < 0)
@@ -451,7 +465,7 @@ struct BtogglerPlus : Module {
 						lights[OUT_LIGHT+i].setBrightness(0.f);
 						internalState[i] = IDLE;
 
-						release[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
+						/*release[i] = convertCVToMs(params[FADE_PARAM].getValue());
 						if (release[i] < noEnvTime) {
 							stage[i] = STOP_STAGE;
 							stageLevel[i] = 0;
@@ -459,6 +473,16 @@ struct BtogglerPlus : Module {
 							stage[i] = RELEASE_STAGE;
 							if (release[i] > maxAdsrTime)
 								release[i] = maxAdsrTime;
+							stageCoeff[i] = stageLevel[i] / (args.sampleRate * release[i]);
+						}*/
+						release[i] = params[FADE_PARAM].getValue();
+						if (release[i] == 0) {
+							stage[i] = STOP_STAGE;
+							stageLevel[i] = 0;
+						} else {
+							//release[i] = convertCVToMs(release[i]);
+							release[i] = std::pow(10000.f, release[i]) / 1000;
+							stage[i] = RELEASE_STAGE;
 							stageCoeff[i] = stageLevel[i] / (args.sampleRate * release[i]);
 						}
 					} else if (params[WARNOUT_PARAM].getValue() == 0) { // if clock is not reached
@@ -486,9 +510,9 @@ struct BtogglerPlus : Module {
 
 				case ATTACK_STAGE:
 					stageLevel[i] += stageCoeff[i];
-					if (stageLevel[i] >= sustain) {
+					if (stageLevel[i] >= SUSTAIN) {
 						stage[i] = SUSTAIN_STAGE;
-						stageLevel[i] = sustain;
+						stageLevel[i] = SUSTAIN;
 					}
 				break;
 
@@ -529,8 +553,8 @@ struct BtogglerPlusWidget : ModuleWidget {
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.7, 21.3)), module, BtogglerPlus::CLOCK_INPUT));
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(20.8, 21.3)), module, BtogglerPlus::FADE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.2, 17.3)), module, BtogglerPlus::WARNIN_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(39.2, 25.3)), module, BtogglerPlus::WARNOUT_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(38.2, 17.3)), module, BtogglerPlus::WARNIN_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(38.2, 25.3)), module, BtogglerPlus::WARNOUT_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(48.2, 21.3)), module, BtogglerPlus::RSTALL_INPUT));
 
 		const float x = 8.9f;

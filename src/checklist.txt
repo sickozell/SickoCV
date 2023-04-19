@@ -1,6 +1,12 @@
 checklist
 
 sickosampler
+- (NO NON SI FA) gate rec su play on rec
+- play on rec su newrecording
+- aggiungere fadevaluerec al controllo di fine sample in registrazione;
+- verifica ultimo sample registrato se è 0, o se è dispari
+- controllo registrazione su mode RESTART
+- riprendere la registrazione se non ha raggiunto la fine del release (specialmente su playpause)
 - fare un menu reset
 - controllare UCE update anche da coontext menu
 - controllare i clip sopra i +-10volt

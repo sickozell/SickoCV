@@ -7,6 +7,7 @@
 #define DECAY_STAGE 2
 #define SUSTAIN_STAGE 3
 #define RELEASE_STAGE 4
+#define SUSTAIN 1.f
 
 #include "plugin.hpp"
 
@@ -55,27 +56,24 @@ struct Btoggler : Module {
 	float prevRstAll = 0;
 
 	float attack[8];
-	const float sustain = 1.f;
+	//const float sustain = 1.f;
 	float release[8];
 	
-	//float maxFadeSample = 0;
-	//float currentFadeSample[8] = {0,0,0,0,0,0,0,0};
-	//bool fading[8] = {false,false,false,false,false,false,false,false};
 	int stage[8] = {0,0,0,0,0,0,0,0};
 	float stageLevel[8] = {0,0,0,0,0,0,0,0};
 	float stageCoeff[8];
 
-	static constexpr float minStageTime = 1.f;  // in milliseconds
+	/*static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	const float maxAdsrTime = 10.f;
 	const float noEnvTime = 0.00101;
-	//const float noEnvTime = 0.f;
+	const float noEnvTime = 0.f;*/
 
 	Btoggler() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configInput(CLOCK_INPUT, "Clock");
-		//configParam(FADE_PARAM, 0.f, 50.f, 0.f, "Fade (ms)");
-		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade", " ms", maxStageTime / minStageTime, minStageTime);
+		//configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade", "ms", maxStageTime / minStageTime, minStageTime);
+		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade", "ms", 10000.f, 1.f);
 		configInput(RSTALL_INPUT, "Reset all toggles");
 		configInput(ARM_INPUT, "Arm #1");
 		configInput(ARM_INPUT+1, "Arm #2");
@@ -137,8 +135,6 @@ struct Btoggler : Module {
 			prevTrigValue[i] = 0;
 			rst[i] = 0;
 			prevRst[i] = 0;
-			//currentFadeSample[i] = 0;
-			//fading[i] = false;
 			outputs[GATE_OUTPUT+i].setVoltage(0);
 			outputs[OUT_OUTPUT+i].setVoltage(0);
 			lights[WRN_LIGHT+i].setBrightness(0.f);
@@ -246,9 +242,10 @@ struct Btoggler : Module {
 		}
 	}
 
-	static float convertCVToSeconds(float cv) {		
-		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
-	}
+	/*static float convertCVToMs(float cv) {		
+		//return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
+		return std::pow(10000.f, cv) / 1000;
+	}*/
 
 	void process(const ProcessArgs& args) override {
 
@@ -295,16 +292,28 @@ struct Btoggler : Module {
 				lights[OUT_LIGHT+i].setBrightness(1.f);
 				lights[WRN_LIGHT+i].setBrightness(0.f);
 
-				attack[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
+				/*attack[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
 				if (attack[i] < noEnvTime) {
 					stage[i] = SUSTAIN_STAGE;
 					stageLevel[i] = sustain;
 				} else {
 					stage[i] = ATTACK_STAGE;
-					if (attack[i] > maxAdsrTime)
-						attack[i] = maxAdsrTime;
+					if (attack[i] > MAXADSRTIME)
+						attack[i] = MAXADSRTIME;
+					stageCoeff[i] = (1-stageLevel[i]) / (args.sampleRate * attack[i]);
+				}*/
+				
+				attack[i] = params[FADE_PARAM].getValue();
+				if (attack[i] == 0) {
+					stage[i] = SUSTAIN_STAGE;
+					stageLevel[i] = SUSTAIN;
+				} else {
+					//attack[i] = convertCVToMs(attack[i]);
+					attack[i] = std::pow(10000.f, attack[i]) / 1000;
+					stage[i] = ATTACK_STAGE;
 					stageCoeff[i] = (1-stageLevel[i]) / (args.sampleRate * attack[i]);
 				}
+
 			}
 
 			trigValue[i] = inputs[ARM_INPUT+i].getVoltage();
@@ -334,14 +343,25 @@ struct Btoggler : Module {
 						lights[WRN_LIGHT+i].setBrightness(0.f);
 						internalState[i] = GATING;
 
-						attack[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
+						/*attack[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
 						if (attack[i] < noEnvTime) {
 							stage[i] = SUSTAIN_STAGE;
 							stageLevel[i] = sustain;
 						} else {
 							stage[i] = ATTACK_STAGE;
-							if (attack[i] > maxAdsrTime)
-								attack[i] = maxAdsrTime;
+							if (attack[i] > MAXADSRTIME)
+								attack[i] = MAXADSRTIME;
+							stageCoeff[i] = (1-stageLevel[i]) / (args.sampleRate * attack[i]);
+						}*/
+
+						attack[i] = params[FADE_PARAM].getValue();
+						if (attack[i] == 0) {
+							stage[i] = SUSTAIN_STAGE;
+							stageLevel[i] = SUSTAIN;
+						} else {
+							//attack[i] = convertCVToMs(attack[i]);
+							attack[i] = std::pow(10000.f, attack[i]) / 1000;
+							stage[i] = ATTACK_STAGE;
 							stageCoeff[i] = (1-stageLevel[i]) / (args.sampleRate * attack[i]);
 						}
 					}
@@ -366,14 +386,24 @@ struct Btoggler : Module {
 						lights[OUT_LIGHT+i].setBrightness(0.f);
 						internalState[i] = IDLE;
 
-						release[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
+						/*release[i] = convertCVToSeconds(params[FADE_PARAM].getValue());
 						if (release[i] < noEnvTime) {
 							stage[i] = STOP_STAGE;
 							stageLevel[i] = 0;
 						} else {
 							stage[i] = RELEASE_STAGE;
-							if (release[i] > maxAdsrTime)
-								release[i] = maxAdsrTime;
+							if (release[i] > MAXADSRTIME)
+								release[i] = MAXADSRTIME;
+							stageCoeff[i] = stageLevel[i] / (args.sampleRate * release[i]);
+						}*/
+						release[i] = params[FADE_PARAM].getValue();
+						if (release[i] == 0) {
+							stage[i] = STOP_STAGE;
+							stageLevel[i] = 0;
+						} else {
+							//release[i] = convertCVToMs(release[i]);
+							release[i] = std::pow(10000.f, release[i]) / 1000;
+							stage[i] = RELEASE_STAGE;
 							stageCoeff[i] = stageLevel[i] / (args.sampleRate * release[i]);
 						}
 					}
@@ -389,9 +419,9 @@ struct Btoggler : Module {
 
 				case ATTACK_STAGE:
 					stageLevel[i] += stageCoeff[i];
-					if (stageLevel[i] >= sustain) {
+					if (stageLevel[i] >= SUSTAIN) {
 						stage[i] = SUSTAIN_STAGE;
-						stageLevel[i] = sustain;
+						stageLevel[i] = SUSTAIN;
 					}
 				break;
 

@@ -1,4 +1,4 @@
-# SickoCV v2.5.3-beta2
+# SickoCV v2.5.3-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -17,13 +17,12 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - **Wavetabler DrumPlayer+ DrumPlayerXtra**
 
 ## **to do list:** 
-- sickoSampler gate recording
 - sickoSampler overall testing
 
 ## **changelog**  
 - added SickoSampler module
-- SickoPlayer: fixed bug on phasescan when scanning through silence  
-- SickoPlayer: added context menu options about "EOC pulses"
+- SickoPlayer: fixed bug on phasescan when scanning through silence.  
+- SickoPlayer: added context menu options about "EOC pulses". Added trig/gate and stop buttons. Changed "Start Only" trig type to "Restart"
 - DrumPlayer+ DrumPlayerXtra: changed default "Text Scrolling" context menu option to disabled
 - all sample player modules: added "Disable Nav Buttons" option to general context menu
 
@@ -31,6 +30,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/229277672-9bf6a4fc-2ea0-4531-88bf-f14eac43be42.JPG)
+
+## Common modules behavior
+- Triggers and gates threshold is +1v
+- Every time-related knob set full anticlockwise and displaying 1ms on the tooltip is actually considered 0ms
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -104,9 +107,6 @@ A trigger on RESET input will reset the toggle state.
 - Initialize On Start: discards previous module state on VCV restart
 - Disable Unarm: this disables unarm feature
 
-NOTE: input trigger threshold is +1v.
-
-
 ## bToggler8
 ### 8 buffered toggle switch signal router
 #### - DESCRIPTION
@@ -144,8 +144,6 @@ Triggering RESETALL input will immediately stop all the 8 routings.
 #### **Context Menu**
 - Initialize On Start: discards previous module state on VCV restart
 - Disable Unarm: this disables unarm feature
-
-NOTE: input trigger threshold is +1v.  
  
 Here below is one example of bToggler8 usage. When buttons are pressed on PULSES module, incoming triggers from the sequencer are routed to drum modules only when the first step of the sequencer is reached. If buttons are pressed again, the routing will stop on next first step of the sequencer.
 
@@ -182,8 +180,6 @@ Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as si
 - Disable Unarm: this disables unarm feature
 - WRN Inversion (trigs only): inverts WRN output behavior when used with triggers. It can be useful when INs are feeded by sequencers trigs and WRN Outs connected to a led midi controller. With this option enabled when there's no routing leds will stay off, when routing leds will stay on and whenn a trig is received led will be turned off for 100ms.
 
-NOTE: input trigger threshold is +1v.  
-
 Here below is one example of bToggler+ usage. The MIDI>GATE module is connected to a programmable Led Midi controller and receives buttonpresses from it. The GATE>MIDI module send back triggers incoming from the sequencer to the controller, turning on and off the corresponding led buttons only when triggers are actually routed to drum modules. Routing rules are the same of previous example.
 
 ![bToggler8plus example](https://user-images.githubusercontent.com/80784296/204083544-34ecf3b0-0d12-4965-bd72-f3bb85339551.JPG)  
@@ -212,7 +208,6 @@ Connect the TRIG input to the same module that feeds the drum module, it can be 
 Connect the ACC input to the module which generates the accents, it can be the sequencer or every other suitable module.  
 When ACC is triggered at the same time as the TRIG input, Drummer module will output the Accent Level set by "Accent Level knob" instead of the one set by "Standard Level Knob".  
 
-Input triggers threshold is +1v.  
 Each knob range is from 0 to 200% of the incoming IN level.  
 LIMIT switch hard clips the output in the range ±5v.  
 When CHOKE switch is on and a trigger occurs, the other slot (Drummer) or the next slot (Drummer4) is muted (for example when used with closed/open hihat sounds).  
@@ -253,8 +248,6 @@ External modulation is allowed only on drumPlayer+ or drumPlayerXtra.
 
 If CHOKE switch is on when TRIG occurs, the playback of next slot is stopped with a 1ms fade out: it's commonly used to simulate a closed/open hihat.  
 LIM switch enables hard clipping limiter set to ±5v on the output.  
-
-NOTE: input trigger threshold is +1v.  
 
 #### CONTEXT MENU
 **Sample Slots**  
@@ -359,12 +352,14 @@ The display shows the waveform, filename, sample duration and number of channels
 
 Mode switch allows to select if sample playback starts with a trigger or play it until a gate is high.  
 
-When in Trig Mode the Trig-Mode switch has 3 options:  
+When in Trig Mode the Trig-Type switch has 3 options:  
 - **SS (Start/Stop)** A trigger starts attack stage from CueStart postition, another trigger sets playback to release stage and at the end sample position is reset to cue start  
-- **S (Start only)** A trigger starts attack stage from CueStart position, another trigger has no effects  
-- **PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage  
+- **R (Restart)** Every trigger starts attack stage from CueStart position. Only a Stop trigger stops playback.  
+- **PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage. A Stop trigger reset position to CueStart.  
 
-In any Trig-Mode a trigger on STOP input sets the playback to release stage and reset sample position to Cue Start.
+In any Trig-Type a trigger on STOP input sets the playback to release stage.
+
+TRG/GTE and STOP buttons have effects only on channel 0 of polyphony.  
 
 Cue Start/End knobs are used to set the start of the Attack and the Release stage.
 
@@ -388,8 +383,6 @@ Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200
 If sample file is mono, left out is duplicated to right out.  
 EOC outputs a 1ms pulse when the sample reaches certain point according to a specific context menu (see below).  
 EOR outputs a 1ms pulse when the sample reaches the end of release stage.
-
-NOTE: input trigger threshold is +1v.  
 
 #### CONTEXT MENU
 **Sample Slot**  
@@ -461,23 +454,34 @@ About player functionalities please follow sickoPlayer instructions. Please note
 
 In sickoSampler the display shows also the recording time and a yellow "S" if sample is not saved yet. 
 In the context menu, along file infos, it's shown if the sample was resampled on loading and if it has to be saved because a recording occurred.  
-Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
-Record button starts/stops recording when no sample is loaded or when a sample is playing back, otherwise arms/unarms recording waiting a playback trigger.  
-Record trig input toggles start/stop or arm/unarm recording, but if "STOP REC" trig input is connected it only starts recording.  
 
-XTN button enables extended recording. In forward recording, it continues recording when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record normally.  
-Please note that when loop recording XFD knob is overridden, and it will not do any crossfade.  
+Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
+Record button arms recording waiting for a playback trig, or start recording when a sample is playing back.  
+Record trig input toggles start/stop or arm/unarm recording, but if "STOP REC" trig input is connected it only starts recording.  
 
 GAIN knob adjusts the volume of the inputs.  
 FD knob sets the fade in/out time when recording starts or stops.  
+
 OVD button overdubs existing sample.  
-UCE button updates Cue End cursor at the end of recording when it is stopped. Note that there is an "UCE update also Cue Start" option in the general context menu.  
+
+XTN button enables extended recording. In forward recording, it continues recording also when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record as usual.  
+Please note that when in loop recording XFD knob is overridden, and it will not do any crossfade.  
+
+RRM (REC Re-Arm). When recording is stopped by a playback trig/button, it is rearmed when release time has ended or fadeout recording has finished. This function is not available in conjunction with previous "Start playback on REC". In "Restart" trig-type mode recording is rearmed only when after a STOP trig/button is detected.  
+
+RRL (Record Release Stage).  Keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).  
+
+UCS (Update Cue Start). Resets the Cue Start cursor to the recording start position after recording is stopped.
+
+UCE (Update Cue End). Resets the Cue End cursor at the end of recording when it is stopped.  
+
+POR (Play On REC ON). When REC button is switched ON or REC trig it will start playback and recording simultaneously. It disables also the REC Re-Arm function.  
+
+SOR (Stop On REC OFF). When REC button is switched OFF or REC trig or REC STOP trig, it will stop record and playback simultaneously. In Play/Pause trig type it will reset position to Cue Start as STOP button/trigger usually does.   
 
 MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
 
 Recording speed follows v/oct and tune settings, but as the recording is not polyphonic, the record playhead will follow only channel nr 0 on the polyphonic cables connected to v/oct.
-
-In the context menu there is a "Record Release Stage" option that keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
@@ -568,7 +572,6 @@ A trigger on RESET input will reset the toggle state.
 The same of toggle mode, but the signals will be routed only while GATE input is in a high state.
 
 NOTE: If a new GATE or Toggle TRIGGER is detected on Attack or Release phases, the envelope ramp will immediately restart from the reached point, as a regular envelope generator and not like a function generator.  
-NOTE2: input trigger and gate threshold is +1v.
 
 **SPECIAL BEHAVIORS**
 

@@ -7,6 +7,7 @@
 #define DECAY_STAGE 2
 #define SUSTAIN_STAGE 3
 #define RELEASE_STAGE 4
+#define MAXADSRTIME 10.f
 
 #include "plugin.hpp"
 
@@ -56,17 +57,21 @@ struct TogglerCompact : Module {
 	float stageLevel = 0;
 	float stageCoeff;
 
-	static constexpr float minStageTime = 1.f;  // in milliseconds
+	int chan;
+
+	/*static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
-	const float maxAdsrTime = 10.f;
+	const float maxAdsrTime = 10.f;*/
 	const float noEnvTime = 0.00101;
 
 	TogglerCompact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
-		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
+		//configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
+		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", "ms", 10000.f, 1.f);
 		configParam(SUSTAIN_PARAM, 0.f, 1.f, 1.f, "Level", "%", 0, 100);
-		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
+		//configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
+		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", "ms", 10000.f, 1.f);
 		configInput(TRIG_INPUT, "Trig/Gate");
 		configInput(RST_INPUT, "Reset");
 		configInput(IN_INPUT, "L");
@@ -118,9 +123,9 @@ struct TogglerCompact : Module {
 		}
 	}
 
-	static float convertCVToSeconds(float cv) {		
+	/*static float convertCVToSeconds(float cv) {		
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
-	}
+	}*/
 	
 	void process(const ProcessArgs& args) override {
 
@@ -157,13 +162,15 @@ struct TogglerCompact : Module {
 					prevGating = false;
 					outputs[GATE_OUTPUT].setVoltage(10);
 					lights[OUT_LIGHT].setBrightness(1.f);
-					attack = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + inputs[ATTACK_INPUT].getVoltage();
+					//attack = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + inputs[ATTACK_INPUT].getVoltage();
+					attack = (std::pow(10000.f, params[ATTACK_PARAM].getValue()) / 1000) + inputs[ATTACK_INPUT].getVoltage();
 					if (attack < noEnvTime) {
+						attack = 0;
 						stage = SUSTAIN_STAGE;
 					} else {
 						stage = ATTACK_STAGE;
-						if (attack > maxAdsrTime)
-							attack = maxAdsrTime;
+						if (attack > MAXADSRTIME)
+							attack = MAXADSRTIME;
 						stageCoeff = (1-stageLevel) / (args.sampleRate * attack);
 					}
 				}
@@ -184,13 +191,15 @@ struct TogglerCompact : Module {
 					lights[OUT_LIGHT].setBrightness(1.f);
 					internalState = 1;
 
-					attack = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + inputs[ATTACK_INPUT].getVoltage();
+					//attack = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + inputs[ATTACK_INPUT].getVoltage();
+					attack = (std::pow(10000.f, params[ATTACK_PARAM].getValue()) / 1000) + inputs[ATTACK_INPUT].getVoltage();
 					if (attack < noEnvTime) {
+						attack = 0;
 						stage = SUSTAIN_STAGE;
 					} else {
 						stage = ATTACK_STAGE;
-						if (attack > maxAdsrTime)
-							attack = maxAdsrTime;
+						if (attack > MAXADSRTIME)
+							attack = MAXADSRTIME;
 						stageCoeff = (1-stageLevel) / (args.sampleRate * attack);
 					}
 				}
@@ -203,13 +212,15 @@ struct TogglerCompact : Module {
 					lights[OUT_LIGHT].setBrightness(0.f);
 					internalState = 0;
 
-					release = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + inputs[RELEASE_INPUT].getVoltage();
+					//release = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + inputs[RELEASE_INPUT].getVoltage();
+					release = (std::pow(10000.f, params[RELEASE_PARAM].getValue()) / 1000) + inputs[RELEASE_INPUT].getVoltage();
 					if (release < noEnvTime) {
+						release = 0;
 						stage = STOP_STAGE;
 					} else {
 						stage = RELEASE_STAGE;
-						if (release > maxAdsrTime)
-							release = maxAdsrTime;
+						if (release > MAXADSRTIME)
+							release = MAXADSRTIME;
 						stageCoeff = stageLevel / (args.sampleRate * release);
 					}
 				} 
@@ -242,15 +253,31 @@ struct TogglerCompact : Module {
 			break;
 		}
 
-		if (inputs[IN_INPUT].isConnected())
-			outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage() * stageLevel);
-		else
-			outputs[OUT_OUTPUT].setVoltage(10 * stageLevel);
+		chan = std::max(1, inputs[IN_INPUT].getChannels());
 
-		if (inputs[IN_INPUT+1].isConnected())
-			outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage() * stageLevel);
-		else
-			outputs[OUT_OUTPUT+1].setVoltage(10 * stageLevel);
+		if (inputs[IN_INPUT].isConnected()) {
+			//outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage() * stageLevel);
+			for (int c = 0; c < chan; c++)
+				outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * stageLevel, c);
+			outputs[OUT_OUTPUT].setChannels(chan);
+		} else {
+			//outputs[OUT_OUTPUT].setVoltage(10 * stageLevel);
+			outputs[OUT_OUTPUT].setVoltage(10.f * stageLevel , 0);
+			outputs[OUT_OUTPUT].setChannels(1);
+		}
+
+		chan = std::max(1, inputs[IN_INPUT+1].getChannels());
+
+		if (inputs[IN_INPUT+1].isConnected()) {
+			//outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage() * stageLevel);
+			for (int c = 0; c < chan; c++)
+				outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage(c) * stageLevel, c);
+			outputs[OUT_OUTPUT+1].setChannels(chan);
+		} else {
+			//outputs[OUT_OUTPUT+1].setVoltage(10 * stageLevel);
+			outputs[OUT_OUTPUT+1].setVoltage(10.f * stageLevel , 0);
+			outputs[OUT_OUTPUT+1].setChannels(1);
+		}
 	}
 };
 
