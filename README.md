@@ -104,7 +104,7 @@ If L or (R) inputs are not connected, relative outputs will provide just the env
 
 A trigger on RESET input will reset the toggle state.
 
-Polyphony on L/(R) inputs is replicated on outs  
+Polyphony on L/(R) inputs is replicated on outs.   
 
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
@@ -484,7 +484,8 @@ SOR (Stop On REC OFF). When REC button is switched OFF or REC trig or REC STOP t
 
 MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
 
-Recording speed follows v/oct and tune settings, but as the recording is not polyphonic, the record playhead will follow only channel nr 0 on the polyphonic cables connected to v/oct.
+Recording speed follows v/oct and tune settings.  
+As recording is not polyphonic, polyphony is disabled when the REC button is switched on, and the record playhead will follow only channel nr 0 on the polyphonic cables connected to v/oct.  
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
@@ -542,7 +543,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 
 **NOTES**  
 - If Fader knob is set to 1ms it won't do any fade
-- In FlipFLop and ToggleGate function types the output will consist in a 'fixed' AR envelope
+- In FlipFlop and ToggleGate function types the output will consist in a 'fixed' AR envelope
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
 - On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones
 - Polyphony on signal inputs is replicated on outs
