@@ -486,7 +486,8 @@ MON switch selects inputs routing to the outs: always [ON], while recording only
 
 Recording speed follows v/oct and tune settings.  
 As recording is not polyphonic, polyphony is disabled when the REC button is switched on, and the record playhead will follow only channel nr 0 on the polyphonic cables connected to v/oct.  
-**HINT**: If it's planned to record a sample to play it polyphonically with a master keyboard, please connect gate and v/oct to a MIDI>CV module with 'Reset' polyphony mode selected. Clear any previous sample in memory, select GATE mode and arm recording. Consider adjusting envelope settings and switch the LOOP button on. On key press (C4 for example) sickoSampler will start recording until key is unpressed, then the sample can be played immediately.
+
+**HINT**: If it's planned to record a sample to play it polyphonically with a master keyboard, please connect gate and v/oct to a MIDI>CV module with 'Reset' polyphony mode selected. Clear any previous sample in memory, select GATE mode, adjust envelope settings, switch the LOOP button on  and arm recording. On key press (C4 for example) sickoSampler will start recording until key is unpressed, then the sample can be played immediately.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
