@@ -459,7 +459,7 @@ In sickoSampler the display shows also the recording time and a yellow "S" if sa
 In the context menu, along file infos, it's shown if the sample was resampled on loading and if it has to be saved because a recording occurred.  
 
 Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
-Record button arms recording waiting for a playback trig, or start recording when a sample is playing back.  
+Record button arms recording waiting for a playback trig, or starts recording when a sample is playing back, or starts recording immediately if PoR button is on (see below).   
 Record trig input toggles start/stop or arm/unarm recording, but if "STOP REC" trig input is connected it only starts recording.  
 
 GAIN knob adjusts the volume of the inputs.  
@@ -470,17 +470,17 @@ OVD button overdubs existing sample.
 XTN button enables extended recording. In forward recording, it continues recording also when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record as usual.  
 Please note that when in loop recording XFD knob is overridden, and it will not do any crossfade.  
 
-RRM (REC Re-Arm). When recording is stopped by a playback trig/button, it is rearmed when release time has ended or fadeout recording has finished. This function is not available in conjunction with previous "Start playback on REC". In "Restart" trig-type mode recording is rearmed only when after a STOP trig/button is detected.  
+RRM (REC Re-Arm): when recording is stopped by a playback trig/button, it is rearmed when release time has ended or fadeout recording has finished. This function is not available in conjunction with previous "Start playback on REC". In "Restart" trig-type mode recording is rearmed only when after a STOP trig/button is detected.  
 
-RRL (Record Release Stage).  Keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).  
+RRL (Record Release Stage): keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).  
 
-UCS (Update Cue Start). Resets the Cue Start cursor to the recording start position after recording is stopped.
+UCS (Update Cue Start): resets the Cue Start cursor to the recording start position after recording is stopped.
 
-UCE (Update Cue End). Resets the Cue End cursor at the end of recording when it is stopped.  
+UCE (Update Cue End): resets the Cue End cursor at the end of recording when it is stopped.  
 
-POR (Play On REC ON). When REC button is switched ON or REC trig it will start playback and recording simultaneously. It disables also the REC Re-Arm function.  
+POR (Play On REC ON): when REC button is switched ON or REC trig it will start playback and recording simultaneously. It disables also the REC Re-Arm function.  
 
-SOR (Stop On REC OFF). When REC button is switched OFF or REC trig or REC STOP trig, it will stop record and playback simultaneously. In Play/Pause trig type it will reset position to Cue Start as STOP button/trigger usually does.   
+SOR (Stop On REC OFF): when REC button is switched OFF or REC trig or REC STOP trig, it will stop record and playback simultaneously. In Play/Pause trig type it will reset position to Cue Start as STOP button/trigger usually does.   
 
 MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
 
