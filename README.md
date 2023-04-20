@@ -25,6 +25,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - SickoPlayer: added context menu options about "EOC pulses". Added trig/gate and stop buttons. Changed "Start Only" trig type to "Restart"
 - DrumPlayer+ DrumPlayerXtra: changed default "Text Scrolling" context menu option to disabled
 - all sample player modules: added "Disable Nav Buttons" option to general context menu
+- added polyphony on signal I/O on bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt  
 
 # SickoCV v2.5.3
 VCV Rack plugin modules
@@ -102,6 +103,8 @@ A, S, R CVinputs are added to respective knob values, bToggler module has attenu
 If L or (R) inputs are not connected, relative outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
 A trigger on RESET input will reset the toggle state.
+
+Polyphony on L/(R) inputs is replicated on outs  
 
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
@@ -503,7 +506,6 @@ Switcher or SwitcherSt (used for stereo signals) are multifunction modules that 
 **TOGGLE/GATE modes**  
 When the MODE switch is in 'TOGGLE' position functions are activated by triggers in a toggle style.  
 When in 'GATE' position functions are gate sensitive, so they stay active until 'T/G' input receives a high gate.  
-Functions will be activated by Triggers/Gates with voltages above +1v.
 
 **Function types**  
 The function type is automatically detected depending on connected cables.  
@@ -539,11 +541,11 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - Initialize On Start: discards previous module state on VCV restart
 
 **NOTES**  
-- If Fader knob is set to 1ms it won't do any fade.
+- If Fader knob is set to 1ms it won't do any fade
 - In FlipFLop and ToggleGate function types the output will consist in a 'fixed' AR envelope
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
-- On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones.
-
+- On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones
+- Polyphony on signal inputs is replicated on outs
 
 ## Toggler / Toggler Compact
 ### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
@@ -566,6 +568,8 @@ A, S, R CVinputs are added to respective knob values, Toggler module has attenuv
 If L or (R) inputs are not connected, L and (R) outputs will provide just the envelope, so a mono signal can be connected to L input to route it to L output and nothing connected to (R) input to have the envelope on (R) output.
 
 A trigger on RESET input will reset the toggle state.
+
+Polyphony on L/(R) inputs is replicated on outs.  
 
 **GATE MODE**
 
