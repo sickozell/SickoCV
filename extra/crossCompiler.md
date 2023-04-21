@@ -1,4 +1,4 @@
-git tag v2.5.3-beta3 -m "create v2.6.0-beta3"  
+git tag v2.5.3-beta4 -m "create v2.5.3-beta4"  
 git push origin --tags
 
 
@@ -12,3 +12,4 @@ git push origin --tags
    * `git tag v2.0.9 -m "create v2.0.9"`
    * `git push origin --tags`
    * **Note:** Make sure that your tag version number is the same as the version in the [plugin.json](https://github.com/qno/vcv-plugin-github-actions-example/blob/main/plugin.json#L4) and the tag starts with `v` (it is a convention), otherwise the the publish step will be canceled.
+

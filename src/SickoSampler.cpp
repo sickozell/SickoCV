@@ -343,6 +343,7 @@ struct SickoSampler : Module {
 	//bool updateCursors = false;
 	bool updateCursorsStart = false;
 	bool updateCursorsEnd = false;
+	bool uceLoop = false;
 
 	int fileSampleRate = 0;
 	bool resampled = false;
@@ -438,7 +439,7 @@ struct SickoSampler : Module {
 		configOutput(EOR_OUTPUT,"End of Release");
 
 		//******************************************************************************
-		configSwitch(PHASESCAN_SWITCH, 0.f, 1.f, 0.f, "Phase Scan", {"Off", "On"});
+		configSwitch(PHASESCAN_SWITCH, 0.f, 1.f, 1.f, "Phase Scan", {"Off", "On"});
 		configInput(IN_INPUT,"Left");
 		configInput(IN_INPUT+1,"Right");
 		configSwitch(REC_PARAM, 0.f, 1.f, 0.f, "REC", {"OFF", "ON"});
@@ -478,7 +479,6 @@ struct SickoSampler : Module {
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
 		polyMaster = POLYPHONIC;
-		params[PHASESCAN_SWITCH].setValue(1.f);
 		//phaseScan = true;
 		prevPhaseScan = false;
 		eocFromTrg = false;
@@ -489,15 +489,8 @@ struct SickoSampler : Module {
 		eocFromLoopStart = true;
 		eocFromPing = true;
 		eocFromPong = true;
-		//uceCueStart = true;
-		//params[UCS_SWITCH].setValue(0.f);
-		//params[UCE_SWITCH].setValue(0.f);
-		//params[REC_REL_SWITCH].setValue(0.f);
-		//recordRelease = false;
-		//playOnRec = false;
-		//stopOnRec = false;
-		//params[PLAYONREC_SWITCH].setValue(0.f);
-		//params[STOPONREC_SWITCH].setValue(0.f);
+		uceLoop = false;
+
 		startPlayOnRec = false;
 		startStopOnRec = false;
 		stopRecNow = false;
@@ -548,8 +541,8 @@ struct SickoSampler : Module {
 		json_object_set_new(rootJ, "EocFromLoopStart", json_boolean(eocFromLoopStart));
 		json_object_set_new(rootJ, "EocFromPing", json_boolean(eocFromPing));
 		json_object_set_new(rootJ, "EocFromPong", json_boolean(eocFromPong));
+		json_object_set_new(rootJ, "UceLoop", json_boolean(uceLoop));
 		/*
-		json_object_set_new(rootJ, "UceCueStart", json_boolean(uceCueStart));
 		json_object_set_new(rootJ, "PlayOnRec", json_boolean(playOnRec));
 		json_object_set_new(rootJ, "StopOnRec", json_boolean(stopOnRec));
 		json_object_set_new(rootJ, "RecordRelease", json_boolean(recordRelease));
@@ -574,12 +567,6 @@ struct SickoSampler : Module {
 		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
 		if (polyMasterJ)
 			polyMaster = json_integer_value(polyMasterJ);
-		
-		/*json_t* phaseScanJ = json_object_get(rootJ, "PhaseScan");
-		if (phaseScanJ)
-			phaseScan = json_boolean_value(phaseScanJ);
-		*/
-
 		json_t* eocFromTrgJ = json_object_get(rootJ, "EocFromTrg");
 		if (eocFromTrgJ)
 			eocFromTrg = json_boolean_value(eocFromTrgJ);
@@ -604,21 +591,9 @@ struct SickoSampler : Module {
 		json_t* eocFromPongJ = json_object_get(rootJ, "EocFromPong");
 		if (eocFromPongJ)
 			eocFromPong = json_boolean_value(eocFromPongJ);
-		/*json_t* uceCueStartJ = json_object_get(rootJ, "UceCueStart");
-		if (uceCueStartJ)
-			uceCueStart = json_boolean_value(uceCueStartJ);
-		json_t* playOnRecJ = json_object_get(rootJ, "PlayOnRec");
-		if (playOnRecJ)
-			playOnRec = json_boolean_value(playOnRecJ);
-		json_t* stopOnRecJ = json_object_get(rootJ, "StopOnRec");
-		if (stopOnRecJ)
-			stopOnRec = json_boolean_value(stopOnRecJ);
-		json_t* recordReleaseJ = json_object_get(rootJ, "RecordRelease");
-		if (recordReleaseJ)
-			recordRelease = json_boolean_value(recordReleaseJ);
-		json_t* rearmSettingJ = json_object_get(rootJ, "RearmSetting");
-		if (rearmSettingJ)
-			rearmSetting = json_boolean_value(rearmSettingJ);*/
+		json_t* uceLoopJ = json_object_get(rootJ, "UceLoop");
+		if (uceLoopJ)
+			uceLoop = json_boolean_value(uceLoopJ);
 		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
 		if (disableNavJ)
 			disableNav = json_boolean_value(disableNavJ);
@@ -2144,7 +2119,7 @@ struct SickoSampler : Module {
 					switch (reversePlaying[c]) {
 						case FORWARD:		// FORWARD PLAYBACK
 
-							if (recordingState == 1 && loop && samplePos[c] > floor(loopEndPos - distancePos[c])) {
+							if (recordingState == 1 && loop && samplePos[c] > floor(loopEndPos - distancePos[c]) && !xtndRec) {
 								waitingRecEdge = true;
 
 								// below it's the same as not recording (code in the next "if")
@@ -2227,6 +2202,7 @@ struct SickoSampler : Module {
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = floor(loopStartPos);
 									prevSampleWeight[c] = 0;
+															
 									if (eocFromLoopEnd) {
 										if (polyOuts) {
 											eoc[c] = true;
@@ -3085,7 +3061,8 @@ struct SickoSampler : Module {
 		//if (!playOnRec && play[recOutChan] && recordingState == 0 && prevRecButton == 0 && recButton == 1)
 			armRec = true;
 
-		if (!play[recOutChan] && playOnRec && !prevRecButton && recButton)
+		//if (!play[recOutChan] && playOnRec && !prevRecButton && recButton)
+		if (!play[recOutChan] && playOnRec && !prevRecButton && recButton && trigMode == TRIG_MODE)
 			startPlayOnRec = true;
 
 		//if (play[recOutChan] && stopOnRec && prevRecButton && !recButton && !inputs[RECSTOP_INPUT].isConnected())
@@ -3335,39 +3312,24 @@ struct SickoSampler : Module {
 			} else {
 				recordingState = 0;
 
-				/*
-				if (startRecPosition <= 0) { 				// <- ATTENZIONE DA VERIFICARE SE VA INTERPOLATO SOLO IL PRIMO SAMPLE ASSOLUTO, potrebbe essere negativo
-					z1 = 0; z2 = 0; z1r = 0; z2r = 0;		//     perchè potrebbe essere negativo se FORWARD o maggiore di totalSamples/totalSampleC se REVERSE
-					int rc = 0;
-					//playBuffer[rc][0][1] = (playBuffer[rc][0][1] * .5) + (playBuffer[rc][0][2] * .5);
-					playBuffer[rc][0][0] = (playBuffer[rc][0][totalSamples] * .5) + (playBuffer[rc][0][2] * .5);		// *****   DA RIVEDERE
-					playBuffer[rc][0][1] = (playBuffer[rc][0][0] * .5) + (playBuffer[rc][0][2] * .5);
-					playBuffer[rc][1][0] = biquadLpf(playBuffer[rc][0][0]); // filtered vector
-					playBuffer[rc][1][1] = biquadLpf(playBuffer[rc][0][1]); // filtered vector
-
-					if (recChannels == 2) {
-						rc = 1;
-						//playBuffer[rc][0][1] = (playBuffer[rc][0][0] * .5) + (playBuffer[rc][0][2] * .5);
-						playBuffer[rc][0][0] = (playBuffer[rc][0][totalSamples] * .5) + (playBuffer[rc][0][2] * .5);		// *****   DA RIVEDERE
-						playBuffer[rc][0][1] = (playBuffer[rc][0][0] * .5) + (playBuffer[rc][0][2] * .5);
-						playBuffer[rc][1][0] = biquadLpf2(playBuffer[rc][0][0]); // filtered vector
-						playBuffer[rc][1][1] = biquadLpf2(playBuffer[rc][0][1]); // filtered vector
-					}
-				}
-				*/
-
-
-				
 				if (extendedRec) {
-					totalSampleC -= 4;
-					totalSamples -= 4;
-					//totalSampleC -= 2;
-					//totalSamples -= 2;
+					///totalSampleC -= 4;
+					//totalSamples -= 4;
+
+					totalSampleC -= (2*ceil(distancePos[recOutChan]))+2;
+					totalSamples -= (2*ceil(distancePos[recOutChan]))+2;
+
 					playBuffer[LEFT][0].resize(totalSampleC);
 					playBuffer[LEFT][1].resize(totalSampleC);
 					if (recChannels == 2) {
 						playBuffer[RIGHT][0].resize(totalSampleC);
 						playBuffer[RIGHT][1].resize(totalSampleC);
+					}
+
+					if (loop) {						// this avoids to play release stage at the beginning of the sample when recoring in gate mode
+						play[recOutChan] = false;
+						stage[recOutChan] = STOP_STAGE;
+						stageLevel[recOutChan] = 0;
 					}
 				}
 				
@@ -3418,6 +3380,11 @@ struct SickoSampler : Module {
 						cueEndPos = currRecPosition;
 						params[CUEEND_PARAM].setValue(cueEndPos/totalSampleC);
 						prevKnobCueEndPos = 2.f;
+						if (uceLoop) {
+							loopEndPos = currRecPosition;
+							params[LOOPEND_PARAM].setValue(loopEndPos/totalSampleC);
+							prevKnobLoopEndPos = 2.f;
+						}
 					}
 				}
 
@@ -4230,19 +4197,15 @@ struct SickoSamplerDisplay : TransparentWidget {
 					module->recTimeDisplay += std::to_string(module->recSeconds);
 				}
 
-				//nvgTextBox(args.vg, 228, 16,97, module->recTimeDisplay.c_str(), NULL);
 				nvgTextBox(args.vg, 176, 16,97, module->recTimeDisplay.c_str(), NULL);
 
 				nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-				//nvgTextBox(args.vg, 186, 16,97, module->timeDisplay.c_str(), NULL);
 				nvgTextBox(args.vg, 142, 16,97, module->timeDisplay.c_str(), NULL);
 	
 				nvgFillColor(args.vg, nvgRGBA(0x88, 0xaa, 0xff, 0xff)); 
-				//nvgTextBox(args.vg, 264, 16,97, module->channelsDisplay.c_str(), NULL);
 				nvgTextBox(args.vg, 208, 16,97, module->channelsDisplay.c_str(), NULL);
 
 				nvgFillColor(args.vg, nvgRGBA(0xee, 0xee, 0x22, 0xff)); 
-				//nvgTextBox(args.vg, 297, 16,97, module->infoToSave.c_str(), NULL);
 				nvgTextBox(args.vg, 237, 16,97, module->infoToSave.c_str(), NULL);
 
 				//nvgTextBox(args.vg, 9, 26,120, module->debugDisplay.c_str(), NULL);
@@ -4253,7 +4216,6 @@ struct SickoSamplerDisplay : TransparentWidget {
 				{
 					nvgBeginPath(args.vg);
 					nvgMoveTo(args.vg, 7, 58.5);
-					//nvgLineTo(args.vg, 302, 58.5);
 					nvgLineTo(args.vg, 242, 58.5);
 					nvgClosePath(args.vg);
 				}
@@ -4269,7 +4231,6 @@ struct SickoSamplerDisplay : TransparentWidget {
 					nvgStrokeWidth(args.vg, 0.8);
 					{
 						nvgBeginPath(args.vg);
-						//xLine = 7 + floor(module->samplePos[module->currentDisplay] * 295 / module->totalSampleC);
 						xLine = 7 + floor(module->samplePos[module->currentDisplay] * 235 / module->totalSampleC);
 						nvgMoveTo(args.vg, xLine, 21);
 						nvgLineTo(args.vg, xLine, 96);
@@ -4282,7 +4243,6 @@ struct SickoSamplerDisplay : TransparentWidget {
 					nvgStrokeWidth(args.vg, 1);
 					{
 						nvgBeginPath(args.vg);
-						//xLine = 7 + floor(module->cueStartPos * 295 / module->totalSampleC);
 						xLine = 7 + floor(module->cueStartPos * 235 / module->totalSampleC);
 						nvgMoveTo(args.vg, xLine , 21);
 						nvgLineTo(args.vg, xLine , 96);
@@ -4295,7 +4255,6 @@ struct SickoSamplerDisplay : TransparentWidget {
 					nvgStrokeWidth(args.vg, 1);
 					{
 						nvgBeginPath(args.vg);
-						//xLine = 7 + floor(module->cueEndPos * 295 / module->totalSampleC);
 						xLine = 7 + floor(module->cueEndPos * 235 / module->totalSampleC);
 						nvgMoveTo(args.vg, xLine , 21);
 						nvgLineTo(args.vg, xLine , 96);
@@ -4308,7 +4267,6 @@ struct SickoSamplerDisplay : TransparentWidget {
 					nvgStrokeWidth(args.vg, 1);
 					{
 						nvgBeginPath(args.vg);
-						//xLine = 7 + floor(module->loopStartPos * 295 / module->totalSampleC);
 						xLine = 7 + floor(module->loopStartPos * 235 / module->totalSampleC);
 						nvgMoveTo(args.vg, xLine , 21);
 						nvgLineTo(args.vg, xLine , 96);
@@ -4321,7 +4279,6 @@ struct SickoSamplerDisplay : TransparentWidget {
 					nvgStrokeWidth(args.vg, 1);
 					{
 						nvgBeginPath(args.vg);
-						//xLine = 7 + floor(module->loopEndPos * 295 / module->totalSampleC);
 						xLine = 7 + floor(module->loopEndPos * 235 / module->totalSampleC);
 						nvgMoveTo(args.vg, xLine , 21);
 						nvgLineTo(args.vg, xLine , 96);
@@ -4332,7 +4289,6 @@ struct SickoSamplerDisplay : TransparentWidget {
 					// Waveform
 					nvgStrokeColor(args.vg, nvgRGBA(0x22, 0x44, 0xc9, 0xc0));
 					nvgSave(args.vg);
-					//Rect b = Rect(Vec(7, 22), Vec(295, 73));
 					Rect b = Rect(Vec(7, 22), Vec(235, 73));
 					nvgScissor(args.vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
 					nvgBeginPath(args.vg);
@@ -4714,11 +4670,9 @@ struct SickoSamplerWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("Phase scan", "", &module->phaseScan));
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
 
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
 				return module->isPolyOuts();
 			}, [=](bool poly) {
@@ -4726,14 +4680,8 @@ struct SickoSamplerWidget : ModuleWidget {
 		}));
 		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
 
-		/*
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Start playback on REC ON", "", &module->playOnRec));
-		menu->addChild(createBoolPtrMenuItem("Stop playback on REC OFF", "", &module->stopOnRec));
-		menu->addChild(createBoolPtrMenuItem("REC Re-Arm", "", &module->rearmSetting));
-		menu->addChild(createBoolPtrMenuItem("Record Release Stage", "", &module->recordRelease));	
-		menu->addChild(createBoolPtrMenuItem("UCE updates also Cue Start", "", &module->uceCueStart));
-		*/
+		menu->addChild(createBoolPtrMenuItem("UCE updates also Loop End", "", &module->uceLoop));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("EOC pulse from", "", [=](Menu* menu) {
