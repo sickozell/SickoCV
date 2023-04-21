@@ -1,4 +1,4 @@
-# SickoCV v2.5.3-beta3
+# SickoCV v2.5.3-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -15,9 +15,11 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - **SickoSampler (NEW!!!)**
 - **SickoPlayer**
 - **Wavetabler DrumPlayer+ DrumPlayerXtra**
+_ **bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt**
 
 ## **to do list:** 
 - sickoSampler overall testing
+- bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt polyphony testing
 
 ## **changelog**  
 - added SickoSampler module
