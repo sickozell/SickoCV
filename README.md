@@ -162,7 +162,7 @@ Some midi controllers can light up or turn off their button leds by receiving th
 Taking advantage of this functionality, connect the WRN outs to a "GATE>MIDI" module connected to the same controller of the ARM inputs.  
 So when pressing buttons on controller, 'bToggler8+' will actually play/stop the sequencers or audio, and simultaneously give a visual feedback on the controller.
 
-![btoggler8plus](https://user-images.githubusercontent.com/80784296/201516811-40c75bb5-84d2-411b-b9ed-fa876e178258.JPG)
+![btoggler8plus](https://user-images.githubusercontent.com/80784296/233729070-514762a0-d978-4d03-9ac5-62dab9ef1078.JPG)
 
 #### - INSTRUCTIONS
 The same of the previous one, plus following features.
@@ -632,3 +632,4 @@ The Component Library graphics for these modules are copyright © VCV and licens
 
 Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [AuxMux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
+Thanks to [Clement Foulc](https://github.com/cfoulc/cf) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis for making all the sampler modules in this collection-
