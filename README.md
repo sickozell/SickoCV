@@ -476,7 +476,7 @@ RRL (Record Release Stage): keeps recording while playback is stopped and it is 
 
 UCS (Update Cue Start): resets the Cue Start cursor to the recording start position after recording is stopped.
 
-UCE (Update Cue End): resets the Cue End cursor at the end of recording when it is stopped. If LOOP button is on, also Loop End cursor is updated.  
+UCE (Update Cue End): resets the Cue End cursor at the end of recording when it is stopped.
 
 POR (Play On REC ON): when REC button is switched ON or REC trig it will start playback and recording simultaneously. It disables also the REC Re-Arm function.  
 
@@ -495,6 +495,7 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - Save CUE Region: saves the wav file from Cue Start to Cue End
 - Save LOOP Region: saves the wav file from Loop Start to Loop End
 - Trim Sample after Save: If this option is enabled, the sample is trimmed and saved in the chosen saving mode, otherwise it will be saved trimmed, but the entire sample remains available in memory
+- UCE updates also Loop End: if UCE button is on, when recording is stopped also Loop End cursor is reset to recording stop position.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
