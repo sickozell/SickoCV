@@ -126,7 +126,7 @@ Otherwise bToggler OUTs can be connected to envelope generators. In that case th
 
 'bToggler8' can also be used to route audio signals. Connect IN to the audio source and OUT to the mixer: the FADE knob will avoid clicks.
 
-![btoggler8](https://user-images.githubusercontent.com/80784296/201516798-acfa6672-07d0-4f0e-bd38-6269a204eb64.JPG)
+![btoggler8](https://user-images.githubusercontent.com/80784296/233732638-2cee94ff-f323-43d9-9e04-b99dbe833daf.JPG)
 
 #### - INSTRUCTIONS
 Connect a clock source.
@@ -191,7 +191,7 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 ## Calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
 
-![calcs](https://user-images.githubusercontent.com/80784296/201516821-8ea683bd-db11-4687-971d-67bef380b81c.JPG)
+![calcs](https://user-images.githubusercontent.com/80784296/233733100-719eb0c9-e6c1-467c-a2c6-cfe8b02012fb.JPG)
 
 #### - INSTRUCTIONS
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
