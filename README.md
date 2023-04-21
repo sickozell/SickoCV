@@ -494,7 +494,7 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - Save FULL Sample: saves the entire sample in a wav file.
 - Save CUE Region: saves the wav file from Cue Start to Cue End
 - Save LOOP Region: saves the wav file from Loop Start to Loop End
-- Trim Sample after Save: If this option is enabled, the sample is trimmed and saved and in the chosen saving mode, otherwise it will be saved trimmed, but the entire sample remains available in memory
+- Trim Sample after Save: If this option is enabled, the sample is trimmed and saved in the chosen saving mode, otherwise it will be saved trimmed, but the entire sample remains available in memory
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
