@@ -632,4 +632,4 @@ The Component Library graphics for these modules are copyright © VCV and licens
 
 Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [AuxMux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
-Thanks to [Clement Foulc](https://github.com/cfoulc/cf) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis for making all the sampler modules in this collection-
+Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  
