@@ -476,7 +476,7 @@ RRL (Record Release Stage): keeps recording while playback is stopped and it is 
 
 UCS (Update Cue Start): resets the Cue Start cursor to the recording start position after recording is stopped.
 
-UCE (Update Cue End): resets the Cue End cursor at the end of recording when it is stopped.  
+UCE (Update Cue End): resets the Cue End cursor at the end of recording when it is stopped. If LOOP button is on, also Loop End cursor is updated.  
 
 POR (Play On REC ON): when REC button is switched ON or REC trig it will start playback and recording simultaneously. It disables also the REC Re-Arm function.  
 
