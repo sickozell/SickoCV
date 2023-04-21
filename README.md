@@ -309,7 +309,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
 
-![parking](https://user-images.githubusercontent.com/80784296/204013230-cda01462-92c9-4013-8599-c0ba9d798ae0.JPG)
+![parking](https://user-images.githubusercontent.com/80784296/233734644-cc9eed31-a959-4ba3-b544-48ed16a6285b.JPG)
 
 #### - INSTRUCTIONS
 This module doesn't do anything. It's just a place to connect temporarily unused cables to not forget to where they were wired.  
@@ -339,13 +339,13 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ## SickoPlayer
 ### wav sample player
 
-![sickoplayer](https://user-images.githubusercontent.com/80784296/219940335-1f5640df-651f-4635-8d84-ba2fdb96ee08.JPG)
-
 #### - DESCRIPTION
 - samples and 1-cycle waveforms player
 - ±24 semitones tuning and v/oct input with polyphony
 - envelope generator, loop, reverse, pingpong
 - different interpolation modes, anti-aliasing filter, phase-scan feature
+
+![sickoplayer](https://user-images.githubusercontent.com/80784296/233733849-2ccd0fb3-a556-4785-ad42-b952642ccd11.JPG)
 
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
@@ -442,14 +442,14 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 ## SickoSampler
 ### wav sample player and recorder
 
-![sickosampler](https://user-images.githubusercontent.com/80784296/233155542-cba808ac-8470-48b4-aa8b-aba71cac1f25.JPG)
-
 #### - DESCRIPTION
 - mono/stereo sample recorder  
 - mono/stereo samples and 1-cycle waveforms player
 - ±24 semitones tuning and v/oct input with polyphony
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
+
+![sickosampler](https://user-images.githubusercontent.com/80784296/233155542-cba808ac-8470-48b4-aa8b-aba71cac1f25.JPG)
 
 #### - INSTRUCTIONS
 
@@ -602,13 +602,13 @@ These behaviors are more understandable connecting a scope on the output.
 ## Wavetabler
 ### wavetable sample player
 
-![wavetabler](https://user-images.githubusercontent.com/80784296/222272709-33ee0e06-bcfa-4f20-8428-6579940f1f0f.JPG)
-
 #### - DESCRIPTION
 - 1-cycle waveforms player
 - ±24 semitones tuning and v/oct input with polyphony
 - envelope generator, reverse, pingpong
 - anti-aliasing filter
+
+![wavetabler](https://user-images.githubusercontent.com/80784296/222272709-33ee0e06-bcfa-4f20-8428-6579940f1f0f.JPG)
 
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
