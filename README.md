@@ -24,7 +24,7 @@ _ **bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt**
 ## **changelog**  
 - added SickoSampler module
 - SickoPlayer: fixed bug on phasescan when scanning through silence.  
-- SickoPlayer: added context menu options about "EOC pulses". Added trig/gate and stop buttons. Changed "Start Only" trig type to "Restart"
+- SickoPlayer: added context menu options "EOC pulse from" and "Reset Cursors on Load". Added trig/gate and stop buttons. Changed "Start Only" trig type to "Restart". Added "Drum Player" preset.  
 - DrumPlayer+ DrumPlayerXtra: changed default "Text Scrolling" context menu option to disabled
 - all sample player modules: added "Disable Nav Buttons" option to general context menu
 - added polyphony on signal I/O on bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt  
