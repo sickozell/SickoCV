@@ -32,7 +32,7 @@ _ **bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt**
 # SickoCV v2.5.3
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/233154821-4eebd86d-fd6c-48a5-90f4-6c5a220dfce7.JPG)
+![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/233832487-7f82ecf7-0b02-4dae-a0b1-aa67e9281ae3.JPG)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
