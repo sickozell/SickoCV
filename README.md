@@ -1,4 +1,4 @@
-# SickoCV v2.5.3-beta4
+# SickoCV v2.5.3-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -404,6 +404,10 @@ There are 3 different interpolation algorithms that are engaged during playback 
 - 'Linear 1' and 'Linear 2' interpolate the samples with different weighted averages  
 - 'Hermite' uses a Cubic Hermite interpolation that usually offers a better result (default)  
 
+**Phase scan**  
+This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
+Be sure to disable it when using one-cycle waveforms, or simply use the specific preset (see below)  
+
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
@@ -413,15 +417,8 @@ When this option is enabled the audio and EOC/EOR outputs reflect v/oct input po
 **Polyphonic Master INs**  
 When this option is enabled the Master CV input accepts polyphonic cables according to V/Oct input polyphony. For example this can be used for velocity control.
 
-**Phase scan**  
-This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
-Be sure to disable it when using one-cycle waveforms, or simply use the specific preset (see below)  
-
-**Reset Cursors**  
-Resets Cue/Loop Start/stop to 0 and 100%.  
-
 **EOC pulse from**  
-This submenu sets whene the EOC pulses are triggered:  
+This submenu sets when the EOC pulses are triggered:  
 - TRG/GATE when is triggered to stop
 - STOP triggering
 - reached CUE END (on forward playback)
@@ -433,6 +430,12 @@ This submenu sets whene the EOC pulses are triggered:
 
 **Disable NAV buttons**
 Disables panel Sample Navigation buttons to avoid utilizing mistakes.
+
+**Reset Cursors**  
+Resets Cue/Loop Start/stop to 0 and 100%.  
+
+**Reset Cursors on Load**  
+Always resets Cue/Loop Start/stop to 0 and 100% when a new sample is loaded.  
 
 **Presets**
 There are some factory presets stored in the context menu for common using settings.  
@@ -476,9 +479,9 @@ RRM (REC Re-Arm): when recording is stopped by a playback trig/button, it is rea
 
 RRL (Record Release Stage): keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).  
 
-UCS (Update Cue Start): resets the Cue Start cursor to the recording start position after recording is stopped.
+UCS (Update Cue Start): resets the Cue Start cursor to the recording start position after recording is stopped (if recording is reversed it updates Cue End cursor).
 
-UCE (Update Cue End): resets the Cue End cursor at the end of recording when it is stopped.
+UCE (Update Cue End): resets the Cue End cursor at the end of recording when it is stopped (if recording is reversed it updates Cue Start cursor).
 
 POR (Play On REC ON): when REC button is switched ON or REC trig it will start playback and recording simultaneously. It disables also the REC Re-Arm function.  
 
@@ -497,7 +500,7 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - Save CUE Region: saves the wav file from Cue Start to Cue End
 - Save LOOP Region: saves the wav file from Loop Start to Loop End
 - Trim Sample after Save: If this option is enabled, the sample is trimmed and saved in the chosen saving mode, otherwise it will be saved trimmed, but the entire sample remains available in memory
-- UCE updates also Loop End: if UCE button is on, when recording is stopped also Loop End cursor is reset to recording stop position.
+- UCE updates also Loop End: if UCE button is on, when recording is stopped also Loop End cursor is reset to recording stop position (if recording is reversed it updates Loop Start cursor).
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate

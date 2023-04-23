@@ -71,7 +71,6 @@ struct SickoSampler : Module {
 		OVERDUB_SWITCH,
 		REC_REL_SWITCH,
 		REARM_SWITCH,
-		//UPDATECURSORS_SWITCH,
 		UCS_SWITCH,
 		UCE_SWITCH,
 		PLAYONREC_SWITCH,
@@ -113,7 +112,6 @@ struct SickoSampler : Module {
 		OVERDUB_LIGHT,
 		REC_REL_LIGHT,
 		REARM_LIGHT,
-		//UPDATECURSORS_LIGHT,
 		UCS_LIGHT,
 		UCE_LIGHT,
 		PLAYONREC_LIGHT,
@@ -143,13 +141,12 @@ struct SickoSampler : Module {
 	bool fileLoaded = false;
 
 	bool play[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-	//bool inPause[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	bool playPauseToStop[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
-	double samplePos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double samplePos[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	//const int sampleCoeff = 2;
 	double currentSpeed = 0.0;
-	double distancePos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double distancePos[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 	double cueStartPos;
 	double cueEndPos;
@@ -172,7 +169,7 @@ struct SickoSampler : Module {
 	float tune = 0.f;
 	float prevTune = -1.f;
 
-	float voct[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float voct[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	float prevVoct[16] = {11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f};
 	float speedVoct[16];
 
@@ -186,9 +183,9 @@ struct SickoSampler : Module {
 	double scanLoopStartSample;
 	double scanLoopEndSample;
 
-	double prevSampleWeight[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	double currSampleWeight[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	double prevSamplePos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double prevSampleWeight[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double currSampleWeight[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double prevSamplePos[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 	std::string storedPath = "";
 	std::string fileDescription = "--none--";
@@ -216,12 +213,12 @@ struct SickoSampler : Module {
 
 	drwav_uint64 recSamples = 0;
 
-	float trigValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float trigValue[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	int trigButValue = 0;
-	float stopButValue = 0;
-	float prevTrigValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	float stopValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	float prevStopValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float stopButValue = 0.f;
+	float prevTrigValue[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+	float stopValue[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+	float prevStopValue[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 
 	bool loop = false;
 
@@ -231,6 +228,8 @@ struct SickoSampler : Module {
 	int polyMaster = POLYPHONIC;
 	bool phaseScan = true;
 	bool prevPhaseScan = false;
+		bool firstLoad = true;
+	bool resetCursorsOnLoad = true;
 	//bool uceCueStart = false;
 	bool recordRelease = false;
 	bool disableNav = false;
@@ -239,16 +238,16 @@ struct SickoSampler : Module {
 	float fadeCoeff = 0.f;
 
 	int fadingType[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	float fadingValue[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-	float fadeDecrement = 0;
-	double fadedPosition[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	double fadeSamples = 0;
+	float fadingValue[16] = {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f};
+	float fadeDecrement = 0.f;
+	double fadedPosition[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double fadeSamples = 0.0;
 	float xFade = 0.f;
 
-	float currentOutput;
-	float currentOutputR;
-	float sumOutput;
-	float sumOutputR;
+	float currentOutput = 0.f;
+	float currentOutputR = 0.f;
+	float sumOutput = 0.f;
+	float sumOutputR = 0.f;
 
 	//std::string debugDisplay = "X";
 	//std::string debugDisplay2 = "X";
@@ -260,7 +259,7 @@ struct SickoSampler : Module {
 	int trigMode;
 	int trigType;
 	int stage[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	float stageLevel[16];
+	float stageLevel[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	
 	bool releaseNew[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
@@ -281,12 +280,12 @@ struct SickoSampler : Module {
 
 	int chan;
 
-	float attackValue;
-	float decayValue;
-	float sustainValue;
-	float releaseValue;
-	float stageCoeff[16];
-	float masterLevel[16];
+	float attackValue = 0.f;
+	float decayValue = 0.f;
+	float sustainValue = 0.f;
+	float releaseValue = 0.f;
+	float stageCoeff[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+	float masterLevel[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	int limiter;
 
 	bool reverseStart = false;
@@ -300,10 +299,10 @@ struct SickoSampler : Module {
 
 	int recButton = 0;
 	int prevRecButton = 0;
-	float recTrig = 0;
-	float prevRecTrig = 0;
-	float recStopTrig = 0;
-	float prevRecStopTrig = 0;
+	float recTrig = 0.f;
+	float prevRecTrig = 0.f;
+	float recStopTrig = 0.f;
+	float prevRecStopTrig = 0.f;
 	int recordingState = 0;
 	bool newRecording = true;
 	bool armRec = false;
@@ -316,26 +315,25 @@ struct SickoSampler : Module {
 	bool startPlayOnRec = false;
 	bool startStopOnRec = false;
 
-	double currRecPosition = 0;
-	double prevRecPosition = 0;
-	double startRecPosition = 0;
+	double currRecPosition = 0.0;
+	double prevRecPosition = 0.0;
+	double startRecPosition = 0.0;
 	int recChannels = 1;
-	float currRecValue[2];
-	float prevRecValue[2];
-	float avgRecCoeff;
-	float recValue[2][5];
-	float recValInterp[2];
-	double recWeight[5] = {0, 0, 0, 0, 0};
-	double recPosition[5] = {0, 0, 0, 0, 0};
+	float currRecValue[2] = {0.f, 0.f};
+	float prevRecValue[2] = {0.f, 0.f};
+	float avgRecCoeff = 0.f;
+	float recValue[2][5] = {{0.f, 0.f, 0.f, 0.f, 0.f},{0.f, 0.f, 0.f, 0.f, 0.f}};
+	float recValInterp[2] = {0.f, 0.f};
+	double recWeight[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
+	double recPosition[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
 	int distanceRec = 0;
 	bool xtndRec = false;
 	bool extendedRec = false;
 	int reverseRecording = false;
 	bool waitingRecEdge = false;
-	//bool recReposition = false;
 	bool stopRecNow = false;
 	
-	float recFadeValue;
+	float recFadeValue = 0.f;
 	bool recFadeIn = false;
 	bool recFadeOut = false;
 	//const int recOutChan = 0;
@@ -351,9 +349,10 @@ struct SickoSampler : Module {
 	std::string infoToSave= "";
 
 	int monitorSwitch = 0;
-	int prevMonitorSwitch = -1;
+	//int prevMonitorSwitch = -1;
+	int prevMonitorSwitch = 0;
 	bool monitorFade = false;
-	float monitorFadeValue = 0;
+	float monitorFadeValue = 0.f;
 	float monitorFadeCoeff = 10 / (APP->engine->getSampleRate());
 
 	int saveMode = 0;
@@ -367,7 +366,7 @@ struct SickoSampler : Module {
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	const float maxAdsrTime = 10.f;
 	const float minAdsrTime = 0.001f;
-	const float noEnvTime = 0.00101;
+	const float noEnvTime = 0.00101f;
 
 	SickoSampler() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -479,7 +478,6 @@ struct SickoSampler : Module {
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
 		polyMaster = POLYPHONIC;
-		//phaseScan = true;
 		prevPhaseScan = false;
 		eocFromTrg = false;
 		eocFromStop = false;
@@ -490,17 +488,16 @@ struct SickoSampler : Module {
 		eocFromPing = true;
 		eocFromPong = true;
 		uceLoop = false;
+		firstLoad = true;
+		resetCursorsOnLoad = true;
 
 		startPlayOnRec = false;
 		startStopOnRec = false;
 		stopRecNow = false;
-		//rearmSetting = false;
-		//params[REARM_SWITCH].setValue(0.f);
 		disableNav = false;
 		clearSlot();
 		for (int i = 0; i < 16; i++) {
 			play[i] = false;
-			//inPause[i] = false;
 			fadingType[i] = NO_FADE;
 			stage[i] = STOP_STAGE;
 			stageLevel[i] = 0;
@@ -517,13 +514,11 @@ struct SickoSampler : Module {
 		totalSampleC = 0;
 		totalSamples = 0;
 		recordingState = 0;
-		//recOutChan = 0;
-		//params[REC_PARAM].setValue(0);
-		//lights[REC_LIGHT].setBrightness(0);
 		recButton = 0;
 		prevRecButton = 0;
 		newRecording = true;
 		restart = false;
+		prevMonitorSwitch = 0;
 	}
 
 	json_t *dataToJson() override {
@@ -541,6 +536,7 @@ struct SickoSampler : Module {
 		json_object_set_new(rootJ, "EocFromLoopStart", json_boolean(eocFromLoopStart));
 		json_object_set_new(rootJ, "EocFromPing", json_boolean(eocFromPing));
 		json_object_set_new(rootJ, "EocFromPong", json_boolean(eocFromPong));
+		json_object_set_new(rootJ, "ResetCursorsOnLoad", json_boolean(resetCursorsOnLoad));
 		json_object_set_new(rootJ, "UceLoop", json_boolean(uceLoop));
 		/*
 		json_object_set_new(rootJ, "PlayOnRec", json_boolean(playOnRec));
@@ -591,6 +587,9 @@ struct SickoSampler : Module {
 		json_t* eocFromPongJ = json_object_get(rootJ, "EocFromPong");
 		if (eocFromPongJ)
 			eocFromPong = json_boolean_value(eocFromPongJ);
+		json_t* resetCursorsOnLoadJ = json_object_get(rootJ, "ResetCursorsOnLoad");
+		if (resetCursorsOnLoadJ)
+			resetCursorsOnLoad = json_boolean_value(resetCursorsOnLoadJ);
 		json_t* uceLoopJ = json_object_get(rootJ, "UceLoop");
 		if (uceLoopJ)
 			uceLoop = json_boolean_value(uceLoopJ);
@@ -1286,6 +1285,19 @@ struct SickoSampler : Module {
 			toSave = false;
 			infoToSave = "";
 
+			if (!firstLoad && resetCursorsOnLoad) {
+				params[CUESTART_PARAM].setValue(0.f);
+				params[CUEEND_PARAM].setValue(1.f);
+				params[LOOPSTART_PARAM].setValue(0.f);
+				params[LOOPEND_PARAM].setValue(1.f);
+				knobCueStartPos = 0.f;
+				knobCueEndPos = 1.f;
+				knobLoopStartPos = 0.f;
+				knobLoopEndPos = 1.f;
+			}
+
+			firstLoad = false;
+
 			prevKnobCueStartPos = -1.f;
 			prevKnobCueEndPos = 2.f;
 			prevKnobLoopStartPos = -1.f;
@@ -1340,36 +1352,68 @@ struct SickoSampler : Module {
 		switch (presetNo) {
 			case 0:	// wavetable
 				phaseScan = false;
-				params[TRIGGATEMODE_SWITCH].setValue(0);
-				params[TRIGMODE_SWITCH].setValue(0);
-				params[CUESTART_PARAM].setValue(0);
-				params[CUEEND_PARAM].setValue(1);
-				params[LOOPSTART_PARAM].setValue(0);
-				params[LOOPEND_PARAM].setValue(1);
-				params[XFADE_PARAM].setValue(0);
-				params[LOOP_PARAM].setValue(1);
-				params[PINGPONG_PARAM].setValue(0);
-				reverseStart = false;
-				prevKnobCueStartPos = -1;
-				prevKnobCueEndPos = 2;
-				prevKnobLoopStartPos = -1;
-				prevKnobLoopEndPos = 2;
+				params[TRIGGATEMODE_SWITCH].setValue(GATE_MODE);
+				//params[TRIGMODE_SWITCH].setValue(START_STOP);
+				
+				params[REV_PARAM].setValue(0.f);
+				params[XFADE_PARAM].setValue(0.f);
+				params[LOOP_PARAM].setValue(1.f);
+				params[PINGPONG_PARAM].setValue(0.f);
+
+				params[CUESTART_PARAM].setValue(0.f);
+				params[CUEEND_PARAM].setValue(1.f);
+				params[LOOPSTART_PARAM].setValue(0.f);
+				params[LOOPEND_PARAM].setValue(1.f);
+				prevKnobCueStartPos = -1.f;
+				prevKnobCueEndPos = 2.f;
+				prevKnobLoopStartPos = -1.f;
+				prevKnobLoopEndPos = 2.f;
 			break;
+
 			case 1:	// trig with envelope
 				phaseScan = true;
-				params[TRIGGATEMODE_SWITCH].setValue(1);
-				params[TRIGMODE_SWITCH].setValue(0);
-				params[XFADE_PARAM].setValue(0.3f);
-				params[LOOP_PARAM].setValue(0);
-				params[PINGPONG_PARAM].setValue(0);
-				params[ATTACK_PARAM].setValue(0.2f);
-				params[DECAY_PARAM].setValue(0);
-				params[SUSTAIN_PARAM].setValue(1);
-				params[RELEASE_PARAM].setValue(0.2f);
-				prevKnobCueStartPos = -1;
-				prevKnobCueEndPos = 2;
-				prevKnobLoopStartPos = -1;
-				prevKnobLoopEndPos = 2;
+				params[TRIGGATEMODE_SWITCH].setValue(TRIG_MODE);
+				params[TRIGMODE_SWITCH].setValue(START_STOP);
+
+				//params[REV_PARAM].setValue(0.f);
+				params[XFADE_PARAM].setValue(0.f);
+				params[LOOP_PARAM].setValue(0.f);
+				params[PINGPONG_PARAM].setValue(0.f);
+
+				params[ATTACK_PARAM].setValue(0.33f);
+				params[DECAY_PARAM].setValue(0.f);
+				params[SUSTAIN_PARAM].setValue(1.f);
+				params[RELEASE_PARAM].setValue(0.33f);
+
+				prevKnobCueStartPos = -1.f;
+				prevKnobCueEndPos = 2.f;
+				prevKnobLoopStartPos = -1.f;
+				prevKnobLoopEndPos = 2.f;
+			break;
+
+			case 2:	// drum player
+				phaseScan = false;
+				params[TRIGGATEMODE_SWITCH].setValue(TRIG_MODE);
+				params[TRIGMODE_SWITCH].setValue(START_RESTART);
+
+				params[REV_PARAM].setValue(0.f);
+				params[XFADE_PARAM].setValue(0.0001f);
+				params[LOOP_PARAM].setValue(0.f);
+				params[PINGPONG_PARAM].setValue(0.f);
+
+				params[ATTACK_PARAM].setValue(0.f);
+				params[DECAY_PARAM].setValue(0.f);
+				params[SUSTAIN_PARAM].setValue(1.f);
+				params[RELEASE_PARAM].setValue(0.f);
+
+				params[CUESTART_PARAM].setValue(0.f);
+				params[CUEEND_PARAM].setValue(1.f);
+				params[LOOPSTART_PARAM].setValue(0.f);
+				params[LOOPEND_PARAM].setValue(1.f);
+				prevKnobCueStartPos = -1.f;
+				prevKnobCueEndPos = 2.f;
+				prevKnobLoopStartPos = -1.f;
+				prevKnobLoopEndPos = 2.f;
 			break;
 		}
 	}
@@ -1676,6 +1720,7 @@ struct SickoSampler : Module {
 				else if (masterLevel[c] < 0)
 					masterLevel[c] = 0;
 
+				//if (trigButValue)
 				if (c == 0 && trigButValue)
 					trigValue[c] = 1;
 				else
@@ -1765,8 +1810,7 @@ struct SickoSampler : Module {
 					break;
 
 					case TRIG_MODE:												// ***** TRIG MODE *****
-						//if (trigValue[c] >= 1 && prevTrigValue[c] < 1) {
-						//if ((trigValue[c] >= 1 && prevTrigValue[c] < 1) || startPlayOnRec) {
+
 						if ((trigValue[c] >= 1 && prevTrigValue[c] < 1) || startPlayOnRec || startStopOnRec) {
 						
 							switch (trigType) {
@@ -1857,10 +1901,8 @@ struct SickoSampler : Module {
 
 								case START_RESTART:									// trig type: START RESTART
 									if (!play[c]) {		// ******* START PLAYBACK
-									//if (!play[c] || recReposition == true) { // *** use this if you want restart in RESTART type after 1st recording
 										
 										play[c] = true;
-										//recReposition = false;
 										
 										if (recButton) {
 											armRec = true;
@@ -2023,15 +2065,14 @@ struct SickoSampler : Module {
 
 						// ************************************************* STOP INPUT MANAGEMENT
 						
-						stopValue[c] = inputs[STOP_INPUT].getVoltage(c);
-						//stopButValue = params[STOPBUT_PARAM].getValue();
+						//stopValue[c] = inputs[STOP_INPUT].getVoltage(c);
 						
-						//if (c == 0 && stopButValue)
-						if (c == 0 && (stopButValue || startStopOnRec)) {
+						//if (c == 0 && (stopButValue || startStopOnRec)) {
+						if (stopButValue || startStopOnRec) {
 							stopValue[c] = 1;
 							startStopOnRec = false;
-							//debugDisplay = "Stop";
-						}
+						} else
+							stopValue[c] = inputs[STOP_INPUT].getVoltage(c);
 
 						if (stopValue[c] >= 1 && prevStopValue[c] < 1) {
 
@@ -2045,7 +2086,6 @@ struct SickoSampler : Module {
 								if (play[c]) {
 									playPauseToStop[c] = true;
 								} else {
-									//debugDisplay = "pause to stop";
 									if (reverseStart == FORWARD) {
 										samplePos[c] = floor(cueStartPos)+1;
 										currSampleWeight[c] = sampleCoeff;
@@ -3058,14 +3098,11 @@ struct SickoSampler : Module {
 		lights[REC_LIGHT].setBrightness(recButton);
 
 		if (play[recOutChan] && recordingState == 0 && prevRecButton == 0 && recButton == 1)
-		//if (!playOnRec && play[recOutChan] && recordingState == 0 && prevRecButton == 0 && recButton == 1)
 			armRec = true;
 
-		//if (!play[recOutChan] && playOnRec && !prevRecButton && recButton)
 		if (!play[recOutChan] && playOnRec && !prevRecButton && recButton && trigMode == TRIG_MODE)
 			startPlayOnRec = true;
 
-		//if (play[recOutChan] && stopOnRec && prevRecButton && !recButton && !inputs[RECSTOP_INPUT].isConnected())
 		if (play[recOutChan] && stopOnRec && prevRecButton && !recButton)
 			startStopOnRec = true;
 
@@ -3080,10 +3117,6 @@ struct SickoSampler : Module {
 				
 				trigValue[recOutChan] = inputs[TRIG_INPUT].getVoltage(recOutChan);
 
-				/*if (trigButValue || startPlayOnRec) {
-					trigValue[recOutChan] = 1;
-					startPlayOnRec = false;
-				}*/
 				if (trigButValue || (trigMode == TRIG_MODE && (startPlayOnRec || startStopOnRec))) {
 					trigValue[recOutChan] = 1;
 					if (startPlayOnRec)
@@ -3104,10 +3137,10 @@ struct SickoSampler : Module {
 						}
 					break;
 					case TRIG_MODE:
-						stopValue[recOutChan] = inputs[STOP_INPUT].getVoltage(recOutChan);
-						//stopButValue = params[STOPBUT_PARAM].getValue();
 						if (stopButValue)
 							stopValue[recOutChan] = 1;
+						else
+							stopValue[recOutChan] = inputs[STOP_INPUT].getVoltage(recOutChan);
 
 						if (stopValue[recOutChan] >= 1 && prevStopValue[recOutChan] < 1 && recordingState == 1) {
 							recButton = 0;
@@ -3299,12 +3332,6 @@ struct SickoSampler : Module {
 		} else if (recButton == 0 && recordingState == 1 && recFadeOut == false)  {	// ********** S T O P   R E C O R D I N G ****************
 
 			if (recFadeValue > 0) {
-				/*if (params[RECFADE_PARAM].getValue() > 0) {
-					recFadeOut = true;
-				} else {
-					recFadeOut = false;
-					recFadeValue = 0;
-				}*/
 				recFadeOut = true;
 				if (params[RECFADE_PARAM].getValue() <= 0)
 					recFadeValue = 0;
@@ -3312,12 +3339,16 @@ struct SickoSampler : Module {
 			} else {
 				recordingState = 0;
 
-				if (extendedRec) {
-					///totalSampleC -= 4;
-					//totalSamples -= 4;
+				//currRecPosition -= (2*ceil(distancePos[recOutChan]))+2;
+				double tempDistance = (2*ceil(distancePos[recOutChan]))+2;
+				currRecPosition -= tempDistance;
 
-					totalSampleC -= (2*ceil(distancePos[recOutChan]))+2;
-					totalSamples -= (2*ceil(distancePos[recOutChan]))+2;
+				if (extendedRec) {
+
+					//totalSampleC -= (2*ceil(distancePos[recOutChan]))+2;
+					//totalSamples -= (2*ceil(distancePos[recOutChan]))+2;
+					totalSampleC -= tempDistance;
+					totalSamples -= tempDistance;
 
 					playBuffer[LEFT][0].resize(totalSampleC);
 					playBuffer[LEFT][1].resize(totalSampleC);
@@ -3332,13 +3363,13 @@ struct SickoSampler : Module {
 						stageLevel[recOutChan] = 0;
 					}
 				}
-				
-				if (startRecPosition <= 0) { 				// <- ATTENZIONE DA VERIFICARE SE VA INTERPOLATO SOLO IL PRIMO SAMPLE ASSOLUTO, potrebbe essere negativo
+
+				if (startRecPosition < 2) { 				// <- ATTENZIONE DA VERIFICARE SE VA INTERPOLATO SOLO IL PRIMO SAMPLE ASSOLUTO, potrebbe essere negativo
 
 					z1 = 0; z2 = 0; z1r = 0; z2r = 0;		//     perchè potrebbe essere negativo se FORWARD o maggiore di totalSamples/totalSampleC se REVERSE
 					int rc = 0;
 					//playBuffer[rc][0][1] = (playBuffer[rc][0][1] * .5) + (playBuffer[rc][0][2] * .5);
-					playBuffer[rc][0][0] = (playBuffer[rc][0][totalSamples] * .5) + (playBuffer[rc][0][2] * .5);		// *****   DA RIVEDERE
+					playBuffer[rc][0][0] = (playBuffer[rc][0][currRecPosition] * .5) + (playBuffer[rc][0][2] * .5);		// *****   DA RIVEDERE
 					playBuffer[rc][0][1] = (playBuffer[rc][0][0] * .5) + (playBuffer[rc][0][2] * .5);
 					playBuffer[rc][1][0] = biquadLpf(playBuffer[rc][0][0]); // filtered vector
 					playBuffer[rc][1][1] = biquadLpf(playBuffer[rc][0][1]); // filtered vector
@@ -3346,12 +3377,13 @@ struct SickoSampler : Module {
 					if (recChannels == 2) {
 						rc = 1;
 						//playBuffer[rc][0][1] = (playBuffer[rc][0][0] * .5) + (playBuffer[rc][0][2] * .5);
-						playBuffer[rc][0][0] = (playBuffer[rc][0][totalSamples] * .5) + (playBuffer[rc][0][2] * .5);		// *****   DA RIVEDERE
+						playBuffer[rc][0][0] = (playBuffer[rc][0][currRecPosition] * .5) + (playBuffer[rc][0][2] * .5);		// *****   DA RIVEDERE
 						playBuffer[rc][0][1] = (playBuffer[rc][0][0] * .5) + (playBuffer[rc][0][2] * .5);
 						playBuffer[rc][1][0] = biquadLpf2(playBuffer[rc][0][0]); // filtered vector
 						playBuffer[rc][1][1] = biquadLpf2(playBuffer[rc][0][1]); // filtered vector
 					}
 				}
+				
 
 				if (newRecording) {
 					newRecording = false;
@@ -3372,18 +3404,35 @@ struct SickoSampler : Module {
 
 				} else {
 					if (updateCursorsStart) {
-						cueStartPos = startRecPosition;
-						params[CUESTART_PARAM].setValue(cueStartPos/totalSampleC);
-						prevKnobCueStartPos = -1.f;
+						if (reverseRecording == FORWARD) {
+							cueStartPos = startRecPosition;
+							params[CUESTART_PARAM].setValue(cueStartPos/totalSampleC);
+							prevKnobCueStartPos = -1.f;
+						} else {
+							cueEndPos = startRecPosition;
+							params[CUEEND_PARAM].setValue(cueEndPos/totalSampleC);
+							prevKnobCueEndPos = 2.f;
+						}
 					}
 					if (updateCursorsEnd) {
-						cueEndPos = currRecPosition;
-						params[CUEEND_PARAM].setValue(cueEndPos/totalSampleC);
-						prevKnobCueEndPos = 2.f;
-						if (uceLoop) {
-							loopEndPos = currRecPosition;
-							params[LOOPEND_PARAM].setValue(loopEndPos/totalSampleC);
-							prevKnobLoopEndPos = 2.f;
+						if (reverseRecording == FORWARD) {
+							cueEndPos = currRecPosition;
+							params[CUEEND_PARAM].setValue(cueEndPos/totalSampleC);
+							prevKnobCueEndPos = 2.f;
+							if (uceLoop) {
+								loopEndPos = currRecPosition;
+								params[LOOPEND_PARAM].setValue(loopEndPos/totalSampleC);
+								prevKnobLoopEndPos = 2.f;
+							}
+						} else {
+							cueStartPos = currRecPosition;
+							params[CUESTART_PARAM].setValue(cueStartPos/totalSampleC);
+							prevKnobCueStartPos = -1.f;
+							if (uceLoop) {
+								loopStartPos = currRecPosition;
+								params[LOOPSTART_PARAM].setValue(loopStartPos/totalSampleC);
+								prevKnobLoopStartPos = -1.f;
+							}
 						}
 					}
 				}
@@ -3419,11 +3468,8 @@ struct SickoSampler : Module {
 					recRearm = false;
 					
 					if (!playOnRec) {
-						//debugDisplay = "rearm";
 						params[REC_PARAM].setValue(1);
 						recButton = 1;
-						//if (recRearmAfter)
-						//	debugDisplay = "recRearm after";
 					}
 
 				}
@@ -3431,16 +3477,9 @@ struct SickoSampler : Module {
 				if (recRearmAfter && !play[recOutChan]) {
 					recRearmAfter = false;
 					recRearm = false;
-					//debugDisplay = "recRearm";	
 					params[REC_PARAM].setValue(1);
 					recButton = 1;
 				}
-
-				/*if (restart) {			// *** use this if you want restart in RESTART type after first recording
-					debugDisplay ="restart";
-					restart = false;
-					recReposition = true;
-				}*/
 
 				startPlayOnRec = false;	// these two lines avoid restart playing when switching from gate to trigger mode
 				startStopOnRec = false;
@@ -3538,6 +3577,40 @@ struct SickoSampler : Module {
 
 						if (loop && currRecPosition > loopEndPos && reverseRecording == FORWARD) {	// ********* LOOP FORWARD  reached LOOP END
 							waitingRecEdge = false;
+							// filling last samples before loop end
+							int directionCoeff = 1;
+							int fillRecDistance = ceil(loopEndPos) - floor(prevRecPosition);
+							if (fillRecDistance > 0) {
+								int rc = 0;
+								avgRecCoeff = currRecValue[rc] / fillRecDistance;
+								for (int i=0; i < fillRecDistance; i++) {
+									if (overdub)
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += currRecValue[rc] - (avgRecCoeff * i);
+									else if (recFadeIn || recFadeOut)
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+									else
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i);
+									
+									playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+								}
+								// ************ RIGHT CHANNEL ******************
+								if (recChannels == 2) {
+									rc = 1;
+									avgRecCoeff = currRecValue[rc] / fillRecDistance;
+									for (int i=0; i < fillRecDistance; i++) {
+										if (overdub)
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += currRecValue[rc] - (avgRecCoeff * i);
+										else if (recFadeIn || recFadeOut)
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+										else
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i);
+										
+										playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+									}
+								}
+							}
+							// end filling
+
 							if (pingpong) {
 								prevRecPosition = floor(loopEndPos);
 								currRecPosition = floor(loopEndPos) - 1;
@@ -3549,8 +3622,43 @@ struct SickoSampler : Module {
 							if (phaseScan)
 								searchingLoopEndPhase = true;
 
-						} else if (waitingRecEdge && loop && currRecPosition < loopStartPos && reverseRecording == REVERSE) {	// *** LOOP REVERSE  reached LOOP START
+						} else if (loop && currRecPosition < loopStartPos && reverseRecording == REVERSE) {	// *** LOOP REVERSE  reached LOOP START
 							waitingRecEdge = false;
+							// filling last samples before loop end
+							int directionCoeff = -1;
+							//int fillRecDistance = ceil(loopEndPos) - floor(prevRecPosition);
+							int fillRecDistance = ceil(prevRecPosition) - floor(loopStartPos);
+							if (fillRecDistance > 0) {
+								int rc = 0;
+								avgRecCoeff = currRecValue[rc] / fillRecDistance;
+								for (int i=0; i < fillRecDistance; i++) {
+									if (overdub)
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += currRecValue[rc] - (avgRecCoeff * i);
+									else if (recFadeIn || recFadeOut)
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+									else
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i);
+									
+									playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+								}
+								// ************ RIGHT CHANNEL ******************
+								if (recChannels == 2) {
+									rc = 1;
+									avgRecCoeff = currRecValue[rc] / fillRecDistance;
+									for (int i=0; i < fillRecDistance; i++) {
+										if (overdub)
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += currRecValue[rc] - (avgRecCoeff * i);
+										else if (recFadeIn || recFadeOut)
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+										else
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i);
+										
+										playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+									}
+								}
+							}
+							// end filling
+
 							if (pingpong) {
 								prevRecPosition = floor(loopStartPos);
 								currRecPosition = floor(loopStartPos) + 1;
@@ -3564,30 +3672,98 @@ struct SickoSampler : Module {
 
 						} else if (currRecPosition > totalSamples && reverseRecording == FORWARD) {	// ********** FORWARD  reached LAST SAMPLE
 							waitingRecEdge = false;
+
+							// filling last samples before loop end
+							int directionCoeff = 1;
+							int fillRecDistance = totalSamples - floor(prevRecPosition);
+							if (fillRecDistance > 0) {
+								int rc = 0;
+								avgRecCoeff = currRecValue[rc] / fillRecDistance;
+								for (int i=0; i < fillRecDistance; i++) {
+									if (overdub)
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += currRecValue[rc] - (avgRecCoeff * i);
+									else if (recFadeIn || recFadeOut)
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+									else
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i);
+									
+									playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+								}
+								// ************ RIGHT CHANNEL ******************
+								if (recChannels == 2) {
+									rc = 1;
+									avgRecCoeff = currRecValue[rc] / fillRecDistance;
+									for (int i=0; i < fillRecDistance; i++) {
+										if (overdub)
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += currRecValue[rc] - (avgRecCoeff * i);
+										else if (recFadeIn || recFadeOut)
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+										else
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i);
+										
+										playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+									}
+								}
+							}
+							// end filling
+
 							params[REC_PARAM].setValue(0);
 							recButton = 0;
 							stopRecNow = true;
-							//debugDisplay = "stop rec now";
 
 						} else if (currRecPosition < 0 && reverseRecording == REVERSE) {	// ********** REVERSE  reached FIRST SAMPLE
 							waitingRecEdge = false;
+
+							// filling last samples before loop end
+							int directionCoeff = -1;
+							int fillRecDistance = floor(prevRecPosition);
+							if (fillRecDistance > 0) {
+								int rc = 0;
+								avgRecCoeff = currRecValue[rc] / fillRecDistance;
+								for (int i=0; i < fillRecDistance; i++) {
+									if (overdub)
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += currRecValue[rc] - (avgRecCoeff * i);
+									else if (recFadeIn || recFadeOut)
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+									else
+										playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i);
+									
+									playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+								}
+								// ************ RIGHT CHANNEL ******************
+								if (recChannels == 2) {
+									rc = 1;
+									avgRecCoeff = currRecValue[rc] / fillRecDistance;
+									for (int i=0; i < fillRecDistance; i++) {
+										if (overdub)
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += currRecValue[rc] - (avgRecCoeff * i);
+										else if (recFadeIn || recFadeOut)
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+										else
+											playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = currRecValue[rc] - (avgRecCoeff * i);
+										
+										playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+									}
+								}
+							}
+							// end filling
+
 							params[REC_PARAM].setValue(0);
 							recButton = 0;
 							stopRecNow = true;
 
 						} else if (currRecPosition > cueEndPos && reverseRecording == FORWARD) {	// ********** FORWARD  reached CUE END
 							//waitingRecEdge = false;
+
 							params[REC_PARAM].setValue(0);
 							recButton = 0;
-							//if (phaseScan)
-							//	searchingCueEndPhase = true;
 
 						} else if (currRecPosition < cueStartPos && reverseRecording == REVERSE) {	// ********** REVERSE  reached CUE START
 							//waitingRecEdge = false;
+
 							params[REC_PARAM].setValue(0);
 							recButton = 0;
-							//if (phaseScan)
-							//	searchingCueStartPhase = true;
+
 						} 
 					}
 				} 
@@ -3596,101 +3772,54 @@ struct SickoSampler : Module {
 
 			// ****************************************************************************************** R E C O R D I N G     S E C T I O N *****************
 
-		if (stopRecNow) {
-			stopRecNow = false;
-			recButton = 0;
-			recFadeOut = false;
-			recFadeValue = 0;
-			/*if (phaseScan) {
-				searchingCueStartPhase = true;
-				searchingCueEndPhase = true;
-				searchingLoopStartPhase = true;
-				searchingLoopEndPhase = true;
-			}*/
-			//debugDisplay = "stopnow";
+			if (stopRecNow) {
+				stopRecNow = false;
+				recButton = 0;
+				recFadeOut = false;
+				recFadeValue = 0;
 
-		} else {
-				
-			if (recFadeIn) {
-				if (recFadeValue < 1)
-					recFadeValue += 1 / (convertCVToSeconds(params[RECFADE_PARAM].getValue()) * args.sampleRate);
-				if (recFadeValue >= 1) {
-					recFadeValue = 1;
-					recFadeIn = false;
-				}
-			} else if (recFadeOut) {
-				//debugDisplay = "fadeout-" + to_string(debugInt);
-				//debugInt++;
-				if (recFadeValue > 0)
-					recFadeValue -= 1 / (convertCVToSeconds(params[RECFADE_PARAM].getValue()) * args.sampleRate);
-				if (recFadeValue <= 0) {
-					recFadeValue = 0;
-					recFadeOut = false;
+			} else {
 					
-					if (recRearm) {
-						//debugDisplay = "after";
-						recRearm = false;
-						recRearmAfter = true;
+				if (recFadeIn) {
+					if (recFadeValue < 1)
+						recFadeValue += 1 / (convertCVToSeconds(params[RECFADE_PARAM].getValue()) * args.sampleRate);
+					if (recFadeValue >= 1) {
+						recFadeValue = 1;
+						recFadeIn = false;
+					}
+				} else if (recFadeOut) {
+					if (recFadeValue > 0)
+						recFadeValue -= 1 / (convertCVToSeconds(params[RECFADE_PARAM].getValue()) * args.sampleRate);
+					if (recFadeValue <= 0) {
+						recFadeValue = 0;
+						recFadeOut = false;
+						
+						if (recRearm) {
+							recRearm = false;
+							recRearmAfter = true;
+						}
 					}
 				}
-			}
 
-			int directionCoeff;
-			if (reverseRecording)
-				directionCoeff = -1;
-			else
-				directionCoeff = 1;
+				int directionCoeff;
+				if (reverseRecording)
+					directionCoeff = -1;
+				else
+					directionCoeff = 1;
 
-			int rc = 0;
-			
-			prevRecValue[rc] = currRecValue[rc];
-			currRecValue[rc] = inputs[IN_INPUT+rc].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
-			avgRecCoeff = abs(currRecValue[rc] - prevRecValue[rc]) / distanceRec;
+				int rc = 0;
+				
+				prevRecValue[rc] = currRecValue[rc];
+				currRecValue[rc] = inputs[IN_INPUT+rc].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
+				avgRecCoeff = abs(currRecValue[rc] - prevRecValue[rc]) / distanceRec;
 
-			if (currRecValue[rc] < prevRecValue[rc])
-				avgRecCoeff *= -1;
+				if (currRecValue[rc] < prevRecValue[rc])
+					avgRecCoeff *= -1;
 
-			if (currRecPosition >= 0 && currRecPosition <= totalSamples && prevRecPosition >= 0 && prevRecPosition <= totalSamples) {
+				if (currRecPosition >= 0 && currRecPosition <= totalSamples && prevRecPosition >= 0 && prevRecPosition <= totalSamples) {
 
-				if (distanceRec > 0) {
-					//for (int i=1; i <= distanceRec; i++) {
-					for (int i=0; i < distanceRec; i++) {
-						if (overdub)
-							playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += prevRecValue[rc] + (avgRecCoeff * i);
-						else if (recFadeIn || recFadeOut)
-							playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = prevRecValue[rc] + (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
-						else
-							playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = prevRecValue[rc] + (avgRecCoeff * i);
-						
-						// *** HARD CLIP ***
-						if (limiter) {
-							if (playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] > 5)
-								playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] = 5;
-							else if (playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] < -5)
-								playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] = -5;
-						} else {
-							if (playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] > 10)
-								playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] = 10;
-							else if (playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] < -10)
-								playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] = -10;
-						}
-						
-						playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
-
-					}
-
-					// ************ RIGHT CHANNEL ******************
-					if (recChannels == 2) {
-						rc = 1;
-						prevRecValue[rc] = currRecValue[rc];
-						currRecValue[rc] = inputs[IN_INPUT+rc].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
-						avgRecCoeff = abs(currRecValue[rc] - prevRecValue[rc]) / distanceRec;
-
-						if (currRecValue[rc] < prevRecValue[rc])
-							avgRecCoeff *= -1;
-
-						for (int i=1; i <= distanceRec; i++) {
-
+					if (distanceRec > 0) {
+						for (int i=0; i < distanceRec; i++) {
 							if (overdub)
 								playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += prevRecValue[rc] + (avgRecCoeff * i);
 							else if (recFadeIn || recFadeOut)
@@ -3714,90 +3843,115 @@ struct SickoSampler : Module {
 							playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
 
 						}
-					}
 
+						// ************ RIGHT CHANNEL ******************
+						if (recChannels == 2) {
+							rc = 1;
+							prevRecValue[rc] = currRecValue[rc];
+							currRecValue[rc] = inputs[IN_INPUT+rc].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
+							avgRecCoeff = abs(currRecValue[rc] - prevRecValue[rc]) / distanceRec;
 
-					// *** CLIPPING LIGHT ***
-					if (playBuffer[LEFT][0][currRecPosition] < -5 || playBuffer[LEFT][0][currRecPosition] > 5) {
-						clipping = true;
-						clippingValue = 0;
-					}
-					if (channels == 2) {
-						if (playBuffer[RIGHT][0][currRecPosition] < -5 || playBuffer[RIGHT][0][currRecPosition] > 5) {
+							if (currRecValue[rc] < prevRecValue[rc])
+								avgRecCoeff *= -1;
+
+							for (int i=1; i <= distanceRec; i++) {
+
+								if (overdub)
+									playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] += prevRecValue[rc] + (avgRecCoeff * i);
+								else if (recFadeIn || recFadeOut)
+									playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = prevRecValue[rc] + (avgRecCoeff * i) + ((1-recFadeValue) * playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]);
+								else
+									playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)] = prevRecValue[rc] + (avgRecCoeff * i);
+								
+								// *** HARD CLIP ***
+								if (limiter) {
+									if (playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] > 5)
+										playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] = 5;
+									else if (playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] < -5)
+										playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] = -5;
+								} else {
+									if (playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] > 10)
+										playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] = 10;
+									else if (playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] < -10)
+										playBuffer[rc][0][prevRecPosition+(i*directionCoeff)] = -10;
+								}
+								
+								playBuffer[rc][1][floor(prevRecPosition)+(i*directionCoeff)] = biquadLpf(playBuffer[rc][0][floor(prevRecPosition)+(i*directionCoeff)]); // filtered vector
+
+							}
+						}
+
+						// *** CLIPPING LIGHT ***
+						if (playBuffer[LEFT][0][currRecPosition] < -5 || playBuffer[LEFT][0][currRecPosition] > 5) {
 							clipping = true;
 							clippingValue = 0;
 						}
+						if (channels == 2) {
+							if (playBuffer[RIGHT][0][currRecPosition] < -5 || playBuffer[RIGHT][0][currRecPosition] > 5) {
+								clipping = true;
+								clippingValue = 0;
+							}
+						}
+						if (clipping && clippingValue < 1)
+							clippingValue += clippingCoeff;
+						else {
+							clipping = false;
+							clippingValue = 1;
+						}
 					}
-					if (clipping && clippingValue < 1)
-						clippingValue += clippingCoeff;
-					else {
-						clipping = false;
-						clippingValue = 1;
-					}
+
 				}
 
-			}
+				// ***********************************************************************************************    U P D A T E    R E C    P O S I T I O N
 
-			// ***********************************************************************************************    U P D A T E    R E C    P O S I T I O N
+				prevRecPosition = currRecPosition;
 
-			prevRecPosition = currRecPosition;
+				//	Update speed also with v/oct in new recording
+				if (newRecording) {
+					if (inputs[VO_INPUT].isConnected()) {
+						voct[recOutChan] = inputs[VO_INPUT].getVoltage(recOutChan);
+						if (voct[recOutChan] != prevVoct[recOutChan]) {
+							speedVoct[recOutChan] = pow(2,voct[recOutChan]);
+							prevVoct[recOutChan] = voct[recOutChan];
+						}
+						distancePos[recOutChan] = currentSpeed * sampleCoeff * speedVoct[recOutChan];
+					} else
+						distancePos[recOutChan] = currentSpeed * sampleCoeff;
 
-			/*
-			if (newRecording) {
-				currRecPosition += currentSpeed * sampleCoeff;	// da valutare se vogliamo registrare solo il tune o anche v/oct
-			} else {
-				if (reverseRecording) {
-					currRecPosition -= distancePos[recOutChan];	
-				} else {
+					prevVoct[recOutChan] = voct[recOutChan];
+
 					currRecPosition += distancePos[recOutChan];	
-				}
-			}
-			*/
-			
-			// ****************************
-			
-			//	Update speed also with v/oct in new recording
-			if (newRecording) {
-				if (inputs[VO_INPUT].isConnected()) {
-					voct[recOutChan] = inputs[VO_INPUT].getVoltage(recOutChan);
-					if (voct[recOutChan] != prevVoct[recOutChan]) {
-						speedVoct[recOutChan] = pow(2,voct[recOutChan]);
-						prevVoct[recOutChan] = voct[recOutChan];
+				
+				} else {
+					if (reverseRecording) {
+						currRecPosition -= distancePos[recOutChan];	
+					} else {
+						currRecPosition += distancePos[recOutChan];	
 					}
-					distancePos[recOutChan] = currentSpeed * sampleCoeff * speedVoct[recOutChan];
-				} else
-					distancePos[recOutChan] = currentSpeed * sampleCoeff;
-
-				prevVoct[recOutChan] = voct[recOutChan];
-
-				currRecPosition += distancePos[recOutChan];	
-			
-			} else {
-				if (reverseRecording) {
-					currRecPosition -= distancePos[recOutChan];	
-				} else {
-					currRecPosition += distancePos[recOutChan];	
 				}
-			}
-			
-			// **************************
-
-			distanceRec = abs(floor(currRecPosition) - floor(prevRecPosition));
-			
-			if (currRecPosition > 52428800) {
-				if (channels == 1) {
-					params[REC_PARAM].setValue(0);
-				} else {
-					if (currRecPosition > 104857600)
+				
+				distanceRec = abs(floor(currRecPosition) - floor(prevRecPosition));
+				
+				/*if (currRecPosition > 52428800) {
+					if (channels == 1) {
 						params[REC_PARAM].setValue(0);
-				}
-			}
-			recSamples++;
+					} else {
+						if (currRecPosition > 104857600)
+							params[REC_PARAM].setValue(0);
+					}
+				}*/
 
-		} // end if stopRecNow
+				if (recChannels == 1 && currRecPosition > 52428800)
+					params[REC_PARAM].setValue(0);
+				else if (recChannels == 2 && currRecPosition > 104857600)
+					params[REC_PARAM].setValue(0);
+
+				recSamples++;
+
+			} // end if stopRecNow
 
 
-		}
+		}	// end if RECORDING STATE = true
 
 /*
 																						███╗░░░███╗░█████╗░███╗░░██╗██╗████████╗░█████╗░██████╗░
@@ -3837,6 +3991,7 @@ struct SickoSampler : Module {
 							sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
 							if (channels == 2)
 								sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
+							
 							// *** HARD CLIP ***
 							if (limiter) {
 								if (sumOutput > 5)
@@ -3848,6 +4003,17 @@ struct SickoSampler : Module {
 										sumOutputR = 5;
 									else if (sumOutputR < -5)
 										sumOutputR = -5;
+								}
+							} else {
+								if (sumOutput > 10)
+									sumOutput = 10;
+								else if (sumOutput < -10)
+									sumOutput = -10;
+								if (channels == 2) {
+									if (sumOutputR > 10)
+										sumOutputR = 10;
+									else if (sumOutputR < -10)
+										sumOutputR = -10;
 								}
 							}
 
@@ -3868,6 +4034,7 @@ struct SickoSampler : Module {
 						case POLYPHONIC:
 							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
 							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
+							
 							// *** HARD CLIP ***
 							if (limiter) {
 								if (currentOutput > 5)
@@ -3879,6 +4046,17 @@ struct SickoSampler : Module {
 										currentOutputR = 5;
 									else if (currentOutputR < -5)
 										currentOutputR = -5;
+								}
+							} else {
+								if (currentOutput > 10)
+									currentOutput = 10;
+								else if (currentOutput < -10)
+									currentOutput = -10;
+								if (channels == 2) {
+									if (currentOutputR > 10)
+										currentOutputR = 10;
+									else if (currentOutputR < -10)
+										currentOutputR = -10;
 								}
 							}
 
@@ -3903,11 +4081,10 @@ struct SickoSampler : Module {
 				if (recordingState == 1) {
 					switch (polyOuts) {
 						case MONOPHONIC:										// monophonic CABLES
-							//sumOutput += currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 							sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0] * recFadeValue;
 							if (channels == 2)
-								//sumOutputR += currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 								sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0] * recFadeValue;
+							
 							// *** HARD CLIP ***
 							if (limiter) {
 								if (sumOutput > 5)
@@ -3919,6 +4096,17 @@ struct SickoSampler : Module {
 										sumOutputR = 5;
 									else if (sumOutputR < -5)
 										sumOutputR = -5;
+								}
+							} else {
+								if (sumOutput > 10)
+									sumOutput = 10;
+								else if (sumOutput < -10)
+									sumOutput = -10;
+								if (channels == 2) {
+									if (sumOutputR > 10)
+										sumOutputR = 10;
+									else if (sumOutputR < -10)
+										sumOutputR = -10;
 								}
 							}
 
@@ -3955,10 +4143,9 @@ struct SickoSampler : Module {
 						break;
 
 						case POLYPHONIC:
-							//currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (currRecValue[LEFT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
-							//currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (currRecValue[RIGHT] * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
 							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0] * recFadeValue);
 							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0] * recFadeValue);
+							
 							// *** HARD CLIP ***
 							if (limiter) {
 								if (currentOutput > 5)
@@ -3970,6 +4157,17 @@ struct SickoSampler : Module {
 										currentOutputR = 5;
 									else if (currentOutputR < -5)
 										currentOutputR = -5;
+								}
+							} else {
+								if (currentOutput > 10)
+									currentOutput = 10;
+								else if (currentOutput < -10)
+									currentOutput = -10;
+								if (channels == 2) {
+									if (currentOutputR > 10)
+										currentOutputR = 10;
+									else if (currentOutputR < -10)
+										currentOutputR = -10;
 								}
 							}
 
@@ -4013,6 +4211,7 @@ struct SickoSampler : Module {
 						sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 						if (channels == 2)
 							sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
+						
 						// *** HARD CLIP ***
 						if (limiter) {
 							if (sumOutput > 5)
@@ -4024,6 +4223,17 @@ struct SickoSampler : Module {
 									sumOutputR = 5;
 								else if (sumOutputR < -5)
 									sumOutputR = -5;
+							}
+						} else {
+							if (sumOutput > 10)
+								sumOutput = 10;
+							else if (sumOutput < -10)
+								sumOutput = -10;
+							if (channels == 2) {
+								if (sumOutputR > 10)
+									sumOutputR = 10;
+								else if (sumOutputR < -10)
+									sumOutputR = -10;
 							}
 						}
 
@@ -4062,6 +4272,7 @@ struct SickoSampler : Module {
 					case POLYPHONIC:
 						currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
 						currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
+						
 						// *** HARD CLIP ***
 						if (limiter) {
 							if (currentOutput > 5)
@@ -4073,6 +4284,17 @@ struct SickoSampler : Module {
 									currentOutputR = 5;
 								else if (currentOutputR < -5)
 									currentOutputR = -5;
+							}
+						} else {
+							if (currentOutput > 10)
+								currentOutput = 10;
+							else if (currentOutput < -10)
+								currentOutput = -10;
+							if (channels == 2) {
+								if (currentOutputR > 10)
+									currentOutputR = 10;
+								else if (currentOutputR < -10)
+									currentOutputR = -10;
 							}
 						}
 
@@ -4424,6 +4646,7 @@ struct SickoSamplerDisplay : TransparentWidget {
 			menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));
 				menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
+				menu->addChild(createMenuItem("Drum Player", "", [=]() {module->setPreset(2);}));
 			}));
 		}
 	}
@@ -4481,7 +4704,6 @@ struct SickoSamplerWidget : ModuleWidget {
 		//addParam(createParamCentered<VCVBezel>(mm2px(Vec(xTrig1+4.6, yTrig2)), module, SickoSampler::TRIGBUT_PARAM));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xTrig2-4.5, yTrig2)), module, SickoSampler::STOP_INPUT));
-
 		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xTrig2+5.1, yTrig2)), module, SickoSampler::STOPBUT_PARAM, SickoSampler::STOPBUT_LIGHT));
 		//addParam(createParamCentered<VCVBezel>(mm2px(Vec(xTrig2+5.1, yTrig2)), module, SickoSampler::STOPBUT_PARAM));
 		//----------------------------------------------------------------------------------------------------------------------------
@@ -4696,9 +4918,11 @@ struct SickoSamplerWidget : ModuleWidget {
 		}));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));		
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
+		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
 			menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));
 			menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
+			menu->addChild(createMenuItem("Drum Player", "", [=]() {module->setPreset(2);}));
 		}));
 	}
 };
