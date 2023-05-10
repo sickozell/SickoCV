@@ -1,4 +1,4 @@
-# SickoCV v2.5.3-beta6
+# SickoCV v2.5.3-beta7
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -32,7 +32,7 @@ _ **bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt**
 # SickoCV v2.5.3
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 3](https://user-images.githubusercontent.com/80784296/233832487-7f82ecf7-0b02-4dae-a0b1-aa67e9281ae3.JPG)
+![SickoCV modules 2 5 3](https://github.com/sickozell/SickoCV/assets/80784296/f7a8f881-6af8-4341-969b-6e521749765f)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
@@ -454,7 +454,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler](https://user-images.githubusercontent.com/80784296/233155542-cba808ac-8470-48b4-aa8b-aba71cac1f25.JPG)
+![sickosampler](https://github.com/sickozell/SickoCV/assets/80784296/48c9dee5-1ae1-49c2-8ffd-e43b6f2de9fa)
 
 #### - INSTRUCTIONS
 
