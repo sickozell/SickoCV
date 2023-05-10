@@ -1,4 +1,4 @@
-# SickoCV v2.5.3-beta5
+# SickoCV v2.5.3-beta6
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -475,17 +475,17 @@ OVD button overdubs existing sample.
 XTN button enables extended recording. In forward recording, it continues recording also when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record as usual.  
 Please note that when in loop recording XFD knob is overridden, and it will not do any crossfade.  
 
-RRM (REC Re-Arm): when recording is stopped by a playback trig/button, it is rearmed when release time has ended or fadeout recording has finished. This function is not available in conjunction with previous "Start playback on REC". In "Restart" trig-type mode recording is rearmed only when after a STOP trig/button is detected.  
+RRM (REC Re-Arm): when recording is stopped by a playback trig/button, it is rearmed when release time has ended or fadeout recording has finished. This function is not available in conjunction with POR "Play on REC". In "Restart" trig-type mode recording is rearmed only when after a STOP trig/button is detected.  
 
-RRL (Record Release Stage): keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).  
+REL (Record Release Stage): keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).  
 
-UCS (Update Cue Start): resets the Cue Start cursor to the recording start position after recording is stopped (if recording is reversed it updates Cue End cursor).
+UCE (Update Cue End): resets the Cue End cursor to the end of recording when it is stopped (if recording is reversed it updates Cue Start cursor).
 
-UCE (Update Cue End): resets the Cue End cursor at the end of recording when it is stopped (if recording is reversed it updates Cue Start cursor).
+ULE (Update Loop End): same as above, but affects Loop End cursor.
 
 POR (Play On REC ON): when REC button is switched ON or REC trig it will start playback and recording simultaneously. It disables also the REC Re-Arm function.  
 
-SOR (Stop On REC OFF): when REC button is switched OFF or REC trig or REC STOP trig, it will stop record and playback simultaneously. In Play/Pause trig type it will reset position to Cue Start as STOP button/trigger usually does.   
+SOR (Stop On REC OFF): when REC button is switched OFF or REC trig or REC STOP trig, it will stop record and playback simultaneously. If playback STOP button/trig occurs, it will stop recording only and continue playing. In Play/Pause trig type it will reset position to Cue Start as STOP button/trigger usually does.   
 
 MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
 
@@ -494,13 +494,18 @@ As recording is not polyphonic, polyphony is disabled when the REC button is swi
 
 **HINT**: If it's planned to record a sample to play it polyphonically with a master keyboard, please connect gate and v/oct to a MIDI>CV module with 'Reset' polyphony mode selected. Clear any previous sample in memory, select GATE mode, switch the LOOP button on, arm recording and consider adjusting envelope knobs. On key press (C4 for example) sickoSampler will start recording until key is unpressed, then the sample can be played immediately.
 
+**New sample recording**  
+In Trig Mode, when recording is stopped by a trig or blue button press and LOOP button is switched on, the sample will be played back immediately in loop mode, and if Rec Re-Arm is on it will keep recording.
+
+
 #### CONTEXT MENU
 Please refer to sickoPlayer for context menu, in sickoSampler following options are added:
 - Save FULL Sample: saves the entire sample in a wav file.
 - Save CUE Region: saves the wav file from Cue Start to Cue End
 - Save LOOP Region: saves the wav file from Loop Start to Loop End
 - Trim Sample after Save: If this option is enabled, the sample is trimmed and saved in the chosen saving mode, otherwise it will be saved trimmed, but the entire sample remains available in memory
-- UCE updates also Loop End: if UCE button is on, when recording is stopped also Loop End cursor is reset to recording stop position (if recording is reversed it updates Loop Start cursor).
+- Save Oversampled: If this option is enabled, samples will be saved at sickoSampler working samplerate (2x VCV samplerate). This can be useful when samples are recorded at different speeds than normal for further external editing.
+- UCE/ULE updates also Start: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor).
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate

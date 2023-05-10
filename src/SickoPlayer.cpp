@@ -458,7 +458,10 @@ struct SickoPlayer : Module {
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
-			loadSample(storedPath);
+			if (storedPath != "")
+				loadSample(storedPath);
+			else
+				firstLoad = false;
 		}
 		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
 		if (userFolderJ) {
@@ -740,23 +743,25 @@ struct SickoPlayer : Module {
 				}
 			}
 
-			if (!firstLoad && resetCursorsOnLoad) {
-				params[CUESTART_PARAM].setValue(0.f);
-				params[CUEEND_PARAM].setValue(1.f);
-				params[LOOPSTART_PARAM].setValue(0.f);
-				params[LOOPEND_PARAM].setValue(1.f);
-				knobCueStartPos = 0.f;
-				knobCueEndPos = 1.f;
-				knobLoopStartPos = 0.f;
-				knobLoopEndPos = 1.f;
+			if (!firstLoad) {
+				prevKnobCueStartPos = -1.f;
+				prevKnobCueEndPos = 2.f;
+				prevKnobLoopStartPos = -1.f;
+				prevKnobLoopEndPos = 2.f;	
+
+				if (resetCursorsOnLoad) {
+					params[CUESTART_PARAM].setValue(0.f);
+					params[CUEEND_PARAM].setValue(1.f);
+					params[LOOPSTART_PARAM].setValue(0.f);
+					params[LOOPEND_PARAM].setValue(1.f);
+					knobCueStartPos = 0.f;
+					knobCueEndPos = 1.f;
+					knobLoopStartPos = 0.f;
+					knobLoopEndPos = 1.f;
+				}
 			}
 
 			firstLoad = false;
-
-			prevKnobCueStartPos = -1.f;
-			prevKnobCueEndPos = 2.f;
-			prevKnobLoopStartPos = -1.f;
-			prevKnobLoopEndPos = 2.f;
 
 			fileLoaded = true;
 		} else {
@@ -789,6 +794,28 @@ struct SickoPlayer : Module {
 		params[CUEEND_PARAM].setValue(1);
 		params[LOOPSTART_PARAM].setValue(0);
 		params[LOOPEND_PARAM].setValue(1);
+	}
+
+	void copyCueToLoop() {
+		loopStartPos = cueStartPos;
+		loopEndPos = cueEndPos;
+		params[LOOPSTART_PARAM].setValue(params[CUESTART_PARAM].getValue());
+		params[LOOPEND_PARAM].setValue(params[CUEEND_PARAM].getValue());
+		prevKnobLoopStartPos = params[CUESTART_PARAM].getValue();
+		prevKnobLoopEndPos = params[CUEEND_PARAM].getValue();
+		knobLoopStartPos = params[CUESTART_PARAM].getValue();
+		knobLoopEndPos = params[CUEEND_PARAM].getValue();
+	}
+	
+	void copyLoopToCue() {
+		cueStartPos = loopStartPos;
+		cueEndPos = loopEndPos;
+		params[CUESTART_PARAM].setValue(params[LOOPSTART_PARAM].getValue());
+		params[CUEEND_PARAM].setValue(params[LOOPEND_PARAM].getValue());
+		prevKnobCueStartPos = params[LOOPSTART_PARAM].getValue();
+		prevKnobCueEndPos = params[LOOPEND_PARAM].getValue();
+		knobCueStartPos = params[LOOPSTART_PARAM].getValue();
+		knobCueEndPos = params[LOOPEND_PARAM].getValue();
 	}
 
 	void setPreset(int presetNo) {
@@ -2352,6 +2379,8 @@ struct SickoPlayerDisplay : TransparentWidget {
 
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
+			menu->addChild(createMenuItem("Copy Cue to Loop", "", [=]() {module->copyCueToLoop();}));
+			menu->addChild(createMenuItem("Copy Loop to Cue", "", [=]() {module->copyLoopToCue();}));
 
 			menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));

@@ -1,4 +1,4 @@
-git tag v2.5.3-beta5 -m "create v2.5.3-beta5"  
+git tag v2.5.3-beta6 -m "create v2.5.3-beta6"  
 git push origin --tags
 
 delete tag

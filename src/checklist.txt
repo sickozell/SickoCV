@@ -38,6 +38,7 @@ sickosampler
 - verificare se è il caso di cambiare la disattivazione del PLAY prima del LoadSample da "fileloaded = false" in "play = false"
 
 sickoplayer
+- ricontrollare il first load
 - ricontrollare il phasescan
 - (fatto) IMPORTANTE TEST EOC
 - (fatto) IMPORTANTE spostare il controllo dello STOPTRIG sul controllo del trig mode, come su sickosampler
