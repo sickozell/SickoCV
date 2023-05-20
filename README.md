@@ -1,4 +1,4 @@
-# SickoCV v2.5.3-beta7
+# SickoCV v2.5.3-beta8
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -407,6 +407,7 @@ There are 3 different interpolation algorithms that are engaged during playback 
 **Phase scan**  
 This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
 Be sure to disable it when using one-cycle waveforms, or simply use the specific preset (see below)  
+Please not that Scan will be applied only on left channel  
 
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
