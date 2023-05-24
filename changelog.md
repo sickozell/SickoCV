@@ -1,3 +1,16 @@
+### 2.5.3 (2023-xx-xx)
+
+added sickoSampler module  
+
+**sickoPlayer**  
+- fixed bug on phasescan when scanning through silence  
+- added context menu options about "EOC pulses"
+- added trig/gate and stop buttons
+- changed "Start Only" trig type to "Restart"
+
+**all sample player modules**
+- added "Disable Nav Buttons" option to general context menu
+
 ### 2.5.2 (2023-03-07)
 added following modules:
 - wavetabler

@@ -25,14 +25,14 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="5.656854"
-     inkscape:cx="101.73499"
-     inkscape:cy="68.412585"
+     inkscape:cx="98.906565"
+     inkscape:cy="82.731497"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g13389"
+     inkscape:current-layer="layer4"
      showguides="true" />
   <defs
      id="defs2">
@@ -191,6 +191,34 @@
        sodipodi:arc-type="arc"
        d="M 17.889344,26.336344 A 5.6999688,5.6999998 0 0 1 15.233581,19.924731 5.6999688,5.6999998 0 0 1 20.739328,15.7 a 5.6999688,5.6999998 0 0 1 5.505748,4.224731 5.6999688,5.6999998 0 0 1 -2.655763,6.411613"
        sodipodi:open="true" />
+    <path
+       style="display:inline;fill:none;stroke:#ededed;stroke-width:0.4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path10536"
+       inkscape:label="circle 1"
+       sodipodi:type="arc"
+       sodipodi:cx="38.199657"
+       sodipodi:cy="17.402"
+       sodipodi:rx="3.5000069"
+       sodipodi:ry="3.5"
+       sodipodi:start="2.268928"
+       sodipodi:end="0.87266463"
+       sodipodi:arc-type="arc"
+       d="m 35.949896,20.083156 a 3.5000069,3.5 0 0 1 -1.039169,-3.878226 3.5000069,3.5 0 0 1 3.28893,-2.30293 3.5000069,3.5 0 0 1 3.288931,2.30293 3.5000069,3.5 0 0 1 -1.039169,3.878226"
+       sodipodi:open="true" />
+    <path
+       style="display:inline;fill:none;stroke:#ededed;stroke-width:0.4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path10536-8"
+       inkscape:label="circle 1"
+       sodipodi:type="arc"
+       sodipodi:cx="38.199657"
+       sodipodi:cy="25.402"
+       sodipodi:rx="3.5000069"
+       sodipodi:ry="3.5"
+       sodipodi:start="2.268928"
+       sodipodi:end="0.87266463"
+       sodipodi:arc-type="arc"
+       d="m 35.949896,28.083156 a 3.5000069,3.5 0 0 1 -1.039169,-3.878226 3.5000069,3.5 0 0 1 3.28893,-2.30293 3.5000069,3.5 0 0 1 3.288931,2.30293 3.5000069,3.5 0 0 1 -1.039169,3.878226"
+       sodipodi:open="true" />
     <rect
        style="fill:#000033;stroke:#666699;stroke-width:0.499548;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;fill-opacity:1"
        id="rect1002"
@@ -332,7 +360,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Etichette Testo"
-     style="display:none">
+     style="display:inline">
     <text
        xml:space="preserve"
        style="font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
@@ -408,26 +436,26 @@
     <text
        xml:space="preserve"
        style="font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
-       x="32.669449"
+       x="31.669102"
        y="26.169451"
        id="text1335"
        inkscape:label="warn release"><tspan
          sodipodi:role="line"
          id="tspan1333"
          style="font-size:2.46944px;text-align:center;text-anchor:middle;stroke:none;stroke-width:0.265"
-         x="32.669449"
+         x="31.669102"
          y="26.169451">WR</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
-       x="32.669449"
+       x="31.669102"
        y="18.669451"
        id="text1202"
        inkscape:label="Warn Attack"><tspan
          sodipodi:role="line"
          id="tspan1200"
          style="font-size:2.46944px;text-align:center;text-anchor:middle;stroke:none;stroke-width:0.265"
-         x="32.669449"
+         x="31.669102"
          y="18.669451">WA</tspan></text>
     <text
        xml:space="preserve"
@@ -439,15 +467,15 @@
        transform="translate(-2.3956277,-3.3767613)"><tspan
          x="50.800026"
          y="16.668739"
-         id="tspan1363"><tspan
+         id="tspan8364"><tspan
            style="stroke-width:0.265"
-           id="tspan1361">RST
+           id="tspan8362">RST
 </tspan></tspan><tspan
          x="50.800026"
          y="19.773192"
-         id="tspan1367"><tspan
+         id="tspan8368"><tspan
            style="stroke-width:0.265"
-           id="tspan1365">ALL</tspan></tspan></text>
+           id="tspan8366">ALL</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
@@ -595,7 +623,7 @@
        id="g13349"
        style="font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#000000;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="warn release"
-       transform="translate(0,0.29999892)">
+       transform="translate(-1.000345,0.29999892)">
       <path
          d="m 32.515109,23.708688 v 2.160764 h -0.617362 v -0.308681 h -0.30868 V 25.25209 h -0.308681 v 0.308681 h -0.30868 v 0.308681 h -0.617361 v -2.160764 h 0.617361 v 1.234722 h 0.30868 v -0.308681 h 0.308681 v 0.308681 h 0.30868 v -1.234722 z"
          style="fill:#000000;stroke-width:0.265"
@@ -610,7 +638,7 @@
        id="g13355"
        style="font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#000000;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="Warn Attack"
-       transform="translate(0,0.29999892)">
+       transform="translate(-1.000345,0.29999892)">
       <path
          d="m 32.515109,16.208688 v 2.160764 h -0.617362 v -0.308681 h -0.30868 V 17.75209 h -0.308681 v 0.308681 h -0.30868 v 0.308681 h -0.617361 v -2.160764 h 0.617361 v 1.234722 h 0.30868 v -0.308681 h 0.308681 v 0.308681 h 0.30868 v -1.234722 z"
          style="fill:#000000;stroke-width:0.265"
@@ -814,7 +842,7 @@
        id="text18159"
        style="font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="warn release"
-       transform="translate(0,0.29999892)">
+       transform="translate(-1.000345,0.29999892)">
       <path
          d="m 32.515109,23.708688 v 2.160764 h -0.617362 v -0.308681 h -0.30868 V 25.25209 h -0.308681 v 0.308681 h -0.30868 v 0.308681 h -0.617361 v -2.160764 h 0.617361 v 1.234722 h 0.30868 v -0.308681 h 0.308681 v 0.308681 h 0.30868 v -1.234722 z"
          style="stroke-width:0.265"
@@ -829,7 +857,7 @@
        id="text18163"
        style="font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="Warn Attack"
-       transform="translate(0,0.29999892)">
+       transform="translate(-1.000345,0.29999892)">
       <path
          d="m 32.515109,16.208688 v 2.160764 h -0.617362 v -0.308681 h -0.30868 V 17.75209 h -0.308681 v 0.308681 h -0.30868 v 0.308681 h -0.617361 v -2.160764 h 0.617361 v 1.234722 h 0.30868 v -0.308681 h 0.308681 v 0.308681 h 0.30868 v -1.234722 z"
          style="stroke-width:0.265"

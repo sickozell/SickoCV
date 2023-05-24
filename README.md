@@ -1,7 +1,11 @@
-# SickoCV v2.5.2
+# SickoCV v2.5.3
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 2](https://user-images.githubusercontent.com/80784296/223517306-7a597609-2ca2-4f94-b1e8-a044cfead03f.JPG)
+![SickoCV modules 2 5 3](https://github.com/sickozell/SickoCV/assets/80784296/f7a8f881-6af8-4341-969b-6e521749765f)
+
+## Common modules behavior
+- Triggers and gates threshold is +1v
+- Every time-related knob set full anticlockwise and displaying 1ms on the tooltip is actually considered 0ms
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -71,12 +75,11 @@ If L or (R) inputs are not connected, relative outputs will provide just the env
 
 A trigger on RESET input will reset the toggle state.
 
+Polyphony on L/(R) inputs is replicated on outs.   
+
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
 - Disable Unarm: this disables unarm feature
-
-NOTE: input trigger threshold is +1v.
-
 
 ## bToggler8
 ### 8 buffered toggle switch signal router
@@ -94,7 +97,7 @@ Otherwise bToggler OUTs can be connected to envelope generators. In that case th
 
 'bToggler8' can also be used to route audio signals. Connect IN to the audio source and OUT to the mixer: the FADE knob will avoid clicks.
 
-![btoggler8](https://user-images.githubusercontent.com/80784296/201516798-acfa6672-07d0-4f0e-bd38-6269a204eb64.JPG)
+![btoggler8](https://user-images.githubusercontent.com/80784296/233732638-2cee94ff-f323-43d9-9e04-b99dbe833daf.JPG)
 
 #### - INSTRUCTIONS
 Connect a clock source.
@@ -103,7 +106,8 @@ When ARM input is triggered (arm on) the IN input will start to be routed to OUT
 
 Then, with another ARM triggering (arm off) the routing will stop on next clock detection and GATE output will go low.
 
-FADE knob up to 10s can be used to avoid attack or release clicks when audio signals are connected to IN input.
+FADE knob up to 10s can be used to avoid attack or release clicks when audio signals are connected to IN input.  
+Be sure to set Fade knob to minimum (1ms) when inputs are feeded by triggers.  
 
 If ARM is triggered again before clock detection it will abort arming (unarm).
 
@@ -114,8 +118,6 @@ Triggering RESETALL input will immediately stop all the 8 routings.
 #### **Context Menu**
 - Initialize On Start: discards previous module state on VCV restart
 - Disable Unarm: this disables unarm feature
-
-NOTE: input trigger threshold is +1v.  
  
 Here below is one example of bToggler8 usage. When buttons are pressed on PULSES module, incoming triggers from the sequencer are routed to drum modules only when the first step of the sequencer is reached. If buttons are pressed again, the routing will stop on next first step of the sequencer.
 
@@ -131,7 +133,7 @@ Some midi controllers can light up or turn off their button leds by receiving th
 Taking advantage of this functionality, connect the WRN outs to a "GATE>MIDI" module connected to the same controller of the ARM inputs.  
 So when pressing buttons on controller, 'bToggler8+' will actually play/stop the sequencers or audio, and simultaneously give a visual feedback on the controller.
 
-![btoggler8plus](https://user-images.githubusercontent.com/80784296/201516811-40c75bb5-84d2-411b-b9ed-fa876e178258.JPG)
+![btoggler8plus](https://user-images.githubusercontent.com/80784296/233729070-514762a0-d978-4d03-9ac5-62dab9ef1078.JPG)
 
 #### - INSTRUCTIONS
 The same of the previous one, plus following features.
@@ -139,7 +141,7 @@ The same of the previous one, plus following features.
 When 'armed on' or 'armed off', the WRN (warning) output will provide a sequence of pulses until next clock is detected.  
 Then it will act as the OUT output (the routed signal) if the FADE knob is set to 1ms, else it will act as the GATE output (high gate).  
 So, if 'bToggler8+' is receiving triggers from a sequencer, the FADE knob will be set to 1ms and the led will light up the same as sequencers trigs.  
-Otherwise, if fade knob is set different from 1ms, it is supposed that an audio signal is routed, so you'll see a fixed led light on the controller.
+Otherwise, if fade knob is set different from 1ms, it is supposed that an audio signal is routed, so a fixed led light on the controller will be seen.
 
 WA and WR knobs set the attack (arm on) and release (arm off) pulserate up to 200 ms of the warning pulses. These are two independent settings because it can be helpful to notice if the routing is going to start or stop.
 
@@ -152,8 +154,6 @@ Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as si
 - Disable Unarm: this disables unarm feature
 - WRN Inversion (trigs only): inverts WRN output behavior when used with triggers. It can be useful when INs are feeded by sequencers trigs and WRN Outs connected to a led midi controller. With this option enabled when there's no routing leds will stay off, when routing leds will stay on and whenn a trig is received led will be turned off for 100ms.
 
-NOTE: input trigger threshold is +1v.  
-
 Here below is one example of bToggler+ usage. The MIDI>GATE module is connected to a programmable Led Midi controller and receives buttonpresses from it. The GATE>MIDI module send back triggers incoming from the sequencer to the controller, turning on and off the corresponding led buttons only when triggers are actually routed to drum modules. Routing rules are the same of previous example.
 
 ![bToggler8plus example](https://user-images.githubusercontent.com/80784296/204083544-34ecf3b0-0d12-4965-bd72-f3bb85339551.JPG)  
@@ -162,7 +162,7 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 ## Calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
 
-![calcs](https://user-images.githubusercontent.com/80784296/201516821-8ea683bd-db11-4687-971d-67bef380b81c.JPG)
+![calcs](https://user-images.githubusercontent.com/80784296/233733100-719eb0c9-e6c1-467c-a2c6-cfe8b02012fb.JPG)
 
 #### - INSTRUCTIONS
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
@@ -182,7 +182,6 @@ Connect the TRIG input to the same module that feeds the drum module, it can be 
 Connect the ACC input to the module which generates the accents, it can be the sequencer or every other suitable module.  
 When ACC is triggered at the same time as the TRIG input, Drummer module will output the Accent Level set by "Accent Level knob" instead of the one set by "Standard Level Knob".  
 
-Input triggers threshold is +1v.  
 Each knob range is from 0 to 200% of the incoming IN level.  
 LIMIT switch hard clips the output in the range ±5v.  
 When CHOKE switch is on and a trigger occurs, the other slot (Drummer) or the next slot (Drummer4) is muted (for example when used with closed/open hihat sounds).  
@@ -197,7 +196,7 @@ Example of Drummer module usage:
 [Download example](./examples/drummer%20example.vcvs?raw=true) (right-click -> save link as)
 
 - **Drummer4 note:**  
-If one slot OUT is not connected, the audio signal will be added to the next one. For example if you connect only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if you connect only out #4, this socket will output all the channels.
+If one slot OUT is not connected, the audio signal will be added to the next one. For example if connecting only out #2 and #4, out #1 and #3 will be respectively mixed with those ones, if connecting only out #4, this socket will output all the channels.
 
 Example of Drummer4 module usage:
 
@@ -213,25 +212,22 @@ Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to para
 ![drumplayer](https://user-images.githubusercontent.com/80784296/221338110-d550144f-4e34-475d-9b00-00872910f331.JPG)
 
 #### INSTRUCTIONS  
-Load wav samples in the slots using context menu.  
+Load wav samples in the slots using general or slot context menu.  
 
 When TRIG input is triggered the sample will be played at the volume percentage set by to "Standard Level" knob + its relative attenuverted CVinput.  
 If ACCENT input is HIGH when TRIG occurs, the sample will be played at "Accent Level" knob + its attenuverted CVinput.  
 
 Playing speed can be set by SPD knob from 1 to 200% and modulated with its attenuverted CVinput. Speed can be modified during sample playback.  
-External modulation is allowed only on drumPlayer+  
+External modulation is allowed only on drumPlayer+ or drumPlayerXtra.  
 
 If CHOKE switch is on when TRIG occurs, the playback of next slot is stopped with a 1ms fade out: it's commonly used to simulate a closed/open hihat.  
-LIM switch is a hard clipping limiter to ±5v on the output.  
-
-NOTE: input trigger threshold is +1v.  
+LIM switch enables hard clipping limiter set to ±5v on the output.  
 
 #### CONTEXT MENU
 **Sample Slots**  
 Click on the slot number to open dialog.  
-When the sample is loaded the green led on the panel is turned on (drumPlayer), or the small 7segment display will show the first 5 chars of the filename (drumPlayer+).  
-Use Clear options to unload samples from slots.  
-Just right-click over the led areas or the displays to access the quick-load menus.  
+When the sample is loaded the green led on the panel is turned on (drumPlayer), or the small 7segment display will show the first chars of the filename (drumPlayer+ drumPlayerXtra).  
+
 
 **Set samples root folder**  
 Once a folder is set, 'Samples browser' option is activated in the quick load menu (right click in the relative led slot area/display) to quickly choose samples from the selected folder.  
@@ -240,32 +236,35 @@ Once a folder is set, 'Samples browser' option is activated in the quick load me
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
 - 'No interpolation' can be used when sample rates match and speed is 100% constant  
 - 'Linear 1' and 'Linear 2' interpolate the samples with different weighted averages  
-- 'Hermite' uses a Cubic Hermite spline interpolation that offers a better result (default)  
+- 'Hermite' uses a Cubic Hermite interpolation that offers a better result (default)  
 
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
 
 **Outs mode**  
-Normalled (default): if one slot out is not connected, its output will be added to the next slot  
+Normalled (default): if one out is not connected, the output of its slot is added to the next one  
 Solo: every slot has its own out socket  
-Unconnected on Out 4: Every unconnected out is routed to out n.4
+Unconnected on Out 4: Every unconnected out is added to out n.4
+
+**Disable NAV buttons** (drumPlayerXtra only)  
+Disables panel Sample Navigation buttons to avoid utilizing mistakes.
 
 **Scrolling Sample Names** (drumPlayer+ and drumPlayerXtra only)  
 This option enables text scrolling on sample name displays  
 
 **Light Boxes** (drumPlayerXtra only)  
 This option enables a light box over waveform displays when sample is triggered.  
-When enebled, in each slot context menu light color and fade duration can be set.
+When enebled, in each slot context menu, the color of light and fade duration can be set.
 
 **Display Triggering** (drumPlayerXtra only)  
 This option enables sample triggering by clicking over the the display area, to play samples live or just to test them while navigating sample folders  
 
-**Global Settings**  (drumPlayerXtra only)  
+**Global Settings** (drumPlayerXtra only)  
 In this menu there are options to clear all the slots or the root folder.  
-It is also used to apply settings to all the slots: Zoom, Lightboxes color and time fading.  
+It is also used to apply settings to all the slots: Zoom, Lightboxes color and time fading.   
 
 #### SLOT CONTEXT MENU
-Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) opens slot context menu with following options:
+Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) the slot context menu is open with following options:  
 - Load Sample (opens file dialog to load a sample in the slot)
 - Samples Browser (if a root sample folder is set on the general context menu, this submenu is enabled to navigate through directories)
 - Current sample (shows sample name when a sample is loaded)
@@ -281,10 +280,10 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ## Parking
 ### Set of unconnected inputs and outputs just to park unused cables
 
-![parking](https://user-images.githubusercontent.com/80784296/204013230-cda01462-92c9-4013-8599-c0ba9d798ae0.JPG)
+![parking](https://user-images.githubusercontent.com/80784296/233734644-cc9eed31-a959-4ba3-b544-48ed16a6285b.JPG)
 
 #### - INSTRUCTIONS
-This module doesn't do anything. It's just a place to connect your temporarily unused cables when you don't want to forget to where they were wired.  
+This module doesn't do anything. It's just a place to connect temporarily unused cables to not forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
 
 ## Shifter
@@ -300,7 +299,7 @@ Shifter module can be useful to shift back and fotrth a sequencer output on the 
 Stage can be controlled via the stage knob, or the 0-10v StageCV input with its attenuverter.  
 If StageCV input is not connected, the attenuverter reduces the range of the Stage knob.  
 Note that the Stage knob and StageCV are added together.  
-The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when you're triggering the sequencer with the same clock of Shifter module, and the input would be sampled before the sequencer advance.  
+The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when triggering the sequencer with the same clock of Shifter module, TRIG DELAY avoids that the input is sampled before the sequencer advances.  
 
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
@@ -311,28 +310,30 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ## SickoPlayer
 ### wav sample player
 
-![sickoplayer](https://user-images.githubusercontent.com/80784296/219940335-1f5640df-651f-4635-8d84-ba2fdb96ee08.JPG)
-
 #### - DESCRIPTION
 - samples and 1-cycle waveforms player
 - ±24 semitones tuning and v/oct input with polyphony
 - envelope generator, loop, reverse, pingpong
 - different interpolation modes, anti-aliasing filter, phase-scan feature
 
+![sickoplayer](https://user-images.githubusercontent.com/80784296/233733849-2ccd0fb3-a556-4785-ad42-b952642ccd11.JPG)
+
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
-Once a sample is loaded you can browse samples in the same folder using Previous and Next buttons above the display.  
+Once a sample is loaded samples in the same folder can be browsed using Previous and Next buttons above the display.  
 
 The display shows the waveform, filename, sample duration and number of channels (1-2 channels wav file are allowed).  
 
 Mode switch allows to select if sample playback starts with a trigger or play it until a gate is high.  
 
-When in Trig Mode the Trig-Mode switch has 3 options:  
+When in Trig Mode the Trig-Type switch has 3 options:  
 - **SS (Start/Stop)** A trigger starts attack stage from CueStart postition, another trigger sets playback to release stage and at the end sample position is reset to cue start  
-- **S (Start only)** A trigger starts attack stage from CueStart position, another trigger has no effects  
-- **PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage  
+- **R (Restart)** Every trigger starts attack stage from CueStart position. Only a Stop trigger stops playback.  
+- **PP (Play/Pause)** A trigger starts attack stage from curent sample position, another trigger goes to release stage. A Stop trigger reset position to CueStart.  
 
-In any Trig-Mode a trigger on STOP input sets the playback to release stage and reset sample position to Cue Start.
+In any Trig-Type a trigger on STOP input sets the playback to release stage.
+
+TRG/GTE and STOP buttons have effects only on channel 0 of polyphony.  
 
 Cue Start/End knobs are used to set the start of the Attack and the Release stage.
 
@@ -354,10 +355,8 @@ v/oct input accepts polyphonic cable usually combined with a polyphonic gate in 
 Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200%. Limit switch is a hard clip limiter with a ±5v range. A led clip light warns of clipping.  
 
 If sample file is mono, left out is duplicated to right out.  
-EOC outputs a 1ms pulse when sample reaches CueEnd or LoopEnd if Loop is enabled (or when Start positions are reached when in reverse playback).  
-EOR outputs a 1ms pulse when sample reaches the end of release stage.
-
-NOTE: input trigger threshold is +1v.  
+EOC outputs a 1ms pulse when the sample reaches certain point according to a specific context menu (see below).  
+EOR outputs a 1ms pulse when the sample reaches the end of release stage.
 
 #### CONTEXT MENU
 **Sample Slot**  
@@ -366,13 +365,18 @@ As described before, just right-click over the waveform display area to access t
 When a sample is loaded, file sample rate and number of channels are shown here.  
 
 **Set samples root folder**  
-Once a folder is set, 'Samples browser' option is activated here and in the quick load menu (right click on display) to quickly choose samples from the selected folder.  
+Once a folder is set, 'Samples browser' option is activated here and in the quick load menu (right click on display) to quickly choose samples from the selected folder and subfolders.    
 
 **Interpolation**  
-There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
+There are 3 different interpolation algorithms that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
 - 'No interpolation' can be used when sample rates match and tune is set to zero  
 - 'Linear 1' and 'Linear 2' interpolate the samples with different weighted averages  
-- 'Hermite' uses a Cubic Hermite spline interpolation that usually offers a better result (default)  
+- 'Hermite' uses a Cubic Hermite interpolation that usually offers a better result (default)  
+
+**Phase scan**  
+This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
+Be sure to disable it when using one-cycle waveforms, or simply use the specific preset (see below)  
+Please not that Scan will be applied only on left channel  
 
 **Anti-aliasing filter**  
 Anti-aliasing filter is made up with 2x oversampling and a 20khz lowpass filter.  
@@ -383,19 +387,96 @@ When this option is enabled the audio and EOC/EOR outputs reflect v/oct input po
 **Polyphonic Master INs**  
 When this option is enabled the Master CV input accepts polyphonic cables according to V/Oct input polyphony. For example this can be used for velocity control.
 
-**Phase scan**  
-This feature automatically sets Cue and Loop Start/Stop positions at zero crossing points to avoid loop clicks and pops eventually in combination with proper crossfade length.  
-Be sure to disable it when using one-cycle waveforms.  
+**EOC pulse from**  
+This submenu sets when the EOC pulses are triggered:  
+- TRG/GATE when is triggered to stop
+- STOP triggering
+- reached CUE END (on forward playback)
+- reached CUE START (on reverse playback)
+- reached LOOP END (on forward playback)
+- reached LOOP START (on reverse playback)
+- PING: reached LOOP END (when pingpong looping on forward playback)
+- PONG: reached LOOP START (when pingpong looping on reverse playback)
 
-**Reset Cursors**
-Reset Cue/Loop Start/stop to 0 and 100%.  
+**Disable NAV buttons**
+Disables panel Sample Navigation buttons to avoid utilizing mistakes.
+
+**Reset Cursors**  
+Resets Cue/Loop Start/stop to 0 and 100%.  
+
+**Reset Cursors on Load**  
+Always resets Cue/Loop Start/stop to 0 and 100% when a new sample is loaded.  
 
 **Presets**
 There are some factory presets stored in the context menu for common using settings.  
 
 #### USING ONE-CYCLE WAVEFORMS
 One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
-Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100%.  
+Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100% and enable loop button.  
+
+## SickoSampler
+### wav sample player and recorder
+
+#### - DESCRIPTION
+- mono/stereo sample recorder  
+- mono/stereo samples and 1-cycle waveforms player
+- ±24 semitones tuning and v/oct input with polyphony
+- envelope generator, loop, reverse, pingpong
+- anti-aliasing filter, phase-scan feature
+
+![sickosampler](https://github.com/sickozell/SickoCV/assets/80784296/48c9dee5-1ae1-49c2-8ffd-e43b6f2de9fa)
+
+#### - INSTRUCTIONS
+
+About player functionalities please follow sickoPlayer instructions. Please note that loaded samples in sickoSampler are always resampled to VCV working samplerate. For this reason interpolation is fixed to Hermite. It can be always toggled antialiasing filter from context menu. 
+
+In sickoSampler the display shows also the recording time and a yellow "S" if sample is not saved yet. 
+In the context menu, along file infos, it's shown if the sample was resampled on loading and if it has to be saved because a recording occurred.  
+
+Recording section has 2 inputs, but record is only enabled if at least left channel is connected.  
+Record button arms recording waiting for a playback trig, or starts recording when a sample is playing back, or starts recording immediately if PoR button is on (see below).   
+Record trig input toggles start/stop or arm/unarm recording, but if "STOP REC" trig input is connected it only starts recording.  
+
+GAIN knob adjusts the volume of the inputs.  
+FD knob sets the fade in/out time when recording starts or stops.  
+
+OVD button overdubs existing sample.  
+
+XTN button enables extended recording. In forward recording, it continues recording also when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record as usual.  
+Please note that when in loop recording XFD knob is overridden, and it will not do any crossfade.  
+
+RRM (REC Re-Arm): when recording is stopped by a playback trig/button, it is rearmed when release time has ended or fadeout recording has finished. This function is not available in conjunction with POR "Play on REC". In "Restart" trig-type mode recording is rearmed only when after a STOP trig/button is detected.  
+
+REL (Record Release Stage): keeps recording while playback is stopped and it is in its release stage. Please note that it will always continue recording until the "Rec Fade in/out" knob (FD) time setting is reached (also if release stage of the playback is reached).  
+
+UCE (Update Cue End): resets the Cue End cursor to the end of recording when it is stopped (if recording is reversed it updates Cue Start cursor).
+
+ULE (Update Loop End): same as above, but affects Loop End cursor.
+
+POR (Play On REC ON): when REC button is switched ON or REC trig it will start playback and recording simultaneously. It disables also the REC Re-Arm function.  
+
+SOR (Stop On REC OFF): when REC button is switched OFF or REC trig or REC STOP trig, it will stop record and playback simultaneously. If playback STOP button/trig occurs, it will stop recording only and continue playing. In Play/Pause trig type it will reset position to Cue Start as STOP button/trigger usually does.   
+
+MON switch selects inputs routing to the outs: always [ON], while recording only [REC], or never [OFF].  
+
+Recording speed follows v/oct and tune settings.  
+As recording is not polyphonic, polyphony is disabled when the REC button is switched on, and the record playhead will follow only channel nr 0 on the polyphonic cables connected to v/oct.  
+
+**HINT**: If it's planned to record a sample to play it polyphonically with a master keyboard, please connect gate and v/oct to a MIDI>CV module with 'Reset' polyphony mode selected. Clear any previous sample in memory, select GATE mode, switch the LOOP button on, arm recording and consider adjusting envelope knobs. On key press (C4 for example) sickoSampler will start recording until key is unpressed, then the sample can be played immediately.
+
+**New sample recording**  
+In Trig Mode, when recording is stopped by a trig or blue button press and LOOP button is switched on, the sample will be played back immediately in loop mode, and if Rec Re-Arm is on it will keep recording.
+
+
+#### CONTEXT MENU
+Please refer to sickoPlayer for context menu, in sickoSampler following options are added:
+- Save FULL Sample: saves the entire sample in a wav file.
+- Save CUE Region: saves the wav file from Cue Start to Cue End
+- Save LOOP Region: saves the wav file from Loop Start to Loop End
+- Trim Sample after Save: If this option is enabled, the sample is trimmed and saved in the chosen saving mode, otherwise it will be saved trimmed, but the entire sample remains available in memory
+- Save Oversampled: If this option is enabled, samples will be saved at sickoSampler working samplerate (2x VCV samplerate). This can be useful when samples are recorded at different speeds than normal for further external editing.
+- UCE/ULE updates also Start: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor).
+- Crossfade while Rec Fading: If overdub is not activated this option crossfades between previous and current recording only during fading in/out recording time, accordingly to the FD knob.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
@@ -417,7 +498,6 @@ Switcher or SwitcherSt (used for stereo signals) are multifunction modules that 
 **TOGGLE/GATE modes**  
 When the MODE switch is in 'TOGGLE' position functions are activated by triggers in a toggle style.  
 When in 'GATE' position functions are gate sensitive, so they stay active until 'T/G' input receives a high gate.  
-Functions will be activated by Trigger/Gates with voltages above +1v.
 
 **Function types**  
 The function type is automatically detected depending on connected cables.  
@@ -446,18 +526,18 @@ Green leds close to the in/out sockets show which input signal is switched or to
 When used as a swapper the OUT1 led on shows that signals are normally routed, otherwise the OUT2 led on shows when signals are swapped.  
 
 **Fader**  
-Fader knob sets the crossfade time (up to 10s) between the switched/routed/swapped signals.  
+Fader knob sets the crossfade time (up to 10s) between the switched/routed/swapped signals. Set the knob to minimum (1ms) to have no fade.
 CV input is added to Fade knob value and the sum will be clamped in the range of 0-10v.  
 
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
 
 **NOTES**  
-- If Fader knob is set to 1ms it won't do any fade.
-- In FlipFLop and ToggleGate function types the output will consist in a 'fixed' AR envelope
+- If Fader knob is set to 1ms it won't do any fade
+- In FlipFlop and ToggleGate function types the output will consist in a 'fixed' AR envelope
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
-- On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones.
-
+- On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones
+- Polyphony on signal inputs is replicated on outs
 
 ## Toggler / Toggler Compact
 ### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
@@ -481,29 +561,27 @@ If L or (R) inputs are not connected, L and (R) outputs will provide just the en
 
 A trigger on RESET input will reset the toggle state.
 
+Polyphony on L/(R) inputs is replicated on outs.  
+
 **GATE MODE**
 
 The same of toggle mode, but the signals will be routed only while GATE input is in a high state.
 
 NOTE: If a new GATE or Toggle TRIGGER is detected on Attack or Release phases, the envelope ramp will immediately restart from the reached point, as a regular envelope generator and not like a function generator.  
-NOTE2: input trigger and gate threshold is +1v.
 
 **SPECIAL BEHAVIORS**
 
-If Attack is set to 1 (and release is set greater than 1) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
+If Attack is set to 1ms (and release is set greater than 1ms) and a new GATE or Toggle TRIGGER is detected before Release phase has ended, the next Release phase will start from the previous reached release point.
 
-If Release is set to 1 (and attack is set greater than 1) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
+If Release is set to 1ms (and attack is set greater than 1ms) and a new GATE or Toggle TRIGGER is detected before Attack phase has ended, the next Attack phase will start from the previous reached Attack point.
 
 These behaviors are more understandable connecting a scope on the output.
 
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
-- Disable Unarm: this disables unarm feature
 
 ## Wavetabler
 ### wavetable sample player
-
-![wavetabler](https://user-images.githubusercontent.com/80784296/222272709-33ee0e06-bcfa-4f20-8428-6579940f1f0f.JPG)
 
 #### - DESCRIPTION
 - 1-cycle waveforms player
@@ -511,9 +589,11 @@ These behaviors are more understandable connecting a scope on the output.
 - envelope generator, reverse, pingpong
 - anti-aliasing filter
 
+![wavetabler](https://user-images.githubusercontent.com/80784296/222272709-33ee0e06-bcfa-4f20-8428-6579940f1f0f.JPG)
+
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
-Once a sample is loaded you can browse samples in the same folder using Previous and Next buttons below the display.  
+Once a sample is loaded samples in the same folder can be browser using Previous and Next buttons below the display.  
 
 REV button changes the playback start direction.
 
@@ -531,5 +611,6 @@ Please refer to sickoPlayer documentation.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
-Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [auxmux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
+Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [AuxMux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
+Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  

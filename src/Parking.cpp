@@ -67,10 +67,10 @@ struct ParkingWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));		
 
-		const float xs = 8;
-		const float x = 11.5;
-		const float ys = 34;
-		const float y = 23;
+		float xs = 8;
+		float x = 11.5;
+		float ys = 34;
+		float y = 23;
 
 		for (int j=0;j<4;j++) {
 			for (int i=0;i<4;i++) {

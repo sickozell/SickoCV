@@ -95,7 +95,7 @@ struct DrumPlayerPlus : Module {
 	int interpolationMode = HERMITE_INTERP;
 	int outsMode = 0;
 	int antiAlias = 1;
-	int scrolling = 1;
+	int scrolling = 0;
 
 	//std::string debugDisplay = "X";
 
@@ -174,7 +174,7 @@ struct DrumPlayerPlus : Module {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		outsMode = NORMALLED_OUTS;
-		scrolling = 1;
+		scrolling = 0;
 		for (int i = 0; i < 4; i++) {
 			clearSlot(i);
 			play[i] = false;
@@ -420,8 +420,11 @@ struct DrumPlayerPlus : Module {
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
 
+			//char* pathDup = strdup(path.c_str());
 			fileDescription[slot] = system::getFilename(std::string(path));
 			fileDescription[slot] = fileDescription[slot].substr(0,fileDescription[slot].length()-4);
+			//fileDisplay[slot] = fileDescription[slot].substr(0,5);
+			//free(pathDup);
 
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription[slot];
@@ -502,6 +505,7 @@ struct DrumPlayerPlus : Module {
 			prevTrigValue[i] = trigValue[i];
 			currentOutput = 0;
 
+			//if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i] && floor(samplePos[i]) >= 0) {
 			if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i]) {
 				switch (interpolationMode) {
 					case NO_INTERP:
@@ -1210,7 +1214,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 
 
-		const float xDelta = 23.5;
+		float xDelta = 23.5;
 
 		for (int i = 0; i < 4; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 21)), module, DrumPlayerPlus::TRIG_INPUT+i));

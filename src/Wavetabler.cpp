@@ -117,6 +117,7 @@ struct Wavetabler : Module {
 	int antiAlias = 1;
 	int polyOuts = POLYPHONIC;
 	int polyMaster = POLYPHONIC;
+	bool disableNav = false;
 
 	float currentOutput;
 	float sumOutput;
@@ -218,6 +219,7 @@ struct Wavetabler : Module {
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
 		polyMaster = POLYPHONIC;
+		disableNav = false;
 		clearSlot();
 		for (int i = 0; i < 16; i++) {
 			play[i] = false;
@@ -244,6 +246,7 @@ struct Wavetabler : Module {
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
 		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
+		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
 		return rootJ;
@@ -259,6 +262,9 @@ struct Wavetabler : Module {
 		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
 		if (polyMasterJ)
 			polyMaster = json_integer_value(polyMasterJ);
+		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
+		if (disableNavJ)
+			disableNav = json_boolean_value(disableNavJ);
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
@@ -546,27 +552,29 @@ struct Wavetabler : Module {
 
 	void process(const ProcessArgs &args) override {
 
-		nextSample = params[NEXTSAMPLE_PARAM].getValue();
-		if (fileLoaded && nextSample && !prevNextSample) {
-			for (int i = 0; i < 16; i++)
-				play[i] = false;
-			currentFile++;
-			if (currentFile >= int(currentFolderV.size()))
-				currentFile = 0;
-			loadSample(currentFolderV[currentFile]);
-		}
-		prevNextSample = nextSample;
+		if (!disableNav) {
+			nextSample = params[NEXTSAMPLE_PARAM].getValue();
+			if (fileLoaded && nextSample && !prevNextSample) {
+				for (int i = 0; i < 16; i++)
+					play[i] = false;
+				currentFile++;
+				if (currentFile >= int(currentFolderV.size()))
+					currentFile = 0;
+				loadSample(currentFolderV[currentFile]);
+			}
+			prevNextSample = nextSample;
 
-		prevSample = params[PREVSAMPLE_PARAM].getValue();
-		if (fileLoaded && prevSample && !prevPrevSample) {
-			for (int i = 0; i < 16; i++)
-				play[i] = false;
-			currentFile--;
-			if (currentFile < 0)
-				currentFile = currentFolderV.size()-1;
-			loadSample(currentFolderV[currentFile]);
+			prevSample = params[PREVSAMPLE_PARAM].getValue();
+			if (fileLoaded && prevSample && !prevPrevSample) {
+				for (int i = 0; i < 16; i++)
+					play[i] = false;
+				currentFile--;
+				if (currentFile < 0)
+					currentFile = currentFolderV.size()-1;
+				loadSample(currentFolderV[currentFile]);
+			}
+			prevPrevSample = prevSample;
 		}
-		prevPrevSample = prevSample;
 
 		reverseStart = params[REV_PARAM].getValue();
 		lights[REV_LIGHT].setBrightness(reverseStart);
@@ -1066,7 +1074,7 @@ struct WavetablerWidget : ModuleWidget {
 			addChild(display);
 		}
 
-		const float yTunVol = 108;
+		float yTunVol = 108;
 
 		addParam(createParamCentered<VCVButton>(mm2px(Vec(9, 39)), module, Wavetabler::PREVSAMPLE_PARAM));
 		addParam(createParamCentered<VCVButton>(mm2px(Vec(17, 39)), module, Wavetabler::NEXTSAMPLE_PARAM));
@@ -1214,6 +1222,7 @@ struct WavetablerWidget : ModuleWidget {
 				module->setPolyOuts(poly);
 		}));
 		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
+		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 	}
 };
 

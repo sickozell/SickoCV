@@ -53,15 +53,18 @@ struct Switcher : Module {
 	float startFade = 0;
 	float lastFade = 0;
 
-	static constexpr float minStageTime = 1.f;  // in milliseconds
+	int chan;
+
+	/*static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
-	const float maxAdsrTime = 10.f;
+	const float maxAdsrTime = 10.f;*/
 	const float noEnvTime = 0.00101;
 
 	Switcher() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
-		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", " ms", maxStageTime / minStageTime, minStageTime);
+		//configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", "ms", maxStageTime / minStageTime, minStageTime);
+		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", "ms", 10000.f, 1.f);
 		configInput(TRIG_INPUT, "Trig/Gate");
 		configInput(RST_INPUT, "Reset");
 		configInput(IN1_INPUT, "IN 1");
@@ -82,8 +85,10 @@ struct Switcher : Module {
 		connectionChange = true;
 		currentSwitch = false;
 		fading = false;
-		outputs[OUT1_OUTPUT].setVoltage(0);
-		outputs[OUT2_OUTPUT].setVoltage(0);
+		outputs[OUT1_OUTPUT].setVoltage(0.f);
+		outputs[OUT1_OUTPUT].setChannels(1);
+		outputs[OUT2_OUTPUT].setVoltage(0.f);
+		outputs[OUT2_OUTPUT].setChannels(1);
 		lights[IN1_LIGHT].setBrightness(0.f);
 		lights[IN2_LIGHT].setBrightness(0.f);
 		lights[OUT1_LIGHT].setBrightness(0.f);
@@ -110,16 +115,19 @@ struct Switcher : Module {
 		}
 	}
 
-	static float convertCVToSeconds(float cv) {		
+	/*static float convertCVToSeconds(float cv) {		
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
-	}
+	}*/
 
 	void process(const ProcessArgs& args) override {
 		trigConnection = inputs[TRIG_INPUT].isConnected();
 		if (!trigConnection) {
 			if (prevTrigConnection) {
-				outputs[OUT1_OUTPUT].setVoltage(0);
-				outputs[OUT2_OUTPUT].setVoltage(0);
+				outputs[OUT1_OUTPUT].setVoltage(0.f, 0);	// ******** TO CHECK IF POLYPHONIC
+				outputs[OUT1_OUTPUT].setChannels(1);
+				outputs[OUT2_OUTPUT].setVoltage(0.f, 0);
+				outputs[OUT2_OUTPUT].setChannels(1);
+
 				lights[IN1_LIGHT].setBrightness(0.f);
 				lights[IN2_LIGHT].setBrightness(0.f);
 				lights[OUT1_LIGHT].setBrightness(0.f);
@@ -152,10 +160,10 @@ struct Switcher : Module {
 			// IN1 + OUT2 = 9
 			// IN2 + OUT1 = 6
 			// IN2 + OUT2 = 10
-			// IN1 + IN2 + OUT1 = 7  *OK
-			// IN1 + IN2 + OUT2 = 11  *OK
-			// IN1 + OUT1 + OUT2 = 13 *OK
-			// IN2 + OUT1 + OUT2 = 14 *OK
+			// IN1 + IN2 + OUT1 = 7
+			// IN1 + IN2 + OUT2 = 11
+			// IN1 + OUT1 + OUT2 = 13
+			// IN2 + OUT1 + OUT2 = 14
 			// IN1 + IN2 + OUT1 + OUT2 = 15
 			//
 
@@ -184,7 +192,8 @@ struct Switcher : Module {
 					prevTrigValue = trigValue;
 
 					if (trigState) {
-						fadeValue = convertCVToSeconds(params[FADE_PARAM].getValue()) + inputs[FADECV_INPUT].getVoltage();
+						//fadeValue = convertCVToSeconds(params[FADE_PARAM].getValue()) + inputs[FADECV_INPUT].getVoltage();
+						fadeValue = (std::pow(10000.f, params[FADE_PARAM].getValue()) / 1000) + inputs[FADECV_INPUT].getVoltage();
 						if (fadeValue > noEnvTime) {
 							if (fading) {
 								startFade = 1-lastFade;
@@ -209,7 +218,8 @@ struct Switcher : Module {
 					if (trigState) {
 						currentSwitch = !currentSwitch;
 						connectionChange = true;
-						fadeValue = convertCVToSeconds(params[FADE_PARAM].getValue()) + inputs[FADECV_INPUT].getVoltage();
+						//fadeValue = convertCVToSeconds(params[FADE_PARAM].getValue()) + inputs[FADECV_INPUT].getVoltage();
+						fadeValue = (std::pow(10000.f, params[FADE_PARAM].getValue()) / 1000) + inputs[FADECV_INPUT].getVoltage();
 						if (fadeValue > noEnvTime) {
 							if (fading) {
 								startFade = 1-lastFade;
@@ -261,13 +271,19 @@ struct Switcher : Module {
 							lastFade = 0;
 						} else {
 							if (currentSwitch) {
-								outputs[OUT1_OUTPUT].setVoltage(10 * lastFade);
+								//outputs[OUT1_OUTPUT].setVoltage(10 * lastFade);
+								outputs[OUT1_OUTPUT].setVoltage(10.f * lastFade, 0);
+								outputs[OUT1_OUTPUT].setChannels(1);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(lastFade);
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							} else {
-								outputs[OUT1_OUTPUT].setVoltage(10 * (1-lastFade));
+								//outputs[OUT1_OUTPUT].setVoltage(10 * (1-lastFade));
+								outputs[OUT1_OUTPUT].setVoltage(10.f * (1-lastFade), 0);
+								outputs[OUT1_OUTPUT].setChannels(1);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
@@ -277,7 +293,10 @@ struct Switcher : Module {
 						currentFadeSample++;
 					} else {
 						if (currentSwitch) {
-							outputs[OUT1_OUTPUT].setVoltage(10);
+							//outputs[OUT1_OUTPUT].setVoltage(10);
+							outputs[OUT1_OUTPUT].setVoltage(10.f, 0);
+							outputs[OUT1_OUTPUT].setChannels(1);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -286,7 +305,10 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							outputs[OUT1_OUTPUT].setVoltage(0);
+							//outputs[OUT1_OUTPUT].setVoltage(0);
+							outputs[OUT1_OUTPUT].setVoltage(0.f, 0);
+							outputs[OUT1_OUTPUT].setChannels(1);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -335,13 +357,19 @@ struct Switcher : Module {
 							lastFade = 0;
 						} else {
 							if (currentSwitch) {
-								outputs[OUT2_OUTPUT].setVoltage(10 * (1-lastFade));
+								//outputs[OUT2_OUTPUT].setVoltage(10 * (1-lastFade));
+								outputs[OUT2_OUTPUT].setVoltage(10.f * (1-lastFade), 0);
+								outputs[OUT2_OUTPUT].setChannels(1);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(0.f);
 								lights[OUT2_LIGHT].setBrightness(1-lastFade);
 							} else {
-								outputs[OUT2_OUTPUT].setVoltage(10 * lastFade);
+								//outputs[OUT2_OUTPUT].setVoltage(10 * lastFade);
+								outputs[OUT2_OUTPUT].setVoltage(10.f * lastFade, 0);
+								outputs[OUT2_OUTPUT].setChannels(1);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(0.f);
@@ -351,7 +379,10 @@ struct Switcher : Module {
 						currentFadeSample++;
 					} else {
 						if (currentSwitch) {
-							outputs[OUT2_OUTPUT].setVoltage(0);
+							//outputs[OUT2_OUTPUT].setVoltage(0);
+							outputs[OUT2_OUTPUT].setVoltage(0.f, 0);
+							outputs[OUT2_OUTPUT].setChannels(1);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -360,7 +391,10 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							outputs[OUT2_OUTPUT].setVoltage(10);
+							//outputs[OUT2_OUTPUT].setVoltage(10);
+							outputs[OUT2_OUTPUT].setVoltage(10.f, 0);
+							outputs[OUT2_OUTPUT].setChannels(1);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -409,15 +443,27 @@ struct Switcher : Module {
 							lastFade = 0;
 						} else {
 							if (currentSwitch) {
-								outputs[OUT1_OUTPUT].setVoltage(10 * (1-lastFade));
-								outputs[OUT2_OUTPUT].setVoltage(10 * lastFade);
+								//outputs[OUT1_OUTPUT].setVoltage(10 * (1-lastFade));
+								outputs[OUT1_OUTPUT].setVoltage(10.f * (1-lastFade), 0);
+								outputs[OUT1_OUTPUT].setChannels(1);
+
+								//outputs[OUT2_OUTPUT].setVoltage(10 * lastFade);
+								outputs[OUT2_OUTPUT].setVoltage(10.f * lastFade, 0);
+								outputs[OUT2_OUTPUT].setChannels(1);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
 								lights[OUT2_LIGHT].setBrightness(lastFade);
 							} else {
-								outputs[OUT1_OUTPUT].setVoltage(10 * lastFade);
-								outputs[OUT2_OUTPUT].setVoltage(10 * (1-lastFade));
+								//outputs[OUT1_OUTPUT].setVoltage(10.f * lastFade);
+								outputs[OUT1_OUTPUT].setVoltage(10.f * lastFade, 0);
+								outputs[OUT1_OUTPUT].setChannels(1);
+
+								//outputs[OUT2_OUTPUT].setVoltage(10.f * (1-lastFade));
+								outputs[OUT2_OUTPUT].setVoltage(10.f * (1-lastFade));
+								outputs[OUT2_OUTPUT].setChannels(1);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(lastFade);
@@ -427,8 +473,14 @@ struct Switcher : Module {
 						currentFadeSample++;
 					} else {
 						if (currentSwitch) {
-							outputs[OUT1_OUTPUT].setVoltage(0);
-							outputs[OUT2_OUTPUT].setVoltage(10);
+							//outputs[OUT1_OUTPUT].setVoltage(0);
+							outputs[OUT1_OUTPUT].setVoltage(0.f, 0);
+							outputs[OUT1_OUTPUT].setChannels(1);
+
+							//outputs[OUT2_OUTPUT].setVoltage(10);
+							outputs[OUT2_OUTPUT].setVoltage(10.f, 0);
+							outputs[OUT2_OUTPUT].setChannels(1);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -437,8 +489,14 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(1.f);
 							}
 						} else {
-							outputs[OUT1_OUTPUT].setVoltage(10);
-							outputs[OUT2_OUTPUT].setVoltage(0);
+							//outputs[OUT1_OUTPUT].setVoltage(10);
+							outputs[OUT1_OUTPUT].setVoltage(10.f, 0);
+							outputs[OUT1_OUTPUT].setChannels(1);
+
+							//outputs[OUT2_OUTPUT].setVoltage(0);
+							outputs[OUT2_OUTPUT].setVoltage(0.f, 0);
+							outputs[OUT2_OUTPUT].setChannels(1);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -486,14 +544,23 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(1, inputs[IN1_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
+								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
+								for (int c = 0; c < chan; c++)
+									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(lastFade);
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							} else {
-								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
+								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
+								for (int c = 0; c < chan; c++)
+									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
@@ -502,8 +569,13 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(1, inputs[IN1_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
+							outputs[OUT1_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -512,7 +584,11 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							outputs[OUT1_OUTPUT].setVoltage(0);
+							//outputs[OUT1_OUTPUT].setVoltage(0);
+							for (int c = 0; c < chan; c++)
+								outputs[OUT1_OUTPUT].setVoltage(0.f , c);
+							outputs[OUT1_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -560,14 +636,23 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(1, inputs[IN2_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * lastFade);
+								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * lastFade);
+								for (int c = 0; c < chan; c++)
+									outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * lastFade, c);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(1.f);
 								lights[OUT1_LIGHT].setBrightness(0.f);
 								lights[OUT2_LIGHT].setBrightness(lastFade);
 							} else {
-								outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * (1-lastFade));
+								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * (1-lastFade));
+								for (int c = 0; c < chan; c++)
+									outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * (1-lastFade), c);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(1.f);
 								lights[OUT1_LIGHT].setBrightness(0.f);
@@ -576,8 +661,13 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(1, inputs[IN2_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c), c);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -586,7 +676,11 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(1.f);
 							}
 						} else {
-							outputs[OUT2_OUTPUT].setVoltage(0);
+							//outputs[OUT2_OUTPUT].setVoltage(0);
+							for (int c = 0; c < chan; c++)
+								outputs[OUT2_OUTPUT].setVoltage(0.f, c);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -634,14 +728,23 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(1, inputs[IN1_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
+								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
+								for (int c = 0; c < chan; c++)
+									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(0.f);
 								lights[OUT2_LIGHT].setBrightness(1-lastFade);
 							} else {
-								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
+								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
+								for (int c = 0; c < chan; c++)
+									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(0.f);
@@ -650,8 +753,13 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(1, inputs[IN1_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT2_OUTPUT].setVoltage(0);
+							//outputs[OUT2_OUTPUT].setVoltage(0);
+							for (int c = 0; c < chan; c++)
+								outputs[OUT2_OUTPUT].setVoltage(0.f, c);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -660,7 +768,11 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -708,14 +820,23 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(1, inputs[IN2_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * (1-lastFade));
+								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * (1-lastFade));
+								for (int c = 0; c < chan; c++)
+									outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * (1-lastFade), c);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(1.f);
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							} else {
-								outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * lastFade);
+								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * lastFade);
+								for (int c = 0; c < chan; c++)
+									outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * lastFade, c);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(1.f);
 								lights[OUT1_LIGHT].setBrightness(lastFade);
@@ -724,8 +845,13 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(1, inputs[IN2_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT1_OUTPUT].setVoltage(0);
+							//outputs[OUT1_OUTPUT].setVoltage(0);
+							for (int c = 0; c < chan; c++)
+								outputs[OUT1_OUTPUT].setVoltage(0.f, c);
+							outputs[OUT1_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -734,7 +860,11 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c), c);
+							outputs[OUT1_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -782,14 +912,23 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(inputs[IN2_INPUT].getChannels(), inputs[IN1_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT1_OUTPUT].setVoltage( (inputs[IN2_INPUT].getVoltage() * lastFade) + (inputs[IN1_INPUT].getVoltage() * (1-lastFade)) );
+								//outputs[OUT1_OUTPUT].setVoltage( (inputs[IN2_INPUT].getVoltage() * lastFade) + (inputs[IN1_INPUT].getVoltage() * (1-lastFade)) );
+								for (int c = 0; c < chan; c++)
+									outputs[OUT1_OUTPUT].setVoltage((inputs[IN2_INPUT].getVoltage(c) * lastFade) + (inputs[IN1_INPUT].getVoltage(c) * (1-lastFade)), c);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1-lastFade);
 								lights[IN2_LIGHT].setBrightness(lastFade);
 								lights[OUT1_LIGHT].setBrightness(1.f);
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							} else {
-								outputs[OUT1_OUTPUT].setVoltage( (inputs[IN1_INPUT].getVoltage() * lastFade) + (inputs[IN2_INPUT].getVoltage() * (1-lastFade)) );
+								//outputs[OUT1_OUTPUT].setVoltage( (inputs[IN1_INPUT].getVoltage() * lastFade) + (inputs[IN2_INPUT].getVoltage() * (1-lastFade)) );
+								for (int c = 0; c < chan; c++)
+									outputs[OUT1_OUTPUT].setVoltage((inputs[IN1_INPUT].getVoltage(c) * lastFade) + (inputs[IN2_INPUT].getVoltage(c) * (1-lastFade)), c);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(lastFade);
 								lights[IN2_LIGHT].setBrightness(1-lastFade);
 								lights[OUT1_LIGHT].setBrightness(1.f);
@@ -798,8 +937,13 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(inputs[IN2_INPUT].getChannels(), inputs[IN1_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c), c);
+							outputs[OUT1_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -808,7 +952,11 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
+							outputs[OUT1_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -856,14 +1004,23 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(inputs[IN2_INPUT].getChannels(), inputs[IN1_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT2_OUTPUT].setVoltage( (inputs[IN1_INPUT].getVoltage() * lastFade) + (inputs[IN2_INPUT].getVoltage() * (1-lastFade)) );
+								//outputs[OUT2_OUTPUT].setVoltage( (inputs[IN1_INPUT].getVoltage() * lastFade) + (inputs[IN2_INPUT].getVoltage() * (1-lastFade)) );
+								for (int c = 0; c < chan; c++)
+									outputs[OUT2_OUTPUT].setVoltage((inputs[IN1_INPUT].getVoltage(c) * lastFade) + (inputs[IN2_INPUT].getVoltage(c) * (1-lastFade)), c);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(lastFade);
 								lights[IN2_LIGHT].setBrightness(1-lastFade);
 								lights[OUT1_LIGHT].setBrightness(0.f);
 								lights[OUT2_LIGHT].setBrightness(1.f);
 							} else {
-								outputs[OUT2_OUTPUT].setVoltage( (inputs[IN2_INPUT].getVoltage() * lastFade) + (inputs[IN1_INPUT].getVoltage() * (1-lastFade)) );
+								//outputs[OUT2_OUTPUT].setVoltage( (inputs[IN2_INPUT].getVoltage() * lastFade) + (inputs[IN1_INPUT].getVoltage() * (1-lastFade)) );
+								for (int c = 0; c < chan; c++)
+									outputs[OUT2_OUTPUT].setVoltage((inputs[IN2_INPUT].getVoltage(c) * lastFade) + (inputs[IN1_INPUT].getVoltage(c) * (1-lastFade)), c);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1-lastFade);
 								lights[IN2_LIGHT].setBrightness(lastFade);
 								lights[OUT1_LIGHT].setBrightness(0.f);
@@ -872,8 +1029,13 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(inputs[IN2_INPUT].getChannels(), inputs[IN1_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -882,7 +1044,11 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(1.f);
 							}
 						} else {
-							outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c), c);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -930,16 +1096,31 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(1, inputs[IN1_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
-								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
+								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
+								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
+								for (int c = 0; c < chan; c++) {
+									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
+									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
+								}
+								outputs[OUT2_OUTPUT].setChannels(chan);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
 								lights[OUT2_LIGHT].setBrightness(lastFade);
 							} else {
-								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade)) ;
-								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
+								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
+								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
+								for (int c = 0; c < chan; c++) {
+									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
+									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
+								}
+								outputs[OUT2_OUTPUT].setChannels(chan);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(lastFade);
@@ -948,21 +1129,38 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(1, inputs[IN1_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
-								outputs[OUT1_OUTPUT].setVoltage(0);
+								//outputs[OUT1_OUTPUT].setVoltage(0);
+								for (int c = 0; c < chan; c++)
+									outputs[OUT1_OUTPUT].setVoltage(0.f, c);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(0.f);
 								lights[OUT2_LIGHT].setBrightness(1.f);
 							}
 						} else {
-							outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
+							outputs[OUT1_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
-								outputs[OUT2_OUTPUT].setVoltage(0);
+								//outputs[OUT2_OUTPUT].setVoltage(0);
+								for (int c = 0; c < chan; c++)
+									outputs[OUT2_OUTPUT].setVoltage(0.f, c);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(1.f);
@@ -1008,16 +1206,31 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(inputs[IN1_INPUT].getChannels(), inputs[IN2_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * (1-lastFade)) ;
-								outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * lastFade);
+								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * (1-lastFade));
+								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * lastFade);
+								for (int c = 0; c < chan; c++) {
+									outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * (1-lastFade), c);
+									outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * lastFade, c);
+								}
+								outputs[OUT2_OUTPUT].setChannels(chan);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(1.f);
 								lights[OUT1_LIGHT].setBrightness(lastFade);
 								lights[OUT2_LIGHT].setBrightness(1-lastFade);
 							} else {
-								outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * lastFade);
-								outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * (1-lastFade));
+								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * lastFade);
+								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage() * (1-lastFade));
+								for (int c = 0; c < chan; c++) {
+									outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * lastFade, c);
+									outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * (1-lastFade), c);
+								}
+								outputs[OUT2_OUTPUT].setChannels(chan);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(1.f);
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
@@ -1026,21 +1239,38 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(inputs[IN1_INPUT].getChannels(), inputs[IN2_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c), c);
+							outputs[OUT1_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
-								outputs[OUT2_OUTPUT].setVoltage(0);
+								//outputs[OUT2_OUTPUT].setVoltage(0);
+								for (int c = 0; c < chan; c++)
+									outputs[OUT2_OUTPUT].setVoltage(0.f, c);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(1.f);
 								lights[OUT1_LIGHT].setBrightness(1.f);
 								lights[OUT2_LIGHT].setBrightness(0.f);									
 							}
 						} else {
-							outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++)
+								outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c), c);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
-								outputs[OUT1_OUTPUT].setVoltage(0);
+								//outputs[OUT1_OUTPUT].setVoltage(0);
+								for (int c = 0; c < chan; c++)
+									outputs[OUT1_OUTPUT].setVoltage(0.f, c);
+								outputs[OUT1_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(0.f);
 								lights[IN2_LIGHT].setBrightness(1.f);
 								lights[OUT1_LIGHT].setBrightness(0.f);
@@ -1086,16 +1316,31 @@ struct Switcher : Module {
 							startFade = 0;
 							lastFade = 0;
 						} else {
+							chan = std::max(inputs[IN1_INPUT].getChannels(), inputs[IN2_INPUT].getChannels());
 							if (currentSwitch) {
-								outputs[OUT1_OUTPUT].setVoltage( (inputs[IN2_INPUT].getVoltage() * lastFade) + (inputs[IN1_INPUT].getVoltage() * (1-lastFade)) );
-								outputs[OUT2_OUTPUT].setVoltage( (inputs[IN1_INPUT].getVoltage() * lastFade) + (inputs[IN2_INPUT].getVoltage() * (1-lastFade)) );
+								//outputs[OUT1_OUTPUT].setVoltage( (inputs[IN2_INPUT].getVoltage() * lastFade) + (inputs[IN1_INPUT].getVoltage() * (1-lastFade)) );
+								//outputs[OUT2_OUTPUT].setVoltage( (inputs[IN1_INPUT].getVoltage() * lastFade) + (inputs[IN2_INPUT].getVoltage() * (1-lastFade)) );
+								for (int c = 0; c < chan; c++) {
+									outputs[OUT1_OUTPUT].setVoltage((inputs[IN2_INPUT].getVoltage(c) * lastFade) + (inputs[IN1_INPUT].getVoltage(c) * (1-lastFade)), c);
+									outputs[OUT2_OUTPUT].setVoltage((inputs[IN1_INPUT].getVoltage(c) * lastFade) + (inputs[IN2_INPUT].getVoltage(c) * (1-lastFade)), c);
+								}
+								outputs[OUT1_OUTPUT].setChannels(chan);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
 								lights[OUT2_LIGHT].setBrightness(lastFade);
 							} else {
-								outputs[OUT1_OUTPUT].setVoltage( (inputs[IN1_INPUT].getVoltage() * lastFade) + (inputs[IN2_INPUT].getVoltage() * (1-lastFade)) );
-								outputs[OUT2_OUTPUT].setVoltage( (inputs[IN2_INPUT].getVoltage() * lastFade) + (inputs[IN1_INPUT].getVoltage() * (1-lastFade)) );
+								//outputs[OUT1_OUTPUT].setVoltage( (inputs[IN1_INPUT].getVoltage() * lastFade) + (inputs[IN2_INPUT].getVoltage() * (1-lastFade)) );
+								//outputs[OUT2_OUTPUT].setVoltage( (inputs[IN2_INPUT].getVoltage() * lastFade) + (inputs[IN1_INPUT].getVoltage() * (1-lastFade)) );
+								for (int c = 0; c < chan; c++) {
+									outputs[OUT1_OUTPUT].setVoltage((inputs[IN1_INPUT].getVoltage(c) * lastFade) + (inputs[IN2_INPUT].getVoltage(c) * (1-lastFade)), c);
+									outputs[OUT2_OUTPUT].setVoltage((inputs[IN2_INPUT].getVoltage(c) * lastFade) + (inputs[IN1_INPUT].getVoltage(c) * (1-lastFade)), c);
+								}
+								outputs[OUT1_OUTPUT].setChannels(chan);
+								outputs[OUT2_OUTPUT].setChannels(chan);
+
 								lights[IN1_LIGHT].setBrightness(1.f);
 								lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(lastFade);
@@ -1104,9 +1349,17 @@ struct Switcher : Module {
 						}
 						currentFadeSample++;
 					} else {
+						chan = std::max(inputs[IN1_INPUT].getChannels(), inputs[IN2_INPUT].getChannels());
 						if (currentSwitch) {
-							outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
-							outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++) {
+								outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c), c);
+								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
+							}
+							outputs[OUT1_OUTPUT].setChannels(chan);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -1115,8 +1368,15 @@ struct Switcher : Module {
 								lights[OUT2_LIGHT].setBrightness(1.f);
 							}
 						} else {
-							outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
-							outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
+							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage());
+							for (int c = 0; c < chan; c++) {
+								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
+								outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c), c);
+							}
+							outputs[OUT1_OUTPUT].setChannels(chan);
+							outputs[OUT2_OUTPUT].setChannels(chan);
+
 							if (connectionChange) {
 								connectionChange = false;
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -1130,8 +1390,10 @@ struct Switcher : Module {
 
 				default:
 					if (connectionChange) {
-						outputs[OUT1_OUTPUT].setVoltage(0);
-						outputs[OUT2_OUTPUT].setVoltage(0);
+						outputs[OUT1_OUTPUT].setVoltage(0.f, 0);
+						outputs[OUT1_OUTPUT].setChannels(1);
+						outputs[OUT2_OUTPUT].setVoltage(0.f, 0);
+						outputs[OUT2_OUTPUT].setChannels(1);
 						lights[IN1_LIGHT].setBrightness(0.f);
 						lights[IN2_LIGHT].setBrightness(0.f);
 						lights[OUT1_LIGHT].setBrightness(0.f);

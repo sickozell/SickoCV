@@ -1,5 +1,8 @@
-git tag v2.5.2 -m "create v2.5.2"  
+git tag v2.5.3-beta8 -m "create v2.5.3-beta8"  
 git push origin --tags
+
+delete tag
+git tag -d v2.5.3-beta
 
 
 ### How to build a VCVRack plugin with Github Action
@@ -12,3 +15,4 @@ git push origin --tags
    * `git tag v2.0.9 -m "create v2.0.9"`
    * `git push origin --tags`
    * **Note:** Make sure that your tag version number is the same as the version in the [plugin.json](https://github.com/qno/vcv-plugin-github-actions-example/blob/main/plugin.json#L4) and the tag starts with `v` (it is a convention), otherwise the the publish step will be canceled.
+
