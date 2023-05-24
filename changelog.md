@@ -1,6 +1,8 @@
-### 2.5.3 (2023-xx-xx)
+### 2.5.3 (2023-05-24)
 
 added sickoSampler module  
+
+added polyphony on signal I/O on bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt  
 
 **sickoPlayer**  
 - fixed bug on phasescan when scanning through silence  
