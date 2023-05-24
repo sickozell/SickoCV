@@ -442,8 +442,9 @@ FD knob sets the fade in/out time when recording starts or stops.
 
 OVD button overdubs existing sample.  
 
-XTN button enables extended recording. In forward recording, it continues recording also when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record as usual.  
-Please note that when in loop recording XFD knob is overridden, and it will not do any crossfade.  
+XTN button enables extended recording. In forward recording, it continues recording also when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached.  
+
+Please note that when in loop recording the XFD knob is overridden, and it will not do any crossfade.  
 
 RRM (REC Re-Arm): when recording is stopped by a playback trig/button, it is rearmed when release time has ended or fadeout recording has finished. This function is not available in conjunction with POR "Play on REC". In "Restart" trig-type mode recording is rearmed only when after a STOP trig/button is detected.  
 
