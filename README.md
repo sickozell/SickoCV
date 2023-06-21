@@ -203,7 +203,7 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 ## CvRouter CvSwitcher
 ### 1>2 and 2>1 voltage controlled switch  
 
-![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/540847e0-c8ff-4d64-82d2-f746cf272914)
+![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/9952b502-db9b-47ff-98c8-486145773831)
 
 ## Drummer Drummer4 Drummer4+
 ### Accent and choke utility for drum modules lacking these features
