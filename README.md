@@ -1,4 +1,4 @@
-# SickoCV v2.5.3-beta9
+# SickoCV v2.5.4-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -12,31 +12,31 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- **SickoSampler (NEW!!!)**
-- **SickoPlayer**
-- **Wavetabler DrumPlayer+ DrumPlayerXtra**
-_ **bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt**
+- **Adder8 (NEW!!!)**
+- **CvRouter (NEW!!!)**
+- **CvSwitcher (NEW!!!)**
+- **bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt**
 
 ## **to do list:** 
-- sickoSampler overall testing
-- bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt polyphony testing
+- new modules overall testing
+- drumPlayerXtra fix a bug that crashes VCV when changing zoom without a sample loaded
 
 ## **changelog**  
-- added SickoSampler module
-- SickoPlayer: fixed bug on phasescan when scanning through silence.  
-- SickoPlayer: added context menu options "EOC pulse from" and "Reset Cursors on Load". Added trig/gate and stop buttons. Changed "Start Only" trig type to "Restart". Added "Drum Player" preset.  
-- DrumPlayer+ DrumPlayerXtra: changed default "Text Scrolling" context menu option to disabled
-- all sample player modules: added "Disable Nav Buttons" option to general context menu
-- added polyphony on signal I/O on bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt  
+- added Adder8, CvRouter and CvSwitcher modules
 
-# SickoCV v2.5.3
+# SickoCV v2.5.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 3](https://github.com/sickozell/SickoCV/assets/80784296/f7a8f881-6af8-4341-969b-6e521749765f)
+![SickoCV modules 2 5 4](https://github.com/sickozell/SickoCV/assets/80784296/10f06782-016a-4cf9-b5fa-11f27a530508)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
 - Every time-related knob set full anticlockwise and displaying 1ms on the tooltip is actually considered 0ms
+
+## Adder8
+### 8 Adder and subtractor
+
+![adder8](https://github.com/sickozell/SickoCV/assets/80784296/c633694c-d2f8-449f-9284-8c16d1b76a12)
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -199,6 +199,11 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
+
+## CvRouter CvSwitcher
+### 1>2 and 2>1 voltage controlled switch  
+
+![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/540847e0-c8ff-4d64-82d2-f746cf272914)
 
 ## Drummer Drummer4 Drummer4+
 ### Accent and choke utility for drum modules lacking these features
