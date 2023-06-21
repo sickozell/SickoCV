@@ -87,18 +87,18 @@
       ]
     },
     {
-      "slug": "CVswitcher",
-      "name": "cvSwitcher",
-      "description": "Dual 2>1 voltage controlled switch",
+      "slug": "CVrouter",
+      "name": "cvRouter",
+      "description": "1>2 voltage controlled switch",
       "tags": [
         "Switch",
         "Polyphonic"
       ]
     },
     {
-      "slug": "CVrouter",
-      "name": "cvRouter",
-      "description": "Dual 1>2 voltage controlled switch",
+      "slug": "CVswitcher",
+      "name": "cvSwitcher",
+      "description": "2>1 voltage controlled switch",
       "tags": [
         "Switch",
         "Polyphonic"
