@@ -15,7 +15,6 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - **Adder8 (NEW!!!)**
 - **CvRouter (NEW!!!)**
 - **CvSwitcher (NEW!!!)**
-- **bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt**
 
 ## **to do list:** 
 - new modules overall testing
