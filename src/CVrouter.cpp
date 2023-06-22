@@ -612,9 +612,8 @@ struct CVrouterWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 17)), module, CVrouter::CV_INPUT));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 32)), module, CVrouter::THRESHOLD_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 41.5)), module, CVrouter::THRESHOLD_CV_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(7.62, 50.3)), module, CVrouter::THRESHOLD_ATTENUV_PARAM));
-
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(7.62, 41.8)), module, CVrouter::THRESHOLD_ATTENUV_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 49.5)), module, CVrouter::THRESHOLD_CV_INPUT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 65)), module, CVrouter::IN1_INPUT));
 

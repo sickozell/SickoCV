@@ -460,8 +460,8 @@ struct CVswitcherWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 17)), module, CVswitcher::CV_INPUT));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 32)), module, CVswitcher::THRESHOLD_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 41.5)), module, CVswitcher::THRESHOLD_CV_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(7.62, 50.3)), module, CVswitcher::THRESHOLD_ATTENUV_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(7.62, 41.8)), module, CVswitcher::THRESHOLD_ATTENUV_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 49.5)), module, CVswitcher::THRESHOLD_CV_INPUT));
 
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 65)), module, CVswitcher::IN1_INPUT));

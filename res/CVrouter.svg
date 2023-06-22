@@ -25,7 +25,7 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.8284271"
-     inkscape:cx="99.52528"
+     inkscape:cx="98.287843"
      inkscape:cy="197.9899"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
@@ -168,13 +168,13 @@
        inkscape:label="circle 1"
        sodipodi:type="arc"
        sodipodi:cx="7.6199999"
-       sodipodi:cy="50.351898"
+       sodipodi:cy="41.851898"
        sodipodi:rx="3.5000069"
        sodipodi:ry="3.5"
        sodipodi:start="2.268928"
        sodipodi:end="0.87266463"
        sodipodi:arc-type="arc"
-       d="m 5.3702389,53.033054 a 3.5000069,3.5 0 0 1 -1.0391697,-3.878226 3.5000069,3.5 0 0 1 3.2889307,-2.30293 3.5000069,3.5 0 0 1 3.2889311,2.30293 3.5000069,3.5 0 0 1 -1.03917,3.878226"
+       d="m 5.3702389,44.533054 a 3.5000069,3.5 0 0 1 -1.0391697,-3.878226 3.5000069,3.5 0 0 1 3.2889307,-2.30293 3.5000069,3.5 0 0 1 3.2889311,2.30293 3.5000069,3.5 0 0 1 -1.03917,3.878226"
        sodipodi:open="true" />
     <rect
        style="display:inline;fill:#f2f2f2;stroke:none;stroke-width:0.375045;stroke-dasharray:none"
@@ -182,7 +182,7 @@
        width="0.62838662"
        height="0.95759505"
        x="7.3058066"
-       y="46"
+       y="37.5"
        ry="0.087054096"
        inkscape:label="line circle 1" />
     <path
