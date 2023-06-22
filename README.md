@@ -1,4 +1,4 @@
-# SickoCV v2.5.4-beta2
+ubtracts# SickoCV v2.5.4-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -33,6 +33,8 @@ VCV Rack plugin modules
 
 ## Adder8
 ### 8 Adder and subtractor
+#### - DESCRIPTION
+'adder8' is inspired by hardware precision adder modules. It adds, ignore or subtracts fixed voltages or CVS to outputs. 
 
 ![adder8](https://github.com/sickozell/SickoCV/assets/80784296/c633694c-d2f8-449f-9284-8c16d1b76a12)
 
