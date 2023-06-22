@@ -50,8 +50,7 @@ The MODE switches force the "-0+" switches to be as: "subtract/ignore", "subtrac
 Context Menu:
 - "Stop Adding on Out Cable" (ticked by default). As mentioned above, the starting voltage is reset to 0v in the next row only when an out cable is detected. Unticking this option the voltage won't be reset.
 
-- "Volt Knob Default". With this option the default initialization value of the VLT/ATNV knob can be changed to 0v, +1v or +10v.
-
+- "Volt Knob Default". With this option the default initialization value of the VLT/ATNV knob can be changed to 0v, +1v or +10v.  
 This unconventional feature lets the user to choose the default knob value depending on the main usage of Adder8:  
 if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add exactly 1 octave in pitch.  
 Otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
