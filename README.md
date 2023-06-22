@@ -1,4 +1,4 @@
-# SickoCV v2.5.4-beta1
+# SickoCV v2.5.4-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -20,7 +20,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - new modules overall testing
 
 ## **changelog**  
-- ficed a bug that crashes VCV when changing zoom without a sample loaded
+- fixed a bug that crashes VCV when changing zoom without a sample loaded
 
 # SickoCV v2.5.4
 VCV Rack plugin modules
