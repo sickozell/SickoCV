@@ -37,6 +37,25 @@ VCV Rack plugin modules
 
 ![adder8](https://github.com/sickozell/SickoCV/assets/80784296/c633694c-d2f8-449f-9284-8c16d1b76a12)
 
+On the first row a fixed voltage set by VLT/ATNV knob is added, ignored or subtracted, depending on the -0+ switch, to the corresponding output.
+
+If the output is not connected, the result voltage is summed to the next row, and with the same rules until a connected output is found.
+
+If a CV input is connected, the VLT/ATNV knob acts as an attenuverter, then the CV voltage will be added or subtracted in the same previous way.
+
+When an output is connected, the starting voltage of the next row is reset to 0v just like the first row does. 
+
+The MODE switches force the "-0+" switches to be as: "subtract/ignore", "subtract/ignore/add" or "ignore/add".
+
+Context Menu:
+- "Stop Adding on Out Cable" (ticked by default). As mentioned above, the starting voltage is reset to 0v in the next row only when an out cable is detected. Unticking this option the voltage won't be reset.
+
+- "Volt Knob Default". With this option the default initialization value of the VLT/ATNV knob can be changed to 0v, +1v or +10v.
+
+This unconventional feature lets the user to choose the default knob value depending on the main usage of Adder8:  
+if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add exactly 1 octave in pitch.  
+Otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
+
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
 #### - DESCRIPTION
@@ -203,6 +222,14 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 ### 1>2 and 2>1 voltage controlled switch  
 
 ![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/9952b502-db9b-47ff-98c8-486145773831)
+
+With the cvRouter the IN signal will be routed to OUT1 or OUT2 if the CV input voltage is lower or higher than the voltage set by the "THR" threshold knob.  
+With the cvSwitcher the OUT will receive the signal from IN1 or IN2 if the voltage of the CV input
+is lower or higher than the voltage set by the threshold "THR" knob.
+
+The FADE knob with its added CV input, will crossfade up to 10s the INs or OUTs. 
+
+The default value of the "THR" knob is +1v.
 
 ## Drummer Drummer4 Drummer4+
 ### Accent and choke utility for drum modules lacking these features
