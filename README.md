@@ -20,7 +20,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - new modules overall testing
 
 ## **changelog**  
-- fixed a bug that crashes VCV when changing zoom without a sample loaded
+- drumPlayerXtra: fixed a bug that crashes VCV when changing zoom without a sample loaded
 
 # SickoCV v2.5.4
 VCV Rack plugin modules
