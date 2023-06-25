@@ -229,9 +229,9 @@ The BPM knob sets the clock speed from 30 to 300 bpm.
 An external clock can be connected on the EXT input.  
 The RUN button or a trig on its input starts or stops the clock.  
 PW (pulse width) knob adjusts the length of the gate in its high state.  
-Clock can be reset with RST but or a trig on its input.  
+Clock can be reset with RST button or a trig on its input.  
 
-There are 4 clock dividers/multipliers up to 256x each with its PW control. Right click on display to quick sleect the deisred division/multiplication.  
+There are 4 clock dividers/multipliers up to 256x each with its PW control. Right click on the display to quick select the desired division/multiplication.  
 
 The metronome can be setup via the TEMPO knob or with a right click on the display.  
 Audio click is activated with its button and volume can be adjusted with the knob from 0 to 200%.
