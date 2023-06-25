@@ -1,4 +1,4 @@
-# SickoCV v2.5.4-beta3
+# SickoCV v2.5.4-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -223,6 +223,24 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 Clocker is a high precision clock generator and modulator with 4 dividers/multipliers and integrated audio click.
 
 ![clocker](https://github.com/sickozell/SickoCV/assets/80784296/33a56d70-90f9-4cdc-8fae-11223335ea62)
+
+#### - INSTRUCTIONS
+The BPM knob sets the clock speed from 30 to 300 bpm.  
+An external clock can be connected on the EXT input.  
+The RUN button or a trig on its input starts or stops the clock.  
+PW (pulse width) knob adjusts the length of the gate in its high state.  
+Clock can be reset with RST but or a trig on its input.  
+
+There are 4 clock dividers/multipliers up to 256x each with its PW control. Right click on display to quick sleect the deisred division/multiplication.  
+
+The metronome can be setup via the TEMPO knob or with a right click on the display.  
+Audio click is activated with its button and volume can be adjusted with the knob from 0 to 200%.
+BEAT and BAR outputs are always active and give a 1ms trigger.
+
+#### Context Menu
+Click Presets: there are 3 predefined types of audio clicks, each one with beat and bar sample.
+Audio clicks can be customized loading wav sample using "Load BEAT" and "Load BAR" options.  
+Beat pulses also on Bar: when ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 
 ## CvRouter CvSwitcher
 ### 1>2 and 2>1 voltage controlled switch  
