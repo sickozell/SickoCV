@@ -173,7 +173,7 @@ struct Clocker : Module {
 	bool barPulse = false;
 	float barPulseTime = 0.f;
 
-	bool barOnBeat = true;
+	bool beatOnBar = true;
 
 	bool extSync = false;
 	bool extConn = false;
@@ -261,16 +261,16 @@ struct Clocker : Module {
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "BarOnBeat", json_boolean(barOnBeat));
+		json_object_set_new(rootJ, "BeatOnBar", json_boolean(beatOnBar));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
-		json_t* barOnBeatJ = json_object_get(rootJ, "BarOnBeat");
-		if (barOnBeatJ)
-			barOnBeat = json_boolean_value(barOnBeatJ);
+		json_t* beatOnBarJ = json_object_get(rootJ, "BeatOnBar");
+		if (beatOnBarJ)
+			beatOnBar = json_boolean_value(beatOnBarJ);
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
@@ -631,7 +631,7 @@ struct Clocker : Module {
 					play[BAR] = true;
 					barPulse = true;
 					barPulseTime = oneMsTime;
-					if (barOnBeat) {
+					if (beatOnBar) {
 						beatPulse = true;
 						beatPulseTime = oneMsTime;
 					}
@@ -685,7 +685,7 @@ struct Clocker : Module {
 						play[BAR] = true;
 						barPulse = true;
 						barPulseTime = oneMsTime;
-						if (barOnBeat) {
+						if (beatOnBar) {
 							beatPulse = true;
 							beatPulseTime = oneMsTime;
 						}
@@ -740,7 +740,7 @@ struct Clocker : Module {
 							play[BAR] = true;
 							barPulse = true;
 							barPulseTime = oneMsTime;
-							if (barOnBeat) {
+							if (beatOnBar) {
 								beatPulse = true;
 								beatPulseTime = oneMsTime;
 							}
@@ -1437,7 +1437,7 @@ struct ClockerWidget : ModuleWidget {
 		menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(1);}));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Bar pulse also on Beat", "", &module->barOnBeat));
+		menu->addChild(createBoolPtrMenuItem("Beat pulse also on Bar", "", &module->beatOnBar));
 
 
 	}
