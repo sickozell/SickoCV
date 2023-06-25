@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.5.4-beta2",
+  "version": "2.5.4-beta3",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -84,6 +84,15 @@
       "description": "Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs",
       "tags": [
         "Utility"
+      ]
+    },
+    {
+      "slug": "Clocker",
+      "name": "clocker",
+      "description": "Clock generator with 4 dividers/multipliers and audio metronome",
+      "tags": [
+        "Clock generator",
+        "Clock modulator"
       ]
     },
     {

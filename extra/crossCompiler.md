@@ -1,8 +1,8 @@
-git tag v2.5.3-beta9 -m "create v2.5.3-beta9"  
+git tag v2.5.4-beta3 -m "create v2.5.4-beta3"  
 git push origin --tags
 
 delete tag
-git tag -d v2.5.3-beta
+git tag -d v2.5.4-beta
 
 
 ### How to build a VCVRack plugin with Github Action

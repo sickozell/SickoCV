@@ -37,4 +37,5 @@ void init(Plugin* p) {
 	p->addModel(modelCVswitcher);
 	p->addModel(modelCVrouter);
 	p->addModel(modelAdder8);
+	p->addModel(modelClocker);
 }
