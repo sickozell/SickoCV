@@ -238,7 +238,7 @@ Audio click is activated with its button and volume can be adjusted with the kno
 BEAT and BAR outputs are always active and give a 1ms trigger.
 
 #### Context Menu
-Click Presets: there are 3 predefined types of audio clicks, each one with beat and bar sample.
+Click Presets: there are 3 predefined types of audio clicks, each one with beat and bar sample.  
 Audio clicks can be customized loading wav sample using "Load BEAT" and "Load BAR" options.  
 Beat pulses also on Bar: when ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 
