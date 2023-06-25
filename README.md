@@ -1,4 +1,4 @@
-# SickoCV v2.5.4-beta2
+# SickoCV v2.5.4-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page
 
@@ -13,6 +13,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## Current modules in beta testing:
 - **Adder8 (NEW!!!)**
+- **Clocker (NEW!!!)**
 - **CvRouter (NEW!!!)**
 - **CvSwitcher (NEW!!!)**
 
@@ -20,12 +21,13 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - new modules overall testing
 
 ## **changelog**  
+- added new modules: Adder8 Clocker CvRouter CvSwitcher
 - drumPlayerXtra: fixed a bug that crashes VCV when changing zoom without a sample loaded
 
 # SickoCV v2.5.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 4](https://github.com/sickozell/SickoCV/assets/80784296/a5a4c326-a782-4726-8033-b664261727b2)
+![SickoCV modules 2 5 4](https://github.com/sickozell/SickoCV/assets/80784296/e95e1497-1f02-4f97-a841-2c211ce08efc)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
@@ -213,6 +215,14 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
+
+## Clocker
+### Clock generator with 4 dividers/multipliers and audio metronome
+
+#### - DESCRIPTION
+Clocker is a high precision clock generator and modulator with 4 dividers/multipliers and integrated audio click.
+
+![clocker](https://github.com/sickozell/SickoCV/assets/80784296/33a56d70-90f9-4cdc-8fae-11223335ea62)
 
 ## CvRouter CvSwitcher
 ### 1>2 and 2>1 voltage controlled switch  
