@@ -234,7 +234,7 @@ Clock and metronome can be reset with RST button or a trig on its input.
 There are 4 clock dividers/multipliers up to 256x each with theirs PW control. Right click on the display to quick select the desired division/multiplication.  
 
 The metronome can be setup via the TEMPO knob or with a right click on the display.  
-Audio click is activated with its button and volume can be adjusted with the knob from 0 to 200%.
+Audio click is activated with its button and volume can be adjusted with the knob from 0 to 200%.  
 BEAT and BAR outputs are always active and give a 1ms trigger.
 
 #### Context Menu
