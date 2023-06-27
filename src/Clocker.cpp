@@ -148,10 +148,12 @@ struct Clocker : Module {
 	float resetBut = 0;
 	float resetValue = 0;
 	float prevResetValue = 0;
+	bool resetStart = true;
 
-	int run_setting = 0;
-	int prev_run_setting = 0;
+	int runSetting = 1;
+	int prevRunSetting = 0;
 
+	float runButton = 0;
 	float runTrig = 0.f;
 	float prevRunTrig = 0.f;
 
@@ -163,7 +165,8 @@ struct Clocker : Module {
 
 	double maxPulseSample = 0.0;
 
-	int beatCounter = 1;
+	//int beatCounter = 1;
+	int beatCounter = 20;
 
 	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
 	bool resetPulse = false;
@@ -173,13 +176,18 @@ struct Clocker : Module {
 	bool barPulse = false;
 	float barPulseTime = 0.f;
 
-	bool beatOnBar = true;
+	bool beatOnBar = false;
+
+	bool resetOnRun = true;
+	bool resetPulseOnRun = false;
+	bool resetOnStop = false;
+	bool resetPulseOnStop = false;
 
 	bool extSync = false;
 	bool extConn = false;
-	bool extBeat = false;
 	bool prevExtConn = true;
-
+	bool extBeat = false;
+	
 	double divClockSample[4] = {1.0, 1.0, 1.0, 1.0};
 	double divMaxSample[4] = {0.0, 0.0, 0.0, 0.0};
 	bool divPulse[4] = {false, false, false, false};
@@ -201,7 +209,7 @@ struct Clocker : Module {
 		paramQuantities[BPM_KNOB_PARAM]->snapEnabled = true;
 
 		configParam(PW_KNOB_PARAM, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
-		configSwitch(CLICK_BUT_PARAM, 0.f, 1.f, 0.f, "Click", {"OFF", "ON"});
+		configSwitch(CLICK_BUT_PARAM, 0.f, 1.f, 1.f, "Click", {"OFF", "ON"});
 		configParam(CLICKVOL_KNOB_PARAM, 0.f, 2.f, 1.0f, "Click Level", "%", 0, 100);
 		
 		configParam<tpBeat>(BEAT_KNOB_PARAM, 0.f, 16.0f, 2.f, "Beat");
@@ -240,16 +248,67 @@ struct Clocker : Module {
 	}
 
 	void onReset() override {
+		resetStart = true;
+		extSync = false;
+		extConn = false;
+		prevExtConn = true;
+		extBeat = false;
+
+		runSetting = 1;
+		prevRunSetting = 0;
+
+		runButton = 0;
+		runTrig = 0.f;
+		prevRunTrig = 0.f;
+
+		clockSample = 1.0;
+
+		//beatCounter = 1;
+		beatCounter = 20;
+		clockSample = 1.0;
+		beatOnBar = false;
+		resetOnRun = true;
+		resetPulseOnRun = false;
+		resetOnStop = false;
+		resetPulseOnStop = false;
+
+		bpm = 0.1;
+
+		for (int d = 0; d < 4; d++) {
+			divClockSample[d] = 1.0;
+			divMaxSample[d] = 0.0;
+			divPulse[d] = false;
+			divCount[d] = 1;
+		}
 		
 		for (int i = 0; i < 2; i++) {
 			clearSlot(i);
 			play[i] = false;
 		}
+		setClick(0);
 	}
 
 	void onSampleRateChange() override {
 		sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 		oneMsTime = (APP->engine->getSampleRate()) / 1000;
+
+		beatSamplesPerSec[0] = ceil(0.5 * APP->engine->getSampleRate());
+		beatSamplesPerSec[1] = ceil(0.74 * APP->engine->getSampleRate());
+		beatSamplesPerSec[2] = APP->engine->getSampleRate();
+		beatSamplesPerSec[3] = ceil(1.25 * APP->engine->getSampleRate());
+		beatSamplesPerSec[4] = ceil(1.5 * APP->engine->getSampleRate());
+		beatSamplesPerSec[5] = ceil(1.75 * APP->engine->getSampleRate());
+		beatSamplesPerSec[6] = ceil(0.625 * APP->engine->getSampleRate());
+		beatSamplesPerSec[7] = ceil(0.75 * APP->engine->getSampleRate());
+		beatSamplesPerSec[8] = ceil(0.875 * APP->engine->getSampleRate());
+		beatSamplesPerSec[9] = APP->engine->getSampleRate();
+		beatSamplesPerSec[10] = ceil(1.125 * APP->engine->getSampleRate());
+		beatSamplesPerSec[11] = ceil(1.25 * APP->engine->getSampleRate());
+		beatSamplesPerSec[12] = ceil(1.375 * APP->engine->getSampleRate());
+		beatSamplesPerSec[13] = ceil(1.5 * APP->engine->getSampleRate());
+		beatSamplesPerSec[14] = ceil(1.625 * APP->engine->getSampleRate());
+		beatSamplesPerSec[15] = ceil(1.75 * APP->engine->getSampleRate());
+		beatSamplesPerSec[16] = ceil(1.875 * APP->engine->getSampleRate());
 
 		for (int i = 0; i < 2; i++) {
 			if (fileLoaded[i]) {
@@ -262,6 +321,10 @@ struct Clocker : Module {
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "BeatOnBar", json_boolean(beatOnBar));
+		json_object_set_new(rootJ, "ResetOnRun", json_boolean(resetOnRun));
+		json_object_set_new(rootJ, "ResetPulseOnRun", json_boolean(resetPulseOnRun));
+		json_object_set_new(rootJ, "ResetOnStop", json_boolean(resetOnStop));
+		json_object_set_new(rootJ, "ResetPulseOnStop", json_boolean(resetPulseOnStop));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		return rootJ;
@@ -271,6 +334,21 @@ struct Clocker : Module {
 		json_t* beatOnBarJ = json_object_get(rootJ, "BeatOnBar");
 		if (beatOnBarJ)
 			beatOnBar = json_boolean_value(beatOnBarJ);
+
+		json_t* resetOnRunJ = json_object_get(rootJ, "ResetOnRun");
+		if (resetOnRunJ)
+			resetOnRun = json_boolean_value(resetOnRunJ);
+		json_t* resetPulseOnRunJ = json_object_get(rootJ, "ResetPulseOnRun");
+		if (resetPulseOnRunJ)
+			resetPulseOnRun = json_boolean_value(resetPulseOnRunJ);
+
+		json_t* resetOnStopJ = json_object_get(rootJ, "ResetOnStop");
+		if (resetOnStopJ)
+			resetOnStop = json_boolean_value(resetOnStopJ);
+		json_t* resetPulseOnStopJ = json_object_get(rootJ, "ResetPulseOnStop");
+		if (resetPulseOnStopJ)
+			resetPulseOnStop = json_boolean_value(resetPulseOnStopJ);
+
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
@@ -493,35 +571,6 @@ struct Clocker : Module {
 		click_setting = params[CLICK_BUT_PARAM].getValue();
 		lights[CLICK_BUT_LIGHT].setBrightness(click_setting);
 
-		// **********  RESET
-
-		resetBut = params[RESET_BUT_PARAM].getValue();
-		if (resetBut)
-			resetValue = 1;
-		else
-			resetValue = inputs[RESET_INPUT].getVoltage();
-
-		lights[RESET_BUT_LIGHT].setBrightness(resetValue);
-
-		if (resetValue >= 1 && prevResetValue < 1) {
-			//clockSample = 1.0;
-			clockSample = clockMaxSample+1;
-			outputs[CLOCK_OUTPUT].setVoltage(0.f);
-			for (int d = 0; d < 4; d++) {
-				divPulse[d] = false;
-				divClockSample[d] = 1.0;
-				divMaxSample[d] = 0.0;
-				outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-			}
-			midBeatPlayed = false;
-			beatCounter = 1;
-			extSync = false;
-
-			resetPulse = true;
-			resetPulseTime = oneMsTime;
-		}
-		prevResetValue = resetValue;
-
 		// ********* EXTERNAL CONNECTION
 
 		extConn = inputs[EXTCLOCK_INPUT].isConnected();
@@ -531,132 +580,175 @@ struct Clocker : Module {
 		}
 		prevExtConn = extConn;
 
-
 		// ********* RUN SETTING
 
-		run_setting = params[RUN_BUT_PARAM].getValue();
-		lights[RUN_BUT_LIGHT].setBrightness(run_setting);
-
 		runTrig = inputs[RUN_INPUT].getVoltage();
-		if (runTrig && !prevRunTrig) {
-			if (run_setting)
-				run_setting = 0;
-			else
-				run_setting = 1;
-			params[RUN_BUT_PARAM].setValue(run_setting);
+		if (runTrig > 1 && prevRunTrig <=1) {
+			if (runSetting) {
+				runSetting = 0;
+				params[RUN_BUT_PARAM].setValue(0);
+			} else {
+				runSetting = 1;
+				params[RUN_BUT_PARAM].setValue(1);
+			}
 		}
 		prevRunTrig = runTrig;
-		
-		if (!extConn && run_setting && !prev_run_setting) {
-			clockSample = 1.0;
-			beatCounter = 1;
+
+		runSetting = params[RUN_BUT_PARAM].getValue();
+		lights[RUN_BUT_LIGHT].setBrightness(runSetting);
+
+		if (!runSetting && prevRunSetting) {
+			runSetting = 0;
+			if (resetOnStop) {
+				resetStart = true;
+				if (!extConn)
+					clockSample = 1.0;
+				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				for (int d = 0; d < 4; d++) {
+					divPulse[d] = false;
+					divClockSample[d] = 1.0;
+					divMaxSample[d] = 0.0;
+					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+				}
+				midBeatPlayed = false;
+				beatCounter = 20;
+			}
+			if (resetPulseOnStop) {
+				resetPulse = true;
+				resetPulseTime = oneMsTime;
+			}
+		} else if (runSetting && !prevRunSetting) {
+			runSetting = 1;
+			if (resetOnRun) {
+				resetStart = true;
+				if (!extConn)
+					clockSample = 1.0;
+				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				for (int d = 0; d < 4; d++) {
+					divPulse[d] = false;
+					divClockSample[d] = 1.0;
+					divMaxSample[d] = 0.0;
+					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+				}
+				midBeatPlayed = false;
+				beatCounter = 20;
+			}
+			if (resetPulseOnRun) {
+				resetPulse = true;
+				resetPulseTime = oneMsTime;
+			}
 		}
 
-		prev_run_setting = run_setting;
-		
-		// ********** EXTERNAL SYNC
+		prevRunSetting = runSetting;
 
-		if (extConn) {
-			extTrigValue = inputs[EXTCLOCK_INPUT].getVoltage();
-				
-			if (extTrigValue >= 1 && prevExtTrigValue < 1) {
+		// ************************* INTERNAL CLOCK
 
-				if (extSync) {
-					clockMaxSample = clockSample;
-					midBeatMaxSample = clockMaxSample / 2;
-					clockSample = 1.0;
+		if (!extConn) {
 
-					// calculate bpms
-					bpm = round(sampleRateCoeff / clockMaxSample);
-					if (bpm > 999)
-						bpm = 999;
+			// **********  RESET
 
-				} else {
-					bpm = 0.0;
-					extSync = true;
-					clockSample = 1.0;
+			resetBut = params[RESET_BUT_PARAM].getValue();
+			if (resetBut)
+				resetValue = 1;
+			else
+				resetValue = inputs[RESET_INPUT].getVoltage();
+
+			lights[RESET_BUT_LIGHT].setBrightness(resetValue);
+
+			if (resetValue >= 1 && prevResetValue < 1) {
+				resetStart = true;
+				clockSample = 1.0;
+				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				for (int d = 0; d < 4; d++) {
+					divPulse[d] = false;
+					divClockSample[d] = 1.0;
+					divMaxSample[d] = 0.0;
+					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
+				midBeatPlayed = false;
+				//beatCounter = 1;
 
-				if (run_setting)
-					extBeat = true;
+				beatCounter = 20;
 
-			} else {
-				extBeat = false;
+				resetPulse = true;
+				resetPulseTime = oneMsTime;
 			}
-			prevExtTrigValue = extTrigValue;
+			prevResetValue = resetValue;
 
-		} else
-
+			// *********** BPM CALC
+			
 			bpm = (double)params[BPM_KNOB_PARAM].getValue()/10;
 
-		// **************   RUN PROCESS   ***************
+			// **************   RUN PROCESS   ***************
 
-		if (run_setting) {
+			if (runSetting && resetPulseTime <= 0) {
 
-			// ****** CLOCK PULSE WIDTH
+				// ****** CLOCK PULSE WIDTH
 
-			maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
-			if (clockSample > maxPulseSample)
-				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
+				if (clockSample > maxPulseSample)
+					outputs[CLOCK_OUTPUT].setVoltage(0.f);
 
-			// ************ DIV / MULT
+				// ************ DIV / MULT
 
-			for (int d = 0; d < 4; d++) {
+				for (int d = 0; d < 4; d++) {
 
-				if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d]) {
-					// ***** CLOCK MULTIPLIER *****
-					divClockSample[d] = 1.0;
-					if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
-						divPulse[d] = true;
-						outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+					if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d]) {
+						// ***** CLOCK MULTIPLIER *****
+						divClockSample[d] = 1.0;
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+							divPulse[d] = true;
+							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+						}
+					}
+
+					// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
+					if (divPulse[d] && divClockSample[d] > divMaxSample[d] * params[DIVPW_KNOB_PARAM+d].getValue()) {
+						divPulse[d] = false;
+						outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 					}
 				}
 
-				// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
-				if (divPulse[d] && divClockSample[d] > divMaxSample[d] * params[DIVPW_KNOB_PARAM+d].getValue()) {
-					divPulse[d] = false;
-					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-				}
-			}
+				currentBeatMaxPerBar = beatMaxPerBar[int(params[BEAT_KNOB_PARAM].getValue())];
 
-			// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
+				// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
 
-			currentBeatMaxPerBar = beatMaxPerBar[int(params[BEAT_KNOB_PARAM].getValue())];
-
-			if (params[BEAT_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
-				beatCounter++;
-				if (beatCounter > currentBeatMaxPerBar) {
-					beatCounter = 1;
-					samplePos[BAR] = 0;
-					play[BAR] = true;
-					barPulse = true;
-					barPulseTime = oneMsTime;
-					if (beatOnBar) {
+				if (params[BEAT_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
+					beatCounter++;
+					if (beatCounter > currentBeatMaxPerBar) {
+						beatCounter = 1;
+						samplePos[BAR] = 0;
+						play[BAR] = true;
+						barPulse = true;
+						barPulseTime = oneMsTime;
+						if (beatOnBar) {
+							beatPulse = true;
+							beatPulseTime = oneMsTime;
+						}
+					} else {
+						samplePos[BEAT] = 0;
+						play[BEAT] = true;
 						beatPulse = true;
 						beatPulseTime = oneMsTime;
 					}
-				} else {
-					samplePos[BEAT] = 0;
-					play[BEAT] = true;
-					beatPulse = true;
-					beatPulseTime = oneMsTime;
+					midBeatPlayed = true;
 				}
-				midBeatPlayed = true;
-			}
-
-			if (!extConn) {
 
 				//	*************************  INTERNAL CLOCK  ******************
 
 				clockMaxSample = sampleRateCoeff / bpm;
 				midBeatMaxSample = clockMaxSample / 2;
 				
-				if (clockSample > clockMaxSample)  {
+				if (clockSample > clockMaxSample || resetStart)  {
 					midBeatPlayed = false;
 
 					beatCounter++;
 
-					clockSample -= clockMaxSample;
+					if (resetStart) {
+						clockSample = 1.0;
+						resetStart = false;
+					} else
+						clockSample -= clockMaxSample;
 					
 					for (int d = 0; d < 4; d++) {
 						
@@ -700,7 +792,132 @@ struct Clocker : Module {
 					
 				}
 
-			} else {		
+				clockSample++;
+				divClockSample[0]++;
+				divClockSample[1]++;
+				divClockSample[2]++;
+				divClockSample[3]++;
+				
+			}
+
+		} else {
+
+			// ************************************************ EXTERNAL CLOCK
+
+			// **********  RESET
+
+			resetBut = params[RESET_BUT_PARAM].getValue();
+			if (resetBut)
+				resetValue = 1;
+			else
+				resetValue = inputs[RESET_INPUT].getVoltage();
+
+			lights[RESET_BUT_LIGHT].setBrightness(resetValue);
+
+			if (resetValue >= 1 && prevResetValue < 1) {
+				//extSync = false;
+				//clockSample = 1.0;
+				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				for (int d = 0; d < 4; d++) {
+					divPulse[d] = false;
+					divClockSample[d] = 1.0;
+					divMaxSample[d] = 0.0;
+					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+				}
+				midBeatPlayed = false;
+				
+				beatCounter = 1;
+
+				resetPulse = true;
+				resetPulseTime = oneMsTime;
+			}
+			prevResetValue = resetValue;
+
+			// ********** EXTERNAL SYNC
+
+			extTrigValue = inputs[EXTCLOCK_INPUT].getVoltage();
+				
+			if (extTrigValue >= 1 && prevExtTrigValue < 1) {
+
+				if (extSync) {
+					clockMaxSample = clockSample;
+					midBeatMaxSample = clockMaxSample / 2;
+					clockSample = 1.0;
+
+					// calculate bpms
+					bpm = round(sampleRateCoeff / clockMaxSample);
+					if (bpm > 999)
+						bpm = 999;
+
+				} else {
+					bpm = 0.0;
+					extSync = true;
+					clockSample = 1.0;
+
+				}
+
+				if (runSetting)
+					extBeat = true;
+
+			} else {
+				extBeat = false;
+			}
+			prevExtTrigValue = extTrigValue;
+
+			// **************   RUN PROCESS   ***************
+
+			if (runSetting && resetPulseTime <= 0) {
+
+				// ****** CLOCK PULSE WIDTH
+
+				maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
+				if (clockSample > maxPulseSample)
+					outputs[CLOCK_OUTPUT].setVoltage(0.f);
+
+				// ************ DIV / MULT
+
+				for (int d = 0; d < 4; d++) {
+
+					if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d]) {
+						// ***** CLOCK MULTIPLIER *****
+						divClockSample[d] = 1.0;
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+							divPulse[d] = true;
+							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+						}
+					}
+
+					// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
+					if (divPulse[d] && divClockSample[d] > divMaxSample[d] * params[DIVPW_KNOB_PARAM+d].getValue()) {
+						divPulse[d] = false;
+						outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+					}
+				}
+
+				currentBeatMaxPerBar = beatMaxPerBar[int(params[BEAT_KNOB_PARAM].getValue())];
+
+				// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
+
+				if (params[BEAT_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
+					beatCounter++;
+					if (beatCounter > currentBeatMaxPerBar) {
+						beatCounter = 1;
+						samplePos[BAR] = 0;
+						play[BAR] = true;
+						barPulse = true;
+						barPulseTime = oneMsTime;
+						if (beatOnBar) {
+							beatPulse = true;
+							beatPulseTime = oneMsTime;
+						}
+					} else {
+						samplePos[BEAT] = 0;
+						play[BEAT] = true;
+						beatPulse = true;
+						beatPulseTime = oneMsTime;
+					}
+					midBeatPlayed = true;
+				}
 
 				// ************************ EXTERNAL CLOCK ******************
 
@@ -767,7 +984,7 @@ struct Clocker : Module {
 					}
 				}
 			}
-
+				
 			clockSample++;
 			divClockSample[0]++;
 			divClockSample[1]++;
@@ -776,6 +993,7 @@ struct Clocker : Module {
 			
 		}
 
+		// ***************************** COMMON PROCESS
 
 		//	************ AUDIO CLICK
 
@@ -1439,7 +1657,15 @@ struct ClockerWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Beat pulse also on Bar", "", &module->beatOnBar));
 
-
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("On Run", "", [=](Menu* menu) {
+			menu->addChild(createBoolPtrMenuItem("Reset Beat", "", &module->resetOnRun));
+			menu->addChild(createBoolPtrMenuItem("Reset Pulse", "", &module->resetPulseOnRun));
+		}));
+		menu->addChild(createSubmenuItem("On Stop", "", [=](Menu* menu) {
+			menu->addChild(createBoolPtrMenuItem("Reset Beat", "", &module->resetOnStop));
+			menu->addChild(createBoolPtrMenuItem("Reset Pulse", "", &module->resetPulseOnStop));
+		}));
 	}
 };
 
