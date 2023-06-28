@@ -3,7 +3,7 @@
 struct Adder8 : Module {
 	
 	bool outMode = true;	//  true: Stop On Cable ---- false: sum all outputs
-	int voltDefaultOption = 1;
+	int voltDefaultOption = 0;
 	float voltDefaults[3] = {0.f, 1.f, 10.f};
 	float cv[8] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 
@@ -47,14 +47,14 @@ struct Adder8 : Module {
 		configSwitch(ADDSUB_SWITCH+6, -1.f, 1.f, 0.f, "Operation", {"Subtract", "Off", "Add"});
 		configSwitch(ADDSUB_SWITCH+7, -1.f, 1.f, 0.f, "Operation", {"Subtract", "Off", "Add"});
 
-		configParam(VOLT_PARAMS+0, -10.f,10.f, 1.f, "Volt", "v");
-		configParam(VOLT_PARAMS+1, -10.f,10.f, 1.f, "Volt", "v");
-		configParam(VOLT_PARAMS+2, -10.f,10.f, 1.f, "Volt", "v");
-		configParam(VOLT_PARAMS+3, -10.f,10.f, 1.f, "Volt", "v");
-		configParam(VOLT_PARAMS+4, -10.f,10.f, 1.f, "Volt", "v");
-		configParam(VOLT_PARAMS+5, -10.f,10.f, 1.f, "Volt", "v");
-		configParam(VOLT_PARAMS+6, -10.f,10.f, 1.f, "Volt", "v");
-		configParam(VOLT_PARAMS+7, -10.f,10.f, 1.f, "Volt", "v");
+		configParam(VOLT_PARAMS+0, -10.f,10.f, 0.f, "Volt", "v");
+		configParam(VOLT_PARAMS+1, -10.f,10.f, 0.f, "Volt", "v");
+		configParam(VOLT_PARAMS+2, -10.f,10.f, 0.f, "Volt", "v");
+		configParam(VOLT_PARAMS+3, -10.f,10.f, 0.f, "Volt", "v");
+		configParam(VOLT_PARAMS+4, -10.f,10.f, 0.f, "Volt", "v");
+		configParam(VOLT_PARAMS+5, -10.f,10.f, 0.f, "Volt", "v");
+		configParam(VOLT_PARAMS+6, -10.f,10.f, 0.f, "Volt", "v");
+		configParam(VOLT_PARAMS+7, -10.f,10.f, 0.f, "Volt", "v");
 
 		configSwitch(MODE_SWITCH+0, -1.f, 1.f, 0.f, "Mode", {"Subtract/Off", "Add/Off/Subtract", "Off/Add"});
 		configSwitch(MODE_SWITCH+1, -1.f, 1.f, 0.f, "Mode", {"Subtract/Off", "Add/Off/Subtract", "Off/Add"});
@@ -77,7 +77,12 @@ struct Adder8 : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
-		outMode = false;
+		outMode = true;
+		voltDefaultOption = 0;
+		for (int i = 0; i < 8; i++) {
+			engine::ParamQuantity* pq = getParamQuantity(VOLT_PARAMS+i);
+			pq->defaultValue = voltDefaults[voltDefaultOption];
+		}
 		Module::onReset(e);
 	}
 
@@ -229,7 +234,11 @@ struct Adder8Widget : ModuleWidget {
 				menu->addChild(voltItem);
 			}
 		}));
-
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Reset All Knobs to Default", "", [=]() {
+			for (int i = 0; i < 8; i++)
+				module->params[module->VOLT_PARAMS+i].setValue(module->voltDefaults[module->voltDefaultOption]);
+		}));
 	}
 };
 

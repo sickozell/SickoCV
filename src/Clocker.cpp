@@ -719,6 +719,7 @@ struct Clocker : Module {
 						beatCounter = 1;
 						samplePos[BAR] = 0;
 						play[BAR] = true;
+						play[BEAT] = false;
 						barPulse = true;
 						barPulseTime = oneMsTime;
 						if (beatOnBar) {
@@ -728,6 +729,7 @@ struct Clocker : Module {
 					} else {
 						samplePos[BEAT] = 0;
 						play[BEAT] = true;
+						play[BAR] = false;
 						beatPulse = true;
 						beatPulseTime = oneMsTime;
 					}
@@ -775,6 +777,7 @@ struct Clocker : Module {
 						beatCounter = 1;
 						samplePos[BAR] = 0;
 						play[BAR] = true;
+						play[BEAT] = false;
 						barPulse = true;
 						barPulseTime = oneMsTime;
 						if (beatOnBar) {
@@ -784,6 +787,7 @@ struct Clocker : Module {
 					} else {
 						samplePos[BEAT] = 0;
 						play[BEAT] = true;
+						play[BAR] = false;
 						beatPulse = true;
 						beatPulseTime = oneMsTime;
 					}
@@ -904,6 +908,7 @@ struct Clocker : Module {
 						beatCounter = 1;
 						samplePos[BAR] = 0;
 						play[BAR] = true;
+						play[BEAT] = false;
 						barPulse = true;
 						barPulseTime = oneMsTime;
 						if (beatOnBar) {
@@ -913,6 +918,7 @@ struct Clocker : Module {
 					} else {
 						samplePos[BEAT] = 0;
 						play[BEAT] = true;
+						play[BAR] = false;
 						beatPulse = true;
 						beatPulseTime = oneMsTime;
 					}
@@ -955,6 +961,7 @@ struct Clocker : Module {
 							beatCounter = 1;
 							samplePos[BAR] = 0;
 							play[BAR] = true;
+							play[BEAT] = false;
 							barPulse = true;
 							barPulseTime = oneMsTime;
 							if (beatOnBar) {
@@ -965,6 +972,7 @@ struct Clocker : Module {
 							// ***** BEAT DETECTED *****
 							samplePos[BEAT] = 0;
 							play[BEAT] = true;
+							play[BAR] = false;
 							beatPulse = true;
 							beatPulseTime = oneMsTime;
 						}
@@ -978,6 +986,7 @@ struct Clocker : Module {
 						beatCounter++;
 						samplePos[BEAT] = 0;
 						play[BEAT] = true;
+						play[BAR] = false;
 						beatPulse = true;
 						beatPulseTime = oneMsTime;
 
