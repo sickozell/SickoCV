@@ -1,8 +1,13 @@
+### 2.5.4 (2023-06-29)
+- added Adder8 module
+- added Clocker module
+- added CvRouter module
+- added CvSwitcher module
+- drumPlayerXtra: fixed a bug that crashes VCV when changing zoom without a sample loaded
+
 ### 2.5.3 (2023-05-24)
 
 added sickoSampler module  
-
-added polyphony on signal I/O on bToggler, bTogglerCompact, Toggler, bTogglerCompact, Switcher, SwitcherSt  
 
 **sickoPlayer**  
 - fixed bug on phasescan when scanning through silence  

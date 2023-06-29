@@ -1,11 +1,33 @@
-# SickoCV v2.5.3
+# SickoCV v2.5.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 3](https://github.com/sickozell/SickoCV/assets/80784296/f7a8f881-6af8-4341-969b-6e521749765f)
+![SickoCV modules 2 5 4](https://github.com/sickozell/SickoCV/assets/80784296/0240477b-b56a-4375-a31d-3c0a2f668bde)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
 - Every time-related knob set full anticlockwise and displaying 1ms on the tooltip is actually considered 0ms
+
+## Adder8
+### 8 Adder and subtractor
+#### - DESCRIPTION
+'adder8' is inspired by hardware precision adder modules. It adds, ignore or subtracts fixed voltages or CVS to outputs. 
+
+![adder8](https://github.com/sickozell/SickoCV/assets/80784296/c633694c-d2f8-449f-9284-8c16d1b76a12)
+
+#### - INSTRUCTIONS
+On the first row a fixed voltage set by VLT/ATNV knob is added, ignored or subtracted, depending on the -0+ switch, to the corresponding output.  
+If the output is not connected, the result voltage is summed to the next row, and with the same rules until a connected output is found.  
+If a CV input is connected, the VLT/ATNV knob acts as an attenuverter, then the CV voltage will be added or subtracted in the same previous way.  
+When an output is connected, the starting voltage of the next row is reset to 0v just like the first row does.  
+The MODE switches force the "-0+" switches to be as: "subtract/ignore", "subtract/ignore/add" or "ignore/add".  
+
+#### CONTEXT MENU
+- **Stop Adding on Out Cable** (ticked by default). As mentioned above, the starting voltage is reset to 0v in the next row only when an out cable is detected. Unticking this option the voltage won't be reset.
+- **Volt Knob Default**. With this option the default initialization value of the VLT/ATNV knob can be changed to 0v, +1v or +10v.  
+This unconventional feature lets the user to choose the default knob value depending on the main usage of Adder8:  
+if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add (or subtract) exactly 1 octave in pitch;  
+otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
+- **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
 
 ## Blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -168,6 +190,58 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
+
+## Clocker
+### Clock generator with 4 dividers/multipliers and audio metronome
+
+#### - DESCRIPTION
+Clocker is a high precision clock generator and modulator with 4 dividers/multipliers and integrated audio click.
+
+![clocker](https://github.com/sickozell/SickoCV/assets/80784296/7cdfce27-6f65-4a45-ad29-4c62aefa22d8)
+
+#### - INSTRUCTIONS
+The BPM knob sets the clock speed from 30 to 300 bpm.  
+An external clock can be connected on the EXT input.  
+The RUN button or a trig on its input starts or stops the clock.  
+PW (pulse width) knob adjusts the length of the gate in its high state.  
+Clock and metronome can be reset with RST button or a trig on its input.  
+
+There are 4 clock dividers/multipliers up to 256x each with theirs PW control. Right click on the display to quick select the desired division/multiplication.  
+
+The metronome setting is controlled by the METER knob or with a right click on the display.  
+Audio click is activated with CLICK button and volume can be adjusted with the knob from 0 to 200%.  
+BEAT and BAR outputs are always active and give a 1ms trigger.
+
+#### Context Menu
+
+- **Click Presets**  
+There are 3 predefined types of audio clicks, each one with beat and bar sample.  
+
+- **Load BEAT click / Load BAR click**  
+Audio clicks can be customized loading wav sample using "Load BEAT" and "Load BAR" options.  
+
+- **Beat pulses also on Bar**  
+When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.  
+
+- **On Run**  
+"Beat Reset" resets metronome when the Run Button is switched on.  
+"Reset Pulse" sends a reset pulse on Reset output when the Run Button is switched on.
+
+- **On Stop**  
+This submenu is the same as the previous one but when the Run Button is switched off.
+
+## CvRouter CvSwitcher
+### 1>2 and 2>1 voltage controlled switch  
+
+![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/d82e6cda-d973-4476-8d3a-28640a4bbe41)
+
+#### - INSTRUCTIONS
+With the cvRouter the IN signal will be routed to OUT1 or OUT2 if the CV input voltage is lower or higher than the voltage set by the "THR" threshold knob.  
+With the cvSwitcher the OUT will receive the signal from IN1 or IN2 if the voltage of the CV input is lower or higher than the voltage set by the threshold "THR" knob.
+
+The FADE knob with its added CV input, will crossfade up to 10s the INs or OUTs. 
+
+The default value of the "THR" knob is +1v.
 
 ## Drummer Drummer4 Drummer4+
 ### Accent and choke utility for drum modules lacking these features
@@ -442,9 +516,8 @@ FD knob sets the fade in/out time when recording starts or stops.
 
 OVD button overdubs existing sample.  
 
-XTN button enables extended recording. In forward recording, it continues recording also when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached.  
-
-Please note that when in loop recording the XFD knob is overridden, and it will not do any crossfade.  
+XTN button enables extended recording. In forward recording, it continues recording also when cue end point or sample end are reached. In reverse recording it keeps recording until sample begin point is reached. If loop is enabled XTN button has no effect and it will record as usual.  
+Please note that when in loop recording XFD knob is overridden, and it will not do any crossfade.  
 
 RRM (REC Re-Arm): when recording is stopped by a playback trig/button, it is rearmed when release time has ended or fadeout recording has finished. This function is not available in conjunction with POR "Play on REC". In "Restart" trig-type mode recording is rearmed only when after a STOP trig/button is detected.  
 

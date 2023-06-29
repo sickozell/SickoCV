@@ -975,7 +975,8 @@ struct dpxSlot1Display : TransparentWidget {
 		int zoom;
 		void onAction(const event::Action& e) override {
 			module->zoom[0] = zoom;
-			module->displayRecalc(zoom, 0);
+			if (module->fileLoaded[0])
+				module->displayRecalc(zoom, 0);
 		}
 	};
 
@@ -1289,7 +1290,8 @@ struct dpxSlot2Display : TransparentWidget {
 		int zoom;
 		void onAction(const event::Action& e) override {
 			module->zoom[1] = zoom;
-			module->displayRecalc(zoom, 1);
+			if (module->fileLoaded[1])
+				module->displayRecalc(zoom, 1);
 		}
 	};
 
@@ -1602,7 +1604,8 @@ struct dpxSlot3Display : TransparentWidget {
 		int zoom;
 		void onAction(const event::Action& e) override {
 			module->zoom[2] = zoom;
-			module->displayRecalc(zoom, 2);
+			if (module->fileLoaded[2])
+				module->displayRecalc(zoom, 2);
 		}
 	};
 
@@ -1915,7 +1918,8 @@ struct dpxSlot4Display : TransparentWidget {
 		int zoom;
 		void onAction(const event::Action& e) override {
 			module->zoom[3] = zoom;
-			module->displayRecalc(zoom, 3);
+			if (module->fileLoaded[3])
+				module->displayRecalc(zoom, 3);
 		}
 	};
 

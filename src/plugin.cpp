@@ -34,4 +34,8 @@ void init(Plugin* p) {
 	p->addModel(modelSickoSampler);
 	p->addModel(modelDrumPlayerXtra);
 	p->addModel(modelWavetabler);
+	p->addModel(modelCVswitcher);
+	p->addModel(modelCVrouter);
+	p->addModel(modelAdder8);
+	p->addModel(modelClocker);
 }
