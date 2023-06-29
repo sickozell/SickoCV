@@ -27,7 +27,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.5.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 4](https://github.com/sickozell/SickoCV/assets/80784296/e95e1497-1f02-4f97-a841-2c211ce08efc)
+![SickoCV modules 2 5 4](https://github.com/sickozell/SickoCV/assets/80784296/0240477b-b56a-4375-a31d-3c0a2f668bde)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
@@ -223,7 +223,7 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 #### - DESCRIPTION
 Clocker is a high precision clock generator and modulator with 4 dividers/multipliers and integrated audio click.
 
-![clocker](https://github.com/sickozell/SickoCV/assets/80784296/33a56d70-90f9-4cdc-8fae-11223335ea62)
+![clocker](https://github.com/sickozell/SickoCV/assets/80784296/7cdfce27-6f65-4a45-ad29-4c62aefa22d8)
 
 #### - INSTRUCTIONS
 The BPM knob sets the clock speed from 30 to 300 bpm.  
