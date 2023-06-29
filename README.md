@@ -1,4 +1,4 @@
-# SickoCV v2.5.4-beta8
+# SickoCV v2.5.4-beta9
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -51,7 +51,7 @@ The MODE switches force the "-0+" switches to be as: "subtract/ignore", "subtrac
 - **Stop Adding on Out Cable** (ticked by default). As mentioned above, the starting voltage is reset to 0v in the next row only when an out cable is detected. Unticking this option the voltage won't be reset.
 - **Volt Knob Default**. With this option the default initialization value of the VLT/ATNV knob can be changed to 0v, +1v or +10v.  
 This unconventional feature lets the user to choose the default knob value depending on the main usage of Adder8:  
-if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add exactly 1 octave in pitch;  
+if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add (or subtract) exactly 1 octave in pitch;  
 otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
 - **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
 
@@ -234,8 +234,8 @@ Clock and metronome can be reset with RST button or a trig on its input.
 
 There are 4 clock dividers/multipliers up to 256x each with theirs PW control. Right click on the display to quick select the desired division/multiplication.  
 
-The metronome can be setup via the TEMPO knob or with a right click on the display.  
-Audio click is activated with its button and volume can be adjusted with the knob from 0 to 200%.  
+The metronome setting is controlled by the METER knob or with a right click on the display.  
+Audio click is activated with CLICK button and volume can be adjusted with the knob from 0 to 200%.  
 BEAT and BAR outputs are always active and give a 1ms trigger.
 
 #### Context Menu
@@ -243,7 +243,7 @@ BEAT and BAR outputs are always active and give a 1ms trigger.
 **Click Presets**  
 There are 3 predefined types of audio clicks, each one with beat and bar sample.  
 
-**Load Beat / Load Bar**  
+**Load BEAT click / Load BAR click**  
 Audio clicks can be customized loading wav sample using "Load BEAT" and "Load BAR" options.  
 
 **Beat pulses also on Bar** 
@@ -251,7 +251,7 @@ when ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 
 **On Run**  
 - "Beat Reset" resets metronome when the Run Button is switched on.  
-- "Reset Pulse" send a reset pulse on Reset output when the Run Button is switched on.
+- "Reset Pulse" sends a reset pulse on Reset output when the Run Button is switched on.
 
 **On Stop**  
 This submenu is the same as the previous one but when the Run Button is switched off.

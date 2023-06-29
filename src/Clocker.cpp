@@ -23,7 +23,7 @@ struct tpBeat : ParamQuantity {
 
 struct tpDivMult : ParamQuantity {
 	std::string getDisplayValueString() override {
-		const std::string valueDisplay[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "1",
+		const std::string valueDisplay[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
 								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
 		return valueDisplay[int(getValue())];
 	}
@@ -86,7 +86,7 @@ struct Clocker : Module {
 	const int beatMaxPerBar[17] = {2, 3, 4, 5, 6, 7, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 	int currentBeatMaxPerBar = 4;
 
-	const std::string divMultDisplay[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "1",
+	const std::string divMultDisplay[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
 								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
 
 	const float divMult[41] = {256, 128, 64, 32, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
@@ -209,10 +209,10 @@ struct Clocker : Module {
 		paramQuantities[BPM_KNOB_PARAM]->snapEnabled = true;
 
 		configParam(PW_KNOB_PARAM, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
-		configSwitch(CLICK_BUT_PARAM, 0.f, 1.f, 1.f, "Click", {"OFF", "ON"});
+		configSwitch(CLICK_BUT_PARAM, 0.f, 1.f, 0.f, "Click", {"OFF", "ON"});
 		configParam(CLICKVOL_KNOB_PARAM, 0.f, 2.f, 1.0f, "Click Level", "%", 0, 100);
 		
-		configParam<tpBeat>(BEAT_KNOB_PARAM, 0.f, 16.0f, 2.f, "Beat");
+		configParam<tpBeat>(BEAT_KNOB_PARAM, 0.f, 16.0f, 2.f, "Meter");
 		paramQuantities[BEAT_KNOB_PARAM]->snapEnabled = true;
 
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 40.f, 20.f, "Mult/Div #1");
@@ -1194,16 +1194,15 @@ struct ClockerDisplayDiv1 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue());
 				float tempXpos = 3;
-				if (tempValue == 20)
+				if (tempValue > 11 && tempValue < 29)
 					tempXpos = 12.8;
 
-				if (tempValue < 20) {
+				if (tempValue < 20)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-					nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-				} else {
+				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-					nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-				}
+
+				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -1224,7 +1223,7 @@ struct ClockerDisplayDiv1 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "1",
+			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
 								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
 			for (int i = 0; i < 41; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
@@ -1263,16 +1262,15 @@ struct ClockerDisplayDiv2 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue());
 				float tempXpos = 3;
-				if (tempValue == 20)
+				if (tempValue > 11 && tempValue < 29)
 					tempXpos = 12.8;
 
-				if (tempValue < 20) {
+				if (tempValue < 20)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-					nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-				} else {
+				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-					nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-				}
+
+				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -1293,7 +1291,7 @@ struct ClockerDisplayDiv2 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "1",
+			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
 								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
 			for (int i = 0; i < 41; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
@@ -1332,16 +1330,15 @@ struct ClockerDisplayDiv3 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue());
 				float tempXpos = 3;
-				if (tempValue == 20)
+				if (tempValue > 11 && tempValue < 29)
 					tempXpos = 12.8;
 
-				if (tempValue < 20) {
+				if (tempValue < 20)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-					nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-				} else {
+				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-					nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-				}
+
+				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -1362,7 +1359,7 @@ struct ClockerDisplayDiv3 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "1",
+			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
 								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
 			for (int i = 0; i < 41; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
@@ -1401,16 +1398,15 @@ struct ClockerDisplayDiv4 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue());
 				float tempXpos = 3;
-				if (tempValue == 20)
+				if (tempValue > 11 && tempValue < 29)
 					tempXpos = 12.8;
 
-				if (tempValue < 20) {
+				if (tempValue < 20)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-					nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-				} else {
+				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-					nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-				}
+
+				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -1431,7 +1427,7 @@ struct ClockerDisplayDiv4 : TransparentWidget {
 				}
 			};
 
-			std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "1",
+			std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
 								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
 			for (int i = 0; i < 41; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
@@ -1444,6 +1440,7 @@ struct ClockerDisplayDiv4 : TransparentWidget {
 	}
 };
 
+/*
 struct ClockerDebugDisplay : TransparentWidget {
 	Clocker *module;
 	int frame = 0;
@@ -1459,7 +1456,7 @@ struct ClockerDebugDisplay : TransparentWidget {
 				nvgTextLetterSpacing(args.vg, 0);
 				nvgFillColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0xff)); 
 				
-				/*
+
 				nvgTextBox(args.vg, 9, 0,120, module->debugDisplay.c_str(), NULL);
 				nvgTextBox(args.vg, 9, 10,120, module->debugDisplay2.c_str(), NULL);
 				nvgTextBox(args.vg, 9, 20,120, module->debugDisplay3.c_str(), NULL);
@@ -1467,13 +1464,14 @@ struct ClockerDebugDisplay : TransparentWidget {
 				nvgTextBox(args.vg, 9, 40,120, module->debugDisplay5.c_str(), NULL);
 				nvgTextBox(args.vg, 9, 50,120, module->debugDisplay6.c_str(), NULL);
 				nvgTextBox(args.vg, 9, 60,120, module->debugDisplay7.c_str(), NULL);
-				*/
+
 
 			}
 		}
 		Widget::drawLayer(args, layer);
 	}
 };
+*/
 
 struct ClockerWidget : ModuleWidget {
 	ClockerWidget(Clocker *module) {
@@ -1654,12 +1652,11 @@ struct ClockerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 
-		menu->addChild(createMenuLabel("Audio Clicks"));
-		menu->addChild(createMenuItem("Load BEAT", "", [=]() {module->menuLoadSample(0);}));
+		menu->addChild(createMenuItem("Load BEAT click", "", [=]() {module->menuLoadSample(0);}));
 		menu->addChild(createMenuItem("File: " + module->fileDescription[0], "", [=]() {module->menuLoadSample(0);}));
 		menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(0);}));
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load BAR", "", [=]() {module->menuLoadSample(1);}));
+		menu->addChild(createMenuItem("Load BAR click", "", [=]() {module->menuLoadSample(1);}));
 		menu->addChild(createMenuItem("File: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
 		menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(1);}));
 

@@ -1,4 +1,4 @@
-### 2.5.4 (2023-06-27)
+### 2.5.4 (2023-06-29)
 - added Adder8 module
 - added Clocker module
 - added CvRouter module
