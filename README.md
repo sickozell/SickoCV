@@ -240,20 +240,20 @@ BEAT and BAR outputs are always active and give a 1ms trigger.
 
 #### Context Menu
 
-**Click Presets**  
+- **Click Presets**  
 There are 3 predefined types of audio clicks, each one with beat and bar sample.  
 
-**Load BEAT click / Load BAR click**  
+- **Load BEAT click / Load BAR click**  
 Audio clicks can be customized loading wav sample using "Load BEAT" and "Load BAR" options.  
 
-**Beat pulses also on Bar** 
-when ticked, BAR pulses on the BAR output are duplicated on the BEAT output.  
+- **Beat pulses also on Bar**  
+When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.  
 
-**On Run**  
-- "Beat Reset" resets metronome when the Run Button is switched on.  
-- "Reset Pulse" sends a reset pulse on Reset output when the Run Button is switched on.
+- **On Run**  
+"Beat Reset" resets metronome when the Run Button is switched on.  
+"Reset Pulse" sends a reset pulse on Reset output when the Run Button is switched on.
 
-**On Stop**  
+- **On Stop**  
 This submenu is the same as the previous one but when the Run Button is switched off.
 
 ## CvRouter CvSwitcher
