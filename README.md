@@ -38,7 +38,7 @@ VCV Rack plugin modules
 #### - DESCRIPTION
 'adder8' is inspired by hardware precision adder modules. It adds, ignore or subtracts fixed voltages or CVS to outputs. 
 
-![adder8](https://github.com/sickozell/SickoCV/assets/80784296/c633694c-d2f8-449f-9284-8c16d1b76a12)
+![adder8](https://github.com/sickozell/SickoCV/assets/80784296/b3d1e618-fcc4-49c1-8662-7ddf119e7304)
 
 #### - INSTRUCTIONS
 On the first row a fixed voltage set by VLT/ATNV knob is added, ignored or subtracted, depending on the -0+ switch, to the corresponding output.  
