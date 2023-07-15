@@ -63,6 +63,7 @@ struct DrumPlayer : Module {
 	std::string storedPath[4] = {"","","",""};
 	std::string fileDescription[4] = {"--none--","--none--","--none--","--none--"};
 	std::string userFolder = "";
+	bool rootFound = false;
 
 	std::string tempDir = "";
 	vector<vector<std::string>> folderTreeData;
@@ -203,8 +204,10 @@ struct DrumPlayer : Module {
 			userFolder = json_string_value(userFolderJ);
 			if (userFolder != "") {
 				createFolder(userFolder);
-				folderTreeData.push_back(tempTreeData);
-				folderTreeDisplay.push_back(tempTreeDisplay);
+				if (rootFound) {
+					folderTreeData.push_back(tempTreeData);
+					folderTreeDisplay.push_back(tempTreeDisplay);
+				}
 			}
 		}
 	}
@@ -247,8 +250,10 @@ struct DrumPlayer : Module {
 			folderTreeDisplay.clear();
 			userFolder = std::string(path);
 			createFolder(userFolder);
-			folderTreeData.push_back(tempTreeData);
-			folderTreeDisplay.push_back(tempTreeDisplay);
+			if (rootFound) {
+				folderTreeData.push_back(tempTreeData);
+				folderTreeDisplay.push_back(tempTreeDisplay);
+			}
 		}
 		free(path);
 	};
@@ -257,8 +262,10 @@ struct DrumPlayer : Module {
 		folderTreeData.clear();
 		folderTreeDisplay.clear();
 		createFolder(userFolder);
-		folderTreeData.push_back(tempTreeData);
-		folderTreeDisplay.push_back(tempTreeDisplay);
+		if (rootFound) {
+			folderTreeData.push_back(tempTreeData);
+			folderTreeDisplay.push_back(tempTreeDisplay);
+		}
 	}
 
 	void createFolder(std::string dir_path) {
@@ -277,44 +284,50 @@ struct DrumPlayer : Module {
 			dir_path += "/";
 
 		DIR *dir = opendir(dir_path.c_str());
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			std::string filename = d->d_name;
-			if (filename != "." && filename != "..") {
-				std::string filepath = std::string(dir_path) + filename;
-				struct stat statbuf;
-				if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
-					browserDir.push_back(filepath + "/");
-					browserDirDisplay.push_back(filename);
-				} else {
-					std::size_t found = filename.find(".wav",filename.length()-5);
-					if (found==std::string::npos)
-						found = filename.find(".WAV",filename.length()-5);
-					if (found!=std::string::npos) {
-						browserFiles.push_back(filepath);
-						browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+
+		if (dir) {
+			rootFound = true;
+			struct dirent *d;
+			while ((d = readdir(dir))) {
+				std::string filename = d->d_name;
+				if (filename != "." && filename != "..") {
+					std::string filepath = std::string(dir_path) + filename;
+					struct stat statbuf;
+					if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
+						browserDir.push_back(filepath + "/");
+						browserDirDisplay.push_back(filename);
+					} else {
+						std::size_t found = filename.find(".wav",filename.length()-5);
+						if (found==std::string::npos)
+							found = filename.find(".WAV",filename.length()-5);
+						if (found!=std::string::npos) {
+							browserFiles.push_back(filepath);
+							browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+						}
 					}
 				}
+	   		}
+	   		closedir(dir);
+	   		
+	   		sort(browserDir.begin(), browserDir.end());
+			sort(browserDirDisplay.begin(), browserDirDisplay.end());
+			sort(browserFiles.begin(), browserFiles.end());
+			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+			
+			tempTreeData.push_back(dir_path);
+			tempTreeDisplay.push_back(dir_path);
+
+			for (unsigned int i = 0; i < browserDir.size(); i++) {
+				tempTreeData.push_back(browserDir[i]);
+				tempTreeDisplay.push_back(browserDirDisplay[i]);
 			}
-   		}
-   		closedir(dir);
-
-		sort(browserDir.begin(), browserDir.end());
-		sort(browserDirDisplay.begin(), browserDirDisplay.end());
-		sort(browserFiles.begin(), browserFiles.end());
-		sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
-		
-		tempTreeData.push_back(dir_path);
-		tempTreeDisplay.push_back(dir_path);
-
-		for (unsigned int i = 0; i < browserDir.size(); i++) {
-			tempTreeData.push_back(browserDir[i]);
-			tempTreeDisplay.push_back(browserDirDisplay[i]);
-		}
-		for (unsigned int i = 0; i < browserFiles.size(); i++) {
-			tempTreeData.push_back(browserFiles[i]);
-			tempTreeDisplay.push_back(browserFilesDisplay[i]);
-		}
+			for (unsigned int i = 0; i < browserFiles.size(); i++) {
+				tempTreeData.push_back(browserFiles[i]);
+				tempTreeDisplay.push_back(browserFilesDisplay[i]);
+			}
+	   	} else {
+	   		rootFound = false;
+	   	}
 	};
 
 	void swapSlot(int slot1, int slot2) {
@@ -1069,9 +1082,17 @@ struct DrumPlayerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
-		if (module->userFolder != "") {
+		/*if (module->userFolder != "") {
 			menu->addChild(createMenuLabel(module->userFolder));
 			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+		}*/
+		if (module->userFolder != "") {
+			if (module->rootFound) {
+				menu->addChild(createMenuLabel(module->userFolder));
+				menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+			} else {
+				menu->addChild(createMenuLabel("(!)"+module->userFolder));
+			}
 		}
 
 		menu->addChild(new MenuSeparator());
