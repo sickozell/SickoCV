@@ -1,3 +1,7 @@
+### 2.5.5 (2023-07)
+- fixed a bug on all player/sampler modules crashing VCV on MACs when root folder is not found
+- added a functionality on all player/sampler modules to to show the path of not found files
+
 ### 2.5.4 (2023-06-29)
 - added Adder8 module
 - added Clocker module

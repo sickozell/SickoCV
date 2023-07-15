@@ -15,11 +15,11 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - all **Player/Sampler** modules
 
 ## **to do list:** 
-- fix all player/sampler modules crashing VCV on MACs when root folder is not found
+- modules test
 
 ## **changelog**  
-- added new modules: Adder8 Clocker CvRouter CvSwitcher
-- drumPlayerXtra: fixed a bug that crashes VCV when changing zoom without a sample loaded
+- fixed a bug on all player/sampler modules crashing VCV on MACs when root folder is not found
+- added a functionality on all player/sampler modules to to show the path of not found files
 
 # SickoCV v2.5.5
 VCV Rack plugin modules
