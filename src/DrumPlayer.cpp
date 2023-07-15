@@ -64,6 +64,7 @@ struct DrumPlayer : Module {
 	std::string fileDescription[4] = {"--none--","--none--","--none--","--none--"};
 	std::string userFolder = "";
 	bool rootFound = false;
+	bool fileFound[4] = {false, false, false, false};
 
 	std::string tempDir = "";
 	vector<vector<std::string>> folderTreeData;
@@ -182,22 +183,26 @@ struct DrumPlayer : Module {
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
-			loadSample(storedPath[0], 0);
+			if (storedPath[0] != "")
+				loadSample(storedPath[0], 0);
 		}
 		json_t *slot2J = json_object_get(rootJ, "Slot2");
 		if (slot2J) {
 			storedPath[1] = json_string_value(slot2J);
-			loadSample(storedPath[1], 1);
+			if (storedPath[1] != "")
+				loadSample(storedPath[1], 1);
 		}
 		json_t *slot3J = json_object_get(rootJ, "Slot3");
 		if (slot3J) {
 			storedPath[2] = json_string_value(slot3J);
-			loadSample(storedPath[2], 2);
+			if (storedPath[2] != "")
+				loadSample(storedPath[2], 2);
 		}
 		json_t *slot4J = json_object_get(rootJ, "Slot4");
 		if (slot4J) {
 			storedPath[3] = json_string_value(slot4J);
-			loadSample(storedPath[3], 3);
+			if (storedPath[3] != "")
+				loadSample(storedPath[3], 3);
 		}
 		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
 		if (userFolderJ) {
@@ -356,7 +361,7 @@ struct DrumPlayer : Module {
 		} else {
 			fileLoaded[slot] = true;
 		}
-		if (storedPath[slot] == "") {
+		if (storedPath[slot] == "" || fileFound[slot] == false) {
 			fileLoaded[slot] = false;
 		}
 		free(path);
@@ -370,6 +375,7 @@ struct DrumPlayer : Module {
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
 		if (pSampleData != NULL) {
+			fileFound[slot] = true;
 			//channels[slot] = c;
 			sampleRate[slot] = sr * 2;
 			calcBiquadLpf(20000.0, sampleRate[slot], 1);
@@ -403,15 +409,22 @@ struct DrumPlayer : Module {
 			fileLoaded[slot] = true;
 
 		} else {
+			/*
 			fileLoaded[slot] = false;
 			storedPath[slot] = "";
 			fileDescription[slot] = "--none--";
+			*/
+			fileFound[slot] = false;
+			fileLoaded[slot] = false;
+			storedPath[slot] = path;
+			fileDescription[slot] = "(!)"+path;
 		}
 	};
 	
 	void clearSlot(int slot) {
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
+		fileFound[slot] = false;
 		fileLoaded[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
@@ -1082,10 +1095,6 @@ struct DrumPlayerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
-		/*if (module->userFolder != "") {
-			menu->addChild(createMenuLabel(module->userFolder));
-			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
-		}*/
 		if (module->userFolder != "") {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));
