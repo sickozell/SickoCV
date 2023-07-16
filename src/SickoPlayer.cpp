@@ -101,6 +101,8 @@ struct SickoPlayer : Module {
 	drwav_uint64 totalSampleC;
 	drwav_uint64 totalSamples;
 
+	const unsigned int minSamplesToLoad = 124;
+
 	vector<float> playBuffer[2][2];
 	vector<double> displayBuff;
 	int currentDisplay = 0;
@@ -665,7 +667,7 @@ struct SickoPlayer : Module {
 		float* pSampleData;
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
-		if (pSampleData != NULL) {
+		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
 			fileFound = true;
 			channels = c;
 			sampleRate = sr * 2;
@@ -2586,13 +2588,6 @@ struct SickoPlayerWidget : ModuleWidget {
 			}));
 		}
 
-		/*if (module->fileLoaded) {
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuLabel("Current Sample:"));
-			menu->addChild(createMenuLabel(module->fileDescription));
-			menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
-			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
-		}*/
 		if (module->storedPath != "") {
 			menu->addChild(new MenuSeparator());
 			if (module->fileLoaded) {
@@ -2600,7 +2595,7 @@ struct SickoPlayerWidget : ModuleWidget {
 				menu->addChild(createMenuLabel(module->fileDescription));
 				menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
 			} else {
-				menu->addChild(createMenuLabel("MISSING Sample:"));
+				menu->addChild(createMenuLabel("Sample ERROR:"));
 				menu->addChild(createMenuLabel(module->fileDescription));
 			}
 			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));

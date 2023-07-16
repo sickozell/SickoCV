@@ -52,6 +52,8 @@ struct DrumPlayerPlus : Module {
 	drwav_uint64 totalSampleC[4];
 	drwav_uint64 totalSamples[4];
 
+	const unsigned int minSamplesToLoad = 9;
+
 	vector<float> playBuffer[4][2];
 
 	bool fileLoaded[4] = {false, false, false, false};
@@ -415,7 +417,7 @@ struct DrumPlayerPlus : Module {
 		float* pSampleData;
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
-		if (pSampleData != NULL) {
+		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
 			fileFound[slot] = true;
 			//channels[slot] = c;
 			sampleRate[slot] = sr * 2;

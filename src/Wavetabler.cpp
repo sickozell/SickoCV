@@ -69,6 +69,8 @@ struct Wavetabler : Module {
 	drwav_uint64 totalSampleC;
 	drwav_uint64 totalSamples;
 
+	const unsigned int minSamplesToLoad = 124;
+
 	vector<float> playBuffer[2];
 	vector<double> displayBuff;
 	int currentDisplay = 0;
@@ -466,7 +468,7 @@ struct Wavetabler : Module {
 		float* pSampleData;
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
-		if (pSampleData != NULL) {
+		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
 			fileFound = true;
 			//channels = c;
 			sampleRate = sr * 2;
@@ -536,12 +538,6 @@ struct Wavetabler : Module {
 
 			fileLoaded = true;
 		} else {
-			/*
-			fileLoaded = false;
-			storedPath = "";
-			fileDescription = "--none--";
-			fileDisplay = "";
-			*/
 			fileFound = false;
 			fileLoaded = false;
 			storedPath = path;
@@ -730,7 +726,6 @@ struct Wavetabler : Module {
 							if (samplePos[c] > floor(totalSamples - distancePos[c])) {		// *** REACHED END OF LOOP ***
 								if (pingpong) {
 									reversePlaying[c] = REVERSE;
-									//params[REV_PARAM].setValue(1);
 									samplePos[c] = totalSamples-1;
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = totalSamples;
@@ -748,7 +743,6 @@ struct Wavetabler : Module {
 							if (samplePos[c] < distancePos[c]) {	// *** REACHED BEGIN OF LOOP ***
 								if (pingpong) {
 									reversePlaying[c] = FORWARD;
-									//params[REV_PARAM].setValue(0);
 									samplePos[c] = 1;
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = 0;
@@ -962,7 +956,6 @@ struct WavetablerDisplay : TransparentWidget {
 				{
 					nvgBeginPath(args.vg);
 					nvgMoveTo(args.vg, 7, 49);
-					//nvgLineTo(args.vg, 242, 58.5);
 					nvgLineTo(args.vg, 167, 49);
 					nvgClosePath(args.vg);
 				}
@@ -972,14 +965,12 @@ struct WavetablerDisplay : TransparentWidget {
 					// Waveform
 					nvgStrokeColor(args.vg, nvgRGBA(0x22, 0x44, 0xc9, 0xc0));
 					nvgSave(args.vg);
-					//Rect b = Rect(Vec(7, 22), Vec(235, 73));
 					Rect b = Rect(Vec(7, 22), Vec(160, 54));
 					nvgScissor(args.vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
 					nvgBeginPath(args.vg);
 					for (unsigned int i = 0; i < module->displayBuff.size(); i++) {
 						float x, y;
 						x = (float)i / (module->displayBuff.size() - 1);
-						//y = module->displayBuff[i] / 2.0 + 0.5;
 						y = module->displayBuff[i] / 10.0 + 0.5;
 						Vec p;
 						p.x = b.pos.x + b.size.x * x;
@@ -1073,7 +1064,6 @@ struct WavetablerDisplay : TransparentWidget {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription));
-				//menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
 				menu->addChild(createMenuLabel(" " + module->samplerateDisplay));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
 			}
@@ -1146,7 +1136,6 @@ struct WavetablerWidget : ModuleWidget {
 
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(46, yTunVol-16.5)), module, Wavetabler::CLIPPING_LIGHT));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(53, 98.5)), module, Wavetabler::LIMIT_SWITCH));
-		//addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(53, 97)), module, Wavetabler::LIMIT_PARAM, Wavetabler::LIMIT_LIGHT));
 		//----------------------------------------------------------------------------------------------------------------------------
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(53.6, adsrInputY+tuneYdelta)), module, Wavetabler::OUT_OUTPUT));
@@ -1219,14 +1208,6 @@ struct WavetablerWidget : ModuleWidget {
 			}));
 		}
 
-		/*if (module->fileLoaded) {
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuLabel("Current Sample:"));
-			menu->addChild(createMenuLabel(module->fileDescription));
-			menu->addChild(createMenuLabel(" " + module->samplerateDisplay));
-			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
-		}*/
-
 		if (module->storedPath != "") {
 			menu->addChild(new MenuSeparator());
 			if (module->fileLoaded) {
@@ -1234,7 +1215,7 @@ struct WavetablerWidget : ModuleWidget {
 				menu->addChild(createMenuLabel(module->fileDescription));
 				menu->addChild(createMenuLabel(" " + module->samplerateDisplay));
 			} else {
-				menu->addChild(createMenuLabel("MISSING Sample:"));
+				menu->addChild(createMenuLabel("Sample ERROR:"));
 				menu->addChild(createMenuLabel(module->fileDescription));
 			}
 			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
@@ -1252,7 +1233,6 @@ struct WavetablerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
 
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
 				return module->isPolyOuts();
 			}, [=](bool poly) {

@@ -130,6 +130,8 @@ struct SickoSampler : Module {
 	drwav_uint64 totalSampleC = 0;
 	drwav_uint64 totalSamples = 0;
 
+	const unsigned int minSamplesToLoad = 124;
+
 	vector<float> playBuffer[2][2];
 	vector<float> tempBuffer[2];
 
@@ -1125,7 +1127,7 @@ struct SickoSampler : Module {
 		float* pSampleData;
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
-		if (pSampleData != NULL) {
+		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
 			fileFound = true;
 			fileChannels = c;
 			sampleRate = sr * 2;
@@ -5372,7 +5374,7 @@ struct SickoSamplerWidget : ModuleWidget {
 			menu->addChild(createBoolPtrMenuItem("Save Oversampled", "", &module->saveOversampled));
 		
 		} else if (module->storedPath != "" && module->fileFound == false) {
-			menu->addChild(createMenuLabel("MISSING Sample:"));
+			menu->addChild(createMenuLabel("Sample ERROR:"));
 			menu->addChild(createMenuLabel(module->fileDescription));
 			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
 		}
