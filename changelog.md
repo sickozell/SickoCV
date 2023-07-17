@@ -1,4 +1,4 @@
-### 2.5.5 (2023-07)
+### 2.5.5 (2023-07-17)
 - fixed a bug on all player/sampler modules crashing VCV on MACs when root folder is not found
 - added a functionality on all player/sampler modules to to show the path of not found files
 
