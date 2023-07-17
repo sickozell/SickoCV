@@ -125,11 +125,14 @@ struct Clocker : Module {
 	drwav_uint64 totalSampleC[2];
 	drwav_uint64 totalSamples[2];
 
+	const unsigned int minSamplesToLoad = 9;
+
 	vector<float> playBuffer[2];
 	vector<float> tempBuffer;
 	vector<float> tempBuffer2;
 
 	bool fileLoaded[2] = {false, false};
+	bool fileFound[2] = {false, false};
 	bool play[2] = {false, false};
 	double samplePos[2] = {0,0};
 
@@ -416,7 +419,8 @@ struct Clocker : Module {
 		float* pSampleData;
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
-		if (pSampleData != NULL) {
+		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
+			fileFound[slot] = true;
 			sampleRate[slot] = sr * 2;
 			
 			playBuffer[slot].clear();
@@ -530,9 +534,10 @@ struct Clocker : Module {
 			fileLoaded[slot] = true;
 
 		} else {
+			fileFound[slot] = false;
 			fileLoaded[slot] = false;
-			storedPath[slot] = "";
-			fileDescription[slot] = "--none--";
+			storedPath[slot] = path;
+			fileDescription[slot] = "(!)"+path;
 		}
 	};
 	
@@ -540,6 +545,7 @@ struct Clocker : Module {
 	void clearSlot(int slot) {
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
+		fileFound[slot] = false;
 		fileLoaded[slot] = false;
 		playBuffer[slot].clear();
 		totalSampleC[slot] = 0;

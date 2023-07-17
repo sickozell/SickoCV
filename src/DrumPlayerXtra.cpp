@@ -56,6 +56,8 @@ struct DrumPlayerXtra : Module {
 	drwav_uint64 totalSampleC[4];
 	drwav_uint64 totalSamples[4];
 
+	const unsigned int minSamplesToLoad = 9;
+
 	vector<float> playBuffer[4][2];
 	vector<double> displayBuff[4];
 
@@ -77,6 +79,8 @@ struct DrumPlayerXtra : Module {
 	std::string scrollDisplay[4] = {"-------","-------","-------","-------"};
 	std::string currFileDisplay[4] = {"-------","-------","-------","-------"};
 	std::string userFolder = "";
+	bool rootFound = false;
+	bool fileFound[4] = {false, false, false, false};
 
 	std::string currentFolder[4] = {"", "", "", ""};
 	vector <std::string> currentFolderV[4];
@@ -389,30 +393,36 @@ struct DrumPlayerXtra : Module {
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
-			loadSample(storedPath[0], 0);
+			if (storedPath[0] != "")
+				loadSample(storedPath[0], 0);
 		}
 		json_t *slot2J = json_object_get(rootJ, "Slot2");
 		if (slot2J) {
 			storedPath[1] = json_string_value(slot2J);
-			loadSample(storedPath[1], 1);
+			if (storedPath[1] != "")
+				loadSample(storedPath[1], 1);
 		}
 		json_t *slot3J = json_object_get(rootJ, "Slot3");
 		if (slot3J) {
 			storedPath[2] = json_string_value(slot3J);
-			loadSample(storedPath[2], 2);
+			if (storedPath[2] != "")
+				loadSample(storedPath[2], 2);
 		}
 		json_t *slot4J = json_object_get(rootJ, "Slot4");
 		if (slot4J) {
 			storedPath[3] = json_string_value(slot4J);
-			loadSample(storedPath[3], 3);
+			if (storedPath[3] != "")
+				loadSample(storedPath[3], 3);
 		}
 		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
 		if (userFolderJ) {
 			userFolder = json_string_value(userFolderJ);
 			if (userFolder != "") {
 				createFolder(userFolder);
-				folderTreeData.push_back(tempTreeData);
-				folderTreeDisplay.push_back(tempTreeDisplay);
+				if (rootFound) {
+					folderTreeData.push_back(tempTreeData);
+					folderTreeDisplay.push_back(tempTreeDisplay);
+				}
 			}
 		}
 	}
@@ -455,8 +465,10 @@ struct DrumPlayerXtra : Module {
 			folderTreeDisplay.clear();
 			userFolder = std::string(path);
 			createFolder(userFolder);
-			folderTreeData.push_back(tempTreeData);
-			folderTreeDisplay.push_back(tempTreeDisplay);
+			if (rootFound) {
+				folderTreeData.push_back(tempTreeData);
+				folderTreeDisplay.push_back(tempTreeDisplay);
+			}
 		}
 		free(path);
 	};
@@ -465,8 +477,10 @@ struct DrumPlayerXtra : Module {
 		folderTreeData.clear();
 		folderTreeDisplay.clear();
 		createFolder(userFolder);
-		folderTreeData.push_back(tempTreeData);
-		folderTreeDisplay.push_back(tempTreeDisplay);
+		if (rootFound) {
+			folderTreeData.push_back(tempTreeData);
+			folderTreeDisplay.push_back(tempTreeDisplay);
+		}
 	}
 
 	void createFolder(std::string dir_path) {
@@ -485,43 +499,48 @@ struct DrumPlayerXtra : Module {
 			dir_path += "/";
 
 		DIR *dir = opendir(dir_path.c_str());
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			std::string filename = d->d_name;
-			if (filename != "." && filename != "..") {
-				std::string filepath = std::string(dir_path) + filename;
-				struct stat statbuf;
-				if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
-					browserDir.push_back(filepath + "/");
-					browserDirDisplay.push_back(filename);
-				} else {
-					std::size_t found = filename.find(".wav",filename.length()-5);
-					if (found==std::string::npos)
-						found = filename.find(".WAV",filename.length()-5);
-					if (found!=std::string::npos) {
-						browserFiles.push_back(filepath);
-						browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+		if (dir) {
+			rootFound = true;
+			struct dirent *d;
+			while ((d = readdir(dir))) {
+				std::string filename = d->d_name;
+				if (filename != "." && filename != "..") {
+					std::string filepath = std::string(dir_path) + filename;
+					struct stat statbuf;
+					if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
+						browserDir.push_back(filepath + "/");
+						browserDirDisplay.push_back(filename);
+					} else {
+						std::size_t found = filename.find(".wav",filename.length()-5);
+						if (found==std::string::npos)
+							found = filename.find(".WAV",filename.length()-5);
+						if (found!=std::string::npos) {
+							browserFiles.push_back(filepath);
+							browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+						}
 					}
 				}
+	   		}
+	   		closedir(dir);
+
+			sort(browserDir.begin(), browserDir.end());
+			sort(browserDirDisplay.begin(), browserDirDisplay.end());
+			sort(browserFiles.begin(), browserFiles.end());
+			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+			
+			tempTreeData.push_back(dir_path);
+			tempTreeDisplay.push_back(dir_path);
+
+			for (unsigned int i = 0; i < browserDir.size(); i++) {
+				tempTreeData.push_back(browserDir[i]);
+				tempTreeDisplay.push_back(browserDirDisplay[i]);
 			}
-   		}
-   		closedir(dir);
-
-		sort(browserDir.begin(), browserDir.end());
-		sort(browserDirDisplay.begin(), browserDirDisplay.end());
-		sort(browserFiles.begin(), browserFiles.end());
-		sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
-		
-		tempTreeData.push_back(dir_path);
-		tempTreeDisplay.push_back(dir_path);
-
-		for (unsigned int i = 0; i < browserDir.size(); i++) {
-			tempTreeData.push_back(browserDir[i]);
-			tempTreeDisplay.push_back(browserDirDisplay[i]);
-		}
-		for (unsigned int i = 0; i < browserFiles.size(); i++) {
-			tempTreeData.push_back(browserFiles[i]);
-			tempTreeDisplay.push_back(browserFilesDisplay[i]);
+			for (unsigned int i = 0; i < browserFiles.size(); i++) {
+				tempTreeData.push_back(browserFiles[i]);
+				tempTreeDisplay.push_back(browserFilesDisplay[i]);
+			}
+		} else {
+			rootFound = false;
 		}
 	};
 
@@ -604,7 +623,7 @@ struct DrumPlayerXtra : Module {
 		} else {
 			fileLoaded[slot] = true;
 		}
-		if (storedPath[slot] == "") {
+		if (storedPath[slot] == "" || fileFound[slot] == false) {
 			fileLoaded[slot] = false;
 		}
 		free(path);
@@ -617,7 +636,8 @@ struct DrumPlayerXtra : Module {
 		float* pSampleData;
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
-		if (pSampleData != NULL) {
+		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
+			fileFound[slot] = true;
 			displayCoeff[slot] = 0;
 			//channels[slot] = c;
 			sampleRate[slot] = sr * 2;
@@ -685,9 +705,18 @@ struct DrumPlayerXtra : Module {
 			fileLoaded[slot] = true;
 
 		} else {
+			/*
 			fileLoaded[slot] = false;
 			storedPath[slot] = "";
 			fileDescription[slot] = "--none--";
+			fileDisplay[slot] = "-------";
+			currFileDisplay[slot] = "-------";
+			scrollDisplay[slot] = "-------";
+			*/
+			fileFound[slot] = false;
+			fileLoaded[slot] = false;
+			storedPath[slot] = path;
+			fileDescription[slot] = "(!)"+path;
 			fileDisplay[slot] = "-------";
 			currFileDisplay[slot] = "-------";
 			scrollDisplay[slot] = "-------";
@@ -700,6 +729,7 @@ struct DrumPlayerXtra : Module {
 		fileDisplay[slot] = "-------";
 		scrollDisplay[slot] = "-------";
 		currFileDisplay[slot] = "-------";
+		fileFound[slot] = false;
 		fileLoaded[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
@@ -2453,10 +2483,18 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
-
+		/*
 		if (module->userFolder != "") {
 			menu->addChild(createMenuLabel(module->userFolder));
 			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+		}*/
+		if (module->userFolder != "") {
+			if (module->rootFound) {
+				menu->addChild(createMenuLabel(module->userFolder));
+				menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+			} else {
+				menu->addChild(createMenuLabel("(!)"+module->userFolder));
+			}
 		}
 
 		menu->addChild(new MenuSeparator());

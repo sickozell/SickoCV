@@ -1,4 +1,4 @@
-# SickoCV v2.5.4
+# SickoCV v2.5.5
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 4](https://github.com/sickozell/SickoCV/assets/80784296/0240477b-b56a-4375-a31d-3c0a2f668bde)

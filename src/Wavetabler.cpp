@@ -69,6 +69,8 @@ struct Wavetabler : Module {
 	drwav_uint64 totalSampleC;
 	drwav_uint64 totalSamples;
 
+	const unsigned int minSamplesToLoad = 124;
+
 	vector<float> playBuffer[2];
 	vector<double> displayBuff;
 	int currentDisplay = 0;
@@ -104,6 +106,9 @@ struct Wavetabler : Module {
 	std::string currentFolder = "";
 	vector <std::string> currentFolderV;
 	int currentFile = 0;
+
+	bool rootFound = false;
+	bool fileFound = false;
 
 	std::string tempDir = "";
 	vector<vector<std::string>> folderTreeData;
@@ -268,15 +273,18 @@ struct Wavetabler : Module {
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
-			loadSample(storedPath);
+			if (storedPath != "")
+				loadSample(storedPath);
 		}
 		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
 		if (userFolderJ) {
 			userFolder = json_string_value(userFolderJ);
 			if (userFolder != "") {
 				createFolder(userFolder);
-				folderTreeData.push_back(tempTreeData);
-				folderTreeDisplay.push_back(tempTreeDisplay);
+				if (rootFound) {
+					folderTreeData.push_back(tempTreeData);
+					folderTreeDisplay.push_back(tempTreeDisplay);
+				}
 			}
 		}
 	}
@@ -319,8 +327,10 @@ struct Wavetabler : Module {
 			folderTreeDisplay.clear();
 			userFolder = std::string(path);
 			createFolder(userFolder);
-			folderTreeData.push_back(tempTreeData);
-			folderTreeDisplay.push_back(tempTreeDisplay);
+			if (rootFound) {
+				folderTreeData.push_back(tempTreeData);
+				folderTreeDisplay.push_back(tempTreeDisplay);
+			}
 		}
 		free(path);
 	};
@@ -329,8 +339,10 @@ struct Wavetabler : Module {
 		folderTreeData.clear();
 		folderTreeDisplay.clear();
 		createFolder(userFolder);
-		folderTreeData.push_back(tempTreeData);
-		folderTreeDisplay.push_back(tempTreeDisplay);
+		if (rootFound) {
+			folderTreeData.push_back(tempTreeData);
+			folderTreeDisplay.push_back(tempTreeDisplay);
+		}
 	}
 
 	void createFolder(std::string dir_path) {
@@ -349,43 +361,49 @@ struct Wavetabler : Module {
 			dir_path += "/";
 
 		DIR *dir = opendir(dir_path.c_str());
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			std::string filename = d->d_name;
-			if (filename != "." && filename != "..") {
-				std::string filepath = std::string(dir_path) + filename;
-				struct stat statbuf;
-				if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
-					browserDir.push_back(filepath + "/");
-					browserDirDisplay.push_back(filename);
-				} else {
-					std::size_t found = filename.find(".wav",filename.length()-5);
-					if (found==std::string::npos)
-						found = filename.find(".WAV",filename.length()-5);
-					if (found!=std::string::npos) {
-						browserFiles.push_back(filepath);
-						browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+
+		if (dir) {
+			rootFound = true;
+			struct dirent *d;
+			while ((d = readdir(dir))) {
+				std::string filename = d->d_name;
+				if (filename != "." && filename != "..") {
+					std::string filepath = std::string(dir_path) + filename;
+					struct stat statbuf;
+					if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
+						browserDir.push_back(filepath + "/");
+						browserDirDisplay.push_back(filename);
+					} else {
+						std::size_t found = filename.find(".wav",filename.length()-5);
+						if (found==std::string::npos)
+							found = filename.find(".WAV",filename.length()-5);
+						if (found!=std::string::npos) {
+							browserFiles.push_back(filepath);
+							browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+						}
 					}
 				}
+	   		}
+	   		closedir(dir);
+
+			sort(browserDir.begin(), browserDir.end());
+			sort(browserDirDisplay.begin(), browserDirDisplay.end());
+			sort(browserFiles.begin(), browserFiles.end());
+			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+			
+			tempTreeData.push_back(dir_path);
+			tempTreeDisplay.push_back(dir_path);
+
+			for (unsigned int i = 0; i < browserDir.size(); i++) {
+				tempTreeData.push_back(browserDir[i]);
+				tempTreeDisplay.push_back(browserDirDisplay[i]);
 			}
-   		}
-   		closedir(dir);
-
-		sort(browserDir.begin(), browserDir.end());
-		sort(browserDirDisplay.begin(), browserDirDisplay.end());
-		sort(browserFiles.begin(), browserFiles.end());
-		sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
-		
-		tempTreeData.push_back(dir_path);
-		tempTreeDisplay.push_back(dir_path);
-
-		for (unsigned int i = 0; i < browserDir.size(); i++) {
-			tempTreeData.push_back(browserDir[i]);
-			tempTreeDisplay.push_back(browserDirDisplay[i]);
-		}
-		for (unsigned int i = 0; i < browserFiles.size(); i++) {
-			tempTreeData.push_back(browserFiles[i]);
-			tempTreeDisplay.push_back(browserFilesDisplay[i]);
+			for (unsigned int i = 0; i < browserFiles.size(); i++) {
+				tempTreeData.push_back(browserFiles[i]);
+				tempTreeDisplay.push_back(browserFilesDisplay[i]);
+			}
+		} else {
+			rootFound = false;
 		}
 	};
 
@@ -436,7 +454,7 @@ struct Wavetabler : Module {
 		} else {
 			fileLoaded = true;
 		}
-		if (storedPath == "") {
+		if (storedPath == "" || fileFound == false) {
 			fileLoaded = false;
 		}
 		free(path);
@@ -450,7 +468,8 @@ struct Wavetabler : Module {
 		float* pSampleData;
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
-		if (pSampleData != NULL) {
+		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
+			fileFound = true;
 			//channels = c;
 			sampleRate = sr * 2;
 			calcBiquadLpf(20000.0, sampleRate, 1);
@@ -519,9 +538,10 @@ struct Wavetabler : Module {
 
 			fileLoaded = true;
 		} else {
+			fileFound = false;
 			fileLoaded = false;
-			storedPath = "";
-			fileDescription = "--none--";
+			storedPath = path;
+			fileDescription = "(!)"+path;
 			fileDisplay = "";
 		}
 	};
@@ -530,6 +550,7 @@ struct Wavetabler : Module {
 		storedPath = "";
 		fileDescription = "--none--";
 		fileDisplay = "";
+		fileFound = false;
 		fileLoaded = false;
 		playBuffer[0].clear();
 		playBuffer[1].clear();
@@ -705,7 +726,6 @@ struct Wavetabler : Module {
 							if (samplePos[c] > floor(totalSamples - distancePos[c])) {		// *** REACHED END OF LOOP ***
 								if (pingpong) {
 									reversePlaying[c] = REVERSE;
-									//params[REV_PARAM].setValue(1);
 									samplePos[c] = totalSamples-1;
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = totalSamples;
@@ -723,7 +743,6 @@ struct Wavetabler : Module {
 							if (samplePos[c] < distancePos[c]) {	// *** REACHED BEGIN OF LOOP ***
 								if (pingpong) {
 									reversePlaying[c] = FORWARD;
-									//params[REV_PARAM].setValue(0);
 									samplePos[c] = 1;
 									currSampleWeight[c] = sampleCoeff;
 									prevSamplePos[c] = 0;
@@ -937,7 +956,6 @@ struct WavetablerDisplay : TransparentWidget {
 				{
 					nvgBeginPath(args.vg);
 					nvgMoveTo(args.vg, 7, 49);
-					//nvgLineTo(args.vg, 242, 58.5);
 					nvgLineTo(args.vg, 167, 49);
 					nvgClosePath(args.vg);
 				}
@@ -947,14 +965,12 @@ struct WavetablerDisplay : TransparentWidget {
 					// Waveform
 					nvgStrokeColor(args.vg, nvgRGBA(0x22, 0x44, 0xc9, 0xc0));
 					nvgSave(args.vg);
-					//Rect b = Rect(Vec(7, 22), Vec(235, 73));
 					Rect b = Rect(Vec(7, 22), Vec(160, 54));
 					nvgScissor(args.vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
 					nvgBeginPath(args.vg);
 					for (unsigned int i = 0; i < module->displayBuff.size(); i++) {
 						float x, y;
 						x = (float)i / (module->displayBuff.size() - 1);
-						//y = module->displayBuff[i] / 2.0 + 0.5;
 						y = module->displayBuff[i] / 10.0 + 0.5;
 						Vec p;
 						p.x = b.pos.x + b.size.x * x;
@@ -1048,7 +1064,6 @@ struct WavetablerDisplay : TransparentWidget {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createMenuLabel("Current Sample:"));
 				menu->addChild(createMenuLabel(module->fileDescription));
-				//menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
 				menu->addChild(createMenuLabel(" " + module->samplerateDisplay));
 				menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
 			}
@@ -1121,7 +1136,6 @@ struct WavetablerWidget : ModuleWidget {
 
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(46, yTunVol-16.5)), module, Wavetabler::CLIPPING_LIGHT));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(53, 98.5)), module, Wavetabler::LIMIT_SWITCH));
-		//addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(53, 97)), module, Wavetabler::LIMIT_PARAM, Wavetabler::LIMIT_LIGHT));
 		//----------------------------------------------------------------------------------------------------------------------------
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(53.6, adsrInputY+tuneYdelta)), module, Wavetabler::OUT_OUTPUT));
@@ -1194,12 +1208,16 @@ struct WavetablerWidget : ModuleWidget {
 			}));
 		}
 
-		if (module->fileLoaded) {
+		if (module->storedPath != "") {
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuLabel("Current Sample:"));
-			menu->addChild(createMenuLabel(module->fileDescription));
-			//menu->addChild(createMenuLabel(" " + module->samplerateDisplay + " - " + std::to_string(module->channels) + "ch"));
-			menu->addChild(createMenuLabel(" " + module->samplerateDisplay));
+			if (module->fileLoaded) {
+				menu->addChild(createMenuLabel("Current Sample:"));
+				menu->addChild(createMenuLabel(module->fileDescription));
+				menu->addChild(createMenuLabel(" " + module->samplerateDisplay));
+			} else {
+				menu->addChild(createMenuLabel("Sample ERROR:"));
+				menu->addChild(createMenuLabel(module->fileDescription));
+			}
 			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
 		}
 
@@ -1215,7 +1233,6 @@ struct WavetablerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
 
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
 				return module->isPolyOuts();
 			}, [=](bool poly) {

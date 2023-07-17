@@ -130,6 +130,8 @@ struct SickoSampler : Module {
 	drwav_uint64 totalSampleC = 0;
 	drwav_uint64 totalSamples = 0;
 
+	const unsigned int minSamplesToLoad = 124;
+
 	vector<float> playBuffer[2][2];
 	vector<float> tempBuffer[2];
 
@@ -200,6 +202,9 @@ struct SickoSampler : Module {
 	std::string currentFolder = "";
 	vector <std::string> currentFolderV;
 	int currentFile = 0;
+
+	bool rootFound = false;
+	bool fileFound = false;
 
 	std::string tempDir = "";
 	vector<vector<std::string>> folderTreeData;
@@ -619,8 +624,10 @@ struct SickoSampler : Module {
 			userFolder = json_string_value(userFolderJ);
 			if (userFolder != "") {
 				createFolder(userFolder);
-				folderTreeData.push_back(tempTreeData);
-				folderTreeDisplay.push_back(tempTreeDisplay);
+				if (rootFound) {
+					folderTreeData.push_back(tempTreeData);
+					folderTreeDisplay.push_back(tempTreeDisplay);
+				}
 			}
 		}
 	}
@@ -669,8 +676,10 @@ struct SickoSampler : Module {
 			folderTreeDisplay.clear();
 			userFolder = std::string(path);
 			createFolder(userFolder);
-			folderTreeData.push_back(tempTreeData);
-			folderTreeDisplay.push_back(tempTreeDisplay);
+			if (rootFound) {
+				folderTreeData.push_back(tempTreeData);
+				folderTreeDisplay.push_back(tempTreeDisplay);
+			}
 		}
 		free(path);
 	};
@@ -679,8 +688,10 @@ struct SickoSampler : Module {
 		folderTreeData.clear();
 		folderTreeDisplay.clear();
 		createFolder(userFolder);
-		folderTreeData.push_back(tempTreeData);
-		folderTreeDisplay.push_back(tempTreeDisplay);
+		if (rootFound) {
+			folderTreeData.push_back(tempTreeData);
+			folderTreeDisplay.push_back(tempTreeDisplay);
+		}
 	}
 
 	void createFolder(std::string dir_path) {
@@ -699,43 +710,49 @@ struct SickoSampler : Module {
 			dir_path += "/";
 
 		DIR *dir = opendir(dir_path.c_str());
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			std::string filename = d->d_name;
-			if (filename != "." && filename != "..") {
-				std::string filepath = std::string(dir_path) + filename;
-				struct stat statbuf;
-				if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
-					browserDir.push_back(filepath + "/");
-					browserDirDisplay.push_back(filename);
-				} else {
-					std::size_t found = filename.find(".wav",filename.length()-5);
-					if (found==std::string::npos)
-						found = filename.find(".WAV",filename.length()-5);
-					if (found!=std::string::npos) {
-						browserFiles.push_back(filepath);
-						browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+
+		if (dir) {
+			rootFound = true;
+			struct dirent *d;
+			while ((d = readdir(dir))) {
+				std::string filename = d->d_name;
+				if (filename != "." && filename != "..") {
+					std::string filepath = std::string(dir_path) + filename;
+					struct stat statbuf;
+					if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
+						browserDir.push_back(filepath + "/");
+						browserDirDisplay.push_back(filename);
+					} else {
+						std::size_t found = filename.find(".wav",filename.length()-5);
+						if (found==std::string::npos)
+							found = filename.find(".WAV",filename.length()-5);
+						if (found!=std::string::npos) {
+							browserFiles.push_back(filepath);
+							browserFilesDisplay.push_back(filename.substr(0, filename.length()-4));
+						}
 					}
 				}
+	   		}
+	   		closedir(dir);
+
+			sort(browserDir.begin(), browserDir.end());
+			sort(browserDirDisplay.begin(), browserDirDisplay.end());
+			sort(browserFiles.begin(), browserFiles.end());
+			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+			
+			tempTreeData.push_back(dir_path);
+			tempTreeDisplay.push_back(dir_path);
+
+			for (unsigned int i = 0; i < browserDir.size(); i++) {
+				tempTreeData.push_back(browserDir[i]);
+				tempTreeDisplay.push_back(browserDirDisplay[i]);
 			}
-   		}
-   		closedir(dir);
-
-		sort(browserDir.begin(), browserDir.end());
-		sort(browserDirDisplay.begin(), browserDirDisplay.end());
-		sort(browserFiles.begin(), browserFiles.end());
-		sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
-		
-		tempTreeData.push_back(dir_path);
-		tempTreeDisplay.push_back(dir_path);
-
-		for (unsigned int i = 0; i < browserDir.size(); i++) {
-			tempTreeData.push_back(browserDir[i]);
-			tempTreeDisplay.push_back(browserDirDisplay[i]);
-		}
-		for (unsigned int i = 0; i < browserFiles.size(); i++) {
-			tempTreeData.push_back(browserFiles[i]);
-			tempTreeDisplay.push_back(browserFilesDisplay[i]);
+			for (unsigned int i = 0; i < browserFiles.size(); i++) {
+				tempTreeData.push_back(browserFiles[i]);
+				tempTreeDisplay.push_back(browserFilesDisplay[i]);
+			}
+		} else {
+			rootFound = false;
 		}
 	};
 
@@ -1092,7 +1109,7 @@ struct SickoSampler : Module {
 		} else {
 			fileLoaded = true;
 		}
-		if (storedPath == "") {
+		if (storedPath == "" || fileFound == false) {
 			fileLoaded = false;
 		}
 		free(path);
@@ -1110,7 +1127,8 @@ struct SickoSampler : Module {
 		float* pSampleData;
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
-		if (pSampleData != NULL) {
+		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
+			fileFound = true;
 			fileChannels = c;
 			sampleRate = sr * 2;
 			fileSampleRate = sr;
@@ -1343,9 +1361,19 @@ struct SickoSampler : Module {
 			channels = fileChannels;
 
 		} else {
-			fileLoaded = false;
+			/*fileLoaded = false;
 			storedPath = "";
 			fileDescription = "--none--";
+			fileDisplay = "";
+			timeDisplay = "";
+			recSamples = 0;
+			recTimeDisplay = "";
+			channelsDisplay = "";
+			*/
+			fileFound = false;
+			fileLoaded = false;
+			storedPath = path;
+			fileDescription = "(!)"+path;
 			fileDisplay = "";
 			timeDisplay = "";
 			recSamples = 0;
@@ -1363,6 +1391,7 @@ struct SickoSampler : Module {
 		recTimeDisplay = "";
 		channelsDisplay = "";
 		fileLoaded = false;
+		fileFound = false;
 		playBuffer[LEFT][0].clear();
 		playBuffer[RIGHT][0].clear();
 		playBuffer[LEFT][1].clear();
@@ -5343,6 +5372,11 @@ struct SickoSamplerWidget : ModuleWidget {
 
 			menu->addChild(createBoolPtrMenuItem("Trim Sample after Save", "", &module->trimOnSave));
 			menu->addChild(createBoolPtrMenuItem("Save Oversampled", "", &module->saveOversampled));
+		
+		} else if (module->storedPath != "" && module->fileFound == false) {
+			menu->addChild(createMenuLabel("Sample ERROR:"));
+			menu->addChild(createMenuLabel(module->fileDescription));
+			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
 		}
 
 		menu->addChild(new MenuSeparator());
