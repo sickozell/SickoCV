@@ -1,5 +1,20 @@
 checklist
 
+sickolooper5
+-one shot va sistemato
+- alla fine dell'overdub si sente una sovrpposizione audio o click
+- overdubbing unsynced: premendo il tasto rec è da far iniziare all'iniizo del loop (o se startimm parte subito). adesso parte subito sempre (anche per lo stop)
+- VALUTARE SE FARE UN FADE OUT REC PER QUANDO LA TRACCIA NON E' LOOP SYNC E VIENE STOPPATO L'OVERDUB
+- eol non parte al primo giro di  overdubbing dopo ilpreroll
+- fare il crossfade per traccia?
+- ricontrollare overdub partendo a idle con 1 e 2 preroll. sembra non registri
+- eseguire test di play rec overdub su 2 bar, o inferiori al bar
+- fare il fade out in reverse quando viene fatto uno stop now
+- ricontrollare i divClockSample per la selezione dei quarti che deve essere invece preso "clockSample"
+
+
+// ****************************************************************************************************
+
 sickosampler
 - (NO NON SI FA) gate rec su play on rec
 - play on rec su newrecording
