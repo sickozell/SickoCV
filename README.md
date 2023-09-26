@@ -592,12 +592,12 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 This audio sampling module simplifies the functionalities of sickoSampler by eliminating overdubbing, tuning and modulation of many parameters, but at the same time it implements a 90s style cyclic time stretch algorithm.  
 Please refer to sickoSampler and sickoPlayer instructions for the main module features.  
 The main difference is that recording is enabled only when the sample is not loaded or previously recorded, so the sample has to be cleared to reactivate the REC button.  
-Pushing REC button starts recording immediately, there is no arming functionality.  
+A REC buttonpress starts recording immediately, there is no arming functionality.  
 Monitor switch has been replaced by a led buttton.  
 
 Recording fade in/out can be achieved setting XFD knob, please remember to set it back to 0 if this is not necessary on playback.  
 The default trig type is Start/Stop: a first trig on Trig Input or a Trig buttonpress starts playback and a second trig goes to release stage.  
-The 'R' led button switches to Start/Restart trig type: every trig on Trig Input or a Trig button press restarts sample from the begin.  
+The 'R' led button switches to Start/Restart trig type: every trig on Trig Input or a Trig buttonpress restarts sample from the beginning.  
 The VOL knob set the master volume from 0 to 100%. Its CV input is added to knob value.  
 
 **Time Stretch**  
