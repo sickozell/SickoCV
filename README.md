@@ -15,11 +15,11 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - sickoSampler2
 
 ## **to do list:** 
-- fix a bug on clocker module that output div/mult even when run button is off
+- module test
 
 ## **changelog**  
-- fixed a bug on all player/sampler modules crashing VCV on MACs when root folder is not found
-- added a functionality on all player/sampler modules to to show the path of not found files
+- added sickoSampler2 module  
+- fixed a bug on sickoSampler crashing rack when pressing nav button after a new recording  
 
 # SickoCV v2.5.6
 VCV Rack plugin modules
