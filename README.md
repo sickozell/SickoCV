@@ -606,7 +606,7 @@ The VOL knob set the master volume from 0 to 100%. Its CV input is added to knob
 'SZ' knob sets the size of the cycle in milliseconds and the 'FD' knob sets the % of crossfade between cycles.  
 
 Cyclic Time stretch algorithm usually plays samples with its characteristic metallic sound, especially when slowing down and depending on cycle size setting.  
-If it is used in combination with v/oct modulation bizarre results can be achieved.  
+If it is used in combination with v/oct modulation some interesting results can be achieved.  
 Please note that extreme settings can however alter pitch a little or obtain a bit of chorus/reverb.
 
 ## Switcher / SwitcherSt
