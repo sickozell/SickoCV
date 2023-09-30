@@ -604,10 +604,14 @@ The VOL knob set the master volume from 0 to 100%. Its CV input is added to knob
 'STRCH' knob lengthen or shorten the sample without pitch change and it can be set from 1 to 999%.  
 100% means no time stretch (default). If it is set to 50% the sample will be played in half time. If it set to 200% the sample will be played in double time as original.  
 'SZ' knob sets the size of the cycle in milliseconds and the 'FD' knob sets the % of crossfade between cycles.  
+When lengthening some clicks may occur at the end of the sample, especially when looping. This behaviour can be reduced adjusting cross fade knob and/or cycle size.  
 
 Cyclic Time stretch algorithm usually plays samples with its characteristic metallic sound, especially when slowing down and depending on cycle size setting.  
 If it is used in combination with v/oct modulation some interesting results can be achieved.  
 Please note that extreme settings can however alter pitch a little or obtain a bit of chorus/reverb.
+
+**Context Menu**  
+'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
