@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="8"
-     inkscape:cx="149.5625"
-     inkscape:cy="205.25"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="-169.35207"
+     inkscape:cy="270.8219"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1272"
@@ -498,7 +498,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Etichette Testo"
-     style="display:inline"
+     style="display:none"
      transform="translate(0,-0.200038)"><text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
@@ -901,8 +901,7 @@
          d="m 6.382365,114.32626 v -0.35277 H 6.0295875 V 112.2096 H 6.382365 v -0.35278 h 1.41111 v 0.35278 h 0.3527776 v 1.76389 H 7.793475 v 0.35277 z m 0.3527775,-0.35277 h 0.705555 v -1.76389 h -0.705555 z"
          style="fill:#000000;stroke-width:0.265"
          id="path2463" /></g><g
-       aria-label="R
-"
+       aria-label="R "
        id="text2333"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#000000;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="RELEASE"><path
@@ -1274,8 +1273,7 @@
          d="m 6.382365,114.32626 v -0.35277 H 6.0295875 V 112.2096 H 6.382365 v -0.35278 h 1.41111 v 0.35278 h 0.3527776 v 1.76389 H 7.793475 v 0.35277 z m 0.3527775,-0.35277 h 0.705555 v -1.76389 h -0.705555 z"
          style="stroke-width:0.265"
          id="path2656" /></g><g
-       aria-label="R
-"
+       aria-label="R "
        id="g2662"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="RELEASE"><path

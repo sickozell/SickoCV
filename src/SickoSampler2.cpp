@@ -192,6 +192,7 @@ struct SickoSampler2 : Module {
 	bool resetCursorsOnLoad = true;
 	bool disableNav = false;
 	bool saveOversampled = false;
+	bool autoMonOff = true;
 	
 	float fadeCoeff = 0.f;
 
@@ -201,6 +202,7 @@ struct SickoSampler2 : Module {
 	double fadedPosition[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	double fadeSamples = 0.0;
 	float xFade = 0.f;
+	float prevXfade = -1.f;
 
 	float currentOutput = 0.f;
 	float currentOutputR = 0.f;
@@ -415,6 +417,7 @@ struct SickoSampler2 : Module {
 		recordingState = 0;
 		recButton = 0;
 		prevMonitorSwitch = 0;
+		prevXfade = -1.f;
 	}
 
 	json_t *dataToJson() override {
@@ -424,6 +427,7 @@ struct SickoSampler2 : Module {
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
 		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
+		json_object_set_new(rootJ, "AutoMonOff", json_integer(autoMonOff));
 		json_object_set_new(rootJ, "EocFromTrg", json_boolean(eocFromTrg));
 		json_object_set_new(rootJ, "EocFromCueEnd", json_boolean(eocFromCueEnd));
 		json_object_set_new(rootJ, "EocFromCueStart", json_boolean(eocFromCueStart));
@@ -454,6 +458,9 @@ struct SickoSampler2 : Module {
 		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
 		if (polyMasterJ)
 			polyMaster = json_integer_value(polyMasterJ);
+		json_t* autoMonOffJ = json_object_get(rootJ, "AutoMonOff");
+		if (autoMonOffJ)
+			autoMonOff = json_integer_value(autoMonOffJ);
 		json_t* eocFromTrgJ = json_object_get(rootJ, "EocFromTrg");
 		if (eocFromTrgJ)
 			eocFromTrg = json_boolean_value(eocFromTrgJ);
@@ -674,6 +681,7 @@ struct SickoSampler2 : Module {
 	void onSampleRateChange() override {
 		monitorFadeCoeff = 10 / (APP->engine->getSampleRate()); // 100ms monitor fade
 		eocEorTime = (APP->engine->getSampleRate())/2000;			// number of samples for 1 ms used for output triggers
+		prevXfade = -1.f;
 
 		if (fileLoaded && APP->engine->getSampleRate() != sampleRate/2) {
 			double resampleCoeff;
@@ -1595,10 +1603,21 @@ struct SickoSampler2 : Module {
 
 			sustainValue = params[SUSTAIN_PARAM].getValue();
 
+			/*			
 			if (xFade == 0)
 				fadeSamples = 0;
 			else
 				fadeSamples = floor(convertCVToSeconds(xFade) * args.sampleRate); // number of samples before starting fade
+			*/
+
+			if (xFade != prevXfade) {
+				if (xFade == 0)
+					fadeSamples = 0;
+				else
+					fadeSamples = floor(convertCVToSeconds(xFade) * args.sampleRate); // number of samples before starting fade
+
+				prevXfade = xFade;
+			}
 
 			// START CHANNEL MANAGEMENT
 
@@ -2143,7 +2162,7 @@ struct SickoSampler2 : Module {
 													eoc[0] = true;
 													eocTime[0] = eocEorTime;
 												}
-											}
+											} 
 										}
 									}
 								}
@@ -2154,58 +2173,13 @@ struct SickoSampler2 : Module {
 
 					if (play[c]) {									// it's false only if end of sample has reached, see above
 
-						grainSampleCount[c]++;
-						if (params[STRETCH_PARAM].getValue() != 1) {
-						
-							if (params[STRETCH_PARAM].getValue() > 1) {
-								if (grainSampleCount[c] > stretchMaxPos ) {		//
-									grainCount[c]++;
-									grainPos[c] = samplePos[c];
-									grainFadeValue[c] = 1;
-									grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * args.sampleRate / 1000 * params[STR_FADE_PARAM].getValue());
-									grainFade[c] = true;
-
-									if (grainCount[c] > (params[STRETCH_PARAM].getValue())) {
-										float tempStretch2 = params[STRETCH_PARAM].getValue()-int(params[STRETCH_PARAM].getValue());
-										if (!reversePlaying[c])
-											samplePos[c] -= stretchMaxPos * tempStretch2 * distancePos[c];
-										else
-											samplePos[c] += stretchMaxPos * tempStretch2 * distancePos[c];
-										grainSampleCount[c] = -floor(stretchMaxPos * tempStretch2);
-										grainCount[c] = 1;
-									} else {
-										if (!reversePlaying[c])
-											samplePos[c] -= stretchMaxPos * distancePos[c];
-										else
-											samplePos[c] += stretchMaxPos * distancePos[c];
-										grainSampleCount[c] = 0;
-									}
-								}
-							} else {
-
-								if (grainSampleCount[c] > stretchMaxPos) {
-									
-									grainPos[c] = samplePos[c];
-									grainFadeValue[c] = 1;
-									
-									grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * args.sampleRate / 1000  * params[STR_FADE_PARAM].getValue());
-									grainFade[c] = true;
-									
-									float tempStretch1 = stretchMaxPos * (1-params[STRETCH_PARAM].getValue());
-									if (!reversePlaying[c])
-										samplePos[c] += tempStretch1 * distancePos[c];
-									else
-										samplePos[c] -= tempStretch1 * distancePos[c];
-									grainSampleCount[c] = 0;
-								}
-							}
-						}
-
 						// *** SICKOSAMPLER USES HERMITE INTERPOLATION ONLY ***
 						if (currSampleWeight[c] == 0) {	// if no distance between samples, it means that speed is 1 and samplerates match -> no interpolation
-							currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
-							if (channels == 2)
-								currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+								//if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
+									currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+									if (channels == 2)
+										currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+								//}
 						} else {
 							if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
 								/*
@@ -2228,16 +2202,17 @@ struct SickoSampler2 : Module {
 								}
 
 							} else { // if playing sample is the first or one of the last 3 -> no interpolation
-								currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
-								if (channels == 2)
-									currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+								//if (floor(samplePos[c]) >= 0 && floor(samplePos[c]) < totalSampleC) {
+									currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+									if (channels == 2)
+										currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+								//}
 							}
 						}
 
 						
-
 						// ******************************************************** G R A I N    F A D E ***********************************************
-
+						
 						if (grainFade[c]) {
 							grainFadeValue[c] -= grainFadeCoeff[c];
 							if (grainFadeValue[c] < 0) {
@@ -2260,7 +2235,7 @@ struct SickoSampler2 : Module {
 										currentOutputR = (currentOutputR * (1-grainFadeValue[c])) + (tempGrainFadeOutput * grainFadeValue[c]);
 									}
 
-								}  else { // if playing sample is the first or one of the last 3 -> no interpolation
+								} else { // if playing sample is the first or one of the last 3 -> no interpolation
 									tempGrainFadeOutput = playBuffer[LEFT][antiAlias][floor(grainPos[c])];
 									currentOutput = (currentOutput * (1-grainFadeValue[c])) + (tempGrainFadeOutput * grainFadeValue[c]);
 									if (channels == 2) {
@@ -2275,13 +2250,10 @@ struct SickoSampler2 : Module {
 									grainPos[c] -= distancePos[c];
 							}
 						}
-
-						if (reversePlaying[c])
-							samplePos[c] -= distancePos[c];
-						else
-							samplePos[c] += distancePos[c];
-
-						currSampleWeight[c] = samplePos[c] - floor(samplePos[c]);
+						
+						// ---------- FIRST UPDATE SAMPLE POSITION
+						
+						
 
 						switch (stage[c]) {
 							case ATTACK_STAGE:
@@ -2353,7 +2325,7 @@ struct SickoSampler2 : Module {
 																													██║░░░░░██║░░██║██████╔╝███████╗
 																													╚═╝░░░░░╚═╝░░╚═╝╚═════╝░╚══════╝
 */
-
+						
 						switch (fadingType[c]) {
 							case NO_FADE:
 							break;
@@ -2363,30 +2335,44 @@ struct SickoSampler2 : Module {
 									fadingValue[c] -= fadeCoeff;
 									switch (reversePlaying[c]) {
 										case FORWARD:
-											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
-											if (channels == 2) {
-												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+											if (floor(fadedPosition[c]) < totalSampleC) {
+												currentOutput *= 1 - fadingValue[c];
+												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+												if (channels == 2) {
+													currentOutputR *= 1 - fadingValue[c];
+													currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+												}
+											} else {
+												fadingType[c] = NO_FADE;
 											}
 											fadedPosition[c] += distancePos[c];
-											if (fadedPosition[c] > totalSamples)
-												fadingType[c] = NO_FADE;
 										break;
 										case REVERSE:
-											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
-											if (channels == 2) {
-												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+											if (floor(fadedPosition[c]) >= 0) {
+												currentOutput *= 1 - fadingValue[c];
+												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+												if (channels == 2) {
+													currentOutputR *= 1 - fadingValue[c];
+													currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+												}
+											} else {
+												fadingType[c] = NO_FADE;
+												/*
+												if (!debugBool) {
+													debugBool = true;
+													debugDisplay = to_string(floor(fadedPosition[c]));
+												} else {
+													debugDisplay2 = to_string(floor(fadedPosition[c]));
+												}*/
 											}
 											fadedPosition[c] -= distancePos[c];
-											if (fadedPosition[c] < 0)
-												fadingType[c] = NO_FADE;
+											
 										break;
 									}
-								} else
+								} else {
 									fadingType[c] = NO_FADE;
+									//debugBool = false;
+								}
 							break;
 							
 							case FADE_OUT:
@@ -2404,32 +2390,95 @@ struct SickoSampler2 : Module {
 									fadingValue[c] -= fadeCoeff;
 									switch (reversePlaying[c]) {
 										case FORWARD:
-											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
-											if (channels == 2) {
-												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+											if (fadedPosition[c] >= 0) {
+												currentOutput *= 1 - fadingValue[c];
+												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+												if (channels == 2) {
+													currentOutputR *= 1 - fadingValue[c];
+													currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+												}
+											} else {
+												fadingType[c] = NO_FADE;
 											}
 											fadedPosition[c] -= distancePos[c];
-											if (fadedPosition[c] < 0)
-												fadingType[c] = NO_FADE;
 										break;
 										case REVERSE:
-											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
-											if (channels == 2) {
-												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+											if (fadedPosition[c] < totalSampleC) {
+												currentOutput *= 1 - fadingValue[c];
+												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+												if (channels == 2) {
+													currentOutputR *= 1 - fadingValue[c];
+													currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+												}
+											} else {
+												fadingType[c] = NO_FADE;
 											}
 											fadedPosition[c] += distancePos[c];
-											if (fadedPosition[c] > totalSamples)
-												fadingType[c] = NO_FADE;
 										break;
 									}
 								} else
 									fadingType[c] = NO_FADE;
 							break;
 						}
+
+						// ------------------------------------------------------- U P D A T E    S A M P L E   P O S I T I O N -----------------
+						
+						if (params[STRETCH_PARAM].getValue() != 1) {
+							grainSampleCount[c]++;
+							if (params[STRETCH_PARAM].getValue() > 1) {
+								if (grainSampleCount[c] > stretchMaxPos ) {		//
+									grainCount[c]++;
+									grainPos[c] = samplePos[c];
+									grainFadeValue[c] = 1;
+									grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * args.sampleRate / 1000 * params[STR_FADE_PARAM].getValue());
+									grainFade[c] = true;
+
+									if (grainCount[c] > (params[STRETCH_PARAM].getValue())) {
+										float tempStretch2 = params[STRETCH_PARAM].getValue()-int(params[STRETCH_PARAM].getValue());
+										if (!reversePlaying[c])
+											samplePos[c] -= stretchMaxPos * tempStretch2 * distancePos[c];
+										else
+											samplePos[c] += stretchMaxPos * tempStretch2 * distancePos[c];
+										grainSampleCount[c] = -floor(stretchMaxPos * tempStretch2);
+										grainCount[c] = 1;
+									} else {
+										if (!reversePlaying[c])
+											samplePos[c] -= stretchMaxPos * distancePos[c];
+										else
+											samplePos[c] += stretchMaxPos * distancePos[c];
+										grainSampleCount[c] = 0;
+									}
+								}
+							} else {
+
+								if (grainSampleCount[c] > stretchMaxPos) {
+									
+									grainPos[c] = samplePos[c];
+									grainFadeValue[c] = 1;
+									
+									grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * args.sampleRate / 1000  * params[STR_FADE_PARAM].getValue());
+									grainFade[c] = true;
+									
+									float tempStretch1 = stretchMaxPos * (1-params[STRETCH_PARAM].getValue());
+									if (!reversePlaying[c])
+										samplePos[c] += tempStretch1 * distancePos[c];
+									else
+										samplePos[c] -= tempStretch1 * distancePos[c];
+									grainSampleCount[c] = 0;
+								}
+							}
+						}
+						
+						if (reversePlaying[c])
+							samplePos[c] -= distancePos[c];
+						else
+							samplePos[c] += distancePos[c];
+
+						currSampleWeight[c] = samplePos[c] - floor(samplePos[c]);
+
+
+						// ------------------------------------------------------------ END POSITION UPDATE
+
 					}
 
 				} else {
@@ -2495,8 +2544,9 @@ struct SickoSampler2 : Module {
 			switch (polyOuts) {
 				case MONOPHONIC:			// monophonic CABLES
 
-					// *** HARD CLIP ***
+					// *** HARD CLIP ***	// removed because this check is done later in monitor section
 
+					/*
 					if (sumOutput > 10)
 						sumOutput = 10;
 					else if (sumOutput < -10)
@@ -2507,6 +2557,7 @@ struct SickoSampler2 : Module {
 						else if (sumOutputR < -10)
 							sumOutputR = -10;
 					}
+					*/
 
 					if (outputs[OUT_OUTPUT].isConnected()) {
 						outputs[OUT_OUTPUT].setVoltage(sumOutput);
@@ -2671,6 +2722,11 @@ struct SickoSampler2 : Module {
 					toSave = true;
 					infoToSave ="S";
 					fileLoaded = true;
+
+					if (autoMonOff) {
+						params[MONITOR_SWITCH].setValue(0.f);
+					}
+
 				}
 			}
 		}
@@ -3498,6 +3554,8 @@ struct SickoSampler2Widget : ModuleWidget {
 				module->setPolyOuts(poly);
 		}));
 		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
+
+		menu->addChild(createBoolPtrMenuItem("Auto Monitor Off", "", &module->autoMonOff));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("EOC pulse from", "", [=](Menu* menu) {
