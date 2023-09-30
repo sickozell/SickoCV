@@ -1226,6 +1226,8 @@ struct SickoSampler2 : Module {
 
 			fileLoaded = true;
 			channels = fileChannels;
+			for (int c=0; c < 16; c++)
+				samplePos[c] = 0;
 
 		} else {
 			fileFound = false;

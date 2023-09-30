@@ -783,14 +783,11 @@ struct SickoPlayer : Module {
 			firstLoad = false;
 
 			fileLoaded = true;
+
+			for (int c=0; c < 16; c++)
+				samplePos[c] = 0;
+			
 		} else {
-			/*fileLoaded = false;
-			storedPath = "";
-			fileDescription = "--none--";
-			fileDisplay = "";
-			timeDisplay = "";
-			channelsDisplay = "";
-			*/
 			fileFound = false;
 			fileLoaded = false;
 			storedPath = path;

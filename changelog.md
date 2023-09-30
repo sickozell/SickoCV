@@ -1,7 +1,9 @@
+### 2.5.7 (2023-10-xx)
+- fixed a bug on player/sampler modules that displays play cursor outside module after loading a shorter sample
+
 ### 2.5.6 (2023-09-30)
 - added sickoSampler2 module
 - fixed a bug on sickoSampler crashing rack when pressing nav buttons after a new recording
-
 
 ### 2.5.5 (2023-07-17)
 - fixed a bug on all player/sampler modules crashing VCV on MACs when root folder is not found
