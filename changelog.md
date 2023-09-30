@@ -1,3 +1,8 @@
+### 2.5.6 (2023-09-30)
+- added sickoSampler2 module
+- fixed a bug on sickoSampler crashing rack when pressing nav buttons after a new recording
+
+
 ### 2.5.5 (2023-07-17)
 - fixed a bug on all player/sampler modules crashing VCV on MACs when root folder is not found
 - added a functionality on all player/sampler modules to to show the path of not found files

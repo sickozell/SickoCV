@@ -37,3 +37,4 @@ extern Model* modelCVswitcher;
 extern Model* modelCVrouter;
 extern Model* modelAdder8;
 extern Model* modelClocker;
+extern Model* modelSickoSampler2;

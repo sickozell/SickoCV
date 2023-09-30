@@ -346,7 +346,7 @@ struct SickoPlayer : Module {
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
@@ -383,6 +383,7 @@ struct SickoPlayer : Module {
 		reverseStart = false;
 		totalSampleC = 0;
 		totalSamples = 0;
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {

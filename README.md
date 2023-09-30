@@ -1,7 +1,7 @@
-# SickoCV v2.5.5
+# SickoCV v2.5.6
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 4](https://github.com/sickozell/SickoCV/assets/80784296/0240477b-b56a-4375-a31d-3c0a2f668bde)
+![SickoCV modules 2 5 6](https://github.com/sickozell/SickoCV/assets/80784296/4782cd63-badf-412b-9824-25104739f73d)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
@@ -551,6 +551,33 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - Save Oversampled: If this option is enabled, samples will be saved at sickoSampler working samplerate (2x VCV samplerate). This can be useful when samples are recorded at different speeds than normal for further external editing.
 - UCE/ULE updates also Start: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor).
 - Crossfade while Rec Fading: If overdub is not activated this option crossfades between previous and current recording only during fading in/out recording time, accordingly to the FD knob.
+
+## SickoSampler2
+### wav sample player and recorder
+
+#### - DESCRIPTION
+- mono/stereo sample recorder  
+- mono/stereo samples and 1-cycle waveforms player
+- v/oct input with polyphony
+- 90s style cyclic time-stretch feature
+- envelope generator, loop, reverse, pingpong
+- anti-aliasing filter, phase-scan feature
+
+![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/e1981952-c943-49ab-8b18-dd9524638c84)
+
+#### - INSTRUCTIONS
+This audio sampling module simplifies the functionalities of sickoSampler by eliminating overdubbing, tuning and modulation of many parameters, but at the same time it implements a 90s style cyclic time stretch algorithm.  
+Please refer to sickoSampler and sickoPlayer instructions for the main module features.
+The main difference is that recording is enabled only when the sample is not loaded or previously recorded, so the sample has to be cleared to reactivate the REC button. Pushing REC button starts recording immediately, there is no arming functionality.
+Monitor switch has been replaced by a led buttton.  
+
+Recording fade in/out can be achieved setting XFD knob, please remember to set it back to 0 if this is not necessary on playback.  
+The default trig type is Start/Stop: a first trig on Trig Input or a Trig buttonpress starts playback and a second trig goes to release stage.  
+The 'R' led button switches to Start/Restart trig type: every trig on Trig Input or a Trig button press restarts sample from the begin.  
+The VOL knob set the master volume from 0 to 100%. Its CV input is added to knob value.  
+
+Time stretch knob lengthen or shorten the sample without pitch change and it can be set from 1 to 999%. 100% means no time stretch (default). If set to 50% the sample will play at doubled speed. If set to 200% the sample will be played at half speed.  
+'SZ' knob sets the size of the cycle in milliseconds and the 'FD' knob sets the % of crossfade between cycles.  
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
