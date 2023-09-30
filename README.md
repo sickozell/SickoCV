@@ -567,17 +567,28 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 
 #### - INSTRUCTIONS
 This audio sampling module simplifies the functionalities of sickoSampler by eliminating overdubbing, tuning and modulation of many parameters, but at the same time it implements a 90s style cyclic time stretch algorithm.  
-Please refer to sickoSampler and sickoPlayer instructions for the main module features.
-The main difference is that recording is enabled only when the sample is not loaded or previously recorded, so the sample has to be cleared to reactivate the REC button. Pushing REC button starts recording immediately, there is no arming functionality.
+Please refer to sickoSampler and sickoPlayer instructions for the main module features.  
+The main difference is that recording is enabled only when the sample is not loaded or previously recorded, so the sample has to be cleared to reactivate the REC button.  
+A REC buttonpress starts recording immediately, there is no arming functionality.  
 Monitor switch has been replaced by a led buttton.  
 
 Recording fade in/out can be achieved setting XFD knob, please remember to set it back to 0 if this is not necessary on playback.  
 The default trig type is Start/Stop: a first trig on Trig Input or a Trig buttonpress starts playback and a second trig goes to release stage.  
-The 'R' led button switches to Start/Restart trig type: every trig on Trig Input or a Trig button press restarts sample from the begin.  
+The 'R' led button switches to Start/Restart trig type: every trig on Trig Input or a Trig buttonpress restarts sample from the beginning. As there is no STOP button, the sample can be stopped just switching the Mode to Gate.  
 The VOL knob set the master volume from 0 to 100%. Its CV input is added to knob value.  
 
-Time stretch knob lengthen or shorten the sample without pitch change and it can be set from 1 to 999%. 100% means no time stretch (default). If set to 50% the sample will play at doubled speed. If set to 200% the sample will be played at half speed.  
+**Time Stretch**  
+'STRCH' knob lengthen or shorten the sample without pitch change and it can be set from 1 to 999%.  
+100% means no time stretch (default). If it is set to 50% the sample will be played in half time. If it set to 200% the sample will be played in double time as original.  
 'SZ' knob sets the size of the cycle in milliseconds and the 'FD' knob sets the % of crossfade between cycles.  
+When lengthening some clicks may occur at the end of the sample, especially when looping. This behaviour can be reduced adjusting cross fade knob and/or cycle size.  
+
+Cyclic Time stretch algorithm usually plays samples with its characteristic metallic sound, especially when slowing down and depending on cycle size setting.  
+If it is used in combination with v/oct modulation some interesting results can be achieved.  
+Please note that extreme settings can however alter pitch a little or obtain a bit of chorus/reverb.
+
+**Context Menu**  
+'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
 
 ## Switcher / SwitcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
