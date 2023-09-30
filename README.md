@@ -1,4 +1,4 @@
-# SickoCV v2.5.6-beta2
+# SickoCV v2.5.7-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,10 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - module test
 
 ## **changelog**  
-- added sickoSampler2 module  
-- fixed a bug on sickoSampler crashing rack when pressing nav button after a new recording  
+- fixed a bug on player/sampler modules that displays play cursor outside module after loading a shorter sample  
 
-# SickoCV v2.5.6
+# SickoCV v2.5.7
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 6](https://github.com/sickozell/SickoCV/assets/80784296/4782cd63-badf-412b-9824-25104739f73d)
