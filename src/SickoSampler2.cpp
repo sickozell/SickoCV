@@ -385,6 +385,7 @@ struct SickoSampler2 : Module {
 		polyOuts = POLYPHONIC;
 		polyMaster = POLYPHONIC;
 		prevPhaseScan = false;
+		autoMonOff = true;
 		eocFromTrg = false;
 		eocFromCueEnd = true;
 		eocFromCueStart = true;
