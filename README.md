@@ -1,4 +1,4 @@
-# SickoCV v2.5.6-beta1
+# SickoCV v2.5.6-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -597,7 +597,7 @@ Monitor switch has been replaced by a led buttton.
 
 Recording fade in/out can be achieved setting XFD knob, please remember to set it back to 0 if this is not necessary on playback.  
 The default trig type is Start/Stop: a first trig on Trig Input or a Trig buttonpress starts playback and a second trig goes to release stage.  
-The 'R' led button switches to Start/Restart trig type: every trig on Trig Input or a Trig buttonpress restarts sample from the beginning.  
+The 'R' led button switches to Start/Restart trig type: every trig on Trig Input or a Trig buttonpress restarts sample from the beginning. As there is no STOP button, the sample can be stopped just switching the Mode to Gate.  
 The VOL knob set the master volume from 0 to 100%. Its CV input is added to knob value.  
 
 **Time Stretch**  
