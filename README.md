@@ -1,8 +1,31 @@
-# SickoCV v2.5.6
+# SickoCV v2.5.7
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 6](https://github.com/sickozell/SickoCV/assets/80784296/4782cd63-badf-412b-9824-25104739f73d)
+![SickoCV modules 2 5 7](https://github.com/sickozell/SickoCV/assets/80784296/13843419-dc51-4c88-acbb-ae7899fb305f)
 
+## table of contents
+- [Common modules behavior](./README.md#common-modules-behavior)
+- [Adder8](./README.md#adder8)
+- [Blender](./README.md#blender)
+- [Blender8](./README.md#blender8)
+- [bToggler / bToggler Compact](./README.md#btoggler--btoggler-compact)
+- [bToggler8](./README.md#btoggler8)
+- [bToggler8+](./README.md#btoggler8-1)
+- [Calcs](./README.md#calcs)
+- [Clocker](./README.md#clocker)
+- [CV router / CV switcher](./README.md#cvrouter--cvswitcher)
+- [Drummer / Drummer4 / Drummer4+](./README.md#drummer--drummer4--drummer4)
+- [DrumPlayer / DrumPlayer+ / DrumPlayerXtra](./README.md#drumplayer--drumplayer--drumplayerxtra)
+- [Parking](./README.md#parking)
+- [Shifter](./README.md#shifter)
+- [SickoPlayer](./README.md#sickoplayer)
+- [SickoSampler](./README.md#sickosampler)
+- [SickoSampler2](./README.md#sickosampler2)
+- [Switcher / SwitcherSt](./README.md#switcher--switcherst)
+- [Toggler / Toggler Compact](./README.md#toggler--toggler-compact)
+- [Wavetabler](./README.md#wavetabler)
+- [Credits](./README.md#credits)
+  
 ## Common modules behavior
 - Triggers and gates threshold is +1v
 - Every time-related knob set full anticlockwise and displaying 1ms on the tooltip is actually considered 0ms
@@ -230,7 +253,7 @@ When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 - **On Stop**  
 This submenu is the same as the previous one but when the Run Button is switched off.
 
-## CvRouter CvSwitcher
+## CvRouter / CvSwitcher
 ### 1>2 and 2>1 voltage controlled switch  
 
 ![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/d82e6cda-d973-4476-8d3a-28640a4bbe41)
@@ -243,7 +266,7 @@ The FADE knob with its added CV input, will crossfade up to 10s the INs or OUTs.
 
 The default value of the "THR" knob is +1v.
 
-## Drummer Drummer4 Drummer4+
+## Drummer / Drummer4 / Drummer4+
 ### Accent and choke utility for drum modules lacking these features
 
 ![drummer](https://user-images.githubusercontent.com/80784296/212536993-c8ac8011-b324-4dae-99f6-8f8b548557eb.JPG)
@@ -280,7 +303,7 @@ Example of Drummer4 module usage:
 - **Drummer4+ note:**  
 Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to parameter knobs.
 
-## DrumPlayer DrumPlayer+ DrumPlayerXtra
+## DrumPlayer / DrumPlayer+ / DrumPlayerXtra
 ### 4 channel Drum Sample Player with accent and choke functionality
 
 ![drumplayer](https://user-images.githubusercontent.com/80784296/221338110-d550144f-4e34-475d-9b00-00872910f331.JPG)
@@ -563,7 +586,7 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/e1981952-c943-49ab-8b18-dd9524638c84)
+![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/4363a39f-10a8-402a-835d-22c137623198)
 
 #### - INSTRUCTIONS
 This audio sampling module simplifies the functionalities of sickoSampler by eliminating overdubbing, tuning and modulation of many parameters, but at the same time it implements a 90s style cyclic time stretch algorithm.  
@@ -578,14 +601,14 @@ The 'R' led button switches to Start/Restart trig type: every trig on Trig Input
 The VOL knob set the master volume from 0 to 100%. Its CV input is added to knob value.  
 
 **Time Stretch**  
-'STRCH' knob lengthen or shorten the sample without pitch change and it can be set from 1 to 999%.  
+'STRETCH' knob lengthen or shorten the sample without pitch change and it can be set from 1 to 999%.  
 100% means no time stretch (default). If it is set to 50% the sample will be played in half time. If it set to 200% the sample will be played in double time as original.  
-'SZ' knob sets the size of the cycle in milliseconds and the 'FD' knob sets the % of crossfade between cycles.  
+'SIZ' knob sets the size of the cycle in milliseconds.  
 When lengthening some clicks may occur at the end of the sample, especially when looping. This behaviour can be reduced adjusting cross fade knob and/or cycle size.  
 
 Cyclic Time stretch algorithm usually plays samples with its characteristic metallic sound, especially when slowing down and depending on cycle size setting.  
 If it is used in combination with v/oct modulation some interesting results can be achieved.  
-Please note that extreme settings can however alter pitch a little or obtain a bit of chorus/reverb.
+Please note that extreme settings can however alter pitch a little or obtain a bit of chorus/echo.
 
 **Context Menu**  
 'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.

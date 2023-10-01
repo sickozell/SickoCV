@@ -673,6 +673,9 @@ struct SickoPlayer : Module {
 			channels = c;
 			sampleRate = sr * 2;
 			calcBiquadLpf(20000.0, sampleRate, 1);
+			
+			for (int c=0; c < 16; c++)
+				samplePos[c] = 0;
 			playBuffer[LEFT][0].clear();
 			playBuffer[LEFT][1].clear();
 			playBuffer[RIGHT][0].clear();
@@ -783,14 +786,8 @@ struct SickoPlayer : Module {
 			firstLoad = false;
 
 			fileLoaded = true;
+			
 		} else {
-			/*fileLoaded = false;
-			storedPath = "";
-			fileDescription = "--none--";
-			fileDisplay = "";
-			timeDisplay = "";
-			channelsDisplay = "";
-			*/
 			fileFound = false;
 			fileLoaded = false;
 			storedPath = path;

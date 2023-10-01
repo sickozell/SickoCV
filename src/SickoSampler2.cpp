@@ -61,11 +61,9 @@ struct SickoSampler2 : Module {
 		PREVSAMPLE_PARAM,
 		NEXTSAMPLE_PARAM,
 		TRIGBUT_PARAM,
-		//STOPBUT_PARAM,
 		PHASESCAN_SWITCH,
 		STRETCH_PARAM,
 		STR_SIZE_PARAM,
-		STR_FADE_PARAM,
 		NUM_PARAMS 
 	};
 	enum InputIds {
@@ -232,6 +230,7 @@ struct SickoSampler2 : Module {
 	float eocTime[16];
 	float eorTime[16];
 	float eocEorTime = (APP->engine->getSampleRate()) / 2000;
+	double oneMsSamples  = (APP->engine->getSampleRate()) / 1000;
 
 	bool eocFromTrg = false;
 	//bool eocFromStop = false;
@@ -298,8 +297,8 @@ struct SickoSampler2 : Module {
 	const float noEnvTime = 0.00101f;
 
 	int grainCount[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int grainSampleCount[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int stretchMaxPos = 0;
+	double grainSampleCount[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double stretchMaxPos = 0;
 	drwav_uint64 grainPos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float grainFadeValue[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	float grainFadeCoeff[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
@@ -344,8 +343,7 @@ struct SickoSampler2 : Module {
 		configInput(VO_INPUT,"V/Oct");
 
 		configParam(STRETCH_PARAM, 0.01f, 9.99f, 1.f, "Time Stretch", "%", 0, 100);
-		configParam(STR_SIZE_PARAM, 20.f, 80.f, 40.f, "Cycle Size", "ms");
-		configParam(STR_FADE_PARAM, 0.01f, 0.5f, 0.25f, "Cycle xFade", "%", 0 ,100);
+		configParam(STR_SIZE_PARAM, 1.f, 99.f, 48.f, "Cycle Size", "ms");
 
 		configParam(VOL_PARAM, 0.f, 1.0f, 1.0f, "Master Volume", "%", 0, 100);
 		configInput(VOL_INPUT,"Master Volume CV");
@@ -385,6 +383,7 @@ struct SickoSampler2 : Module {
 		polyOuts = POLYPHONIC;
 		polyMaster = POLYPHONIC;
 		prevPhaseScan = false;
+		autoMonOff = true;
 		eocFromTrg = false;
 		eocFromCueEnd = true;
 		eocFromCueStart = true;
@@ -681,6 +680,7 @@ struct SickoSampler2 : Module {
 	void onSampleRateChange() override {
 		monitorFadeCoeff = 10 / (APP->engine->getSampleRate()); // 100ms monitor fade
 		eocEorTime = (APP->engine->getSampleRate())/2000;			// number of samples for 1 ms used for output triggers
+		oneMsSamples  = (APP->engine->getSampleRate())/1000;
 		prevXfade = -1.f;
 
 		if (fileLoaded && APP->engine->getSampleRate() != sampleRate/2) {
@@ -999,6 +999,9 @@ struct SickoSampler2 : Module {
 			fileChannels = c;
 			sampleRate = sr * 2;
 			fileSampleRate = sr;
+
+			for (int c=0; c < 16; c++)
+				samplePos[c] = 0;
 			
 			playBuffer[LEFT][0].clear();
 			playBuffer[LEFT][1].clear();
@@ -1439,7 +1442,7 @@ struct SickoSampler2 : Module {
 		trigButValue = params[TRIGBUT_PARAM].getValue();
 		lights[TRIGBUT_LIGHT].setBrightness(trigButValue);
 
-		stretchMaxPos = int(args.sampleRate / 1000 * params[STR_SIZE_PARAM].getValue());
+		stretchMaxPos = oneMsSamples * params[STR_SIZE_PARAM].getValue();
 
 		// *********************************************************************************************** PLAY SECTION *******************************		
 
@@ -2426,29 +2429,34 @@ struct SickoSampler2 : Module {
 						if (params[STRETCH_PARAM].getValue() != 1) {
 							grainSampleCount[c]++;
 							if (params[STRETCH_PARAM].getValue() > 1) {
+
 								if (grainSampleCount[c] > stretchMaxPos ) {		//
 									grainCount[c]++;
 									grainPos[c] = samplePos[c];
 									grainFadeValue[c] = 1;
-									grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * args.sampleRate / 1000 * params[STR_FADE_PARAM].getValue());
+
+									//grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples * params[STR_FADE_PARAM].getValue());
+									grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
 									grainFade[c] = true;
 
 									if (grainCount[c] > (params[STRETCH_PARAM].getValue())) {
-										float tempStretch2 = params[STRETCH_PARAM].getValue()-int(params[STRETCH_PARAM].getValue());
+										double tempStretch1 = params[STRETCH_PARAM].getValue()-floor(params[STRETCH_PARAM].getValue());
 										if (!reversePlaying[c])
-											samplePos[c] -= stretchMaxPos * tempStretch2 * distancePos[c];
+											samplePos[c] -= stretchMaxPos * tempStretch1 * distancePos[c];
 										else
-											samplePos[c] += stretchMaxPos * tempStretch2 * distancePos[c];
-										grainSampleCount[c] = -floor(stretchMaxPos * tempStretch2);
+											samplePos[c] += stretchMaxPos* tempStretch1 * distancePos[c];
+										grainSampleCount[c] = -stretchMaxPos * tempStretch1;
 										grainCount[c] = 1;
 									} else {
 										if (!reversePlaying[c])
 											samplePos[c] -= stretchMaxPos * distancePos[c];
 										else
 											samplePos[c] += stretchMaxPos * distancePos[c];
-										grainSampleCount[c] = 0;
+										//grainSampleCount[c] = 0;
+										grainSampleCount[c] = grainSampleCount[c] - stretchMaxPos;
 									}
 								}
+
 							} else {
 
 								if (grainSampleCount[c] > stretchMaxPos) {
@@ -2456,15 +2464,20 @@ struct SickoSampler2 : Module {
 									grainPos[c] = samplePos[c];
 									grainFadeValue[c] = 1;
 									
-									grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * args.sampleRate / 1000  * params[STR_FADE_PARAM].getValue());
+									//grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples * params[STR_FADE_PARAM].getValue());
+									grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
 									grainFade[c] = true;
 									
-									float tempStretch1 = stretchMaxPos * (1-params[STRETCH_PARAM].getValue());
+									//double tempStretch2 = (stretchMaxPos / params[STRETCH_PARAM].getValue());
+
 									if (!reversePlaying[c])
-										samplePos[c] += tempStretch1 * distancePos[c];
+										//samplePos[c] += (tempStretch2 - stretchMaxPos) * distancePos[c];
+										samplePos[c] += ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
 									else
-										samplePos[c] -= tempStretch1 * distancePos[c];
-									grainSampleCount[c] = 0;
+										//samplePos[c] -= (tempStretch2 - stretchMaxPos) * distancePos[c];
+										samplePos[c] -= ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
+									//grainSampleCount[c] = 0;
+									grainSampleCount[c] = grainSampleCount[c] - stretchMaxPos;
 								}
 							}
 						}
@@ -3342,14 +3355,11 @@ struct SickoSampler2Widget : ModuleWidget {
 		const float xScan = 45.f;
 		const float yScan = 79.f;
 
-		const float xStretch = 7.2f;
+		const float xStretch = 9.7f;
 		const float yStretch = 103.f;
 
-		const float xStretchSiz = 17.f;
-		const float yStretchSiz = 103.1f;
-
-		const float xStretchFd = 25.5f;
-		const float yStretchFd = 103.1f;
+		const float xStretchSiz = 23.f;
+		const float yStretchSiz = 103.2f;
 
 		const float xVoct = 5.9f;
 		const float yVoct = 117.8f;
@@ -3421,7 +3431,6 @@ struct SickoSampler2Widget : ModuleWidget {
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStretch, yStretch)), module, SickoSampler2::STRETCH_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xStretchSiz, yStretchSiz)), module, SickoSampler2::STR_SIZE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xStretchFd, yStretchFd)), module, SickoSampler2::STR_FADE_PARAM));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xVoct, yVoct)), module, SickoSampler2::VO_INPUT));
 
