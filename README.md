@@ -1,4 +1,4 @@
-# SickoCV v2.5.7-beta2
+# SickoCV v2.5.7-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -19,6 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - module test  
 
 ## **changelog**  
+- improved time stretch feature on sickoSampler2
 - fixed a bug on player/sampler modules that displays play cursor outside module after loading a shorter sample  
 
 # SickoCV v2.5.7
