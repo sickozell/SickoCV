@@ -25,7 +25,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.5.7
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 6](https://github.com/sickozell/SickoCV/assets/80784296/4782cd63-badf-412b-9824-25104739f73d)
+![SickoCV modules 2 5 7](https://github.com/sickozell/SickoCV/assets/80784296/13843419-dc51-4c88-acbb-ae7899fb305f)
 
 ## Common modules behavior
 - Triggers and gates threshold is +1v
@@ -587,7 +587,7 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/e1981952-c943-49ab-8b18-dd9524638c84)
+![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/b51be9cc-bcc0-4b35-b165-3c70638e8a80)
 
 #### - INSTRUCTIONS
 This audio sampling module simplifies the functionalities of sickoSampler by eliminating overdubbing, tuning and modulation of many parameters, but at the same time it implements a 90s style cyclic time stretch algorithm.  
@@ -602,14 +602,14 @@ The 'R' led button switches to Start/Restart trig type: every trig on Trig Input
 The VOL knob set the master volume from 0 to 100%. Its CV input is added to knob value.  
 
 **Time Stretch**  
-'STRCH' knob lengthen or shorten the sample without pitch change and it can be set from 1 to 999%.  
+'STRETCH' knob lengthen or shorten the sample without pitch change and it can be set from 1 to 999%.  
 100% means no time stretch (default). If it is set to 50% the sample will be played in half time. If it set to 200% the sample will be played in double time as original.  
-'SZ' knob sets the size of the cycle in milliseconds and the 'FD' knob sets the % of crossfade between cycles.  
+'SIZ' knob sets the size of the cycle in milliseconds.  
 When lengthening some clicks may occur at the end of the sample, especially when looping. This behaviour can be reduced adjusting cross fade knob and/or cycle size.  
 
 Cyclic Time stretch algorithm usually plays samples with its characteristic metallic sound, especially when slowing down and depending on cycle size setting.  
 If it is used in combination with v/oct modulation some interesting results can be achieved.  
-Please note that extreme settings can however alter pitch a little or obtain a bit of chorus/reverb.
+Please note that extreme settings can however alter pitch a little or obtain a bit of chorus/echo.
 
 **Context Menu**  
 'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
