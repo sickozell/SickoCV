@@ -1133,6 +1133,8 @@ struct SickoSampler : Module {
 			sampleRate = sr * 2;
 			fileSampleRate = sr;
 			
+			for (int c=0; c < 16; c++)
+				samplePos[c] = 0;
 			playBuffer[LEFT][0].clear();
 			playBuffer[LEFT][1].clear();
 			playBuffer[RIGHT][0].clear();
@@ -1360,19 +1362,8 @@ struct SickoSampler : Module {
 			fileLoaded = true;
 			channels = fileChannels;
 
-			for (int c=0; c < 16; c++)
-				samplePos[c] = 0;
-
 		} else {
-			/*fileLoaded = false;
-			storedPath = "";
-			fileDescription = "--none--";
-			fileDisplay = "";
-			timeDisplay = "";
-			recSamples = 0;
-			recTimeDisplay = "";
-			channelsDisplay = "";
-			*/
+
 			fileFound = false;
 			fileLoaded = false;
 			storedPath = path;
