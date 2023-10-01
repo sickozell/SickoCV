@@ -61,11 +61,9 @@ struct SickoSampler2 : Module {
 		PREVSAMPLE_PARAM,
 		NEXTSAMPLE_PARAM,
 		TRIGBUT_PARAM,
-		//STOPBUT_PARAM,
 		PHASESCAN_SWITCH,
 		STRETCH_PARAM,
 		STR_SIZE_PARAM,
-		//STR_FADE_PARAM,
 		NUM_PARAMS 
 	};
 	enum InputIds {
@@ -299,9 +297,7 @@ struct SickoSampler2 : Module {
 	const float noEnvTime = 0.00101f;
 
 	int grainCount[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	//int grainSampleCount[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double grainSampleCount[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	//int stretchMaxPos = 0;
 	double stretchMaxPos = 0;
 	drwav_uint64 grainPos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float grainFadeValue[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
@@ -348,7 +344,6 @@ struct SickoSampler2 : Module {
 
 		configParam(STRETCH_PARAM, 0.01f, 9.99f, 1.f, "Time Stretch", "%", 0, 100);
 		configParam(STR_SIZE_PARAM, 1.f, 99.f, 48.f, "Cycle Size", "ms");
-		//configParam(STR_FADE_PARAM, 0.01f, 0.5f, 0.25f, "Cycle xFade", "%", 0 ,100);
 
 		configParam(VOL_PARAM, 0.f, 1.0f, 1.0f, "Master Volume", "%", 0, 100);
 		configInput(VOL_INPUT,"Master Volume CV");
@@ -3363,12 +3358,8 @@ struct SickoSampler2Widget : ModuleWidget {
 		const float xStretch = 9.7f;
 		const float yStretch = 103.f;
 
-		//const float xStretchSiz = 17.f;
 		const float xStretchSiz = 23.f;
 		const float yStretchSiz = 103.2f;
-
-		//const float xStretchFd = 25.5f;
-		//const float yStretchFd = 103.1f;
 
 		const float xVoct = 5.9f;
 		const float yVoct = 117.8f;
@@ -3440,7 +3431,6 @@ struct SickoSampler2Widget : ModuleWidget {
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStretch, yStretch)), module, SickoSampler2::STRETCH_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xStretchSiz, yStretchSiz)), module, SickoSampler2::STR_SIZE_PARAM));
-		//addParam(createParamCentered<Trimpot>(mm2px(Vec(xStretchFd, yStretchFd)), module, SickoSampler2::STR_FADE_PARAM));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xVoct, yVoct)), module, SickoSampler2::VO_INPUT));
 
