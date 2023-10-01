@@ -27,6 +27,29 @@ VCV Rack plugin modules
 
 ![SickoCV modules 2 5 7](https://github.com/sickozell/SickoCV/assets/80784296/13843419-dc51-4c88-acbb-ae7899fb305f)
 
+## table of contents
+- [Common modules behavior](./README.md#common-modules-behavior)
+- [Adder8](./README.md#adder8)
+- [Blender](./README.md#blender)
+- [Blender8](./README.md#blender8)
+- [bToggler / bToggler Compact](./README.md#btoggler--btoggler-compact)
+- [bToggler8](./README.md#btoggler8)
+- [bToggler8+](./README.md#btoggler8-1)
+- [Calcs](./README.md#calcs)
+- [Clocker](./README.md#clocker)
+- [CV router / CV switcher](./README.md#cvrouter-cvswitcher)
+- [Drummer / Drummer4 / Drummer4+](./README.md#drummer-drummer4-drummer4)
+- [DrumPlayer / DrumPlayer+ / DrumPlayerXtra](./README.md#drumplayer-drumplayer-drumplayerxtra)
+- [Parking](./README.md#parking)
+- [Shifter](./README.md#shifter)
+- [SickoPlayer](./README.md#sickoplayer)
+- [SickoSampler](./README.md#sickosampler)
+- [SickoSampler2](./README.md#sickosampler2)
+- [Switcher / SwitcherSt](./README.md#switcher--switcherst)
+- [Toggler / Toggler Compact](./README.md#toggler--toggler-compact)
+- [Wavetabler](./README.md#wavetabler)
+- [Credits](./README.md#credits)
+  
 ## Common modules behavior
 - Triggers and gates threshold is +1v
 - Every time-related knob set full anticlockwise and displaying 1ms on the tooltip is actually considered 0ms
@@ -254,7 +277,7 @@ When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 - **On Stop**  
 This submenu is the same as the previous one but when the Run Button is switched off.
 
-## CvRouter CvSwitcher
+## CvRouter / CvSwitcher
 ### 1>2 and 2>1 voltage controlled switch  
 
 ![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/d82e6cda-d973-4476-8d3a-28640a4bbe41)
@@ -267,7 +290,7 @@ The FADE knob with its added CV input, will crossfade up to 10s the INs or OUTs.
 
 The default value of the "THR" knob is +1v.
 
-## Drummer Drummer4 Drummer4+
+## Drummer / Drummer4 / Drummer4+
 ### Accent and choke utility for drum modules lacking these features
 
 ![drummer](https://user-images.githubusercontent.com/80784296/212536993-c8ac8011-b324-4dae-99f6-8f8b548557eb.JPG)
@@ -304,7 +327,7 @@ Example of Drummer4 module usage:
 - **Drummer4+ note:**  
 Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to parameter knobs.
 
-## DrumPlayer DrumPlayer+ DrumPlayerXtra
+## DrumPlayer / DrumPlayer+ / DrumPlayerXtra
 ### 4 channel Drum Sample Player with accent and choke functionality
 
 ![drumplayer](https://user-images.githubusercontent.com/80784296/221338110-d550144f-4e34-475d-9b00-00872910f331.JPG)
