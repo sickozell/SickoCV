@@ -587,7 +587,7 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/b51be9cc-bcc0-4b35-b165-3c70638e8a80)
+![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/4363a39f-10a8-402a-835d-22c137623198)
 
 #### - INSTRUCTIONS
 This audio sampling module simplifies the functionalities of sickoSampler by eliminating overdubbing, tuning and modulation of many parameters, but at the same time it implements a 90s style cyclic time stretch algorithm.  
