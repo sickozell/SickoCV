@@ -263,7 +263,7 @@ BEAT and BAR outputs are always active and give a 1ms trigger.
 
 #### Context Menu
 
-- **Trig/Swing od Div**
+- **Trig/Swing od Div**  
 With this option enabled the selected divider/multiplier outputs a 1ms trigger instead of gate.
 In this case the PW knob sets the amount of Swing applied to the odd pulses for clock multiplications only.
 Swing control at 0% means no swing. At 100% it delays the odd pulses to the next even ones.
