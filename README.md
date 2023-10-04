@@ -1,4 +1,4 @@
-# SickoCV v2.5.7-beta4
+# SickoCV v2.5.8-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -13,6 +13,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## Current modules in beta testing:
 - sickoSampler2
+- clocker
 
 ## **to do list:** 
 - fix a bug on player/sampler modules that displays cursors outside module after loading a shorter sample if it's only been recorded a sample  
@@ -20,12 +21,13 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog**  
 - improved time stretch feature on sickoSampler2
+- added swing feature on clocker
 - fixed a bug on player/sampler modules that displays play cursor outside module after loading a shorter sample  
 
-# SickoCV v2.5.7
+# SickoCV v2.5.8
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 7](https://github.com/sickozell/SickoCV/assets/80784296/13843419-dc51-4c88-acbb-ae7899fb305f)
+![SickoCV modules 2 5 8](https://github.com/sickozell/SickoCV/assets/80784296/6345fdbc-5bd3-41f6-985d-e8ae77e75329)
 
 ## table of contents
 - [Common modules behavior](./README.md#common-modules-behavior)
@@ -242,9 +244,9 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 ### Clock generator with 4 dividers/multipliers and audio metronome
 
 #### - DESCRIPTION
-Clocker is a high precision clock generator and modulator with 4 dividers/multipliers and integrated audio click.
+Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature and integrated audio click.
 
-![clocker](https://github.com/sickozell/SickoCV/assets/80784296/7cdfce27-6f65-4a45-ad29-4c62aefa22d8)
+![clocker](https://github.com/sickozell/SickoCV/assets/80784296/297e57cc-7338-4dc5-a817-2f4215387c7e)
 
 #### - INSTRUCTIONS
 The BPM knob sets the clock speed from 30 to 300 bpm.  
@@ -260,6 +262,12 @@ Audio click is activated with CLICK button and volume can be adjusted with the k
 BEAT and BAR outputs are always active and give a 1ms trigger.
 
 #### Context Menu
+
+- **Trig/Swing od Div**
+With this option enabled the selected divider/multiplier outputs a 1ms trigger instead of gate.
+In this case the PW knob sets the amount of Swing applied to the odd pulses for clock multiplications only.
+Swing control at 0% means no swing. At 100% it delays the odd pulses to the next even ones.
+Please note that every clock timing (beat detection) resets the even pulses.
 
 - **Click Presets**  
 There are 3 predefined types of audio clicks, each one with beat and bar sample.  
