@@ -313,8 +313,8 @@ struct SickoSampler2 : Module {
 		configSwitch(TRIGGATEMODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Trig"});
 		configSwitch(TRIGMODE_SWITCH, 0.f, 1.f, 0.f, "Trig Type", {"Start/Stop", "Restart"});
 
-		configInput(TRIG_INPUT,"Trig/Gate");
-		configSwitch(TRIGBUT_PARAM, 0.f, 1.f, 0.f, "Trig/Gate", {"OFF", "ON"});
+		configInput(TRIG_INPUT,"Play");
+		configSwitch(TRIGBUT_PARAM, 0.f, 1.f, 0.f, "Play", {"OFF", "ON"});
 
 		//******************************************************************************
 
@@ -995,6 +995,7 @@ struct SickoSampler2 : Module {
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
 		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
+
 			fileFound = true;
 			fileChannels = c;
 			sampleRate = sr * 2;
@@ -1210,7 +1211,7 @@ struct SickoSampler2 : Module {
 				prevKnobCueStartPos = -1.f;
 				prevKnobCueEndPos = 2.f;
 				prevKnobLoopStartPos = -1.f;
-				prevKnobLoopEndPos = 2.f;	
+				prevKnobLoopEndPos = 2.f;
 
 				if (resetCursorsOnLoad) {
 					params[CUESTART_PARAM].setValue(0.f);
@@ -1222,7 +1223,14 @@ struct SickoSampler2 : Module {
 					knobLoopStartPos = 0.f;
 					knobLoopEndPos = 1.f;
 				}
-			}
+			} /*else {
+				prevKnobCueStartPos = -1.f;
+				prevKnobCueEndPos = 2.f;
+				prevKnobLoopStartPos = -1.f;
+				prevKnobLoopEndPos = 2.f;
+
+			}*/
+
 
 			firstLoad = false;
 

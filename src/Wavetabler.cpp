@@ -1089,7 +1089,7 @@ struct WavetablerWidget : ModuleWidget {
 			addChild(display);
 		}
 
-		float yTunVol = 108;
+		const float yTunVol = 108;
 
 		addParam(createParamCentered<VCVButton>(mm2px(Vec(9, 39)), module, Wavetabler::PREVSAMPLE_PARAM));
 		addParam(createParamCentered<VCVButton>(mm2px(Vec(17, 39)), module, Wavetabler::NEXTSAMPLE_PARAM));

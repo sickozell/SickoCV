@@ -1244,8 +1244,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			addChild(display);
 		}
 
-
-		float xDelta = 23.5;
+		const float xDelta = 23.5;
 
 		for (int i = 0; i < 4; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 21)), module, DrumPlayerPlus::TRIG_INPUT+i));

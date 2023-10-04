@@ -389,8 +389,8 @@ struct SickoSampler : Module {
 		configSwitch(TRIGGATEMODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Trig"});
 		configSwitch(TRIGMODE_SWITCH, 0.f, 2.f, 0.f, "Trig Type", {"Start/Stop", "Restart", "Play/Pause"});
 
-		configInput(TRIG_INPUT,"Trig/Gate");
-		configSwitch(TRIGBUT_PARAM, 0.f, 1.f, 0.f, "Trig/Gate", {"OFF", "ON"});
+		configInput(TRIG_INPUT,"Play");
+		configSwitch(TRIGBUT_PARAM, 0.f, 1.f, 0.f, "Play", {"OFF", "ON"});
 		configInput(STOP_INPUT,"Stop");
 		configSwitch(STOPBUT_PARAM, 0.f, 1.f, 0.f, "Stop", {"OFF", "ON"});
 
