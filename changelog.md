@@ -1,7 +1,7 @@
 ### 2.5.8 (2023-xx-xx)
 
 ### 2.5.7 (2023-10-01)
-- improved time stretch feature on sickoSampler2
+- improved time stretch feature on sickoSampler2 and removed TimeStretch crossfading knob  
 - fixed a bug on player/sampler modules that displays play cursor outside module after loading a shorter sample
 
 ### 2.5.6 (2023-09-30)
