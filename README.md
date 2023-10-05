@@ -260,6 +260,9 @@ The metronome setting is controlled by the METER knob or with a right click on t
 Audio click is activated with CLICK button and volume can be adjusted with the knob from 0 to 200%.  
 BEAT and BAR outputs are always active and give a 1ms trigger.
 
+To get best clock precision the algorithm used may alter the clock lengths, according to working vcv samplerate and BPM setting.  
+There will therefore be clocks of non-fixed length, but which will guarantee the exact number of BPMs within a minute.
+
 #### Context Menu
 
 - **Trig/Swing of Div**  
