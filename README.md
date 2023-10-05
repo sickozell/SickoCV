@@ -265,7 +265,7 @@ There will therefore be clocks of non-fixed length, but which will guarantee the
 
 #### Context Menu
 
-- **Trig/Swing of Div**  
+- **Trig/Swing on Div**  
 With this option enabled the selected divider/multiplier outputs a 1ms trigger instead of gate.
 In this case the PW knob sets the amount of Swing applied to the even pulses for clock multiplications only.
 Swing control at 0% means no swing, so every pulse has equal timing. Increasing swing ratio it delays the even pulses by its percentage until 100% that means the even pulses fall on to the next odd ones.
