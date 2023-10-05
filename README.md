@@ -16,11 +16,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - clocker
 
 ## **to do list:** 
-- fix a bug on player/sampler modules that displays cursors outside module after loading a shorter sample if it's only been recorded a sample  
+- fix a bug on sampler modules that displays cursors outside module after loading a shorter sample if it's only been recorded a sample  
 - module test  
 
 ## **changelog**  
-- improved time stretch feature on sickoSampler2
 - added swing feature on clocker
 - fixed a bug on player/sampler modules that displays play cursor outside module after loading a shorter sample  
 
@@ -265,9 +264,9 @@ BEAT and BAR outputs are always active and give a 1ms trigger.
 
 - **Trig/Swing of Div**  
 With this option enabled the selected divider/multiplier outputs a 1ms trigger instead of gate.
-In this case the PW knob sets the amount of Swing applied to the odd pulses for clock multiplications only.
-Swing control at 0% means no swing. At 100% it delays the odd pulses to the next even ones.
-Please note that every clock timing (beat detection) resets the even pulses.
+In this case the PW knob sets the amount of Swing applied to the even pulses for clock multiplications only.
+Swing control at 0% means no swing, so every pulse has equal timing. Increasing swing ratio it delays the even pulses by its percentage until 100% that means the even pulses fall on to the next odd ones.
+Please note that every clock timing (beat detection) resets the odd pulses, so every pulse that is a beat will be an odd one. This is beacause it has to match metronome and don't mess when odd clock divisions are selected.
 
 - **Click Presets**  
 There are 3 predefined types of audio clicks, each one with beat and bar sample.  
