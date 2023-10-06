@@ -953,6 +953,7 @@ struct SickoSampler2 : Module {
 		}
 
 		fileLoaded = true;
+		fileFound = true;
 		channels = fileChannels;
 	}
 /*
@@ -976,7 +977,7 @@ struct SickoSampler2 : Module {
 		} else {
 			fileLoaded = true;
 		}
-		if (storedPath == "" || fileFound == false) {
+		if ((storedPath == "" || fileFound == false) && !toSave) {
 			fileLoaded = false;
 		}
 		free(path);
@@ -1204,10 +1205,8 @@ struct SickoSampler2 : Module {
 
 			recSeconds = 0;
 			recMinutes = 0;
-			toSave = false;
-			infoToSave = "";
-
-			if (!firstLoad) {
+			
+			if (!firstLoad || toSave) {
 				prevKnobCueStartPos = -1.f;
 				prevKnobCueEndPos = 2.f;
 				prevKnobLoopStartPos = -1.f;
@@ -1223,14 +1222,10 @@ struct SickoSampler2 : Module {
 					knobLoopStartPos = 0.f;
 					knobLoopEndPos = 1.f;
 				}
-			} /*else {
-				prevKnobCueStartPos = -1.f;
-				prevKnobCueEndPos = 2.f;
-				prevKnobLoopStartPos = -1.f;
-				prevKnobLoopEndPos = 2.f;
+			}
 
-			}*/
-
+			toSave = false;
+			infoToSave = "";
 
 			firstLoad = false;
 

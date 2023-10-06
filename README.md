@@ -1,4 +1,4 @@
-# SickoCV v2.5.8-beta1
+# SickoCV v2.5.8-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,16 +12,17 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- sickoSampler2
 - clocker
+- sickoSampler
+- sickoSampler2
 
 ## **to do list:** 
-- fix a bug on sampler modules that displays cursors outside module after loading a shorter sample if it's only been recorded a sample  
 - module test  
 
 ## **changelog**  
-- added swing feature on clocker
-- fixed a bug on player/sampler modules that displays play cursor outside module after loading a shorter sample  
+- clocker: added swing feature
+- sickoSampler: improved cpu load when using xFade knob
+- sickoSampler/sickoSampler2: fixed bugs that display cursors wrong when loading a sample after a fresh recording
 
 # SickoCV v2.5.8
 VCV Rack plugin modules

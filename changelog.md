@@ -1,4 +1,7 @@
 ### 2.5.8 (2023-xx-xx)
+- clocker: added swing feature
+- sickoSampler: improved cpu load when using xFade knob
+- sickoSampler/sickoSampler2: fixed bug that clear memory when loading sample after a fresh recording
 
 ### 2.5.7 (2023-10-01)
 - improved time stretch feature on sickoSampler2 and removed TimeStretch crossfading knob  

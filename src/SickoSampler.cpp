@@ -249,6 +249,7 @@ struct SickoSampler : Module {
 	double fadedPosition[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	double fadeSamples = 0.0;
 	float xFade = 0.f;
+	float prevXfade = -1.f;
 
 	float currentOutput = 0.f;
 	float currentOutputR = 0.f;
@@ -533,6 +534,7 @@ struct SickoSampler : Module {
 		prevRecButton = 0;
 		newRecording = true;
 		prevMonitorSwitch = 0;
+		prevXfade = -1.f;
 	}
 
 	json_t *dataToJson() override {
@@ -805,6 +807,7 @@ struct SickoSampler : Module {
 		monitorFadeCoeff = 10 / (APP->engine->getSampleRate()); // 100ms monitor fade
 		eocEorTime = (APP->engine->getSampleRate())/2000;			// number of samples for 1 ms used for output triggers
 		clippingCoeff = 5 / (APP->engine->getSampleRate());	// decrement for 200 ms clipping light (1/0.2)
+		prevXfade = -1.f;
 
 		if (fileLoaded && APP->engine->getSampleRate() != sampleRate/2) {
 			double resampleCoeff;
@@ -1086,6 +1089,7 @@ struct SickoSampler : Module {
 		}
 
 		fileLoaded = true;
+		fileFound = true;
 		channels = fileChannels;
 	}
 /*
@@ -1109,7 +1113,7 @@ struct SickoSampler : Module {
 		} else {
 			fileLoaded = true;
 		}
-		if (storedPath == "" || fileFound == false) {
+		if ((storedPath == "" || fileFound == false) && !toSave) {
 			fileLoaded = false;
 		}
 		free(path);
@@ -1336,10 +1340,8 @@ struct SickoSampler : Module {
 			newRecording = false;
 			recSeconds = 0;
 			recMinutes = 0;
-			toSave = false;
-			infoToSave = "";
 
-			if (!firstLoad) {
+			if (!firstLoad || toSave) {
 				prevKnobCueStartPos = -1.f;
 				prevKnobCueEndPos = 2.f;
 				prevKnobLoopStartPos = -1.f;
@@ -1356,6 +1358,9 @@ struct SickoSampler : Module {
 					knobLoopEndPos = 1.f;
 				}
 			}
+
+			toSave = false;
+			infoToSave = "";
 
 			firstLoad = false;
 
@@ -1775,10 +1780,20 @@ struct SickoSampler : Module {
 				sustainValue = 0;
 
 			xFade = params[XFADE_PARAM].getValue();
+			/*
 			if (xFade == 0)
 				fadeSamples = 0;
 			else
 				fadeSamples = floor(convertCVToSeconds(xFade) * args.sampleRate); // number of samples before starting fade
+			*/
+			if (xFade != prevXfade) {
+				if (xFade == 0)
+					fadeSamples = 0;
+				else
+					fadeSamples = floor(convertCVToSeconds(xFade) * args.sampleRate); // number of samples before starting fade
+
+				prevXfade = xFade;
+			}
 
 			// START CHANNEL MANAGEMENT
 
