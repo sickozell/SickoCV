@@ -78,8 +78,9 @@ struct Blender : Module {
 		configOutput(OUT_OUTPUT+1, "R");
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		polyOuts = POLYPHONIC;
+		Module::onReset(e);
 	}
 
 	json_t *dataToJson() override {

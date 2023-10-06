@@ -220,7 +220,7 @@ struct Wavetabler : Module {
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
 		polyMaster = POLYPHONIC;
@@ -238,6 +238,7 @@ struct Wavetabler : Module {
 		reverseStart = false;
 		totalSampleC = 0;
 		totalSamples = 0;
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {

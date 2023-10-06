@@ -255,7 +255,7 @@ struct Clocker : Module {
 		setClick(0);
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		resetStart = true;
 		extSync = false;
 		extConn = false;
@@ -297,6 +297,7 @@ struct Clocker : Module {
 			play[i] = false;
 		}
 		setClick(0);
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {

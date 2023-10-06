@@ -174,7 +174,7 @@ struct DrumPlayerPlus : Module {
 		playBuffer[3][1].resize(0);
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		outsMode = NORMALLED_OUTS;
@@ -185,6 +185,7 @@ struct DrumPlayerPlus : Module {
 			choking[i] = false;
 			fading[i] = false;
 		}
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {

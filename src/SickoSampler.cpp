@@ -477,7 +477,7 @@ struct SickoSampler : Module {
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		trimOnSave = true;
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
@@ -526,6 +526,7 @@ struct SickoSampler : Module {
 		newRecording = true;
 		prevMonitorSwitch = 0;
 		prevXfade = -1.f;
+		Module::onReset(e);
 	}
 
 	json_t *dataToJson() override {

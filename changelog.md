@@ -1,4 +1,5 @@
 ### 2.5.8 (2023-10-06)
+- added sickoAmp module
 - clocker: added swing feature
 - sickoPlayer / sickoSampler / sickoSampler2: added EoC pulse when sample has reached begin/end if start/end cursors are set to 0% or 100%
 - sickoPlayer / sickoSampler: improved cpu load when using xFade knob

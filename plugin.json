@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.5.8-beta5",
+  "version": "2.5.8-beta6",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -188,6 +188,15 @@
       "tags": [
         "Sample and hold",
         "Utility"
+      ]
+    },
+    {
+      "slug": "SickoAmp",
+      "name": "SickoAmp",
+      "description": "Stereo VCA up to 200% with limiter",
+      "tags": [
+        "Voltage-controlled amplifier",
+        "Polyphonic"
       ]
     },
     {

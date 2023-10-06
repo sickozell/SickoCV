@@ -1,4 +1,4 @@
-# SickoCV v2.5.8-beta5
+# SickoCV v2.5.8-beta6
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,6 +12,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
+- sickoAmp
 - clocker
 - sickoSampler
 - sickoSampler2
@@ -20,6 +21,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - module test  
 
 ## **changelog**  
+- added sickoAmp module
 - clocker: added swing feature
 - sickoPlayer / sickoSampler / sickoSampler2: added EoC pulse when sample has reached begin/end if start/end cursors are set to 0% or 100%
 - sickoPlayer / sickoSampler: improved cpu load when using xFade knob
