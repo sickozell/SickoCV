@@ -111,7 +111,6 @@ struct SickoSampler2 : Module {
 	bool play[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 	double samplePos[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-	//const int sampleCoeff = 2;
 	double distancePos[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 	double cueStartPos;
@@ -229,8 +228,7 @@ struct SickoSampler2 : Module {
 	bool eor[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	float eocTime[16];
 	float eorTime[16];
-	float eocEorTime = (APP->engine->getSampleRate()) / 2000;
-	double oneMsSamples  = (APP->engine->getSampleRate()) / 1000;
+	float oneMsSamples  = (APP->engine->getSampleRate()) / 1000;	// number of samples in 1ms
 
 	bool eocFromTrg = false;
 	//bool eocFromStop = false;
@@ -679,8 +677,7 @@ struct SickoSampler2 : Module {
 
 	void onSampleRateChange() override {
 		monitorFadeCoeff = 10 / (APP->engine->getSampleRate()); // 100ms monitor fade
-		eocEorTime = (APP->engine->getSampleRate())/2000;			// number of samples for 1 ms used for output triggers
-		oneMsSamples  = (APP->engine->getSampleRate())/1000;
+		oneMsSamples = (APP->engine->getSampleRate())/1000;			// number of samples for 1 ms used for output triggers
 		prevXfade = -1.f;
 
 		if (fileLoaded && APP->engine->getSampleRate() != sampleRate/2) {
@@ -1449,7 +1446,6 @@ struct SickoSampler2 : Module {
 
 		// *********************************************************************************************** PLAY SECTION *******************************		
 
-		
 		if (!fileLoaded) {
 
 			for (int c = 0; c < chan; c++) {
@@ -1609,13 +1605,6 @@ struct SickoSampler2 : Module {
 
 			sustainValue = params[SUSTAIN_PARAM].getValue();
 
-			/*			
-			if (xFade == 0)
-				fadeSamples = 0;
-			else
-				fadeSamples = floor(convertCVToSeconds(xFade) * args.sampleRate); // number of samples before starting fade
-			*/
-
 			if (xFade != prevXfade) {
 				if (xFade == 0)
 					fadeSamples = 0;
@@ -1630,8 +1619,6 @@ struct SickoSampler2 : Module {
 			voctDisplay = 100.f;
 
 			for (int c = 0; c < chan; c++) {
-
-				//reversePlaying[c] = reverseStart;
 
 				if (polyMaster) 
 					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(c) * 0.1);
@@ -1709,11 +1696,11 @@ struct SickoSampler2 : Module {
 									if (eocFromTrg) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -1750,11 +1737,11 @@ struct SickoSampler2 : Module {
 											if (eocFromTrg) {
 												if (polyOuts) {
 													eoc[c] = true;
-													eocTime[c] = eocEorTime;
+													eocTime[c] = oneMsSamples;
 												} else {
 													if (c == currentDisplay) {
 														eoc[0] = true;
-														eocTime[0] = eocEorTime;
+														eocTime[0] = oneMsSamples;
 													}
 												}
 											}
@@ -1909,11 +1896,11 @@ struct SickoSampler2 : Module {
 									if (eocFromPing) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -1925,11 +1912,11 @@ struct SickoSampler2 : Module {
 									if (eocFromLoopEnd) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -1946,7 +1933,17 @@ struct SickoSampler2 : Module {
 									fadeCoeff = 1;
 
 							} else if (floor(samplePos[c]) > totalSamples) {	// *** REACHED END OF SAMPLE ***
-
+								if (eocFromCueEnd) {
+									if (polyOuts) {
+										eoc[c] = true;
+										eocTime[c] = oneMsSamples;
+									} else {
+										if (c == currentDisplay) {
+											eoc[0] = true;
+											eocTime[0] = oneMsSamples;
+										}
+									}
+								}
 								play[c] = false;
 
 							} else if (samplePos[c] > cueEndPos) {				// *** REACHED CUE END ***
@@ -1968,11 +1965,11 @@ struct SickoSampler2 : Module {
 									if (eocFromCueEnd) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -1990,11 +1987,11 @@ struct SickoSampler2 : Module {
 										if (eocFromPing) {
 											if (polyOuts) {
 												eoc[c] = true;
-												eocTime[c] = eocEorTime;
+												eocTime[c] = oneMsSamples;
 											} else {
 												if (c == currentDisplay) {
 													eoc[0] = true;
-													eocTime[0] = eocEorTime;
+													eocTime[0] = oneMsSamples;
 												}
 											}
 										}
@@ -2012,11 +2009,11 @@ struct SickoSampler2 : Module {
 										if (eocFromCueEnd) {
 											if (polyOuts) {
 												eoc[c] = true;
-												eocTime[c] = eocEorTime;
+												eocTime[c] = oneMsSamples;
 											} else {
 												if (c == currentDisplay) {
 													eoc[0] = true;
-													eocTime[0] = eocEorTime;
+													eocTime[0] = oneMsSamples;
 												}
 											}
 										}
@@ -2051,11 +2048,11 @@ struct SickoSampler2 : Module {
 									if (eocFromPong) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -2072,11 +2069,11 @@ struct SickoSampler2 : Module {
 									if (eocFromLoopStart) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -2094,6 +2091,17 @@ struct SickoSampler2 : Module {
 
 							} else if (floor(samplePos[c]) < 0) {				// *** REACHED START OF SAMPLE ***
 
+								if (eocFromCueEnd) {
+									if (polyOuts) {
+										eoc[c] = true;
+										eocTime[c] = oneMsSamples;
+									} else {
+										if (c == currentDisplay) {
+											eoc[0] = true;
+											eocTime[0] = oneMsSamples;
+										}
+									}
+								}
 								play[c] = false;
 
 							} else if (samplePos[c] < cueStartPos) {			// *** REACHED CUE START ***
@@ -2116,11 +2124,11 @@ struct SickoSampler2 : Module {
 									if (eocFromCueStart) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -2139,11 +2147,11 @@ struct SickoSampler2 : Module {
 										if (eocFromPong) {
 											if (polyOuts) {
 												eoc[c] = true;
-												eocTime[c] = eocEorTime;
+												eocTime[c] = oneMsSamples;
 											} else {
 												if (c == currentDisplay) {
 													eoc[0] = true;
-													eocTime[0] = eocEorTime;
+													eocTime[0] = oneMsSamples;
 												}
 											}
 										}
@@ -2162,11 +2170,11 @@ struct SickoSampler2 : Module {
 										if (eocFromCueStart) {
 											if (polyOuts) {
 												eoc[c] = true;
-												eocTime[c] = eocEorTime;
+												eocTime[c] = oneMsSamples;
 											} else {
 												if (c == currentDisplay) {
 													eoc[0] = true;
-													eocTime[0] = eocEorTime;
+													eocTime[0] = oneMsSamples;
 												}
 											} 
 										}
@@ -2181,11 +2189,10 @@ struct SickoSampler2 : Module {
 
 						// *** SICKOSAMPLER USES HERMITE INTERPOLATION ONLY ***
 						if (currSampleWeight[c] == 0) {	// if no distance between samples, it means that speed is 1 and samplerates match -> no interpolation
-								//if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
-									currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
-									if (channels == 2)
-										currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
-								//}
+							currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+							if (channels == 2)
+								currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+
 						} else {
 							if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
 								/*
@@ -2208,11 +2215,9 @@ struct SickoSampler2 : Module {
 								}
 
 							} else { // if playing sample is the first or one of the last 3 -> no interpolation
-								//if (floor(samplePos[c]) >= 0 && floor(samplePos[c]) < totalSampleC) {
-									currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
-									if (channels == 2)
-										currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
-								//}
+								currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+								if (channels == 2)
+									currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
 							}
 						}
 
@@ -2257,9 +2262,7 @@ struct SickoSampler2 : Module {
 							}
 						}
 						
-						// ---------- FIRST UPDATE SAMPLE POSITION
-						
-						
+						// --------------------- A D S R
 
 						switch (stage[c]) {
 							case ATTACK_STAGE:
@@ -2291,7 +2294,7 @@ struct SickoSampler2 : Module {
 
 							case RELEASE_STAGE:
 								stageLevel[c] -= stageCoeff[c];
-								if (stageLevel[c] < 0) {	// SE HA FINITO IL RELEASE
+								if (stageLevel[c] < 0) {	// if release has ended
 									stageLevel[c] = 0;
 
 									stage[c] = STOP_STAGE;
@@ -2301,11 +2304,11 @@ struct SickoSampler2 : Module {
 										releaseNew[c] = false;
 										if (polyOuts) {
 											eor[c] = true;
-											eorTime[c] = eocEorTime;
+											eorTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eor[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -2363,13 +2366,6 @@ struct SickoSampler2 : Module {
 												}
 											} else {
 												fadingType[c] = NO_FADE;
-												/*
-												if (!debugBool) {
-													debugBool = true;
-													debugDisplay = to_string(floor(fadedPosition[c]));
-												} else {
-													debugDisplay2 = to_string(floor(fadedPosition[c]));
-												}*/
 											}
 											fadedPosition[c] -= distancePos[c];
 											
@@ -2377,7 +2373,6 @@ struct SickoSampler2 : Module {
 									}
 								} else {
 									fadingType[c] = NO_FADE;
-									//debugBool = false;
 								}
 							break;
 							
@@ -2438,7 +2433,6 @@ struct SickoSampler2 : Module {
 									grainPos[c] = samplePos[c];
 									grainFadeValue[c] = 1;
 
-									//grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples * params[STR_FADE_PARAM].getValue());
 									grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
 									grainFade[c] = true;
 
@@ -2455,7 +2449,6 @@ struct SickoSampler2 : Module {
 											samplePos[c] -= stretchMaxPos * distancePos[c];
 										else
 											samplePos[c] += stretchMaxPos * distancePos[c];
-										//grainSampleCount[c] = 0;
 										grainSampleCount[c] = grainSampleCount[c] - stretchMaxPos;
 									}
 								}
@@ -2467,19 +2460,14 @@ struct SickoSampler2 : Module {
 									grainPos[c] = samplePos[c];
 									grainFadeValue[c] = 1;
 									
-									//grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples * params[STR_FADE_PARAM].getValue());
 									grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
 									grainFade[c] = true;
 									
-									//double tempStretch2 = (stretchMaxPos / params[STRETCH_PARAM].getValue());
-
 									if (!reversePlaying[c])
-										//samplePos[c] += (tempStretch2 - stretchMaxPos) * distancePos[c];
 										samplePos[c] += ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
 									else
-										//samplePos[c] -= (tempStretch2 - stretchMaxPos) * distancePos[c];
 										samplePos[c] -= ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
-									//grainSampleCount[c] = 0;
+
 									grainSampleCount[c] = grainSampleCount[c] - stretchMaxPos;
 								}
 							}
@@ -2491,7 +2479,6 @@ struct SickoSampler2 : Module {
 							samplePos[c] += distancePos[c];
 
 						currSampleWeight[c] = samplePos[c] - floor(samplePos[c]);
-
 
 						// ------------------------------------------------------------ END POSITION UPDATE
 
@@ -2559,21 +2546,6 @@ struct SickoSampler2 : Module {
 
 			switch (polyOuts) {
 				case MONOPHONIC:			// monophonic CABLES
-
-					// *** HARD CLIP ***	// removed because this check is done later in monitor section
-
-					/*
-					if (sumOutput > 10)
-						sumOutput = 10;
-					else if (sumOutput < -10)
-						sumOutput = -10;
-					if (channels == 2) {
-						if (sumOutputR > 10)
-							sumOutputR = 10;
-						else if (sumOutputR < -10)
-							sumOutputR = -10;
-					}
-					*/
 
 					if (outputs[OUT_OUTPUT].isConnected()) {
 						outputs[OUT_OUTPUT].setVoltage(sumOutput);
@@ -2749,7 +2721,7 @@ struct SickoSampler2 : Module {
 
 		if (recordingState) {
 
-			// ****************************************************************************************** R E C O R D I N G     S E C T I O N *****************
+			// **************************************************************************** R E C O R D I N G     S E C T I O N *****************
 					
 			if (recFadeIn) {
 				if (recFadeValue < 1)

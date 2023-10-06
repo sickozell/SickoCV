@@ -442,11 +442,8 @@ struct DrumPlayerPlus : Module {
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
 
-			//char* pathDup = strdup(path.c_str());
 			fileDescription[slot] = system::getFilename(std::string(path));
 			fileDescription[slot] = fileDescription[slot].substr(0,fileDescription[slot].length()-4);
-			//fileDisplay[slot] = fileDescription[slot].substr(0,5);
-			//free(pathDup);
 
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription[slot];
@@ -470,13 +467,7 @@ struct DrumPlayerPlus : Module {
 			fileLoaded[slot] = true;
 
 		} else {
-			/*fileLoaded[slot] = false;
-			storedPath[slot] = "";
-			fileDescription[slot] = "--none--";
-			fileDisplay[slot] = "-----";
-			scrollDisplay[slot] = "-----";
-			currFileDisplay[slot] = "-----";
-			*/
+
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
 			storedPath[slot] = path;
@@ -536,7 +527,6 @@ struct DrumPlayerPlus : Module {
 			prevTrigValue[i] = trigValue[i];
 			currentOutput = 0;
 
-			//if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i] && floor(samplePos[i]) >= 0) {
 			if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i]) {
 				switch (interpolationMode) {
 					case NO_INTERP:
@@ -703,7 +693,6 @@ struct DrumPlayerPlus : Module {
 			}
 
 			if (!inputs[TRIG_INPUT+i].isConnected())
-			//if (!outputs[OUT_OUTPUT+i].isConnected())
 				play[i] = false;
 		}
 	}
@@ -1137,7 +1126,6 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 	DrumPlayerPlus *module;
 	int frame = 0;
 
-	//std::string currFileDisplay[4];
 	int fileGap[4] = {0,0,0,0};
 	float currTime;
 	float deltaTime;
@@ -1151,7 +1139,6 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 		if (module) {
 			if (layer ==1) {
 				shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf"));
-				//shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
 				nvgFontSize(args.vg, 10);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);

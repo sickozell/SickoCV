@@ -705,14 +705,7 @@ struct DrumPlayerXtra : Module {
 			fileLoaded[slot] = true;
 
 		} else {
-			/*
-			fileLoaded[slot] = false;
-			storedPath[slot] = "";
-			fileDescription[slot] = "--none--";
-			fileDisplay[slot] = "-------";
-			currFileDisplay[slot] = "-------";
-			scrollDisplay[slot] = "-------";
-			*/
+
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
 			storedPath[slot] = path;
@@ -2276,7 +2269,6 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 		if (module) {
 			if (layer ==1) {
 				shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf"));
-				//shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
 				nvgFontSize(args.vg, 10);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
@@ -2483,11 +2475,7 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
-		/*
-		if (module->userFolder != "") {
-			menu->addChild(createMenuLabel(module->userFolder));
-			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
-		}*/
+
 		if (module->userFolder != "") {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));

@@ -411,11 +411,7 @@ struct DrumPlayer : Module {
 			fileLoaded[slot] = true;
 
 		} else {
-			/*
-			fileLoaded[slot] = false;
-			storedPath[slot] = "";
-			fileDescription[slot] = "--none--";
-			*/
+
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
 			storedPath[slot] = path;

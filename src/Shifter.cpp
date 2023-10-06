@@ -174,7 +174,6 @@ struct TextDisplayWidget : TransparentWidget {
 
 	void drawLayer(const DrawArgs &args, int layer) override {
 		if (layer ==1) {
-			//std::shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG7ClassicMini-BoldItalic.ttf"));
 			std::shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf"));
 			int val = module ? module->regStage : 64;
 

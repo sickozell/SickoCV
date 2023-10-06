@@ -1,4 +1,4 @@
-# SickoCV v2.5.8-beta4
+# SickoCV v2.5.8-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -21,8 +21,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog**  
 - clocker: added swing feature
-- sickoSampler: improved cpu load when using xFade knob
-- sickoSampler/sickoSampler2: fixed bugs that display cursors wrong when loading a sample after a fresh recording
+- sickoPlayer / sickoSampler / sickoSampler2: added EoC pulse when sample has reached begin/end if start/end cursors are set to 0% or 100%
+- sickoPlayer / sickoSampler: improved cpu load when using xFade knob
+- sickoSampler / sickoSampler2: fixed bugs that display cursors wrong when loading a sample after a fresh recording or clear sample when a new sample load is cancelled
 
 # SickoCV v2.5.8
 VCV Rack plugin modules
@@ -268,7 +269,7 @@ There will therefore be clocks of non-fixed length, but which will guarantee the
 
 - **Trig/Swing on Div**  
 With this option enabled the selected divider/multiplier outputs a 1ms trigger instead of gate.  
-A little led is turned on near the PW knob that will control the swing amount instead of pulse width, but only for clock multiplications.  
+A little blue led is turned on near the PW knob. This knob will control the swing amount instead of pulse width, but only for clock multiplications.  
 Swing control at 0% means no swing, so every pulse has equal timing. Increasing swing ratio it delays the even pulses by its percentage until 100% that means the even pulses fall on the next odd ones.  
 Please note that every clock timing (beat detection) resets the odd pulses, so every pulse that is a beat will be an odd one.
 This is beacause it has to match metronome and don't mess when odd clock divisions are selected.

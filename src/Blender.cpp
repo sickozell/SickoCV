@@ -301,7 +301,6 @@ struct BlenderWidget : ModuleWidget {
 	   	Blender *module = dynamic_cast<Blender*>(this->module);
 		assert(module);
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
 				return module->isPolyOuts();
 			}, [=](bool poly) {
