@@ -451,7 +451,8 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 
 #### - INSTRUCTIONS
 Amplify knob can be set up to 200% and its CV input is added to its value.  
-Considering a modulation of 0-10v, CV attenuverter is set by default to 50% just to act as a traditional VCA. If set to 100% the output will result 2x amplified.  
+Considering a usual modulation of 0-10v, CV attenuverter is set by default to 50% just to act as a traditional VCA.  
+If set to 100% it will modulate the signal level up to 2x.  
 Limit switch activates signal limiting, set by Limit knob in the range up to ±10v.
 
 #### Context Menu
