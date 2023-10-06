@@ -47,6 +47,7 @@ VCV Rack plugin modules
 - [DrumPlayer / DrumPlayer+ / DrumPlayerXtra](./README.md#drumplayer--drumplayer--drumplayerxtra)
 - [Parking](./README.md#parking)
 - [Shifter](./README.md#shifter)
+- [SickoAmp](./README.md#sickoamp)
 - [SickoPlayer](./README.md#sickoplayer)
 - [SickoSampler](./README.md#sickosampler)
 - [SickoSampler2](./README.md#sickosampler2)
