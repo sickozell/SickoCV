@@ -1,4 +1,4 @@
-# SickoCV v2.5.8-beta6
+# SickoCV v2.5.8-beta7
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -451,7 +451,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 #### - INSTRUCTIONS
 Amplify knob can be set up to 200% and its CV input is added to its value.  
 Considering a modulation of 0-10v, CV attenuverter is set by default to 50% just to act as a traditional VCA. If set to 100% the output will result 2x amplified.  
-Limit switch activates signal limiting, set by Limit knob in the range up to +-10v.
+Limit switch activates signal limiting, set by Limit knob in the range up to ±10v.
 
 #### Context Menu
 - Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
