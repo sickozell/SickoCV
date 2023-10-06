@@ -30,7 +30,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.5.8
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 8](https://github.com/sickozell/SickoCV/assets/80784296/6345fdbc-5bd3-41f6-985d-e8ae77e75329)
+![SickoCV modules 2 5 8](https://github.com/sickozell/SickoCV/assets/80784296/571b2a3b-d1b2-4303-ab3b-7c119f235994)
 
 ## table of contents
 - [Common modules behavior](./README.md#common-modules-behavior)
@@ -442,6 +442,19 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 
 ![shifter example](https://user-images.githubusercontent.com/80784296/212531455-776e3110-78ef-4bec-a3f8-64180fe4ca53.JPG)  
 [Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
+
+## SickoAmp
+### Polyphonic stereo VCA up to 200% with limiter
+
+![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/ba7314f8-eee5-4d8f-b5b6-3240a1c95b01)
+
+#### - INSTRUCTIONS
+Amplify knob can be set up to 200% and its CV input is added to its value.  
+Considering a modulation of 0-10v, CV attenuverter is set by default to 50% just to act as a traditional VCA. If set to 100% the output will result 2x amplified.  
+Limit switch activates signal limiting, set by Limit knob in the range up to +-10v.
+
+#### Context Menu
+- Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
 
 ## SickoPlayer
 ### wav sample player
