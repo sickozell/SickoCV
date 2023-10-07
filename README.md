@@ -455,6 +455,7 @@ Level knob can be set up to 200% and its CV input is added to its value.
 Considering a usual modulation of 0-10v, CV attenuverter is set by default to 50% just to act as a traditional VCA.  
 If set to 100% it will modulate the signal level up to 2x.  
 Limit switch activates signal limiter set by Limit knob in the range up to ±10v.
+If both inputs are used with polyphony, channels on the Right output replicate the same number of channels of the Left input.
 
 #### Context Menu
 - Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
