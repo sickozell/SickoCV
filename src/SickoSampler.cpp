@@ -714,7 +714,8 @@ struct SickoSampler : Module {
 					std::string filepath = std::string(dir_path) + filename;
 					struct stat statbuf;
 					if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
-						browserDir.push_back(filepath + "/");
+						//browserDir.push_back(filepath + "/");
+						browserDir.push_back(filepath);
 						browserDirDisplay.push_back(filename);
 					} else {
 						std::size_t found = filename.find(".wav",filename.length()-5);
