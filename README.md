@@ -1,4 +1,4 @@
-# SickoCV v2.5.8-beta1
+# SickoCV v2.5.8-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -26,6 +26,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - sickoPlayer / sickoSampler / sickoSampler2: added EoC pulse when sample has reached begin/end if start/end cursors are set to 0% or 100%
 - sickoPlayer / sickoSampler: improved cpu load when using xFade knob
 - sickoSampler / sickoSampler2: fixed bugs that display cursors wrong when loading a sample after a fresh recording or clear sample when a new sample load is cancelled
+- all player/sampler modules: fixed a bug that shows swapped files between folders when foldernames begin with the same word
 - all attenuverters knob scale has been modified to percentage
 
 # SickoCV v2.5.8

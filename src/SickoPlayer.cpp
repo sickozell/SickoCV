@@ -582,10 +582,15 @@ struct SickoPlayer : Module {
 	   		}
 	   		closedir(dir);
 
+			// This below it's removed due to swapping files between folders when there are for example: "folder", "folder a" "folder b"
+			// so "folder" displays the files of "folder b" and so on
+			
+	   		/*
 			sort(browserDir.begin(), browserDir.end());
 			sort(browserDirDisplay.begin(), browserDirDisplay.end());
 			sort(browserFiles.begin(), browserFiles.end());
 			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+			*/
 			
 			tempTreeData.push_back(dir_path);
 			tempTreeDisplay.push_back(dir_path);
