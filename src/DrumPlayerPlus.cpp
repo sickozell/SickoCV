@@ -774,8 +774,9 @@ struct dppSlot1Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -880,8 +881,9 @@ struct dppSlot2Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -986,8 +988,9 @@ struct dppSlot3Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -1092,8 +1095,9 @@ struct dppSlot4Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 								module->tempDir = module->folderTreeData[0][i];
@@ -1286,7 +1290,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		if (module->userFolder != "") {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));
-				menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+				//menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
 			} else {
 				menu->addChild(createMenuLabel("(!)"+module->userFolder));
 			}

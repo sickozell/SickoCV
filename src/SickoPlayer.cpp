@@ -584,7 +584,7 @@ struct SickoPlayer : Module {
 
 			// This below it's removed due to swapping files between folders when there are for example: "folder", "folder a" "folder b"
 			// so "folder" displays the files of "folder b" and so on
-			
+
 	   		/*
 			sort(browserDir.begin(), browserDir.end());
 			sort(browserDirDisplay.begin(), browserDirDisplay.end());
@@ -2370,8 +2370,9 @@ struct SickoPlayerDisplay : TransparentWidget {
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -2564,8 +2565,9 @@ struct SickoPlayerWidget : ModuleWidget {
 
 		if (module->folderTreeData.size() > 0) {
 			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-				module->folderTreeData.resize(1);
-				module->folderTreeDisplay.resize(1);
+				//module->folderTreeData.resize(1);
+				//module->folderTreeDisplay.resize(1);
+				module->refreshRootFolder();
 				for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 					if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[0][i];
@@ -2597,7 +2599,7 @@ struct SickoPlayerWidget : ModuleWidget {
 		if (module->userFolder != "") {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));
-				menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+				//menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
 			} else {
 				menu->addChild(createMenuLabel("(!)"+module->userFolder));
 			}

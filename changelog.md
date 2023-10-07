@@ -5,6 +5,7 @@
 - sickoPlayer / sickoSampler: improved cpu load when using xFade knob
 - sickoSampler / sickoSampler2: fixed bugs that display cursors wrong when loading a sample after a fresh recording or clear sample when a new sample load is cancelled
 - all player/sampler modules: fixed a bug that shows swapped files between folders when foldernames begin with the same word
+- all player/sampler modules: removed refresh folder option from context menu and implemented an auto-refresh function
 - all attenuverters knob scale has been modified to percentage
 
 ### 2.5.7 (2023-10-01)
