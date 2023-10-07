@@ -317,15 +317,15 @@ struct DrumPlayer : Module {
 	   		}
 	   		closedir(dir);
 	   		
-			// This below it's removed due to swapping files between folders when there are for example: "folder", "folder a" "folder b"
-			// so "folder" displays the files of "folder b" and so on
-
-			/*
 	   		sort(browserDir.begin(), browserDir.end());
 			sort(browserDirDisplay.begin(), browserDirDisplay.end());
 			sort(browserFiles.begin(), browserFiles.end());
 			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
-			*/
+			
+			// this adds "/" to browserDir after sorting to avoid wrong sorting with foldernames with spaces
+			int dirSize = (int)browserDir.size();
+			for (int i=0; i < dirSize; i++)
+				browserDir[i] += "/";
 			
 			tempTreeData.push_back(dir_path);
 			tempTreeDisplay.push_back(dir_path);
