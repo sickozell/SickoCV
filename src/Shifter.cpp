@@ -53,10 +53,10 @@ struct Shifter : Module {
 		paramQuantities[DELAY_PARAMS]->snapEnabled = true;
 		configParam(STAGE_PARAMS, 1.f, (float)(regLength), 0.f, "Register Stage");
 		paramQuantities[STAGE_PARAMS]->snapEnabled = true;
-		configParam(ATNV_PARAMS, -1.f, 1.f, 0.f, "Stage Attenuverter", "%", 0, 100);
+		configParam(ATNV_PARAMS, -1.f, 1.f, 0.f, "Stage CV", "%", 0, 100);
 		configInput(TRIG_INPUT, "Trig");
 		configInput(IN_INPUT, "IN");
-		configInput(STAGE_INPUT, "Stage CV");
+		configInput(STAGE_INPUT, "Stage");
 		configOutput(OUT_OUTPUT, "OUT");
 	}
 

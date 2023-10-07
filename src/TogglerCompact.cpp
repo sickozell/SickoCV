@@ -76,9 +76,9 @@ struct TogglerCompact : Module {
 		configInput(RST_INPUT, "Reset");
 		configInput(IN_INPUT, "L");
 		configInput(IN_INPUT+1, "R");
-		configInput(ATTACK_INPUT, "Attack CV");
-		configInput(SUSTAIN_INPUT, "Sustain CV");
-		configInput(RELEASE_INPUT, "Release CV");
+		configInput(ATTACK_INPUT, "Attack");
+		configInput(SUSTAIN_INPUT, "Sustain");
+		configInput(RELEASE_INPUT, "Release");
 		configOutput(OUT_OUTPUT, "L");
 		configOutput(OUT_OUTPUT+1, "R");
 		configOutput(GATE_OUTPUT, "Gate");

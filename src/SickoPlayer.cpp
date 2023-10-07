@@ -296,32 +296,32 @@ struct SickoPlayer : Module {
 		//******************************************************************************
 
 		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", "ms", maxStageTime / minStageTime, minStageTime);
-		configInput(ATTACK_INPUT,"Attack CV");
-		configParam(ATTACKATNV_PARAM, -1.0f, 1.0f, 0.0f, "Attack CV Attenuv.");
+		configInput(ATTACK_INPUT,"Attack");
+		configParam(ATTACKATNV_PARAM, -1.0f, 1.0f, 0.0f, "Attack CV","%", 0, 100);
 
 		configParam(DECAY_PARAM, 0.f, 1.f, 0.f, "Decay", "ms", maxStageTime / minStageTime, minStageTime);
-		configInput(DECAY_INPUT,"Decay CV");
-		configParam(DECAYATNV_PARAM, -1.0f, 1.0f, 0.0f, "Decay CV Attenuv.");
+		configInput(DECAY_INPUT,"Decay");
+		configParam(DECAYATNV_PARAM, -1.0f, 1.0f, 0.0f, "Decay CV","%", 0, 100);
 
 		configParam(SUSTAIN_PARAM, 0.f, 1.0f, 1.0f, "Sustain","%", 0, 100);
-		configInput(SUSTAIN_INPUT,"Sustain CV");
-		configParam(SUSTAINATNV_PARAM, -1.0f, 1.0f, 0.0f, "Sustain CV Attenuv.");
+		configInput(SUSTAIN_INPUT,"Sustain");
+		configParam(SUSTAINATNV_PARAM, -1.0f, 1.0f, 0.0f, "Sustain CV","%", 0, 100);
 
 		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", "ms", maxStageTime / minStageTime, minStageTime);
-		configInput(RELEASE_INPUT,"Release CV");
-		configParam(RELEASEATNV_PARAM, -1.0f, 1.0f, 0.0f, "Release CV Attenuv.");
+		configInput(RELEASE_INPUT,"Release ");
+		configParam(RELEASEATNV_PARAM, -1.0f, 1.0f, 0.0f, "Release CV","%", 0, 100);
 
 		//******************************************************************************
 		
 		configInput(VO_INPUT,"V/Oct");
 
 		configParam(TUNE_PARAM, -2.f, 2.f, 0.f, "Tune", " semitones", 0, 12);
-		configInput(TUNE_INPUT,"Tune CV");
-		configParam(TUNEATNV_PARAM, -1.0f, 1.0f, 0.0f, "Tune CV Attenuv.");
+		configInput(TUNE_INPUT,"Tune");
+		configParam(TUNEATNV_PARAM, -1.0f, 1.0f, 0.0f, "Tune CV","%", 0, 100);
 
 		configParam(VOL_PARAM, 0.f, 2.0f, 1.0f, "Master Volume", "%", 0, 100);
-		configInput(VOL_INPUT,"Master Volume CV");
-		configParam(VOLATNV_PARAM, -1.f, 1.0f, 0.f, "Master Volume CV Attenuv.", "%", 0, 100);
+		configInput(VOL_INPUT,"Master Volume");
+		configParam(VOLATNV_PARAM, -1.f, 1.0f, 0.f, "Master Volume CV", "%", 0, 100);
 
 		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "±5v"});
 

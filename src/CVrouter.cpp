@@ -57,9 +57,9 @@ struct CVrouter : Module {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		
 		configInput(CV_INPUT, "CV");
-		configParam(THRESHOLD_PARAM, -10.f, 10.f, 1.f, "Switch Threshold", "v");
-		configInput(THRESHOLD_CV_INPUT, "Threshold CV");
-		configParam(THRESHOLD_ATTENUV_PARAM, -1.f, 1.f, 0.f, "Attenuv.");
+		configParam(THRESHOLD_PARAM, -10.f, 10.f, 1.f, "Threshold", "v");
+		configInput(THRESHOLD_CV_INPUT, "Threshold");
+		configParam(THRESHOLD_ATTENUV_PARAM, -1.f, 1.f, 0.f, "Threshold CV", "%", 0, 100);
 		configInput(IN1_INPUT, "IN 1");
 		//configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", "ms", maxStageTime / minStageTime, minStageTime);
 		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", "ms", 10000.f, 1.f);

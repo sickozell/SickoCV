@@ -40,9 +40,9 @@ struct SickoAmp : Module {
 		configInput(IN_INPUT+LEFT, "Left");
 		configInput(IN_INPUT+RIGHT, "Right");
 
-		configParam(VCA_PARAM, 0.f, 2.0f, 1.0f, "Amplify", "%", 0, 100);
-		configParam(CV_ATNV_PARAM, -1.0f, 1.0f, 0.5f, "CV Attenuv.", "%", 0, 100);
-		configInput(CV_INPUT, "CV");
+		configParam(VCA_PARAM, 0.f, 2.0f, 1.0f, "Level", "%", 0, 100);
+		configParam(CV_ATNV_PARAM, -1.0f, 1.0f, 0.5f, "Level CV", "%", 0, 100);
+		configInput(CV_INPUT, "Level");
 
 		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "On"});
 		configParam(LIMIT_PARAM, 0.f, 10.0f, 10.f, "Limit Voltage", "±v");		
