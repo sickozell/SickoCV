@@ -54,7 +54,7 @@ VCV Rack plugin modules
 - [Switcher / SwitcherSt](./README.md#switcher--switcherst)
 - [Toggler / Toggler Compact](./README.md#toggler--toggler-compact)
 - [Wavetabler](./README.md#wavetabler)
-- [Credits](./README.md#credits)
+- [Credits](#credits)
   
 ## Common modules behavior
 - Triggers and gates threshold is +1v
