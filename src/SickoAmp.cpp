@@ -45,7 +45,7 @@ struct SickoAmp : Module {
 		configInput(CV_INPUT, "Level");
 
 		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit", {"Off", "On"});
-		configParam(LIMIT_PARAM, 0.f, 10.0f, 10.f, "Limit Voltage", "±v");		
+		configParam(LIMIT_PARAM, 0.f, 10.0f, 5.f, "Limit Voltage", "±v");		
 
 		configOutput(OUT_OUTPUT+LEFT, "Left");
 		configOutput(OUT_OUTPUT+RIGHT, "Right");
