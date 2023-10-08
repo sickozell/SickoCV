@@ -1092,7 +1092,7 @@ struct WavetablerWidget : ModuleWidget {
 		{
 			WavetablerDisplay *display = new WavetablerDisplay();
 			display->box.pos = Vec(3, 24);
-			display->box.size = Vec(247, 100);
+			display->box.size = Vec(247, 80);
 			display->module = module;
 			addChild(display);
 		}
