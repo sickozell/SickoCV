@@ -24,15 +24,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="4.0000001"
-     inkscape:cx="13.875"
-     inkscape:cy="-31.499999"
+     inkscape:zoom="5.6568544"
+     inkscape:cx="29.698484"
+     inkscape:cy="-19.268659"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1272"
-     inkscape:window-y="-8"
+     inkscape:window-y="6"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g16210"
+     inkscape:current-layer="g7864"
      showguides="true" />
   <defs
      id="defs2">
@@ -65,45 +65,44 @@
      transform="matrix(0.16666667,0,0,0.77278577,13.841667,123.58214)"
      style="display:inline;fill:#000000;stroke:none">
     <rect
-       style="display:inline;fill:#0088ff;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#0088ff;fill-opacity:1;stroke-width:0.33678"
        id="rect7854-9"
-       width="60"
+       width="42"
        height="0.40000001"
        x="3.0200005"
        y="5.0580001"
        inkscape:label="azzurro" />
     <rect
-       style="display:inline;fill:#00cc55;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#00cc55;fill-opacity:1;stroke-width:0.33678"
        id="rect7856-4"
-       width="60"
+       width="42"
        height="0.40000001"
        x="3.0200005"
        y="4.0580001"
        inkscape:label="verde" />
     <rect
-       style="display:inline;fill:#eeee77;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#eeee77;fill-opacity:1;stroke-width:0.33678"
        id="rect7858-5"
-       width="60"
+       width="42"
        height="0.40000001"
        x="3.0200005"
        y="3.0580001"
        inkscape:label="giallo" />
     <rect
-       style="display:inline;fill:#ff7777;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#ff7777;fill-opacity:1;stroke-width:0.33678"
        id="rect7860-1"
-       width="60"
+       width="42"
        height="0.40000001"
        x="3.0200005"
        y="2.0580001"
        inkscape:label="rosa" />
     <rect
-       style="display:inline;fill:#bd0000;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#bd0000;fill-opacity:1;stroke-width:0.33678"
        id="rect7862-6"
-       width="60"
+       width="42"
        height="0.40000001"
-       x="2.7204449"
-       y="0.65833217"
-       transform="translate(0.29955559,0.400001)"
+       x="3.0200005"
+       y="1.0583332"
        inkscape:label="rosso" />
   </g>
   <g
@@ -113,45 +112,44 @@
      transform="matrix(0.11666667,0,0,0.77278577,5.5076666,0.08213519)"
      style="display:inline;fill:#000000">
     <rect
-       style="display:inline;fill:#0088ff;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#0088ff;fill-opacity:1;stroke-width:0.3402"
        id="rect7854"
-       width="60"
+       width="42.857143"
        height="0.40000001"
-       x="3.0200005"
+       x="20.162857"
        y="5.0580001"
        inkscape:label="azzurro" />
     <rect
-       style="display:inline;fill:#00cc55;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#00cc55;fill-opacity:1;stroke-width:0.3402"
        id="rect7856"
-       width="60"
+       width="42.857143"
        height="0.40000001"
-       x="3.0200005"
+       x="20.162857"
        y="4.0580001"
        inkscape:label="verde" />
     <rect
-       style="display:inline;fill:#eeee77;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#eeee77;fill-opacity:1;stroke-width:0.3402"
        id="rect7858"
-       width="60"
+       width="42.857143"
        height="0.40000001"
-       x="3.0200005"
+       x="20.162857"
        y="3.0580001"
        inkscape:label="giallo" />
     <rect
-       style="display:inline;fill:#ff7777;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#ff7777;fill-opacity:1;stroke-width:0.3402"
        id="rect7860"
-       width="60"
+       width="42.857143"
        height="0.40000001"
-       x="3.0200005"
+       x="20.162857"
        y="2.0580001"
        inkscape:label="rosa" />
     <rect
-       style="display:inline;fill:#bd0000;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#bd0000;fill-opacity:1;stroke-width:0.3402"
        id="rect7862"
-       width="60"
+       width="42.857143"
        height="0.40000001"
-       x="2.7204449"
-       y="0.65833217"
-       transform="translate(0.29955559,0.400001)"
+       x="20.162857"
+       y="1.0583332"
        inkscape:label="rosso" />
   </g>
   <g

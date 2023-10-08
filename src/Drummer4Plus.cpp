@@ -60,14 +60,14 @@ struct Drummer4Plus : Module {
 		configParam(NOACCENTVOL_PARAMS+1, 0.f, 2.f, 1.f, "Standard Level #2", "%", 0, 100);
 		configParam(NOACCENTVOL_PARAMS+2, 0.f, 2.f, 1.f, "Standard Level #3", "%", 0, 100);
 		configParam(NOACCENTVOL_PARAMS+3, 0.f, 2.f, 1.f, "Standard Level #4", "%", 0, 100);
-		configParam(NOACCENTVOLATNV_PARAMS, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #1", "%", 0, 100);
-		configParam(NOACCENTVOLATNV_PARAMS+1, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #2", "%", 0, 100);
-		configParam(NOACCENTVOLATNV_PARAMS+2, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #3", "%", 0, 100);
-		configParam(NOACCENTVOLATNV_PARAMS+3, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #4", "%", 0, 100);
-		configInput(NOACCENTVOL_INPUT,"Stand.Lev.CV #1");
-		configInput(NOACCENTVOL_INPUT+1,"Stand.Lev.CV #2");
-		configInput(NOACCENTVOL_INPUT+2,"Stand.Lev.CV #3");
-		configInput(NOACCENTVOL_INPUT+3,"Stand.Lev.CV #4");
+		configParam(NOACCENTVOLATNV_PARAMS, -1.f, 1.0f, 0.f, "Stand.Lev.CV #1", "%", 0, 100);
+		configParam(NOACCENTVOLATNV_PARAMS+1, -1.f, 1.0f, 0.f, "Stand.Lev.CV #2", "%", 0, 100);
+		configParam(NOACCENTVOLATNV_PARAMS+2, -1.f, 1.0f, 0.f, "Stand.Lev.CV #3", "%", 0, 100);
+		configParam(NOACCENTVOLATNV_PARAMS+3, -1.f, 1.0f, 0.f, "Stand.Lev.CV #4", "%", 0, 100);
+		configInput(NOACCENTVOL_INPUT,"Stand.Lev. #1");
+		configInput(NOACCENTVOL_INPUT+1,"Stand.Lev. #2");
+		configInput(NOACCENTVOL_INPUT+2,"Stand.Lev. #3");
+		configInput(NOACCENTVOL_INPUT+3,"Stand.Lev. #4");
 
 		configInput(ACCENT_INPUT, "Accent #1");
 		configInput(ACCENT_INPUT+1, "Accent #2");
@@ -77,14 +77,14 @@ struct Drummer4Plus : Module {
 		configParam(ACCENTVOL_PARAMS+1, 0.f, 2.f, 1.f, "Accent Level #2", "%", 0, 100);
 		configParam(ACCENTVOL_PARAMS+2, 0.f, 2.f, 1.f, "Accent Level #3", "%", 0, 100);
 		configParam(ACCENTVOL_PARAMS+3, 0.f, 2.f, 1.f, "Accent Level #4", "%", 0, 100);
-		configParam(ACCENTVOLATNV_PARAMS, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #1", "%", 0, 100);
-		configParam(ACCENTVOLATNV_PARAMS+1, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #2", "%", 0, 100);
-		configParam(ACCENTVOLATNV_PARAMS+2, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #3", "%", 0, 100);
-		configParam(ACCENTVOLATNV_PARAMS+3, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #4", "%", 0, 100);
-		configInput(ACCENTVOL_INPUT,"Accent.Lev.CV #1");
-		configInput(ACCENTVOL_INPUT+1,"Accent.Lev.CV #2");
-		configInput(ACCENTVOL_INPUT+2,"Accent.Lev.CV #3");
-		configInput(ACCENTVOL_INPUT+3,"Accent.Lev.CV #4");
+		configParam(ACCENTVOLATNV_PARAMS, -1.f, 1.0f, 0.f, "Accent.Lev.CV #1", "%", 0, 100);
+		configParam(ACCENTVOLATNV_PARAMS+1, -1.f, 1.0f, 0.f, "Accent.Lev.CV #2", "%", 0, 100);
+		configParam(ACCENTVOLATNV_PARAMS+2, -1.f, 1.0f, 0.f, "Accent.Lev.CV #3", "%", 0, 100);
+		configParam(ACCENTVOLATNV_PARAMS+3, -1.f, 1.0f, 0.f, "Accent.Lev.CV #4", "%", 0, 100);
+		configInput(ACCENTVOL_INPUT,"Accent.Lev. #1");
+		configInput(ACCENTVOL_INPUT+1,"Accent.Lev. #2");
+		configInput(ACCENTVOL_INPUT+2,"Accent.Lev. #3");
+		configInput(ACCENTVOL_INPUT+3,"Accent.Lev. #4");
 
 		configInput(IN_INPUT, "AUDIO #1");
 		configInput(IN_INPUT+1, "AUDIO #2");
@@ -357,7 +357,7 @@ struct Drummer4PlusWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));			
 
-		float xDelta = 23.5;
+		const float xDelta = 23.5;
 
 		for (int i = 0; i < 4; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 15)), module, Drummer4Plus::TRIG_INPUT+i));

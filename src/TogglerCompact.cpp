@@ -76,9 +76,9 @@ struct TogglerCompact : Module {
 		configInput(RST_INPUT, "Reset");
 		configInput(IN_INPUT, "L");
 		configInput(IN_INPUT+1, "R");
-		configInput(ATTACK_INPUT, "Attack CV");
-		configInput(SUSTAIN_INPUT, "Sustain CV");
-		configInput(RELEASE_INPUT, "Release CV");
+		configInput(ATTACK_INPUT, "Attack");
+		configInput(SUSTAIN_INPUT, "Sustain");
+		configInput(RELEASE_INPUT, "Release");
 		configOutput(OUT_OUTPUT, "L");
 		configOutput(OUT_OUTPUT+1, "R");
 		configOutput(GATE_OUTPUT, "Gate");
@@ -256,12 +256,10 @@ struct TogglerCompact : Module {
 		chan = std::max(1, inputs[IN_INPUT].getChannels());
 
 		if (inputs[IN_INPUT].isConnected()) {
-			//outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage() * stageLevel);
 			for (int c = 0; c < chan; c++)
 				outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * stageLevel, c);
 			outputs[OUT_OUTPUT].setChannels(chan);
 		} else {
-			//outputs[OUT_OUTPUT].setVoltage(10 * stageLevel);
 			outputs[OUT_OUTPUT].setVoltage(10.f * stageLevel , 0);
 			outputs[OUT_OUTPUT].setChannels(1);
 		}
@@ -269,12 +267,10 @@ struct TogglerCompact : Module {
 		chan = std::max(1, inputs[IN_INPUT+1].getChannels());
 
 		if (inputs[IN_INPUT+1].isConnected()) {
-			//outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage() * stageLevel);
 			for (int c = 0; c < chan; c++)
 				outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage(c) * stageLevel, c);
 			outputs[OUT_OUTPUT+1].setChannels(chan);
 		} else {
-			//outputs[OUT_OUTPUT+1].setVoltage(10 * stageLevel);
 			outputs[OUT_OUTPUT+1].setVoltage(10.f * stageLevel , 0);
 			outputs[OUT_OUTPUT+1].setChannels(1);
 		}

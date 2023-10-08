@@ -78,8 +78,9 @@ struct Blender : Module {
 		configOutput(OUT_OUTPUT+1, "R");
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		polyOuts = POLYPHONIC;
+		Module::onReset(e);
 	}
 
 	json_t *dataToJson() override {
@@ -301,7 +302,6 @@ struct BlenderWidget : ModuleWidget {
 	   	Blender *module = dynamic_cast<Blender*>(this->module);
 		assert(module);
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("Polyphonic outs", "", &module->polyOuts));
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
 				return module->isPolyOuts();
 			}, [=](bool poly) {

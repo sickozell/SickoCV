@@ -152,38 +152,38 @@ struct DrumPlayerXtra : Module {
 		configInput(TRIG_INPUT+1,"Trig #2");
 		configInput(TRIG_INPUT+2,"Trig #3");
 		configInput(TRIG_INPUT+3,"Trig #4");
-		configInput(TRIGVOL_INPUT,"Stand.Lev.CV #1");
-		configInput(TRIGVOL_INPUT+1,"Stand.Lev.CV #2");
-		configInput(TRIGVOL_INPUT+2,"Stand.Lev.CV #3");
-		configInput(TRIGVOL_INPUT+3,"Stand.Lev.CV #4");
+		configInput(TRIGVOL_INPUT,"Stand.Lev. #1");
+		configInput(TRIGVOL_INPUT+1,"Stand.Lev. #2");
+		configInput(TRIGVOL_INPUT+2,"Stand.Lev. #3");
+		configInput(TRIGVOL_INPUT+3,"Stand.Lev. #4");
 		configParam(TRIGVOL_PARAM, 0.f, 2.0f, 1.0f, "Standard Level #1", "%", 0, 100);
 		configParam(TRIGVOL_PARAM+1, 0.f, 2.0f, 1.0f, "Standard Level #2", "%", 0, 100);
 		configParam(TRIGVOL_PARAM+2, 0.f, 2.0f, 1.0f, "Standard Level #3", "%", 0, 100);
 		configParam(TRIGVOL_PARAM+3, 0.f, 2.0f, 1.0f, "Standard Level #4", "%", 0, 100);
-		configParam(TRIGVOLATNV_PARAM, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #1", "%", 0, 100);
-		configParam(TRIGVOLATNV_PARAM+1, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #2", "%", 0, 100);
-		configParam(TRIGVOLATNV_PARAM+2, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #3", "%", 0, 100);
-		configParam(TRIGVOLATNV_PARAM+3, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #4", "%", 0, 100);
+		configParam(TRIGVOLATNV_PARAM, -1.f, 1.0f, 0.f, "Stand.Lev.CV #1", "%", 0, 100);
+		configParam(TRIGVOLATNV_PARAM+1, -1.f, 1.0f, 0.f, "Stand.Lev.CV #2", "%", 0, 100);
+		configParam(TRIGVOLATNV_PARAM+2, -1.f, 1.0f, 0.f, "Stand.Lev.CV #3", "%", 0, 100);
+		configParam(TRIGVOLATNV_PARAM+3, -1.f, 1.0f, 0.f, "Stand.Lev.CV #4", "%", 0, 100);
 		configInput(ACC_INPUT,"Accent #1");
 		configInput(ACC_INPUT+1,"Accent #2");
 		configInput(ACC_INPUT+2,"Accent #3");
 		configInput(ACC_INPUT+3,"Accent #4");
-		configInput(ACCVOL_INPUT,"Accent.Lev.CV #1");
-		configInput(ACCVOL_INPUT+1,"Accent.Lev.CV #2");
-		configInput(ACCVOL_INPUT+2,"Accent.Lev.CV #3");
-		configInput(ACCVOL_INPUT+3,"Accent.Lev.CV #4");
+		configInput(ACCVOL_INPUT,"Accent.Lev. #1");
+		configInput(ACCVOL_INPUT+1,"Accent.Lev. #2");
+		configInput(ACCVOL_INPUT+2,"Accent.Lev. #3");
+		configInput(ACCVOL_INPUT+3,"Accent.Lev. #4");
 		configParam(ACCVOL_PARAM, 0.f, 2.0f, 1.0f, "Accent Level #1", "%", 0, 100);
 		configParam(ACCVOL_PARAM+1, 0.f, 2.0f, 1.0f, "Accent Level #2", "%", 0, 100);
 		configParam(ACCVOL_PARAM+2, 0.f, 2.0f, 1.0f, "Accent Level #3", "%", 0, 100);
 		configParam(ACCVOL_PARAM+3, 0.f, 2.0f, 1.0f, "Accent Level #4", "%", 0, 100);
-		configParam(ACCVOLATNV_PARAM, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #1", "%", 0, 100);
-		configParam(ACCVOLATNV_PARAM+1, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #2", "%", 0, 100);
-		configParam(ACCVOLATNV_PARAM+2, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #3", "%", 0, 100);
-		configParam(ACCVOLATNV_PARAM+3, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #4", "%", 0, 100);
-		configParam(SPEEDATNV_PARAM, -1.0f, 1.0f, 0.0f, "Speed CV Attenuv. #1");
-		configParam(SPEEDATNV_PARAM+1, -1.0f, 1.0f, 0.0f, "Speed CV Attenuv. #2");
-		configParam(SPEEDATNV_PARAM+2, -1.0f, 1.0f, 0.0f, "Speed CV Attenuv. #3");
-		configParam(SPEEDATNV_PARAM+3, -1.0f, 1.0f, 0.0f, "Speed CV Attenuv. #4");
+		configParam(ACCVOLATNV_PARAM, -1.f, 1.0f, 0.f, "Accent.Lev.CV #1", "%", 0, 100);
+		configParam(ACCVOLATNV_PARAM+1, -1.f, 1.0f, 0.f, "Accent.Lev.CV #2", "%", 0, 100);
+		configParam(ACCVOLATNV_PARAM+2, -1.f, 1.0f, 0.f, "Accent.Lev.CV #3", "%", 0, 100);
+		configParam(ACCVOLATNV_PARAM+3, -1.f, 1.0f, 0.f, "Accent.Lev.CV #4", "%", 0, 100);
+		configParam(SPEEDATNV_PARAM, -1.0f, 1.0f, 0.0f, "Speed CV #1");
+		configParam(SPEEDATNV_PARAM+1, -1.0f, 1.0f, 0.0f, "Speed CV #2");
+		configParam(SPEEDATNV_PARAM+2, -1.0f, 1.0f, 0.0f, "Speed CV #3");
+		configParam(SPEEDATNV_PARAM+3, -1.0f, 1.0f, 0.0f, "Speed CV #4");
 		configParam(SPEED_PARAM, 0.01f, 2.0f, 1.0f, "Speed #1", "x", 0, 1);
 		configParam(SPEED_PARAM+1, 0.01f, 2.0f, 1.0f, "Speed #2", "x", 0, 1);
 		configParam(SPEED_PARAM+2, 0.01f, 2.0f, 1.0f, "Speed #3", "x", 0, 1);
@@ -215,7 +215,7 @@ struct DrumPlayerXtra : Module {
 		playBuffer[3][1].resize(0);
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		outsMode = NORMALLED_OUTS;
@@ -244,6 +244,7 @@ struct DrumPlayerXtra : Module {
 		colorBoxB[1] = 0;
 		colorBoxB[2] = 0;
 		colorBoxB[3] = 0;
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {
@@ -508,7 +509,8 @@ struct DrumPlayerXtra : Module {
 					std::string filepath = std::string(dir_path) + filename;
 					struct stat statbuf;
 					if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
-						browserDir.push_back(filepath + "/");
+						//browserDir.push_back(filepath + "/");
+						browserDir.push_back(filepath);
 						browserDirDisplay.push_back(filename);
 					} else {
 						std::size_t found = filename.find(".wav",filename.length()-5);
@@ -527,6 +529,11 @@ struct DrumPlayerXtra : Module {
 			sort(browserDirDisplay.begin(), browserDirDisplay.end());
 			sort(browserFiles.begin(), browserFiles.end());
 			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+			
+			// this adds "/" to browserDir after sorting to avoid wrong sorting with foldernames with spaces
+			int dirSize = (int)browserDir.size();
+			for (int i=0; i < dirSize; i++)
+				browserDir[i] += "/";
 			
 			tempTreeData.push_back(dir_path);
 			tempTreeDisplay.push_back(dir_path);
@@ -705,14 +712,7 @@ struct DrumPlayerXtra : Module {
 			fileLoaded[slot] = true;
 
 		} else {
-			/*
-			fileLoaded[slot] = false;
-			storedPath[slot] = "";
-			fileDescription[slot] = "--none--";
-			fileDisplay[slot] = "-------";
-			currFileDisplay[slot] = "-------";
-			scrollDisplay[slot] = "-------";
-			*/
+
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
 			storedPath[slot] = path;
@@ -1187,8 +1187,9 @@ struct dpxSlot1Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -1501,8 +1502,9 @@ struct dpxSlot2Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -1815,8 +1817,9 @@ struct dpxSlot3Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -2129,8 +2132,9 @@ struct dpxSlot4Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -2276,7 +2280,6 @@ struct DrumPlayerXtraDisplay : TransparentWidget {
 		if (module) {
 			if (layer ==1) {
 				shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf"));
-				//shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
 				nvgFontSize(args.vg, 10);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
@@ -2483,15 +2486,11 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
-		/*
-		if (module->userFolder != "") {
-			menu->addChild(createMenuLabel(module->userFolder));
-			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
-		}*/
+
 		if (module->userFolder != "") {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));
-				menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+				//menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
 			} else {
 				menu->addChild(createMenuLabel("(!)"+module->userFolder));
 			}

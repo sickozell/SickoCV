@@ -57,9 +57,9 @@ struct CVrouter : Module {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		
 		configInput(CV_INPUT, "CV");
-		configParam(THRESHOLD_PARAM, -10.f, 10.f, 1.f, "Switch Threshold", "v");
-		configInput(THRESHOLD_CV_INPUT, "Threshold CV");
-		configParam(THRESHOLD_ATTENUV_PARAM, -1.f, 1.f, 0.f, "Attenuv.");
+		configParam(THRESHOLD_PARAM, -10.f, 10.f, 1.f, "Threshold", "v");
+		configInput(THRESHOLD_CV_INPUT, "Threshold");
+		configParam(THRESHOLD_ATTENUV_PARAM, -1.f, 1.f, 0.f, "Threshold CV", "%", 0, 100);
 		configInput(IN1_INPUT, "IN 1");
 		//configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", "ms", maxStageTime / minStageTime, minStageTime);
 		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", "ms", 10000.f, 1.f);
@@ -193,14 +193,12 @@ struct CVrouter : Module {
 							lastFade = 0;
 						} else {
 							if (!currentSwitch) {
-								//outputs[OUT1_OUTPUT].setVoltage(10 * lastFade);
 								outputs[OUT1_OUTPUT].setVoltage(10.f * lastFade, 0);
 								outputs[OUT1_OUTPUT].setChannels(1);
 
 								lights[OUT1_LIGHT].setBrightness(lastFade);
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							} else {
-								//outputs[OUT1_OUTPUT].setVoltage(10 * (1-lastFade));
 								outputs[OUT1_OUTPUT].setVoltage(10.f * (1-lastFade), 0);
 								outputs[OUT1_OUTPUT].setChannels(1);
 
@@ -211,7 +209,6 @@ struct CVrouter : Module {
 						currentFadeSample++;
 					} else {
 						if (!currentSwitch) {
-							//outputs[OUT1_OUTPUT].setVoltage(10);
 							outputs[OUT1_OUTPUT].setVoltage(10.f, 0);
 							outputs[OUT1_OUTPUT].setChannels(1);
 
@@ -221,7 +218,6 @@ struct CVrouter : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							//outputs[OUT1_OUTPUT].setVoltage(0);
 							outputs[OUT1_OUTPUT].setVoltage(0.f, 0);
 							outputs[OUT1_OUTPUT].setChannels(1);
 
@@ -251,14 +247,12 @@ struct CVrouter : Module {
 							lastFade = 0;
 						} else {
 							if (!currentSwitch) {
-								//outputs[OUT2_OUTPUT].setVoltage(10 * (1-lastFade));
 								outputs[OUT2_OUTPUT].setVoltage(10.f * (1-lastFade), 0);
 								outputs[OUT2_OUTPUT].setChannels(1);
 
 								lights[OUT1_LIGHT].setBrightness(0.f);
 								lights[OUT2_LIGHT].setBrightness(1-lastFade);
 							} else {
-								//outputs[OUT2_OUTPUT].setVoltage(10 * lastFade);
 								outputs[OUT2_OUTPUT].setVoltage(10.f * lastFade, 0);
 								outputs[OUT2_OUTPUT].setChannels(1);
 
@@ -269,7 +263,6 @@ struct CVrouter : Module {
 						currentFadeSample++;
 					} else {
 						if (!currentSwitch) {
-							//outputs[OUT2_OUTPUT].setVoltage(0);
 							outputs[OUT2_OUTPUT].setVoltage(0.f, 0);
 							outputs[OUT2_OUTPUT].setChannels(1);
 
@@ -279,7 +272,6 @@ struct CVrouter : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							//outputs[OUT2_OUTPUT].setVoltage(10);
 							outputs[OUT2_OUTPUT].setVoltage(10.f, 0);
 							outputs[OUT2_OUTPUT].setChannels(1);
 
@@ -309,22 +301,18 @@ struct CVrouter : Module {
 							lastFade = 0;
 						} else {
 							if (currentSwitch) {
-								//outputs[OUT1_OUTPUT].setVoltage(10 * (1-lastFade));
 								outputs[OUT1_OUTPUT].setVoltage(10.f * (1-lastFade), 0);
 								outputs[OUT1_OUTPUT].setChannels(1);
 
-								//outputs[OUT2_OUTPUT].setVoltage(10 * lastFade);
 								outputs[OUT2_OUTPUT].setVoltage(10.f * lastFade, 0);
 								outputs[OUT2_OUTPUT].setChannels(1);
 
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
 								lights[OUT2_LIGHT].setBrightness(lastFade);
 							} else {
-								//outputs[OUT1_OUTPUT].setVoltage(10.f * lastFade);
 								outputs[OUT1_OUTPUT].setVoltage(10.f * lastFade, 0);
 								outputs[OUT1_OUTPUT].setChannels(1);
 
-								//outputs[OUT2_OUTPUT].setVoltage(10.f * (1-lastFade));
 								outputs[OUT2_OUTPUT].setVoltage(10.f * (1-lastFade));
 								outputs[OUT2_OUTPUT].setChannels(1);
 
@@ -335,11 +323,9 @@ struct CVrouter : Module {
 						currentFadeSample++;
 					} else {
 						if (currentSwitch) {
-							//outputs[OUT1_OUTPUT].setVoltage(0);
 							outputs[OUT1_OUTPUT].setVoltage(0.f, 0);
 							outputs[OUT1_OUTPUT].setChannels(1);
 
-							//outputs[OUT2_OUTPUT].setVoltage(10);
 							outputs[OUT2_OUTPUT].setVoltage(10.f, 0);
 							outputs[OUT2_OUTPUT].setChannels(1);
 
@@ -349,11 +335,9 @@ struct CVrouter : Module {
 								lights[OUT2_LIGHT].setBrightness(1.f);
 							}
 						} else {
-							//outputs[OUT1_OUTPUT].setVoltage(10);
 							outputs[OUT1_OUTPUT].setVoltage(10.f, 0);
 							outputs[OUT1_OUTPUT].setChannels(1);
 
-							//outputs[OUT2_OUTPUT].setVoltage(0);
 							outputs[OUT2_OUTPUT].setVoltage(0.f, 0);
 							outputs[OUT2_OUTPUT].setChannels(1);
 
@@ -384,7 +368,6 @@ struct CVrouter : Module {
 						} else {
 							chan = std::max(1, inputs[IN1_INPUT].getChannels());
 							if (!currentSwitch) {
-								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
 								for (int c = 0; c < chan; c++)
 									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
 								outputs[OUT1_OUTPUT].setChannels(chan);
@@ -392,7 +375,6 @@ struct CVrouter : Module {
 								lights[OUT1_LIGHT].setBrightness(lastFade);
 								lights[OUT2_LIGHT].setBrightness(1-lastFade);
 							} else {
-								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
 								for (int c = 0; c < chan; c++)
 									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
 								outputs[OUT1_OUTPUT].setChannels(chan);
@@ -405,20 +387,16 @@ struct CVrouter : Module {
 					} else {
 						chan = std::max(1, inputs[IN1_INPUT].getChannels());
 						if (!currentSwitch) {
-							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
 							for (int c = 0; c < chan; c++)
 								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
 							outputs[OUT1_OUTPUT].setChannels(chan);
 
 							if (connectionChange) {
 								connectionChange = false;
-								//lights[IN1_LIGHT].setBrightness(1.f);
-								//lights[IN2_LIGHT].setBrightness(0.f);
 								lights[OUT1_LIGHT].setBrightness(1.f);
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							//outputs[OUT1_OUTPUT].setVoltage(0);
 							for (int c = 0; c < chan; c++)
 								outputs[OUT1_OUTPUT].setVoltage(0.f , c);
 							outputs[OUT1_OUTPUT].setChannels(chan);
@@ -450,7 +428,6 @@ struct CVrouter : Module {
 						} else {
 							chan = std::max(1, inputs[IN1_INPUT].getChannels());
 							if (!currentSwitch) {
-								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
 								for (int c = 0; c < chan; c++)
 									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
 								outputs[OUT2_OUTPUT].setChannels(chan);
@@ -458,7 +435,6 @@ struct CVrouter : Module {
 								lights[OUT1_LIGHT].setBrightness(lastFade);
 								lights[OUT2_LIGHT].setBrightness(1-lastFade);
 							} else {
-								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
 								for (int c = 0; c < chan; c++)
 									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
 								outputs[OUT2_OUTPUT].setChannels(chan);
@@ -471,7 +447,6 @@ struct CVrouter : Module {
 					} else {
 						chan = std::max(1, inputs[IN1_INPUT].getChannels());
 						if (!currentSwitch) {
-							//outputs[OUT2_OUTPUT].setVoltage(0);
 							for (int c = 0; c < chan; c++)
 								outputs[OUT2_OUTPUT].setVoltage(0.f, c);
 							outputs[OUT2_OUTPUT].setChannels(chan);
@@ -482,7 +457,6 @@ struct CVrouter : Module {
 								lights[OUT2_LIGHT].setBrightness(0.f);
 							}
 						} else {
-							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
 							for (int c = 0; c < chan; c++)
 								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
 							outputs[OUT2_OUTPUT].setChannels(chan);
@@ -514,8 +488,6 @@ struct CVrouter : Module {
 						} else {
 							chan = std::max(1, inputs[IN1_INPUT].getChannels());
 							if (currentSwitch) {
-								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
-								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
 								for (int c = 0; c < chan; c++) {
 									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
 									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
@@ -526,8 +498,6 @@ struct CVrouter : Module {
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
 								lights[OUT2_LIGHT].setBrightness(lastFade);
 							} else {
-								//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * (1-lastFade));
-								//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage() * lastFade);
 								for (int c = 0; c < chan; c++) {
 									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
 									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
@@ -543,14 +513,12 @@ struct CVrouter : Module {
 					} else {
 						chan = std::max(1, inputs[IN1_INPUT].getChannels());
 						if (currentSwitch) {
-							//outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
 							for (int c = 0; c < chan; c++)
 								outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
 							outputs[OUT2_OUTPUT].setChannels(chan);
 
 							if (connectionChange) {
 								connectionChange = false;
-								//outputs[OUT1_OUTPUT].setVoltage(0);
 								for (int c = 0; c < chan; c++)
 									outputs[OUT1_OUTPUT].setVoltage(0.f, c);
 								outputs[OUT1_OUTPUT].setChannels(chan);
@@ -559,14 +527,12 @@ struct CVrouter : Module {
 								lights[OUT2_LIGHT].setBrightness(1.f);
 							}
 						} else {
-							//outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage());
 							for (int c = 0; c < chan; c++)
 								outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c), c);
 							outputs[OUT1_OUTPUT].setChannels(chan);
 
 							if (connectionChange) {
 								connectionChange = false;
-								//outputs[OUT2_OUTPUT].setVoltage(0);
 								for (int c = 0; c < chan; c++)
 									outputs[OUT2_OUTPUT].setVoltage(0.f, c);
 								outputs[OUT2_OUTPUT].setChannels(chan);
@@ -601,13 +567,6 @@ struct CVrouterWidget : ModuleWidget {
 
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-
-		// buttons --- 4.1
-		// trimpot --- x  3.7 --- y 4.3
-		// trimpot senza stanghetta --- y 3.7
-		// smallRoundKnob --- x 4.6 --- y 5.1
-		// roundBlackKnob --- x 5.7 --- y 6.4
-		// input/output --- 4.5
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 17)), module, CVrouter::CV_INPUT));
 

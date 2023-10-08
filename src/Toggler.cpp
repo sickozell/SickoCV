@@ -72,19 +72,19 @@ struct Toggler : Module {
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Toggle"});
 		//configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
 		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", "ms", 10000.f, 1.f);
-		configParam(ATTACKATNV_PARAM, -1.f, 1.f, 0.f, "Attack Attenuv.", "%", 0, 100);
+		configParam(ATTACKATNV_PARAM, -1.f, 1.f, 0.f, "Attack CV", "%", 0, 100);
 		configParam(SUSTAIN_PARAM, 0.f, 1.f, 1.f, "Sustain Level", "%", 0, 100);
-		configParam(SUSTAINATNV_PARAM, -1.f, 1.f, 0.f, "Sustain Attenuv.", "%", 0, 100);
+		configParam(SUSTAINATNV_PARAM, -1.f, 1.f, 0.f, "Sustain CV", "%", 0, 100);
 		//configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
 		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", "ms", 10000.f, 1.f);
-		configParam(RELEASEATNV_PARAM, -1.f, 1.f, 0.f, "Release Attenuv.", "%", 0, 100);
+		configParam(RELEASEATNV_PARAM, -1.f, 1.f, 0.f, "Release CV", "%", 0, 100);
 		configInput(TRIG_INPUT, "Trig/Gate");
 		configInput(RST_INPUT, "Reset");
 		configInput(IN_INPUT, "L");
 		configInput(IN_INPUT+1, "R");
-		configInput(ATTACK_INPUT, "Attack CV");
-		configInput(SUSTAIN_INPUT, "Sustain CV");
-		configInput(RELEASE_INPUT, "Release CV");
+		configInput(ATTACK_INPUT, "Attack");
+		configInput(SUSTAIN_INPUT, "Sustain");
+		configInput(RELEASE_INPUT, "Release");
 		configOutput(OUT_OUTPUT, "L");
 		configOutput(OUT_OUTPUT+1, "R");
 		configOutput(GATE_OUTPUT, "Gate");
@@ -262,12 +262,10 @@ struct Toggler : Module {
 		chan = std::max(1, inputs[IN_INPUT].getChannels());
 
 		if (inputs[IN_INPUT].isConnected()) {
-			//outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage() * stageLevel);
 			for (int c = 0; c < chan; c++)
 				outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * stageLevel, c);
 			outputs[OUT_OUTPUT].setChannels(chan);
 		} else {
-			//outputs[OUT_OUTPUT].setVoltage(10 * stageLevel);
 			outputs[OUT_OUTPUT].setVoltage(10.f * stageLevel , 0);
 			outputs[OUT_OUTPUT].setChannels(1);
 		}
@@ -275,12 +273,10 @@ struct Toggler : Module {
 		chan = std::max(1, inputs[IN_INPUT+1].getChannels());
 
 		if (inputs[IN_INPUT+1].isConnected()) {
-			//outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage() * stageLevel);
 			for (int c = 0; c < chan; c++)
 				outputs[OUT_OUTPUT+1].setVoltage(inputs[IN_INPUT+1].getVoltage(c) * stageLevel, c);
 			outputs[OUT_OUTPUT+1].setChannels(chan);
 		} else {
-			//outputs[OUT_OUTPUT+1].setVoltage(10 * stageLevel);
 			outputs[OUT_OUTPUT+1].setVoltage(10.f * stageLevel , 0);
 			outputs[OUT_OUTPUT+1].setChannels(1);
 		}

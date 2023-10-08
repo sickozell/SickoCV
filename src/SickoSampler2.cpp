@@ -111,7 +111,6 @@ struct SickoSampler2 : Module {
 	bool play[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 	double samplePos[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-	//const int sampleCoeff = 2;
 	double distancePos[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 	double cueStartPos;
@@ -229,8 +228,7 @@ struct SickoSampler2 : Module {
 	bool eor[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	float eocTime[16];
 	float eorTime[16];
-	float eocEorTime = (APP->engine->getSampleRate()) / 2000;
-	double oneMsSamples  = (APP->engine->getSampleRate()) / 1000;
+	float oneMsSamples  = (APP->engine->getSampleRate()) / 1000;	// number of samples in 1ms
 
 	bool eocFromTrg = false;
 	//bool eocFromStop = false;
@@ -313,8 +311,8 @@ struct SickoSampler2 : Module {
 		configSwitch(TRIGGATEMODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Gate", "Trig"});
 		configSwitch(TRIGMODE_SWITCH, 0.f, 1.f, 0.f, "Trig Type", {"Start/Stop", "Restart"});
 
-		configInput(TRIG_INPUT,"Trig/Gate");
-		configSwitch(TRIGBUT_PARAM, 0.f, 1.f, 0.f, "Trig/Gate", {"OFF", "ON"});
+		configInput(TRIG_INPUT,"Play");
+		configSwitch(TRIGBUT_PARAM, 0.f, 1.f, 0.f, "Play", {"OFF", "ON"});
 
 		//******************************************************************************
 
@@ -377,7 +375,7 @@ struct SickoSampler2 : Module {
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		trimOnSave = true;
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
@@ -417,6 +415,7 @@ struct SickoSampler2 : Module {
 		recButton = 0;
 		prevMonitorSwitch = 0;
 		prevXfade = -1.f;
+		Module::onReset(e);
 	}
 
 	json_t *dataToJson() override {
@@ -596,7 +595,8 @@ struct SickoSampler2 : Module {
 					std::string filepath = std::string(dir_path) + filename;
 					struct stat statbuf;
 					if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
-						browserDir.push_back(filepath + "/");
+						//browserDir.push_back(filepath + "/");
+						browserDir.push_back(filepath);
 						browserDirDisplay.push_back(filename);
 					} else {
 						std::size_t found = filename.find(".wav",filename.length()-5);
@@ -615,6 +615,11 @@ struct SickoSampler2 : Module {
 			sort(browserDirDisplay.begin(), browserDirDisplay.end());
 			sort(browserFiles.begin(), browserFiles.end());
 			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+			
+			// this adds "/" to browserDir after sorting to avoid wrong sorting with foldernames with spaces
+			int dirSize = (int)browserDir.size();
+			for (int i=0; i < dirSize; i++)
+				browserDir[i] += "/";
 			
 			tempTreeData.push_back(dir_path);
 			tempTreeDisplay.push_back(dir_path);
@@ -679,8 +684,7 @@ struct SickoSampler2 : Module {
 
 	void onSampleRateChange() override {
 		monitorFadeCoeff = 10 / (APP->engine->getSampleRate()); // 100ms monitor fade
-		eocEorTime = (APP->engine->getSampleRate())/2000;			// number of samples for 1 ms used for output triggers
-		oneMsSamples  = (APP->engine->getSampleRate())/1000;
+		oneMsSamples = (APP->engine->getSampleRate())/1000;			// number of samples for 1 ms used for output triggers
 		prevXfade = -1.f;
 
 		if (fileLoaded && APP->engine->getSampleRate() != sampleRate/2) {
@@ -953,6 +957,7 @@ struct SickoSampler2 : Module {
 		}
 
 		fileLoaded = true;
+		fileFound = true;
 		channels = fileChannels;
 	}
 /*
@@ -976,7 +981,7 @@ struct SickoSampler2 : Module {
 		} else {
 			fileLoaded = true;
 		}
-		if (storedPath == "" || fileFound == false) {
+		if ((storedPath == "" || fileFound == false) && !toSave) {
 			fileLoaded = false;
 		}
 		free(path);
@@ -995,6 +1000,7 @@ struct SickoSampler2 : Module {
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
 		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
+
 			fileFound = true;
 			fileChannels = c;
 			sampleRate = sr * 2;
@@ -1203,14 +1209,12 @@ struct SickoSampler2 : Module {
 
 			recSeconds = 0;
 			recMinutes = 0;
-			toSave = false;
-			infoToSave = "";
-
-			if (!firstLoad) {
+			
+			if (!firstLoad || toSave) {
 				prevKnobCueStartPos = -1.f;
 				prevKnobCueEndPos = 2.f;
 				prevKnobLoopStartPos = -1.f;
-				prevKnobLoopEndPos = 2.f;	
+				prevKnobLoopEndPos = 2.f;
 
 				if (resetCursorsOnLoad) {
 					params[CUESTART_PARAM].setValue(0.f);
@@ -1223,6 +1227,9 @@ struct SickoSampler2 : Module {
 					knobLoopEndPos = 1.f;
 				}
 			}
+
+			toSave = false;
+			infoToSave = "";
 
 			firstLoad = false;
 
@@ -1446,7 +1453,6 @@ struct SickoSampler2 : Module {
 
 		// *********************************************************************************************** PLAY SECTION *******************************		
 
-		
 		if (!fileLoaded) {
 
 			for (int c = 0; c < chan; c++) {
@@ -1606,13 +1612,6 @@ struct SickoSampler2 : Module {
 
 			sustainValue = params[SUSTAIN_PARAM].getValue();
 
-			/*			
-			if (xFade == 0)
-				fadeSamples = 0;
-			else
-				fadeSamples = floor(convertCVToSeconds(xFade) * args.sampleRate); // number of samples before starting fade
-			*/
-
 			if (xFade != prevXfade) {
 				if (xFade == 0)
 					fadeSamples = 0;
@@ -1627,8 +1626,6 @@ struct SickoSampler2 : Module {
 			voctDisplay = 100.f;
 
 			for (int c = 0; c < chan; c++) {
-
-				//reversePlaying[c] = reverseStart;
 
 				if (polyMaster) 
 					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(c) * 0.1);
@@ -1706,11 +1703,11 @@ struct SickoSampler2 : Module {
 									if (eocFromTrg) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -1747,11 +1744,11 @@ struct SickoSampler2 : Module {
 											if (eocFromTrg) {
 												if (polyOuts) {
 													eoc[c] = true;
-													eocTime[c] = eocEorTime;
+													eocTime[c] = oneMsSamples;
 												} else {
 													if (c == currentDisplay) {
 														eoc[0] = true;
-														eocTime[0] = eocEorTime;
+														eocTime[0] = oneMsSamples;
 													}
 												}
 											}
@@ -1906,11 +1903,11 @@ struct SickoSampler2 : Module {
 									if (eocFromPing) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -1922,11 +1919,11 @@ struct SickoSampler2 : Module {
 									if (eocFromLoopEnd) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -1943,7 +1940,17 @@ struct SickoSampler2 : Module {
 									fadeCoeff = 1;
 
 							} else if (floor(samplePos[c]) > totalSamples) {	// *** REACHED END OF SAMPLE ***
-
+								if (eocFromCueEnd) {
+									if (polyOuts) {
+										eoc[c] = true;
+										eocTime[c] = oneMsSamples;
+									} else {
+										if (c == currentDisplay) {
+											eoc[0] = true;
+											eocTime[0] = oneMsSamples;
+										}
+									}
+								}
 								play[c] = false;
 
 							} else if (samplePos[c] > cueEndPos) {				// *** REACHED CUE END ***
@@ -1965,11 +1972,11 @@ struct SickoSampler2 : Module {
 									if (eocFromCueEnd) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -1987,11 +1994,11 @@ struct SickoSampler2 : Module {
 										if (eocFromPing) {
 											if (polyOuts) {
 												eoc[c] = true;
-												eocTime[c] = eocEorTime;
+												eocTime[c] = oneMsSamples;
 											} else {
 												if (c == currentDisplay) {
 													eoc[0] = true;
-													eocTime[0] = eocEorTime;
+													eocTime[0] = oneMsSamples;
 												}
 											}
 										}
@@ -2009,11 +2016,11 @@ struct SickoSampler2 : Module {
 										if (eocFromCueEnd) {
 											if (polyOuts) {
 												eoc[c] = true;
-												eocTime[c] = eocEorTime;
+												eocTime[c] = oneMsSamples;
 											} else {
 												if (c == currentDisplay) {
 													eoc[0] = true;
-													eocTime[0] = eocEorTime;
+													eocTime[0] = oneMsSamples;
 												}
 											}
 										}
@@ -2048,11 +2055,11 @@ struct SickoSampler2 : Module {
 									if (eocFromPong) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -2069,11 +2076,11 @@ struct SickoSampler2 : Module {
 									if (eocFromLoopStart) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -2091,6 +2098,17 @@ struct SickoSampler2 : Module {
 
 							} else if (floor(samplePos[c]) < 0) {				// *** REACHED START OF SAMPLE ***
 
+								if (eocFromCueEnd) {
+									if (polyOuts) {
+										eoc[c] = true;
+										eocTime[c] = oneMsSamples;
+									} else {
+										if (c == currentDisplay) {
+											eoc[0] = true;
+											eocTime[0] = oneMsSamples;
+										}
+									}
+								}
 								play[c] = false;
 
 							} else if (samplePos[c] < cueStartPos) {			// *** REACHED CUE START ***
@@ -2113,11 +2131,11 @@ struct SickoSampler2 : Module {
 									if (eocFromCueStart) {
 										if (polyOuts) {
 											eoc[c] = true;
-											eocTime[c] = eocEorTime;
+											eocTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eoc[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -2136,11 +2154,11 @@ struct SickoSampler2 : Module {
 										if (eocFromPong) {
 											if (polyOuts) {
 												eoc[c] = true;
-												eocTime[c] = eocEorTime;
+												eocTime[c] = oneMsSamples;
 											} else {
 												if (c == currentDisplay) {
 													eoc[0] = true;
-													eocTime[0] = eocEorTime;
+													eocTime[0] = oneMsSamples;
 												}
 											}
 										}
@@ -2159,11 +2177,11 @@ struct SickoSampler2 : Module {
 										if (eocFromCueStart) {
 											if (polyOuts) {
 												eoc[c] = true;
-												eocTime[c] = eocEorTime;
+												eocTime[c] = oneMsSamples;
 											} else {
 												if (c == currentDisplay) {
 													eoc[0] = true;
-													eocTime[0] = eocEorTime;
+													eocTime[0] = oneMsSamples;
 												}
 											} 
 										}
@@ -2178,11 +2196,10 @@ struct SickoSampler2 : Module {
 
 						// *** SICKOSAMPLER USES HERMITE INTERPOLATION ONLY ***
 						if (currSampleWeight[c] == 0) {	// if no distance between samples, it means that speed is 1 and samplerates match -> no interpolation
-								//if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
-									currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
-									if (channels == 2)
-										currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
-								//}
+							currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+							if (channels == 2)
+								currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+
 						} else {
 							if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
 								/*
@@ -2205,11 +2222,9 @@ struct SickoSampler2 : Module {
 								}
 
 							} else { // if playing sample is the first or one of the last 3 -> no interpolation
-								//if (floor(samplePos[c]) >= 0 && floor(samplePos[c]) < totalSampleC) {
-									currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
-									if (channels == 2)
-										currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
-								//}
+								currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+								if (channels == 2)
+									currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
 							}
 						}
 
@@ -2254,9 +2269,7 @@ struct SickoSampler2 : Module {
 							}
 						}
 						
-						// ---------- FIRST UPDATE SAMPLE POSITION
-						
-						
+						// --------------------- A D S R
 
 						switch (stage[c]) {
 							case ATTACK_STAGE:
@@ -2288,7 +2301,7 @@ struct SickoSampler2 : Module {
 
 							case RELEASE_STAGE:
 								stageLevel[c] -= stageCoeff[c];
-								if (stageLevel[c] < 0) {	// SE HA FINITO IL RELEASE
+								if (stageLevel[c] < 0) {	// if release has ended
 									stageLevel[c] = 0;
 
 									stage[c] = STOP_STAGE;
@@ -2298,11 +2311,11 @@ struct SickoSampler2 : Module {
 										releaseNew[c] = false;
 										if (polyOuts) {
 											eor[c] = true;
-											eorTime[c] = eocEorTime;
+											eorTime[c] = oneMsSamples;
 										} else {
 											if (c == currentDisplay) {
 												eor[0] = true;
-												eocTime[0] = eocEorTime;
+												eocTime[0] = oneMsSamples;
 											}
 										}
 									}
@@ -2360,13 +2373,6 @@ struct SickoSampler2 : Module {
 												}
 											} else {
 												fadingType[c] = NO_FADE;
-												/*
-												if (!debugBool) {
-													debugBool = true;
-													debugDisplay = to_string(floor(fadedPosition[c]));
-												} else {
-													debugDisplay2 = to_string(floor(fadedPosition[c]));
-												}*/
 											}
 											fadedPosition[c] -= distancePos[c];
 											
@@ -2374,7 +2380,6 @@ struct SickoSampler2 : Module {
 									}
 								} else {
 									fadingType[c] = NO_FADE;
-									//debugBool = false;
 								}
 							break;
 							
@@ -2435,7 +2440,6 @@ struct SickoSampler2 : Module {
 									grainPos[c] = samplePos[c];
 									grainFadeValue[c] = 1;
 
-									//grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples * params[STR_FADE_PARAM].getValue());
 									grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
 									grainFade[c] = true;
 
@@ -2452,7 +2456,6 @@ struct SickoSampler2 : Module {
 											samplePos[c] -= stretchMaxPos * distancePos[c];
 										else
 											samplePos[c] += stretchMaxPos * distancePos[c];
-										//grainSampleCount[c] = 0;
 										grainSampleCount[c] = grainSampleCount[c] - stretchMaxPos;
 									}
 								}
@@ -2464,19 +2467,14 @@ struct SickoSampler2 : Module {
 									grainPos[c] = samplePos[c];
 									grainFadeValue[c] = 1;
 									
-									//grainFadeCoeff[c] = 1 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples * params[STR_FADE_PARAM].getValue());
 									grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
 									grainFade[c] = true;
 									
-									//double tempStretch2 = (stretchMaxPos / params[STRETCH_PARAM].getValue());
-
 									if (!reversePlaying[c])
-										//samplePos[c] += (tempStretch2 - stretchMaxPos) * distancePos[c];
 										samplePos[c] += ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
 									else
-										//samplePos[c] -= (tempStretch2 - stretchMaxPos) * distancePos[c];
 										samplePos[c] -= ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
-									//grainSampleCount[c] = 0;
+
 									grainSampleCount[c] = grainSampleCount[c] - stretchMaxPos;
 								}
 							}
@@ -2488,7 +2486,6 @@ struct SickoSampler2 : Module {
 							samplePos[c] += distancePos[c];
 
 						currSampleWeight[c] = samplePos[c] - floor(samplePos[c]);
-
 
 						// ------------------------------------------------------------ END POSITION UPDATE
 
@@ -2556,21 +2553,6 @@ struct SickoSampler2 : Module {
 
 			switch (polyOuts) {
 				case MONOPHONIC:			// monophonic CABLES
-
-					// *** HARD CLIP ***	// removed because this check is done later in monitor section
-
-					/*
-					if (sumOutput > 10)
-						sumOutput = 10;
-					else if (sumOutput < -10)
-						sumOutput = -10;
-					if (channels == 2) {
-						if (sumOutputR > 10)
-							sumOutputR = 10;
-						else if (sumOutputR < -10)
-							sumOutputR = -10;
-					}
-					*/
 
 					if (outputs[OUT_OUTPUT].isConnected()) {
 						outputs[OUT_OUTPUT].setVoltage(sumOutput);
@@ -2746,7 +2728,7 @@ struct SickoSampler2 : Module {
 
 		if (recordingState) {
 
-			// ****************************************************************************************** R E C O R D I N G     S E C T I O N *****************
+			// **************************************************************************** R E C O R D I N G     S E C T I O N *****************
 					
 			if (recFadeIn) {
 				if (recFadeValue < 1)
@@ -3240,8 +3222,9 @@ struct SickoSampler2Display : TransparentWidget {
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -3496,8 +3479,9 @@ struct SickoSampler2Widget : ModuleWidget {
 
 		if (module->folderTreeData.size() > 0) {
 			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-				module->folderTreeData.resize(1);
-				module->folderTreeDisplay.resize(1);
+				//module->folderTreeData.resize(1);
+				//module->folderTreeDisplay.resize(1);
+				module->refreshRootFolder();
 				for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 					if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 						module->tempDir = module->folderTreeData[0][i];
@@ -3550,7 +3534,7 @@ struct SickoSampler2Widget : ModuleWidget {
 
 		if (module->userFolder != "") {
 			menu->addChild(createMenuLabel(module->userFolder));
-			menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+			//menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
 		}
 
 		menu->addChild(new MenuSeparator());

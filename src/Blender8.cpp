@@ -129,8 +129,8 @@ struct Blender8Widget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		float y = 13;
-		float ys = 22;
+		const float y = 13;
+		const float ys = 22;
 		for (int i=0; i<8; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.7, ys+(i*y))), module, Blender8::IN1_INPUT+i));
 			

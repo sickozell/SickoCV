@@ -111,18 +111,18 @@ struct DrumPlayerPlus : Module {
 		configInput(TRIG_INPUT+1,"Trig #2");
 		configInput(TRIG_INPUT+2,"Trig #3");
 		configInput(TRIG_INPUT+3,"Trig #4");
-		configInput(TRIGVOL_INPUT,"Stand.Lev.CV #1");
-		configInput(TRIGVOL_INPUT+1,"Stand.Lev.CV #2");
-		configInput(TRIGVOL_INPUT+2,"Stand.Lev.CV #3");
-		configInput(TRIGVOL_INPUT+3,"Stand.Lev.CV #4");
+		configInput(TRIGVOL_INPUT,"Stand.Lev. #1");
+		configInput(TRIGVOL_INPUT+1,"Stand.Lev. #2");
+		configInput(TRIGVOL_INPUT+2,"Stand.Lev. #3");
+		configInput(TRIGVOL_INPUT+3,"Stand.Lev. #4");
 		configParam(TRIGVOL_PARAM, 0.f, 2.0f, 1.0f, "Standard Level #1", "%", 0, 100);
 		configParam(TRIGVOL_PARAM+1, 0.f, 2.0f, 1.0f, "Standard Level #2", "%", 0, 100);
 		configParam(TRIGVOL_PARAM+2, 0.f, 2.0f, 1.0f, "Standard Level #3", "%", 0, 100);
 		configParam(TRIGVOL_PARAM+3, 0.f, 2.0f, 1.0f, "Standard Level #4", "%", 0, 100);
-		configParam(TRIGVOLATNV_PARAM, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #1", "%", 0, 100);
-		configParam(TRIGVOLATNV_PARAM+1, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #2", "%", 0, 100);
-		configParam(TRIGVOLATNV_PARAM+2, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #3", "%", 0, 100);
-		configParam(TRIGVOLATNV_PARAM+3, -1.f, 1.0f, 0.f, "Stand.Lev.CV Attenuv. #4", "%", 0, 100);
+		configParam(TRIGVOLATNV_PARAM, -1.f, 1.0f, 0.f, "Stand.Lev.CV #1", "%", 0, 100);
+		configParam(TRIGVOLATNV_PARAM+1, -1.f, 1.0f, 0.f, "Stand.Lev.CV #2", "%", 0, 100);
+		configParam(TRIGVOLATNV_PARAM+2, -1.f, 1.0f, 0.f, "Stand.Lev.CV #3", "%", 0, 100);
+		configParam(TRIGVOLATNV_PARAM+3, -1.f, 1.0f, 0.f, "Stand.Lev.CV #4", "%", 0, 100);
 		configInput(ACC_INPUT,"Accent #1");
 		configInput(ACC_INPUT+1,"Accent #2");
 		configInput(ACC_INPUT+2,"Accent #3");
@@ -135,22 +135,22 @@ struct DrumPlayerPlus : Module {
 		configParam(ACCVOL_PARAM+1, 0.f, 2.0f, 1.0f, "Accent Level #2", "%", 0, 100);
 		configParam(ACCVOL_PARAM+2, 0.f, 2.0f, 1.0f, "Accent Level #3", "%", 0, 100);
 		configParam(ACCVOL_PARAM+3, 0.f, 2.0f, 1.0f, "Accent Level #4", "%", 0, 100);
-		configParam(ACCVOLATNV_PARAM, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #1", "%", 0, 100);
-		configParam(ACCVOLATNV_PARAM+1, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #2", "%", 0, 100);
-		configParam(ACCVOLATNV_PARAM+2, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #3", "%", 0, 100);
-		configParam(ACCVOLATNV_PARAM+3, -1.f, 1.0f, 0.f, "Accent.Lev.CV Attenuv. #4", "%", 0, 100);
+		configParam(ACCVOLATNV_PARAM, -1.f, 1.0f, 0.f, "Accent.Lev.CV #1", "%", 0, 100);
+		configParam(ACCVOLATNV_PARAM+1, -1.f, 1.0f, 0.f, "Accent.Lev.CV #2", "%", 0, 100);
+		configParam(ACCVOLATNV_PARAM+2, -1.f, 1.0f, 0.f, "Accent.Lev.CV #3", "%", 0, 100);
+		configParam(ACCVOLATNV_PARAM+3, -1.f, 1.0f, 0.f, "Accent.Lev.CV #4", "%", 0, 100);
 		configParam(SPEEDATNV_PARAM, -1.0f, 1.0f, 0.0f, "Speed CV Attenuv. #1");
-		configParam(SPEEDATNV_PARAM+1, -1.0f, 1.0f, 0.0f, "Speed CV Attenuv. #2");
-		configParam(SPEEDATNV_PARAM+2, -1.0f, 1.0f, 0.0f, "Speed CV Attenuv. #3");
-		configParam(SPEEDATNV_PARAM+3, -1.0f, 1.0f, 0.0f, "Speed CV Attenuv. #4");
+		configParam(SPEEDATNV_PARAM+1, -1.0f, 1.0f, 0.0f, "Speed CV #2");
+		configParam(SPEEDATNV_PARAM+2, -1.0f, 1.0f, 0.0f, "Speed CV #3");
+		configParam(SPEEDATNV_PARAM+3, -1.0f, 1.0f, 0.0f, "Speed CV #4");
 		configParam(SPEED_PARAM, 0.01f, 2.0f, 1.0f, "Speed #1", "x", 0, 1);
 		configParam(SPEED_PARAM+1, 0.01f, 2.0f, 1.0f, "Speed #2", "x", 0, 1);
 		configParam(SPEED_PARAM+2, 0.01f, 2.0f, 1.0f, "Speed #3", "x", 0, 1);
 		configParam(SPEED_PARAM+3, 0.01f, 2.0f, 1.0f, "Speed #4", "x", 0, 1);
-		configInput(SPEED_INPUT,"Speed CV #1");
-		configInput(SPEED_INPUT+1,"Speed CV #2");
-		configInput(SPEED_INPUT+2,"Speed CV #3");
-		configInput(SPEED_INPUT+3,"Speed CV #4");
+		configInput(SPEED_INPUT,"Speed #1");
+		configInput(SPEED_INPUT+1,"Speed #2");
+		configInput(SPEED_INPUT+2,"Speed #3");
+		configInput(SPEED_INPUT+3,"Speed #4");
 		configSwitch(LIMIT_SWITCH, 0.f, 1.f, 0.f, "Limit #1", {"Off", "±5v"});
 		configSwitch(LIMIT_SWITCH+1, 0.f, 1.f, 0.f, "Limit #2", {"Off", "±5v"});
 		configSwitch(LIMIT_SWITCH+2, 0.f, 1.f, 0.f, "Limit #3", {"Off", "±5v"});
@@ -174,7 +174,7 @@ struct DrumPlayerPlus : Module {
 		playBuffer[3][1].resize(0);
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		outsMode = NORMALLED_OUTS;
@@ -185,6 +185,7 @@ struct DrumPlayerPlus : Module {
 			choking[i] = false;
 			fading[i] = false;
 		}
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {
@@ -342,7 +343,8 @@ struct DrumPlayerPlus : Module {
 					std::string filepath = std::string(dir_path) + filename;
 					struct stat statbuf;
 					if (stat(filepath.c_str(), &statbuf) == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
-						browserDir.push_back(filepath + "/");
+						//browserDir.push_back(filepath + "/");
+						browserDir.push_back(filepath);
 						browserDirDisplay.push_back(filename);
 					} else {
 						std::size_t found = filename.find(".wav",filename.length()-5);
@@ -361,6 +363,11 @@ struct DrumPlayerPlus : Module {
 			sort(browserDirDisplay.begin(), browserDirDisplay.end());
 			sort(browserFiles.begin(), browserFiles.end());
 			sort(browserFilesDisplay.begin(), browserFilesDisplay.end());
+			
+			// this adds "/" to browserDir after sorting to avoid wrong sorting with foldernames with spaces
+			int dirSize = (int)browserDir.size();
+			for (int i=0; i < dirSize; i++)
+				browserDir[i] += "/";
 			
 			tempTreeData.push_back(dir_path);
 			tempTreeDisplay.push_back(dir_path);
@@ -442,11 +449,8 @@ struct DrumPlayerPlus : Module {
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
 
-			//char* pathDup = strdup(path.c_str());
 			fileDescription[slot] = system::getFilename(std::string(path));
 			fileDescription[slot] = fileDescription[slot].substr(0,fileDescription[slot].length()-4);
-			//fileDisplay[slot] = fileDescription[slot].substr(0,5);
-			//free(pathDup);
 
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription[slot];
@@ -470,13 +474,7 @@ struct DrumPlayerPlus : Module {
 			fileLoaded[slot] = true;
 
 		} else {
-			/*fileLoaded[slot] = false;
-			storedPath[slot] = "";
-			fileDescription[slot] = "--none--";
-			fileDisplay[slot] = "-----";
-			scrollDisplay[slot] = "-----";
-			currFileDisplay[slot] = "-----";
-			*/
+
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
 			storedPath[slot] = path;
@@ -536,7 +534,6 @@ struct DrumPlayerPlus : Module {
 			prevTrigValue[i] = trigValue[i];
 			currentOutput = 0;
 
-			//if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i] && floor(samplePos[i]) >= 0) {
 			if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i]) {
 				switch (interpolationMode) {
 					case NO_INTERP:
@@ -703,7 +700,6 @@ struct DrumPlayerPlus : Module {
 			}
 
 			if (!inputs[TRIG_INPUT+i].isConnected())
-			//if (!outputs[OUT_OUTPUT+i].isConnected())
 				play[i] = false;
 		}
 	}
@@ -780,8 +776,9 @@ struct dppSlot1Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -886,8 +883,9 @@ struct dppSlot2Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -992,8 +990,9 @@ struct dppSlot3Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 							module->tempDir = module->folderTreeData[0][i];
@@ -1098,8 +1097,9 @@ struct dppSlot4Display : TransparentWidget {
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-					module->folderTreeData.resize(1);
-					module->folderTreeDisplay.resize(1);
+					//module->folderTreeData.resize(1);
+					//module->folderTreeDisplay.resize(1);
+					module->refreshRootFolder();
 					for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
 						if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
 								module->tempDir = module->folderTreeData[0][i];
@@ -1137,7 +1137,6 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 	DrumPlayerPlus *module;
 	int frame = 0;
 
-	//std::string currFileDisplay[4];
 	int fileGap[4] = {0,0,0,0};
 	float currTime;
 	float deltaTime;
@@ -1151,7 +1150,6 @@ struct DrumPlayerPlusDisplay : TransparentWidget {
 		if (module) {
 			if (layer ==1) {
 				shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf"));
-				//shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
 				nvgFontSize(args.vg, 10);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
@@ -1244,8 +1242,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			addChild(display);
 		}
 
-
-		float xDelta = 23.5;
+		const float xDelta = 23.5;
 
 		for (int i = 0; i < 4; i++) {
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.9+(xDelta*i), 21)), module, DrumPlayerPlus::TRIG_INPUT+i));
@@ -1295,7 +1292,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		if (module->userFolder != "") {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));
-				menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+				//menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
 			} else {
 				menu->addChild(createMenuLabel("(!)"+module->userFolder));
 			}

@@ -60,13 +60,14 @@ struct Clocker : Module {
 		CLICK_BUT_LIGHT,
 		RUN_BUT_LIGHT,
 		RESET_BUT_LIGHT,
+		ENUMS(DIVSWING_LIGHT, 4),
 		NUM_LIGHTS
 	};
 
 	//**************************************************************
 	//  DEBUG 
 
-	/*
+	/*	
 	std::string debugDisplay = "X";
 	std::string debugDisplay2 = "X";
 	std::string debugDisplay3 = "X";
@@ -192,9 +193,13 @@ struct Clocker : Module {
 	bool extBeat = false;
 	
 	double divClockSample[4] = {1.0, 1.0, 1.0, 1.0};
-	double divMaxSample[4] = {0.0, 0.0, 0.0, 0.0};
+	double divMaxSample[4][2] = {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+	int divOddCounter[4] = {0, 0, 0, 0};
 	bool divPulse[4] = {false, false, false, false};
+	float divPulseTime[4] = {0.0, 0.0, 0.0, 0.0};
 	int divCount[4] = {1, 1, 1, 1};
+
+	bool divSwing[4] = {false, false, false, false};
 
 	Clocker() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -220,19 +225,19 @@ struct Clocker : Module {
 
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 40.f, 20.f, "Mult/Div #1");
 		paramQuantities[DIVMULT_KNOB_PARAM+0]->snapEnabled = true;
-		configParam(DIVPW_KNOB_PARAM+0, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
+		configParam(DIVPW_KNOB_PARAM+0, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 40.f, 20.f, "Mult/Div #2");
 		paramQuantities[DIVMULT_KNOB_PARAM+1]->snapEnabled = true;
-		configParam(DIVPW_KNOB_PARAM+1, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
+		configParam(DIVPW_KNOB_PARAM+1, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 40.f, 20.f, "Mult/Div #3");
 		paramQuantities[DIVMULT_KNOB_PARAM+2]->snapEnabled = true;
-		configParam(DIVPW_KNOB_PARAM+2, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
+		configParam(DIVPW_KNOB_PARAM+2, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 40.f, 20.f, "Mult/Div #4");
 		paramQuantities[DIVMULT_KNOB_PARAM+3]->snapEnabled = true;
-		configParam(DIVPW_KNOB_PARAM+3, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
+		configParam(DIVPW_KNOB_PARAM+3, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
 		configOutput(DIVMULT_OUTPUT+0,"Div/Mult #1");
 		configOutput(DIVMULT_OUTPUT+1,"Div/Mult #2");
@@ -250,7 +255,7 @@ struct Clocker : Module {
 		setClick(0);
 	}
 
-	void onReset() override {
+	void onReset(const ResetEvent &e) override {
 		resetStart = true;
 		extSync = false;
 		extConn = false;
@@ -279,9 +284,12 @@ struct Clocker : Module {
 
 		for (int d = 0; d < 4; d++) {
 			divClockSample[d] = 1.0;
-			divMaxSample[d] = 0.0;
+			divMaxSample[d][0] = 0.0;
+			divMaxSample[d][1] = 0.0;
 			divPulse[d] = false;
+			divPulseTime[d] = false;
 			divCount[d] = 1;
+			divSwing[d] = false;
 		}
 		
 		for (int i = 0; i < 2; i++) {
@@ -289,6 +297,7 @@ struct Clocker : Module {
 			play[i] = false;
 		}
 		setClick(0);
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {
@@ -328,6 +337,10 @@ struct Clocker : Module {
 		json_object_set_new(rootJ, "ResetPulseOnRun", json_boolean(resetPulseOnRun));
 		json_object_set_new(rootJ, "ResetOnStop", json_boolean(resetOnStop));
 		json_object_set_new(rootJ, "ResetPulseOnStop", json_boolean(resetPulseOnStop));
+		json_object_set_new(rootJ, "Swing1", json_boolean(divSwing[0]));
+		json_object_set_new(rootJ, "Swing2", json_boolean(divSwing[1]));
+		json_object_set_new(rootJ, "Swing3", json_boolean(divSwing[2]));
+		json_object_set_new(rootJ, "Swing4", json_boolean(divSwing[3]));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		return rootJ;
@@ -351,6 +364,19 @@ struct Clocker : Module {
 		json_t* resetPulseOnStopJ = json_object_get(rootJ, "ResetPulseOnStop");
 		if (resetPulseOnStopJ)
 			resetPulseOnStop = json_boolean_value(resetPulseOnStopJ);
+
+		json_t* swing1J = json_object_get(rootJ, "Swing1");
+		if (swing1J)
+			divSwing[0] = json_boolean_value(swing1J);
+		json_t* swing2J = json_object_get(rootJ, "Swing2");
+		if (swing2J)
+			divSwing[1] = json_boolean_value(swing2J);
+		json_t* swing3J = json_object_get(rootJ, "Swing3");
+		if (swing3J)
+			divSwing[2] = json_boolean_value(swing3J);
+		json_t* swing4J = json_object_get(rootJ, "Swing4");
+		if (swing4J)
+			divSwing[3] = json_boolean_value(swing4J);
 
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
@@ -577,6 +603,11 @@ struct Clocker : Module {
 		click_setting = params[CLICK_BUT_PARAM].getValue();
 		lights[CLICK_BUT_LIGHT].setBrightness(click_setting);
 
+		lights[DIVSWING_LIGHT+0].setBrightness(divSwing[0]);
+		lights[DIVSWING_LIGHT+1].setBrightness(divSwing[1]);
+		lights[DIVSWING_LIGHT+2].setBrightness(divSwing[2]);
+		lights[DIVSWING_LIGHT+3].setBrightness(divSwing[3]);
+
 		// ********* EXTERNAL CONNECTION
 
 		extConn = inputs[EXTCLOCK_INPUT].isConnected();
@@ -613,7 +644,8 @@ struct Clocker : Module {
 				for (int d = 0; d < 4; d++) {
 					divPulse[d] = false;
 					divClockSample[d] = 1.0;
-					divMaxSample[d] = 0.0;
+					divMaxSample[d][0] = 0.0;
+					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 				midBeatPlayed = false;
@@ -633,7 +665,8 @@ struct Clocker : Module {
 				for (int d = 0; d < 4; d++) {
 					divPulse[d] = false;
 					divClockSample[d] = 1.0;
-					divMaxSample[d] = 0.0;
+					divMaxSample[d][0] = 0.0;
+					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 				midBeatPlayed = false;
@@ -667,8 +700,10 @@ struct Clocker : Module {
 				outputs[CLOCK_OUTPUT].setVoltage(0.f);
 				for (int d = 0; d < 4; d++) {
 					divPulse[d] = false;
+					divPulseTime[d] = 0;
 					divClockSample[d] = 1.0;
-					divMaxSample[d] = 0.0;
+					divMaxSample[d][0] = 0.0;
+					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 				midBeatPlayed = false;
@@ -699,19 +734,37 @@ struct Clocker : Module {
 
 				for (int d = 0; d < 4; d++) {
 
-					if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d]) {
-						// ***** CLOCK MULTIPLIER *****
-						divClockSample[d] = 1.0;
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+					if (!divSwing[d]) {
+
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][0]) {
+							// ***** CLOCK MULTIPLIER *****
+							divClockSample[d] = 1.0;
 							divPulse[d] = true;
 							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
 						}
-					}
 
-					// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
-					if (divPulse[d] && divClockSample[d] > divMaxSample[d] * params[DIVPW_KNOB_PARAM+d].getValue()) {
-						divPulse[d] = false;
-						outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+						// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
+						if (divPulse[d] && divClockSample[d] > divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue()) {
+							divPulse[d] = false;
+							outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+						}
+						
+					} else {
+
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+							// ***** CLOCK MULTIPLIER *****
+							divPulse[d] = true;
+							divPulseTime[d] = oneMsTime;
+							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+	
+							if (divOddCounter[d] == 0) {
+								divClockSample[d] = 1.0;
+								divOddCounter[d] = 1;
+							}	else {
+								divClockSample[d] = 1.0 + divMaxSample[d][1] - divMaxSample[d][0];
+								divOddCounter[d] = 0;
+							}
+						}
 					}
 				}
 
@@ -760,21 +813,51 @@ struct Clocker : Module {
 					
 					for (int d = 0; d < 4; d++) {
 						
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
-							// ***** CLOCK MULTIPLIER *****
-							divMaxSample[d] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-							divClockSample[d] = 1.0;
-							divPulse[d] = true;
-							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-						} else {
-							// ***** CLOCK DIVIDER *****
-							divMaxSample[d] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-							divCount[d]++;
-							if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+						if (!divSwing[d]) {
+
+							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+								// ***** CLOCK MULTIPLIER *****
+								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+								divMaxSample[d][1] = divMaxSample[d][0];
 								divClockSample[d] = 1.0;
-								divCount[d] = 1;
 								divPulse[d] = true;
 								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+							} else {
+								// ***** CLOCK DIVIDER *****
+								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+								divMaxSample[d][1] = divMaxSample[d][0];
+								divCount[d]++;
+								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+									divClockSample[d] = 1.0;
+									divCount[d] = 1;
+									divPulse[d] = true;
+									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								}
+							}
+						} else {
+							
+							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+								// ***** CLOCK MULTIPLIER *****
+								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+								divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
+								divOddCounter[d] = 1;
+								divClockSample[d] = 1.0;
+								divPulse[d] = true;
+								divPulseTime[d] = oneMsTime;
+								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+							} else {
+								// ***** CLOCK DIVIDER *****
+								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+								divMaxSample[d][1] = divMaxSample[d][0];
+								divCount[d]++;
+								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+									divOddCounter[d] = 1;
+									divClockSample[d] = 1.0;
+									divCount[d] = 1;
+									divPulse[d] = true;
+									divPulseTime[d] = oneMsTime;
+									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								}
 							}
 						}
 					}
@@ -831,7 +914,8 @@ struct Clocker : Module {
 				for (int d = 0; d < 4; d++) {
 					divPulse[d] = false;
 					divClockSample[d] = 1.0;
-					divMaxSample[d] = 0.0;
+					divMaxSample[d][0] = 0.0;
+					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 				midBeatPlayed = false;
@@ -888,19 +972,36 @@ struct Clocker : Module {
 
 				for (int d = 0; d < 4; d++) {
 
-					if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d]) {
-						// ***** CLOCK MULTIPLIER *****
-						divClockSample[d] = 1.0;
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+					if(!divSwing[d]) {
+
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][0]) {
+							// ***** CLOCK MULTIPLIER *****
+							divClockSample[d] = 1.0;
 							divPulse[d] = true;
 							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
 						}
-					}
 
-					// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
-					if (divPulse[d] && divClockSample[d] > divMaxSample[d] * params[DIVPW_KNOB_PARAM+d].getValue()) {
-						divPulse[d] = false;
-						outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+						// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
+						if (divPulse[d] && divClockSample[d] > divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue()) {
+							divPulse[d] = false;
+							outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+						}
+
+					} else {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+							// ***** CLOCK MULTIPLIER *****
+							divPulse[d] = true;
+							divPulseTime[d] = oneMsTime;
+							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+	
+							if (divOddCounter[d] == 0) {
+								divClockSample[d] = 1.0;
+								divOddCounter[d] = 1;
+							}	else {
+								divClockSample[d] = 1.0 + divMaxSample[d][1] - divMaxSample[d][0];
+								divOddCounter[d] = 0;
+							}
+						}
 					}
 				}
 
@@ -943,21 +1044,71 @@ struct Clocker : Module {
 						// ********** SYNCED BEAT
 
 						for (int d = 0; d < 4; d++) {
+							/*
 							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
 								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[d] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+								// -----------------------------------------------------------------------------------------------------
 								divClockSample[d] = 1.0;
 								divPulse[d] = true;
 								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
 							} else {
 								// ***** CLOCK DIVIDER *****
-								divMaxSample[d] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+								//divMaxSample[d] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 								divCount[d]++;
 								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
 									divClockSample[d] = 1.0;
 									divCount[d] = 1;
 									divPulse[d] = true;
 									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								}
+							}
+							*/
+							if (!divSwing[d]) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+									// ***** CLOCK MULTIPLIER *****
+									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0];
+									divClockSample[d] = 1.0;
+									divPulse[d] = true;
+									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								} else {
+									// ***** CLOCK DIVIDER *****
+									//divMaxSample[d] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][1];
+									divCount[d]++;
+									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+										divClockSample[d] = 1.0;
+										divCount[d] = 1;
+										divPulse[d] = true;
+										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+									}
+								}
+							} else {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+									// ***** CLOCK MULTIPLIER *****
+									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
+									divOddCounter[d] = 1;
+									divClockSample[d] = 1.0;
+									divPulse[d] = true;
+									divPulseTime[d] = oneMsTime;
+									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								} else {
+									// ***** CLOCK DIVIDER *****
+									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0];
+									divCount[d]++;
+									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+										divOddCounter[d] = 1;
+										divClockSample[d] = 1.0;
+										divCount[d] = 1;
+										divPulse[d] = true;
+										divPulseTime[d] = oneMsTime;
+										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+									}
 								}
 							}
 						}
@@ -1059,6 +1210,17 @@ struct Clocker : Module {
 				outputs[BARPULSE_OUTPUT].setVoltage(0.f);
 			} else
 				outputs[BARPULSE_OUTPUT].setVoltage(10.f);
+		}
+
+		for (int d = 0; d < 4; d++) {
+			if (divSwing[d] && divPulse[d]) {
+				divPulseTime[d]--;
+				if (divPulseTime[d] < 0) {
+					divPulse[d] = false;
+					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+				} else
+					outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+			}
 		}
 	}
 };
@@ -1470,8 +1632,7 @@ struct ClockerDebugDisplay : TransparentWidget {
 				nvgTextBox(args.vg, 9, 40,120, module->debugDisplay5.c_str(), NULL);
 				nvgTextBox(args.vg, 9, 50,120, module->debugDisplay6.c_str(), NULL);
 				nvgTextBox(args.vg, 9, 60,120, module->debugDisplay7.c_str(), NULL);
-
-
+				
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -1489,7 +1650,7 @@ struct ClockerWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH))); 
 
-		/*
+		/*		
 		{
 			ClockerDebugDisplay *display = new ClockerDebugDisplay();
 			display->box.pos = Vec(0, 10);
@@ -1497,7 +1658,7 @@ struct ClockerWidget : ModuleWidget {
 			display->module = module;
 			addChild(display);
 		}
-		*/
+		*/	
 
 		{
 			ClockerDisplayTempo *display = new ClockerDisplayTempo();
@@ -1555,6 +1716,7 @@ struct ClockerWidget : ModuleWidget {
 		const float xRun = 7.5f;
 		const float xBpmKnob = 22.f;
 		const float xPwKnob = 36.f;
+		const float xDivLg = 40.f;
 
 		const float xBeatKnob = 10.f;
 
@@ -1562,6 +1724,7 @@ struct ClockerWidget : ModuleWidget {
 		const float xClickVolKnob = 35.f;
 
 		const float xDivKnob = 8.7f;
+		
 		const float xDivOut = 49.1f;
 
 		// -------------------------------
@@ -1585,6 +1748,11 @@ struct ClockerWidget : ModuleWidget {
 		const float yDivKn3 = 105.5f;
 		const float yDivKn4 = 116.5f;
 
+		const float yDivLg1 = 80.5f;
+		const float yDivLg2 = 91.5f;
+		const float yDivLg3 = 102.5f;
+		const float yDivLg4 = 113.f;
+
 		const float yClockOut = 17.5f;
 		const float yResetOut = 31.5f;
 
@@ -1596,7 +1764,7 @@ struct ClockerWidget : ModuleWidget {
 		const float yDiv2 = 98.f;
 		const float yDiv3 = 107.5f;
 		const float yDiv4 = 117.f;
-
+		
 		// buttons --- 4.1
 		// trimpot --- x  3.7 --- y 4.3
 		// trimpot senza stanghetta --- y 3.7
@@ -1632,6 +1800,11 @@ struct ClockerWidget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn2)), module, Clocker::DIVPW_KNOB_PARAM+1));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker::DIVPW_KNOB_PARAM+2));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker::DIVPW_KNOB_PARAM+3));
+
+		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg1)), module, Clocker::DIVSWING_LIGHT+0));
+		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg2)), module, Clocker::DIVSWING_LIGHT+1));
+		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg3)), module, Clocker::DIVSWING_LIGHT+2));
+		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg4)), module, Clocker::DIVSWING_LIGHT+3));
 		
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yClockOut)), module, Clocker::CLOCK_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yResetOut)), module, Clocker::RESET_OUTPUT));
@@ -1648,6 +1821,12 @@ struct ClockerWidget : ModuleWidget {
 	   	Clocker *module = dynamic_cast<Clocker*>(this->module);
 			assert(module);
 		
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #1", "", &module->divSwing[0]));
+		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #2", "", &module->divSwing[1]));
+		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #3", "", &module->divSwing[2]));
+		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #4", "", &module->divSwing[3]));
+
 		menu->addChild(new MenuSeparator());
 
 		menu->addChild(createSubmenuItem("Click Presets", "", [=](Menu * menu) {

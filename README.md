@@ -1,36 +1,37 @@
-# SickoCV v2.5.7
+# SickoCV v2.5.8
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 7](https://github.com/sickozell/SickoCV/assets/80784296/13843419-dc51-4c88-acbb-ae7899fb305f)
+![SickoCV modules 2 5 8](https://github.com/sickozell/SickoCV/assets/80784296/571b2a3b-d1b2-4303-ab3b-7c119f235994)
 
 ## table of contents
-- [Common modules behavior](./README.md#common-modules-behavior)
-- [Adder8](./README.md#adder8)
-- [Blender](./README.md#blender)
-- [Blender8](./README.md#blender8)
-- [bToggler / bToggler Compact](./README.md#btoggler--btoggler-compact)
-- [bToggler8](./README.md#btoggler8)
-- [bToggler8+](./README.md#btoggler8-1)
-- [Calcs](./README.md#calcs)
-- [Clocker](./README.md#clocker)
-- [CV router / CV switcher](./README.md#cvrouter--cvswitcher)
-- [Drummer / Drummer4 / Drummer4+](./README.md#drummer--drummer4--drummer4)
-- [DrumPlayer / DrumPlayer+ / DrumPlayerXtra](./README.md#drumplayer--drumplayer--drumplayerxtra)
-- [Parking](./README.md#parking)
-- [Shifter](./README.md#shifter)
-- [SickoPlayer](./README.md#sickoplayer)
-- [SickoSampler](./README.md#sickosampler)
-- [SickoSampler2](./README.md#sickosampler2)
-- [Switcher / SwitcherSt](./README.md#switcher--switcherst)
-- [Toggler / Toggler Compact](./README.md#toggler--toggler-compact)
-- [Wavetabler](./README.md#wavetabler)
-- [Credits](./README.md#credits)
+- [Common modules behavior](#common-modules-behavior)
+- [adder8](#adder8)
+- [blender](#blender)
+- [blender8](#blender8)
+- [bToggler / bToggler Compact](#btoggler--btoggler-compact)
+- [bToggler8](#btoggler8)
+- [bToggler8+](#btoggler8-1)
+- [calcs](#calcs)
+- [clocker](#clocker)
+- [CV router / CV switcher](#cvrouter--cvswitcher)
+- [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
+- [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
+- [parking](#parking)
+- [shifter](#shifter)
+- [sickoAmp](#sickoamp)
+- [sickoPlayer](#sickoplayer)
+- [sickoSampler](#sickosampler)
+- [sickoSampler2](#sickosampler2)
+- [switcher / switcherSt](#switcher--switcherst)
+- [toggler / toggler Compact](#toggler--toggler-compact)
+- [wavetabler](#wavetabler)
+- [Credits](#credits)
   
 ## Common modules behavior
 - Triggers and gates threshold is +1v
 - Every time-related knob set full anticlockwise and displaying 1ms on the tooltip is actually considered 0ms
 
-## Adder8
+## adder8
 ### 8 Adder and subtractor
 #### - DESCRIPTION
 'adder8' is inspired by hardware precision adder modules. It adds, ignore or subtracts fixed voltages or CVS to outputs. 
@@ -52,7 +53,7 @@ if it's used as a fixed pitch adder (without input CV connection) maybe it's use
 otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
 - **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
 
-## Blender
+## blender
 ### Polyphonic stereo crossfade mixer with double modulation
 #### - DESCRIPTION
 'blender' is a crossfade mixer of mono or stereo signals.  
@@ -79,7 +80,7 @@ Modulation is added to the MIX knob.
 **MOD2 section**  
 MOD2 can be used to add modulation to the MOD attenuverter knob in MOD section, the rules are the same.
 
-## Blender8
+## blender8
 ### 8 single crossfade mixers with modulation
 #### - DESCRIPTION
 'blender8' is a set of 8 crossfade mixers of two signals.  
@@ -204,7 +205,7 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 ![bToggler8plus example](https://user-images.githubusercontent.com/80784296/204083544-34ecf3b0-0d12-4965-bd72-f3bb85339551.JPG)  
 [Download example](./examples/bToggler8plus%20example.vcvs?raw=true) (right-click -> save link as)
 
-## Calcs
+## calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
 
 ![calcs](https://user-images.githubusercontent.com/80784296/233733100-719eb0c9-e6c1-467c-a2c6-cfe8b02012fb.JPG)
@@ -214,13 +215,13 @@ A, B and C are the inputs. The output tables provide simple math calculations an
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 
-## Clocker
+## clocker
 ### Clock generator with 4 dividers/multipliers and audio metronome
 
 #### - DESCRIPTION
-Clocker is a high precision clock generator and modulator with 4 dividers/multipliers and integrated audio click.
+Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature and integrated audio click.
 
-![clocker](https://github.com/sickozell/SickoCV/assets/80784296/7cdfce27-6f65-4a45-ad29-4c62aefa22d8)
+![clocker](https://github.com/sickozell/SickoCV/assets/80784296/297e57cc-7338-4dc5-a817-2f4215387c7e)
 
 #### - INSTRUCTIONS
 The BPM knob sets the clock speed from 30 to 300 bpm.  
@@ -239,6 +240,13 @@ To get best clock precision the algorithm used may alter the clock lengths, acco
 There will therefore be clocks of non-fixed length, but which will guarantee the exact number of BPM within a minute.
 
 #### Context Menu
+
+- **Trig/Swing on Div**  
+With this option enabled the selected divider/multiplier outputs a 1ms trigger instead of gate.  
+A little blue led is turned on near the PW knob. This knob will control the swing amount instead of pulse width, but only for clock multiplications.  
+Swing control at 0% means no swing, so every pulse has equal timing. Increasing swing ratio it delays the even pulses by its percentage until 100% that means the even pulses fall on the next odd ones.  
+Please note that every clock timing (beat detection) resets the odd pulses, so every pulse that is a beat will be an odd one.
+This is beacause it has to match metronome and don't mess when odd clock divisions are selected.
 
 - **Click Presets**  
 There are 3 predefined types of audio clicks, each one with beat and bar sample.  
@@ -269,7 +277,7 @@ The FADE knob with its added CV input, will crossfade up to 10s the INs or OUTs.
 
 The default value of the "THR" knob is +1v.
 
-## Drummer / Drummer4 / Drummer4+
+## drummer / drummer4 / drummer4+
 ### Accent and choke utility for drum modules lacking these features
 
 ![drummer](https://user-images.githubusercontent.com/80784296/212536993-c8ac8011-b324-4dae-99f6-8f8b548557eb.JPG)
@@ -306,7 +314,7 @@ Example of Drummer4 module usage:
 - **Drummer4+ note:**  
 Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to parameter knobs.
 
-## DrumPlayer / DrumPlayer+ / DrumPlayerXtra
+## drumPlayer / drumPlayer+ / drumPlayerXtra
 ### 4 channel Drum Sample Player with accent and choke functionality
 
 ![drumplayer](https://user-images.githubusercontent.com/80784296/221338110-d550144f-4e34-475d-9b00-00872910f331.JPG)
@@ -377,7 +385,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 - Light Box color (if Light Boxes option is enabled in the general context menu, a predefined color or a custom one can be set here)
 - Light Box Fade (Fade time of Light Boxes is set here: Slow (0.5s), Normal (0.25s), Fast (0.1s)
 
-## Parking
+## parking
 ### Set of unconnected inputs and outputs just to park unused cables
 
 ![parking](https://user-images.githubusercontent.com/80784296/233734644-cc9eed31-a959-4ba3-b544-48ed16a6285b.JPG)
@@ -386,7 +394,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 This module doesn't do anything. It's just a place to connect temporarily unused cables to not forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
 
-## Shifter
+## shifter
 ### 64 selectable stages shift register
 #### - DESCRIPTION
 - 64 stages shift register that outputs only the selected stage controlled by knob/CV with attenuverter
@@ -407,7 +415,22 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ![shifter example](https://user-images.githubusercontent.com/80784296/212531455-776e3110-78ef-4bec-a3f8-64180fe4ca53.JPG)  
 [Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
 
-## SickoPlayer
+## sickoAmp
+### Polyphonic stereo VCA up to 200% with limiter
+
+![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/ba7314f8-eee5-4d8f-b5b6-3240a1c95b01)
+
+#### - INSTRUCTIONS
+Level knob can be set up to 200% and its CV input is added to its value.  
+Considering a usual modulation of 0-10v, CV attenuverter is set by default to 50% just to act as a traditional VCA.  
+If set to 100% it will modulate the signal level up to 2x.  
+Limit switch activates signal limiter set by Limit knob in the range up to ±10v.  
+If both inputs are used with polyphony, channels on the Right output replicate the same number of channels of the Left input.
+
+#### Context Menu
+- Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
+
+## sickoPlayer
 ### wav sample player
 
 #### - DESCRIPTION
@@ -514,7 +537,7 @@ There are some factory presets stored in the context menu for common using setti
 One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
 Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100% and enable loop button.  
 
-## SickoSampler
+## sickoSampler
 ### wav sample player and recorder
 
 #### - DESCRIPTION
@@ -578,7 +601,7 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - UCE/ULE updates also Start: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor).
 - Crossfade while Rec Fading: If overdub is not activated this option crossfades between previous and current recording only during fading in/out recording time, accordingly to the FD knob.
 
-## SickoSampler2
+## sickoSampler2
 ### wav sample player and recorder
 
 #### - DESCRIPTION
@@ -616,7 +639,7 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 **Context Menu**  
 'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
 
-## Switcher / SwitcherSt
+## switcher / switcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - DESCRIPTION
 - Signal switch (2 inputs, 1 output)
@@ -677,7 +700,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones
 - Polyphony on signal inputs is replicated on outs
 
-## Toggler / Toggler Compact
+## toggler / toggler Compact
 ### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
 #### - DESCRIPTION
 - Toggled VCA with builtin ASR envelope generator
@@ -718,7 +741,7 @@ These behaviors are more understandable connecting a scope on the output.
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
 
-## Wavetabler
+## wavetabler
 ### wavetable sample player
 
 #### - DESCRIPTION

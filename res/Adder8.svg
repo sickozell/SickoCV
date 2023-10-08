@@ -24,15 +24,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="2.0000001"
-     inkscape:cx="26.749999"
-     inkscape:cy="151.5"
+     inkscape:zoom="8.0000004"
+     inkscape:cx="111.43749"
+     inkscape:cy="27.374999"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-x="1272"
+     inkscape:window-y="6"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g1286"
+     inkscape:current-layer="layer7"
      showguides="true" />
   <defs
      id="defs2">
@@ -64,45 +64,44 @@
      inkscape:label="stripes copy"
      transform="matrix(0.6214092,0,0,0.77278577,7.4210685,123.58213)">
     <rect
-       style="display:inline;fill:#0088ff;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#0088ff;fill-opacity:1;stroke-width:0.384391"
        id="rect7854"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="3.0200005"
+       x="5.6628265"
        y="5.0580001"
        inkscape:label="azzurro" />
     <rect
-       style="display:inline;fill:#00cc55;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#00cc55;fill-opacity:1;stroke-width:0.384391"
        id="rect7856"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="3.0200005"
+       x="5.6628265"
        y="4.0580001"
        inkscape:label="verde" />
     <rect
-       style="display:inline;fill:#eeee77;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#eeee77;fill-opacity:1;stroke-width:0.384391"
        id="rect7858"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="3.0200005"
+       x="5.6628265"
        y="3.0580001"
        inkscape:label="giallo" />
     <rect
-       style="display:inline;fill:#ff7777;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#ff7777;fill-opacity:1;stroke-width:0.384391"
        id="rect7860"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="3.0200005"
+       x="5.6628265"
        y="2.0580001"
        inkscape:label="rosa" />
     <rect
-       style="display:inline;fill:#bd0000;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#bd0000;fill-opacity:1;stroke-width:0.384391"
        id="rect7862"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="2.7204449"
-       y="0.65833217"
-       transform="translate(0.29955559,0.400001)"
+       x="5.6628265"
+       y="1.0583332"
        inkscape:label="rosso" />
   </g>
   <g
@@ -111,45 +110,44 @@
      inkscape:label="stripes"
      transform="matrix(0.6214092,0,0,1,7.4210685,0.59166683)">
     <rect
-       style="display:inline;fill:#0088ff;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#0088ff;fill-opacity:1;stroke-width:0.384391"
        id="rect1316"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="3.0200005"
+       x="5.6628265"
        y="5.0580001"
        inkscape:label="azzurro" />
     <rect
-       style="display:inline;fill:#00cc55;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#00cc55;fill-opacity:1;stroke-width:0.384391"
        id="rect1313"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="3.0200005"
+       x="5.6628265"
        y="4.0580001"
        inkscape:label="verde" />
     <rect
-       style="display:inline;fill:#eeee77;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#eeee77;fill-opacity:1;stroke-width:0.384391"
        id="rect1310"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="3.0200005"
+       x="5.6628265"
        y="3.0580001"
        inkscape:label="giallo" />
     <rect
-       style="display:inline;fill:#ff7777;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#ff7777;fill-opacity:1;stroke-width:0.384391"
        id="rect989"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="3.0200005"
+       x="5.6628265"
        y="2.0580001"
        inkscape:label="rosa" />
     <rect
-       style="display:inline;fill:#bd0000;fill-opacity:1;stroke-width:0.40253"
+       style="display:inline;fill:#bd0000;fill-opacity:1;stroke-width:0.384391"
        id="rect1308"
-       width="60"
+       width="54.714348"
        height="0.40000001"
-       x="2.7204449"
-       y="0.65833217"
-       transform="translate(0.29955559,0.400001)"
+       x="5.6628265"
+       y="1.0583332"
        inkscape:label="rosso" />
   </g>
   <g
@@ -958,16 +956,16 @@
      transform="translate(-5.079999)">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264583"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:none;fill:#ffffff;stroke-width:0.264583"
        x="33.218437"
-       y="4.8914113"
+       y="4.9781251"
        id="text1341"
        inkscape:label="adder8"><tspan
          sodipodi:role="line"
          id="tspan1339"
          style="font-size:3.175px;text-align:center;text-anchor:middle;fill:#ffffff;stroke-width:0.264583"
          x="33.218437"
-         y="4.8914113">adder8</tspan></text>
+         y="4.9781251">adder8</tspan></text>
     <rect
        style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect1447-8"
@@ -1033,7 +1031,8 @@
        aria-label="adder8"
        id="text1051"
        style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264583"
-       inkscape:label="adder8">
+       inkscape:label="adder8"
+       transform="translate(0,0.0867137)">
       <path
          d="m 25.280937,4.8914113 v -0.396875 h -0.396875 v -0.396875 h 0.396875 v -0.396875 h 1.190625 v -0.396875 h -1.190625 v -0.396875 h 1.5875 v 0.396875 h 0.396875 v 1.5875 z m 0.396875,-0.396875 h 0.79375 v -0.396875 h -0.79375 z"
          id="path1053" />

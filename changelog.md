@@ -1,3 +1,13 @@
+### 2.5.8 (2023-10-08)
+- added sickoAmp module
+- clocker: added swing feature
+- sickoPlayer / sickoSampler / sickoSampler2: added EoC pulse when sample has reached begin/end if start/end cursors are set to 0% or 100%
+- sickoPlayer / sickoSampler: improved cpu load when using xFade knob
+- sickoSampler / sickoSampler2: fixed bugs that display cursors wrong when loading a sample after a fresh recording or clear sample when a new sample load is cancelled
+- all player/sampler modules: fixed a bug that shows swapped files between folders when foldernames begin with the same word.  
+Removed refresh folder option from context menu and implemented an auto-refresh function
+- all attenuverters knob scale has been modified to percentage
+
 ### 2.5.7 (2023-10-01)
 - improved time stretch feature on sickoSampler2 and removed TimeStretch crossfading knob  
 - fixed a bug on player/sampler modules that displays play cursor outside module after loading a shorter sample
