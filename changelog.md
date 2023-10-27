@@ -1,3 +1,6 @@
+### 2.5.9 (2023-xx-xx)
+- bTogglerCompact: added "Trigger to Gate Output" option in context menu
+
 ### 2.5.8 (2023-10-07)
 - added sickoAmp module
 - clocker: added swing feature
