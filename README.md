@@ -24,11 +24,12 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.5.9
 VCV Rack plugin modules
 
-![SickoCV modules 2 5 8](https://github.com/sickozell/SickoCV/assets/80784296/571b2a3b-d1b2-4303-ab3b-7c119f235994)
+![SickoCV modules 2 5 9](https://github.com/sickozell/SickoCV/assets/80784296/a321311a-45e1-4867-a9d7-b6db90436360)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
 - [adder8](#adder8)
+- [bGates](#bgates)
 - [blender](#blender)
 - [blender8](#blender8)
 - [bToggler / bToggler Compact](#btoggler--btoggler-compact)
@@ -75,6 +76,32 @@ This unconventional feature lets the user to choose the default knob value depen
 if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add (or subtract) exactly 1 octave in pitch;  
 otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
 - **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
+
+## bGates
+### 8 buffered gates and triggers
+#### - DESCRIPTION
+'bGates' provides 8 buffered gates or triggers on 8 individual clock inputs.  
+
+![bgates](https://github.com/sickozell/SickoCV/assets/80784296/e49921ca-39c9-4684-b014-58021face2f8)
+
+#### - INSTRUCTIONS
+Connect a clock source.
+
+When ARM input is triggered (arm on) the GATE output will be set to high state on next clock detection and 1ms trigger will be given by TRG out.
+
+Then, with another ARM triggering (arm off) GATE output will go low and another 1ms trigger will be given by TRG out.
+
+If ARM is triggered again before clock detection it will abort arming (unarm).
+
+Clock inputs are normalled to previous ones.
+
+Triggering RST input will immediately set the GATE out state to low and unarm it. If the GATE out state was HIGH a 1ms trigger is given by TRG out
+
+Pressing RSTALL button or triggering RESETALL input will immediately set all the 8 GATE outs to low and unarm them.
+
+#### **Context Menu**
+- Initialize On Start: discards previous module state on VCV restart
+- Disable Unarm: this disables unarm feature
 
 ## blender
 ### Polyphonic stereo crossfade mixer with double modulation
