@@ -40,4 +40,5 @@ void init(Plugin* p) {
 	p->addModel(modelClocker);
 	p->addModel(modelSickoSampler2);
 	p->addModel(modelSickoAmp);
+	p->addModel(modelBgates);
 }

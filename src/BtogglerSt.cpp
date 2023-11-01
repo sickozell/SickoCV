@@ -46,6 +46,7 @@ struct BtogglerSt : Module {
 
 	bool initStart = false;
 	bool disableUnarm = false;
+	bool trigOnGateOut = false;
 	bool clockState = false;
 	float clock = 0;
 	float prevClock = 0;
@@ -67,6 +68,10 @@ struct BtogglerSt : Module {
 	int stage = STOP_STAGE;
 	float stageLevel = 0;
 	float stageCoeff;
+
+	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
+	bool trigOut = false;
+	float trigOutTime = 0.f;
 
 	int chan;
 
@@ -101,6 +106,7 @@ struct BtogglerSt : Module {
 	void onReset(const ResetEvent &e) override {
 		initStart = false;
 		disableUnarm = false;
+		trigOnGateOut = false;
 		internalState = IDLE;
 		prevGating = false;
 		clockState = false;
@@ -119,10 +125,15 @@ struct BtogglerSt : Module {
 		Module::onReset(e);
 	}
 
+	void onSampleRateChange() override {
+		oneMsTime = (APP->engine->getSampleRate()) / 1000;
+	}
+
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "InitStart", json_boolean(initStart));
 		json_object_set_new(rootJ, "DisableUnarm", json_boolean(disableUnarm));
+		json_object_set_new(rootJ, "TrigOnGateOut", json_boolean(trigOnGateOut));
 		json_object_set_new(rootJ, "State", json_integer(internalState));
 		return rootJ;
 	}
@@ -135,6 +146,10 @@ struct BtogglerSt : Module {
 		json_t* disableUnarmJ = json_object_get(rootJ, "DisableUnarm");
 		if (disableUnarmJ)
 			disableUnarm = json_boolean_value(disableUnarmJ);
+
+		json_t* trigOnGateOutJ = json_object_get(rootJ, "TrigOnGateOut");
+		if (trigOnGateOutJ)
+			trigOnGateOut = json_boolean_value(trigOnGateOutJ);
 
 		if (!initStart) {
 			json_t* jsonState = json_object_get(rootJ, "State");
@@ -171,6 +186,11 @@ struct BtogglerSt : Module {
 			rst = inputs[RST_INPUT].getVoltage();
 			if (rst >= 1 && prevRst < 1) {
 				outputs[GATE_OUTPUT].setVoltage(0.f);
+				if (trigOnGateOut && internalState == GATING) {
+					outputs[GATE_OUTPUT].setVoltage(10.f);
+					trigOut = true;
+					trigOutTime = oneMsTime;
+				}
 				lights[OUT_LIGHT].setBrightness(0.f);
 				lights[WRN_LIGHT].setBrightness(0.f);
 				stage = STOP_STAGE;
@@ -230,7 +250,14 @@ struct BtogglerSt : Module {
 					lights[WRN_LIGHT].setBrightness(0.f);
 					internalState = IDLE;
 				} else if (clockState) {
-					outputs[GATE_OUTPUT].setVoltage(10);
+					//outputs[GATE_OUTPUT].setVoltage(10);
+					if (!trigOnGateOut) {
+						outputs[GATE_OUTPUT].setVoltage(10);
+					} else {
+						outputs[GATE_OUTPUT].setVoltage(10);
+						trigOut = true;
+						trigOutTime = oneMsTime;
+					}
 					lights[OUT_LIGHT].setBrightness(1.f);
 					lights[WRN_LIGHT].setBrightness(0.f);
 					internalState = GATING;
@@ -259,7 +286,9 @@ struct BtogglerSt : Module {
 			break;
 
 			case GATING:
-				outputs[GATE_OUTPUT].setVoltage(10);
+				//outputs[GATE_OUTPUT].setVoltage(10);
+				if (!trigOnGateOut)
+					outputs[GATE_OUTPUT].setVoltage(10);
 				lights[OUT_LIGHT].setBrightness(1.f);
 				if (trigState) {
 					lights[WRN_LIGHT].setBrightness(1.f);
@@ -272,7 +301,14 @@ struct BtogglerSt : Module {
 					internalState = GATING;
 					lights[WRN_LIGHT].setBrightness(0.f);
 				} else if (clockState) {
-					outputs[GATE_OUTPUT].setVoltage(0);
+					//outputs[GATE_OUTPUT].setVoltage(0);
+					if (!trigOnGateOut)
+						outputs[GATE_OUTPUT].setVoltage(0);
+					else {
+						outputs[GATE_OUTPUT].setVoltage(10);
+						trigOut = true;
+						trigOutTime = oneMsTime;
+					}
 					lights[WRN_LIGHT].setBrightness(0.f);
 					lights[OUT_LIGHT].setBrightness(0.f);
 					internalState = IDLE;
@@ -352,6 +388,16 @@ struct BtogglerSt : Module {
 			outputs[OUT_OUTPUT+1].setVoltage(10.f * stageLevel , 0);
 			outputs[OUT_OUTPUT+1].setChannels(1);
 		}
+
+		if (trigOnGateOut) {
+			if (trigOut) {
+				trigOutTime--;
+				if (trigOutTime < 0) {
+					trigOut = false;
+					outputs[GATE_OUTPUT].setVoltage(0);
+				}
+			}
+		}
 	}
 };
 
@@ -399,6 +445,7 @@ struct BtogglerStWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 		menu->addChild(createBoolPtrMenuItem("Disable Unarm", "", &module->disableUnarm));
+		menu->addChild(createBoolPtrMenuItem("Trigger on Gate Out", "", &module->trigOnGateOut));
 	}
 };
 

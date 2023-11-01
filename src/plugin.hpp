@@ -39,3 +39,4 @@ extern Model* modelAdder8;
 extern Model* modelClocker;
 extern Model* modelSickoSampler2;
 extern Model* modelSickoAmp;
+extern Model* modelBgates;
