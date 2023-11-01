@@ -23,6 +23,14 @@
       ]
     },
     {
+      "slug": "Bgates",
+      "name": "bGates",
+      "description": "8 Buffered gates and triggers",
+      "tags": [
+        "Logic"
+      ]
+    },
+    {
       "slug": "Blender",
       "name": "blender",
       "description": "Stereo crossfade mixer with double modulation",

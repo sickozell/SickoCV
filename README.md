@@ -1,4 +1,4 @@
-# SickoCV v2.5.9-beta1
+# SickoCV v2.5.9-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,13 +12,14 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- bTogglerCompact
+- bToggler, bTogglerCompact
 
 ## **to do list:** 
 - module testing  
 
 ## **changelog**  
-- bTogglerCompact: added "Trigger to Gate Output" option in context menu
+- added bGates module
+- bToggler/bTogglerCompact: added "Trigger to Gate Output" option in context menu
 
 # SickoCV v2.5.9
 VCV Rack plugin modules
@@ -148,6 +149,7 @@ Polyphony on L/(R) inputs is replicated on outs.
 #### Context Menu
 - Initialize On Start: discards previous module state on VCV restart
 - Disable Unarm: this disables unarm feature
+- Trigger on Gate Out: this option substitutes Gate Output with a 1ms trigger whenever a clock is detected when armed
 
 ## bToggler8
 ### 8 buffered toggle switch signal router

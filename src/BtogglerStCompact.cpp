@@ -180,6 +180,11 @@ struct BtogglerStCompact : Module {
 			rst = inputs[RST_INPUT].getVoltage();
 			if (rst >= 1 && prevRst < 1) {
 				outputs[GATE_OUTPUT].setVoltage(0.f);
+				if (trigOnGateOut && internalState == GATING) {
+					outputs[GATE_OUTPUT].setVoltage(10.f);
+					trigOut = true;
+					trigOutTime = oneMsTime;
+				}
 				lights[OUT_LIGHT].setBrightness(0.f);
 				lights[WRN_LIGHT].setBrightness(0.f);
 				stage = STOP_STAGE;
