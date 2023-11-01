@@ -85,15 +85,13 @@ otherwise, if the knob is used as attenuverter with a CV input connected, it can
 ![bgates](https://github.com/sickozell/SickoCV/assets/80784296/e49921ca-39c9-4684-b014-58021face2f8)
 
 #### - INSTRUCTIONS
-Connect a clock source.
+Connect a clock source. Clock inputs are normalled to previous ones.
 
 When ARM input is triggered (arm on) the GATE output will be set to high state on next clock detection and 1ms trigger will be given by TRG out.
 
 Then, with another ARM triggering (arm off) GATE output will go low and another 1ms trigger will be given by TRG out.
 
 If ARM is triggered again before clock detection it will abort arming (unarm).
-
-Clock inputs are normalled to previous ones.
 
 Triggering RST input will immediately set the GATE out state to low and unarm it. If the GATE out state was HIGH a 1ms trigger is given by TRG out
 
