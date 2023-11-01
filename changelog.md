@@ -1,6 +1,6 @@
 ### 2.5.9 (2023-11-01)
 - added bGates module
-- bTogglerCompact: added "Trigger to Gate Output" option in context menu
+- bToggler / bTogglerCompact: added "Trigger to Gate Output" option in context menu
 
 ### 2.5.8 (2023-10-07)
 - added sickoAmp module
