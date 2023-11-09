@@ -569,18 +569,15 @@ This submenu sets when the EOC pulses are triggered:
 - PING: reached LOOP END (when pingpong looping on forward playback)
 - PONG: reached LOOP START (when pingpong looping on reverse playback)
 
-**Disable NAV buttons**
-Disables panel Sample Navigation buttons to avoid utilizing mistakes.
-
-**Store Sample in Patch**
-This option enables storing the sample in the patch file when saved or VCV is closed.  
-If the sample is not found when VCV is relaunched, or patch is loaded from another machine, the sample is loaded from the patchfile, but the original file reference is retained for when the file is available again.
-
-**Reset Cursors**  
-Resets Cue/Loop Start/stop to 0 and 100%.  
-
 **Reset Cursors on Load**  
 Always resets Cue/Loop Start/stop to 0 and 100% when a new sample is loaded.  
+
+**Store Sample in Patch**  
+This option enables storing the sample in the patch file when saved or VCV is closed.  
+If the sample is not found when VCV is relaunched, or patch is loaded from another machine, the sample is loaded from the patchfile, but the original file reference is retained for when the file is available again.  
+
+**Disable NAV buttons**  
+Disables panel Sample Navigation buttons to avoid utilizing mistakes.  
 
 **Presets**
 There are some factory presets stored in the context menu for common using settings.  

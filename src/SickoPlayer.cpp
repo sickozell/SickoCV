@@ -2740,7 +2740,6 @@ struct SickoPlayerWidget : ModuleWidget {
 		}));
 		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("EOC pulse from", "", [=](Menu* menu) {
 			menu->addChild(createBoolPtrMenuItem("TRG/GATE (stop)", "", &module->eocFromTrg));
 			menu->addChild(createBoolPtrMenuItem("STOP trig", "", &module->eocFromStop));
@@ -2751,15 +2750,22 @@ struct SickoPlayerWidget : ModuleWidget {
 			menu->addChild(createBoolPtrMenuItem("PING", "", &module->eocFromPing));
 			menu->addChild(createBoolPtrMenuItem("PONG", "", &module->eocFromPong));
 		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
-		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
-		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
+		
+		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
 			menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));
 			menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
 			menu->addChild(createMenuItem("Drum Player", "", [=]() {module->setPreset(2);}));
 		}));
+
+		menu->addChild(new MenuSeparator());
+		
+		
 	}
 };
 
