@@ -1,4 +1,4 @@
-# SickoCV v2.5.9-beta2
+# SickoCV v2.5.10-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,16 +12,15 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- bToggler, bTogglerCompact
+- sickoPlayer
 
 ## **to do list:** 
 - module testing  
 
 ## **changelog**  
-- added bGates module
-- bToggler/bTogglerCompact: added "Trigger to Gate Output" option in context menu
+- sickoPlayer added 'Store Sample in Patch' feature
 
-# SickoCV v2.5.9
+# SickoCV v2.5.10
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 9](https://github.com/sickozell/SickoCV/assets/80784296/a321311a-45e1-4867-a9d7-b6db90436360)
@@ -572,6 +571,10 @@ This submenu sets when the EOC pulses are triggered:
 
 **Disable NAV buttons**
 Disables panel Sample Navigation buttons to avoid utilizing mistakes.
+
+**Store Sample in Patch**
+This option enables storing the sample in the patch file when saved or VCV is closed.  
+If the sample is not found when VCV is relaunched, or patch is loaded from another machine, the sample is loaded from the patchfile, but the original file reference is retained for when the file is available again.
 
 **Reset Cursors**  
 Resets Cue/Loop Start/stop to 0 and 100%.  

@@ -33,8 +33,6 @@
 #include <libgen.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-//#include <filesystem>
-//#include <cstdint>
 
 using namespace std;
 
@@ -197,10 +195,7 @@ struct SickoPlayer : Module {
 	bool firstLoad = true;
 	bool resetCursorsOnLoad = true;
 	bool disableNav = false;
-	bool sampleInPatch = true;
 	
-	bool loadFromPatch = false;
-
 	float fadeCoeff = 0.f;
 
 	int fadingType[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -365,7 +360,6 @@ struct SickoPlayer : Module {
 		eocFromPing = true;
 		eocFromPong = true;
 		disableNav = false;
-		sampleInPatch = true;
 		clearSlot();
 		for (int i = 0; i < 16; i++) {
 			play[i] = false;
@@ -395,44 +389,6 @@ struct SickoPlayer : Module {
 			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at speed 1x
 	}
 
-	void onAdd(const AddEvent& e) override {
-		if (!fileLoaded) {
-			char* path = strdup(storedPath.c_str());
-			std::string pathDup = basename(path);
-			std::string patchFile = system::join(getPatchStorageDirectory(), pathDup);
-			loadFromPatch = true;
-			loadSample(patchFile);
-			loadFromPatch = false;
-		}		
-		Module::onAdd(e);
-	}
-
-	void onSave(const SaveEvent& e) override {
-		if (fileLoaded) {
-			// remove directory
-			system::removeRecursively(getPatchStorageDirectory().c_str());
-			if (sampleInPatch) {
-				char* path = strdup(storedPath.c_str());
-				std::string pathDup = basename(path);
-				std::string patchFile = system::join(createPatchStorageDirectory(), pathDup);
-			
-				saveSample(patchFile);
-			}
-		}
-
-		Module::onSave(e);
-	}
-
-	/*
-	bool delete_under(const std::filesystem::path& dirpath, std::error_code& ec) { 
-  		using namespace std::filesystem;
-  		if (remove_all(dirpath, ec) == static_cast<std::uintmax_t>(-1)) { 
-    		return false; 
-  		} 
-  		return create_directory(dirpath, ec); 
-	}
-	*/ 
-
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
@@ -449,7 +405,6 @@ struct SickoPlayer : Module {
 		json_object_set_new(rootJ, "EocFromPing", json_boolean(eocFromPing));
 		json_object_set_new(rootJ, "EocFromPong", json_boolean(eocFromPong));
 		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
-		json_object_set_new(rootJ, "sampleInPatch", json_boolean(sampleInPatch));
 		json_object_set_new(rootJ, "ResetCursorsOnLoad", json_boolean(resetCursorsOnLoad));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
@@ -499,9 +454,6 @@ struct SickoPlayer : Module {
 		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
 		if (disableNavJ)
 			disableNav = json_boolean_value(disableNavJ);
-		json_t* sampleInPatchJ = json_object_get(rootJ, "sampleInPatch");
-		if (sampleInPatchJ)
-			sampleInPatch = json_boolean_value(sampleInPatchJ);
 		json_t* resetCursorsOnLoadJ = json_object_get(rootJ, "ResetCursorsOnLoad");
 		if (resetCursorsOnLoadJ)
 			resetCursorsOnLoad = json_boolean_value(resetCursorsOnLoadJ);
@@ -783,16 +735,8 @@ struct SickoPlayer : Module {
 				timeDisplay += "0";
 			timeDisplay += std::to_string(seconds);
 
-			if (loadFromPatch) {
-				path = storedPath;
-			} 
-
 			char* pathDup = strdup(path.c_str());
 			fileDescription = basename(pathDup);
-
-			if (loadFromPatch) {
-				fileDescription = "(!)"+fileDescription;
-			} 
 
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription.substr(0, fileDescription.size()-4);
@@ -856,53 +800,6 @@ struct SickoPlayer : Module {
 		}
 	};
 	
-	/*
-
-																							░██████╗░█████╗░██╗░░░██╗███████╗
-																							██╔════╝██╔══██╗██║░░░██║██╔════╝
-																							╚█████╗░███████║╚██╗░██╔╝█████╗░░
-																							░╚═══██╗██╔══██║░╚████╔╝░██╔══╝░░
-																							██████╔╝██║░░██║░░╚██╔╝░░███████╗
-																							╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
-*/
-
-	void saveSample(std::string path) {
-		drwav_uint64 samples;
-
-		samples = playBuffer[LEFT][0].size();
-
-		std::vector<float> data;
-
-		for (unsigned int i = 0; i <= playBuffer[LEFT][0].size(); i = i + 2) {
-			data.push_back(playBuffer[LEFT][0][i] / 5);
-			if (channels == 2)
-				data.push_back(playBuffer[RIGHT][0][i] / 5);
-		}
-
-		drwav_data_format format;
-		format.container = drwav_container_riff;
-		format.format = DR_WAVE_FORMAT_IEEE_FLOAT;
-
-		format.channels = channels;
-
-		if (channels == 1)
-			samples /= 2;
-
-		format.sampleRate = sampleRate / 2;
-
-		format.bitsPerSample = 32;
-
-		if (path.substr(path.size() - 4) != ".wav" and path.substr(path.size() - 4) != ".WAV")
-			path += ".wav";
-
-		drwav *pWav = drwav_open_file_write(path.c_str(), &format);
-		drwav_write(pWav, samples, data.data());
-		drwav_close(pWav);
-
-		data.clear();
-		
-	}
-
 	void clearSlot() {
 		storedPath = "";
 		fileDescription = "--none--";
@@ -2751,7 +2648,6 @@ struct SickoPlayerWidget : ModuleWidget {
 			menu->addChild(createBoolPtrMenuItem("PING", "", &module->eocFromPing));
 			menu->addChild(createBoolPtrMenuItem("PONG", "", &module->eocFromPong));
 		}));
-		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 		menu->addChild(createMenuItem("Reset Cursors", "", [=]() {module->resetCursors();}));
 		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
