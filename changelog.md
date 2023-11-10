@@ -1,5 +1,5 @@
 ### 2.5.10 (2023-11-xx)
-- sickoPlayer added 'Store Sample in Patch' feature
+- sickoPlayer: added 'Store Sample in Patch' feature
 
 ### 2.5.9 (2023-11-01)
 - added bGates module

@@ -1,4 +1,4 @@
-# SickoCV v2.5.10-beta1
+# SickoCV v2.5.10-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,7 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - module testing  
 
 ## **changelog**  
-- sickoPlayer added 'Store Sample in Patch' feature
+- sickoPlayer: added 'Store Sample in Patch' feature
 
 # SickoCV v2.5.10
 VCV Rack plugin modules
@@ -573,8 +573,8 @@ This submenu sets when the EOC pulses are triggered:
 Always resets Cue/Loop Start/stop to 0 and 100% when a new sample is loaded.  
 
 **Store Sample in Patch**  
-This option enables storing the sample in the patch file when saved or VCV is closed.  
-If the sample is not found when VCV is relaunched, or patch is loaded from another machine, the sample is loaded from the patchfile, but the original file reference is retained for when the file is available again.  
+This option enables storing the sample in the patch file when the patch is saved or VCV is closed.  
+When VCV is relaunched, or patch is loaded from another machine, the sample will be loaded from patch file if the original stored reference is not reachable, without loosing it.
 
 **Disable NAV buttons**  
 Disables panel Sample Navigation buttons to avoid utilizing mistakes.  

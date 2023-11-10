@@ -348,6 +348,7 @@ struct SickoPlayer : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
+		system::removeRecursively(getPatchStorageDirectory().c_str());
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
@@ -409,7 +410,6 @@ struct SickoPlayer : Module {
 
 	void onSave(const SaveEvent& e) override {
 		if (fileLoaded) {
-			// remove directory
 			system::removeRecursively(getPatchStorageDirectory().c_str());
 			if (sampleInPatch) {
 				char* path = strdup(storedPath.c_str());
@@ -422,16 +422,6 @@ struct SickoPlayer : Module {
 
 		Module::onSave(e);
 	}
-
-	/*
-	bool delete_under(const std::filesystem::path& dirpath, std::error_code& ec) { 
-  		using namespace std::filesystem;
-  		if (remove_all(dirpath, ec) == static_cast<std::uintmax_t>(-1)) { 
-    		return false; 
-  		} 
-  		return create_directory(dirpath, ec); 
-	}
-	*/ 
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
@@ -2511,7 +2501,7 @@ struct SickoPlayerDisplay : TransparentWidget {
 				menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
 				menu->addChild(createMenuItem("Drum Player", "", [=]() {module->setPreset(2);}));
 			}));
-	}
+		}
 	}
 };
 
