@@ -33,6 +33,7 @@
 #include <libgen.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
 //#include <filesystem>
 //#include <cstdint>
 
@@ -398,12 +399,31 @@ struct SickoPlayer : Module {
 
 	void onAdd(const AddEvent& e) override {
 		if (!fileLoaded) {
+
+			/*
 			char* path = strdup(storedPath.c_str());
 			std::string pathDup = basename(path);
 			std::string patchFile = system::join(getPatchStorageDirectory(), pathDup);
+			INFO("[ sickoCV ] LOAD on add %s\n",(patchFile).c_str());
 			loadFromPatch = true;
 			loadSample(patchFile);
 			loadFromPatch = false;
+			*/
+
+
+			/*char* path = strdup(storedPath.c_str());
+			std::string pathDup = basename(path);
+			std::string pathDup filesystem::
+			*/
+			std::string patchFile = system::join(getPatchStorageDirectory(), "sample.wav");
+
+
+			INFO("[ sickoCV ] LOAD on add %s\n",(patchFile).c_str());
+			loadFromPatch = true;
+			loadSample(patchFile);
+			loadFromPatch = false;
+			
+
 		}		
 		Module::onAdd(e);
 	}
@@ -412,10 +432,12 @@ struct SickoPlayer : Module {
 		if (fileLoaded) {
 			system::removeRecursively(getPatchStorageDirectory().c_str());
 			if (sampleInPatch) {
+				/*
 				char* path = strdup(storedPath.c_str());
 				std::string pathDup = basename(path);
 				std::string patchFile = system::join(createPatchStorageDirectory(), pathDup);
-			
+				*/
+				std::string patchFile = system::join(createPatchStorageDirectory(), "sample.wav");
 				saveSample(patchFile);
 			}
 		}
@@ -498,9 +520,10 @@ struct SickoPlayer : Module {
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
-			if (storedPath != "")
+			if (storedPath != "") {
+				INFO("[ sickoCV ] load attempt from JSON %s\n",(storedPath).c_str());
 				loadSample(storedPath);
-			else
+			} else
 				firstLoad = false;
 		}
 		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
@@ -838,7 +861,10 @@ struct SickoPlayer : Module {
 		} else {
 			fileFound = false;
 			fileLoaded = false;
-			storedPath = path;
+			//storedPath = path;
+			if (loadFromPatch) {
+				path = storedPath;
+			} 
 			fileDescription = "(!)"+path;
 			fileDisplay = "";
 			timeDisplay = "";
@@ -882,7 +908,8 @@ struct SickoPlayer : Module {
 
 		format.bitsPerSample = 32;
 
-		if (path.substr(path.size() - 4) != ".wav" and path.substr(path.size() - 4) != ".WAV")
+		//if (path.substr(path.size() - 4) != ".wav" and path.substr(path.size() - 4) != ".WAV")
+		if (path.substr(path.size() - 4) != ".wav" && path.substr(path.size() - 4) != ".WAV")
 			path += ".wav";
 
 		drwav *pWav = drwav_open_file_write(path.c_str(), &format);
@@ -2275,8 +2302,8 @@ struct SickoPlayerDisplay : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
-			e.consume(this);
+		/*if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+			e.consume(this);*/
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();

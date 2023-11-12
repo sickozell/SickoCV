@@ -1,5 +1,6 @@
 ### 2.5.10 (2023-11-xx)
 - sickoPlayer: added 'Store Sample in Patch' feature
+- all module with leds displays: added module drag&drop when over leds displays
 
 ### 2.5.9 (2023-11-01)
 - added bGates module

@@ -1,4 +1,4 @@
-# SickoCV v2.5.10-beta2
+# SickoCV v2.5.10-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -19,6 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog**  
 - sickoPlayer: added 'Store Sample in Patch' feature
+- all module with leds displays: added module drag&drop when over leds displays
 
 # SickoCV v2.5.10
 VCV Rack plugin modules
