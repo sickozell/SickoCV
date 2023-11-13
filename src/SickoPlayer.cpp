@@ -723,7 +723,8 @@ struct SickoPlayer : Module {
 		free(path);
 	}
 
-	void loadSample(std::string path) {
+	void loadSample(std::string fromPath) {
+		std::string path = fromPath;
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 		unsigned int c;
 		unsigned int sr;
@@ -2770,8 +2771,8 @@ struct SickoPlayerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
-		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
+		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
 		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
