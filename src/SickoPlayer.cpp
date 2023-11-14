@@ -421,6 +421,7 @@ struct SickoPlayer : Module {
 			INFO("[ sickoCV ] LOAD on add %s\n",(patchFile).c_str());
 			loadFromPatch = true;
 			loadSample(patchFile);
+			INFO("[ sickoCV ] EXITING onAdd after fileLoaded \n");
 			loadFromPatch = false;
 			
 
@@ -724,7 +725,9 @@ struct SickoPlayer : Module {
 	}
 
 	void loadSample(std::string fromPath) {
+		INFO("[ sickoCV ] loadSample(%s)\n",(fromPath).c_str());
 		std::string path = fromPath;
+		INFO("[ sickoCV ] path = %s\n",(path).c_str());
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 		unsigned int c;
 		unsigned int sr;
@@ -733,6 +736,8 @@ struct SickoPlayer : Module {
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
 		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
+			INFO("[ sickoCV ] pSampleData != NULL && tsc > minSamplesToLoad * c = TRUE\n");
+			INFO("[ sickoCV ] initialize sample vectors\n");
 			fileFound = true;
 			channels = c;
 			sampleRate = sr * 2;
@@ -748,7 +753,7 @@ struct SickoPlayer : Module {
 
 			if (tsc > 52428800)
 				tsc = 52428800;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
-
+			INFO("[ sickoCV ] creating vector with oversampling holes\n");
 			for (unsigned int i=0; i < tsc; i = i + c) {
 				playBuffer[LEFT][0].push_back(pSampleData[i] * 5);
 				playBuffer[LEFT][0].push_back(0);
@@ -759,8 +764,9 @@ struct SickoPlayer : Module {
 			}
 			totalSampleC = playBuffer[LEFT][0].size();
 			totalSamples = totalSampleC-1;
+			INFO("[ sickoCV ] clear pSampleData\n");
 			drwav_free(pSampleData);
-
+			INFO("[ sickoCV ] averaging oversampled vector\n");
 			for (unsigned int i = 1; i < totalSamples; i = i+2) {
 				playBuffer[LEFT][0][i] = playBuffer[LEFT][0][i-1] * .5f + playBuffer[LEFT][0][i+1] * .5f;
 				if (channels == 2)
@@ -771,6 +777,7 @@ struct SickoPlayer : Module {
 			if (channels == 2)
 				playBuffer[RIGHT][0][totalSamples] = playBuffer[RIGHT][0][totalSamples-1] * .5f;
 
+			INFO("[ sickoCV ] antialiasing vector\n");
 			for (unsigned int i = 0; i < totalSampleC; i++) {
 				playBuffer[LEFT][1].push_back(biquadLpf(playBuffer[LEFT][0][i]));
 				if (channels == 2)
@@ -784,6 +791,7 @@ struct SickoPlayer : Module {
 			prevKnobLoopStartPos = -1.f;
 			prevKnobLoopEndPos = 2.f;
 
+			INFO("[ sickoCV ] creating display vector\n");
 			vector<double>().swap(displayBuff);
 			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/240))
 				displayBuff.push_back(playBuffer[0][0][i]);
@@ -797,17 +805,25 @@ struct SickoPlayer : Module {
 				timeDisplay += "0";
 			timeDisplay += std::to_string(seconds);
 
+			INFO("[ sickoCV ] if (loadFromPatch\n");
 			if (loadFromPatch) {
 				path = storedPath;
+				INFO("[ sickoCV ] path = %s\n",(storedPath).c_str());
 			} 
 
+			INFO("[ sickoCV ] initialize pathDup\n");
 			char* pathDup = strdup(path.c_str());
+			INFO("[ sickoCV ] pathDup = %s\n",pathDup);
 			fileDescription = basename(pathDup);
+			//INFO("[ sickoCV ] basename(pathDup) = %s\n",(basename(to_string(pathDup))).c_str());
+			INFO("[ sickoCV ] basename(pathDup) = %s\n",(basename(pathDup)));
+			INFO("[ sickoCV ] fileDescription = %s\n",(fileDescription).c_str());
 
 			if (loadFromPatch) {
 				fileDescription = "(!)"+fileDescription;
 			} 
 
+			INFO("[ sickoCV ] CHARS check\n");
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription.substr(0, fileDescription.size()-4);
 			char tempFileChar;
@@ -824,6 +840,7 @@ struct SickoPlayer : Module {
 			samplerateDisplay = std::to_string(int(sampleRate * .5));
 			channelsDisplay = std::to_string(channels) + "Ch";
 
+			INFO("[ sickoCV ] free pathDup & start pupulating currentFolder\n");
 			free(pathDup);
 			storedPath = path;
 			currentFolder = system::getDirectory(path);
@@ -837,6 +854,7 @@ struct SickoPlayer : Module {
 				}
 			}
 
+			INFO("[ sickoCV ] setting knobs\n");
 			if (!firstLoad) {
 				prevKnobCueStartPos = -1.f;
 				prevKnobCueEndPos = 2.f;
@@ -858,13 +876,17 @@ struct SickoPlayer : Module {
 			firstLoad = false;
 
 			fileLoaded = true;
+			INFO("[ sickoCV ] setting firstLoad false and fileLoaded true\n");
 			
 		} else {
+			INFO("[ sickoCV ] pSampleData != NULL && tsc > minSamplesToLoad * c -> FALSE\n");
+			INFO("[ sickoCV ] tsc = %s\n",(fromPath).c_str());
 			fileFound = false;
 			fileLoaded = false;
 			//storedPath = path;
 			if (loadFromPatch) {
 				path = storedPath;
+				INFO("[ sickoCV ] File not Found: restore storedPath to 'path' and fileDescription(!)\n");
 			} 
 			fileDescription = "(!)"+path;
 			fileDisplay = "";
