@@ -422,7 +422,7 @@ struct SickoPlayer : Module {
 			loadFromPatch = true;
 			loadSample(patchFile);
 			INFO("[ sickoCV ] EXITING onAdd after fileLoaded \n");
-			loadFromPatch = false;
+			//loadFromPatch = false;
 			
 
 		}		
@@ -840,17 +840,21 @@ struct SickoPlayer : Module {
 			samplerateDisplay = std::to_string(int(sampleRate * .5));
 			channelsDisplay = std::to_string(channels) + "Ch";
 
-			INFO("[ sickoCV ] free pathDup & start pupulating currentFolder\n");
+			INFO("[ sickoCV ] free pathDup\n");
 			free(pathDup);
 			storedPath = path;
-			currentFolder = system::getDirectory(path);
-			createCurrentFolder(currentFolder);
-			currentFolderV.clear();
-			currentFolderV = tempTreeData;
-			for (unsigned int i = 0; i < currentFolderV.size(); i++) {
-				if (system::getFilename(path) == system::getFilename(currentFolderV[i])) {
-					currentFile = i;
-					i = currentFolderV.size();
+
+			if (!loadFromPatch) {
+				INFO("[ sickoCV ] start pupulating currentFolder\n");
+				currentFolder = system::getDirectory(path);
+				createCurrentFolder(currentFolder);
+				currentFolderV.clear();
+				currentFolderV = tempTreeData;
+				for (unsigned int i = 0; i < currentFolderV.size(); i++) {
+					if (system::getFilename(path) == system::getFilename(currentFolderV[i])) {
+						currentFile = i;
+						i = currentFolderV.size();
+					}
 				}
 			}
 
@@ -1074,7 +1078,8 @@ struct SickoPlayer : Module {
 	
 	void process(const ProcessArgs &args) override {
 
-		if (!disableNav) {
+		//if (!disableNav) {
+		if (!disableNav && !loadFromPatch) {
 			nextSample = params[NEXTSAMPLE_PARAM].getValue();
 			if (fileLoaded && nextSample && !prevNextSample) {
 				for (int i = 0; i < 16; i++)
