@@ -155,13 +155,17 @@ struct SickoSampler : Module {
 	double loopStartPos;
 	double loopEndPos;
 
-	float knobCueStartPos;
-	float knobCueEndPos;
+	//float knobCueStartPos;
+	//float knobCueEndPos;
+	float knobCueStartPos = 0.f;
+	float knobCueEndPos = 1.f;
 	float prevKnobCueStartPos = -1.f;
 	float prevKnobCueEndPos = 2.f;
-
-	float knobLoopStartPos;
-	float knobLoopEndPos;
+	
+	//float knobLoopStartPos;
+	//float knobLoopEndPos;
+	float knobLoopStartPos = 0.f;
+	float knobLoopEndPos = 1.f;
 	float prevKnobLoopStartPos = -1.f;
 	float prevKnobLoopEndPos = 2.f;
 
@@ -236,6 +240,11 @@ struct SickoSampler : Module {
 	bool recordRelease = false;
 	bool disableNav = false;
 	bool saveOversampled = false;
+
+	bool sampleInPatch = true;
+
+	bool loadFromPatch = false;
+	bool restoreLoadFromPatch = false;
 	
 	float fadeCoeff = 0.f;
 
@@ -478,6 +487,16 @@ struct SickoSampler : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
+		for (int i = 0; i < 16; i++) {
+			play[i] = false;
+			fadingType[i] = NO_FADE;
+			stage[i] = STOP_STAGE;
+			stageLevel[i] = 0;
+			voct[i] = 0.f;
+			prevVoct[i] = 11.f;
+			reversePlaying[i] = FORWARD;
+		}
+		clearSlot();
 		trimOnSave = true;
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
@@ -502,16 +521,8 @@ struct SickoSampler : Module {
 		startStopOnRec = false;
 		stopRecNow = false;
 		disableNav = false;
-		clearSlot();
-		for (int i = 0; i < 16; i++) {
-			play[i] = false;
-			fadingType[i] = NO_FADE;
-			stage[i] = STOP_STAGE;
-			stageLevel[i] = 0;
-			voct[i] = 0.f;
-			prevVoct[i] = 11.f;
-			reversePlaying[i] = FORWARD;
-		}
+		sampleInPatch = true;
+
 		prevKnobCueStartPos = -1.f;
 		prevKnobCueEndPos = 2.f;
 		prevKnobLoopStartPos = -1.f;
@@ -526,7 +537,31 @@ struct SickoSampler : Module {
 		newRecording = true;
 		prevMonitorSwitch = 0;
 		prevXfade = -1.f;
+		system::removeRecursively(getPatchStorageDirectory().c_str());
 		Module::onReset(e);
+	}
+
+	void onAdd(const AddEvent& e) override {
+		if (!fileLoaded) {
+			std::string patchFile = system::join(getPatchStorageDirectory(), "sample.wav");
+			loadFromPatch = true;
+			loadSample(patchFile);
+		}
+		Module::onAdd(e);
+	}
+
+	void onSave(const SaveEvent& e) override {
+		system::removeRecursively(getPatchStorageDirectory().c_str());
+		if (fileLoaded) {
+			if (sampleInPatch) {
+				std::string patchFile = system::join(createPatchStorageDirectory(), "sample.wav");
+				saveMode = SAVE_FULL;
+				loadFromPatch = true;
+				saveSample(patchFile);
+			}
+		}
+
+		Module::onSave(e);
 	}
 
 	json_t *dataToJson() override {
@@ -548,6 +583,7 @@ struct SickoSampler : Module {
 		json_object_set_new(rootJ, "UpdateAlsoStart", json_boolean(updateAlsoStart));
 		json_object_set_new(rootJ, "CrossRecFade", json_boolean(crossRecFade));
 		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
+		json_object_set_new(rootJ, "sampleInPatch", json_boolean(sampleInPatch));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
 		return rootJ;
@@ -605,6 +641,9 @@ struct SickoSampler : Module {
 		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
 		if (disableNavJ)
 			disableNav = json_boolean_value(disableNavJ);
+		json_t* sampleInPatchJ = json_object_get(rootJ, "sampleInPatch");
+		if (sampleInPatchJ)
+			sampleInPatch = json_boolean_value(sampleInPatchJ);
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
@@ -612,7 +651,7 @@ struct SickoSampler : Module {
 				loadSample(storedPath);
 			else
 				firstLoad = false;
-	}
+		}
 		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
 		if (userFolderJ) {
 			userFolder = json_string_value(userFolderJ);
@@ -624,6 +663,7 @@ struct SickoSampler : Module {
 				}
 			}
 		}
+		//INFO (" [SickoCV] JSON LOADED");
 	}
 	
 	void calcBiquadLpf(double frequency, double samplerate, double Q) {
@@ -808,6 +848,10 @@ struct SickoSampler : Module {
 		prevXfade = -1.f;
 
 		if (fileLoaded && APP->engine->getSampleRate() != sampleRate/2) {
+			/*
+			INFO ("[ SickoCV ] resampling %s\n", (to_string(APP->engine->getSampleRate())).c_str());
+			INFO ("[ SickoCV ] resampling %s\n", (to_string(sampleRate/2)).c_str());
+			*/
 			double resampleCoeff;
 
 			fileLoaded = false;
@@ -908,6 +952,7 @@ struct SickoSampler : Module {
 			prevKnobLoopStartPos = -1.f;
 			prevKnobLoopEndPos = 2.f;
 
+
 			vector<double>().swap(displayBuff);
 			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/240))
 				displayBuff.push_back(playBuffer[0][0][i]);
@@ -915,7 +960,15 @@ struct SickoSampler : Module {
 			resampled = true;
 			recSamples = 0;
 			fileLoaded = true;
+
 		}
+		/*
+		INFO ("[ SickoCV ] cueStartPos %s\n", (to_string(knobCueStartPos)).c_str());
+		INFO ("[ SickoCV ] cueEndPos %s\n", (to_string(knobCueEndPos)).c_str());
+		INFO ("[ SickoCV ] loopStartPos %s\n", (to_string(knobLoopStartPos)).c_str());
+		INFO ("[ SickoCV ] loopEndPos %s\n", (to_string(knobLoopEndPos)).c_str());
+		INFO ("[ SickoCV ] RESAMPLED");
+		*/
 	}	
 /*
 
@@ -1019,11 +1072,17 @@ struct SickoSampler : Module {
 		drwav *pWav = drwav_open_file_write(path.c_str(), &format);
 		drwav_write(pWav, samples, data.data());
 		drwav_close(pWav);
-		toSave = false;
-		infoToSave = "";
 
 		char* pathDup = strdup(path.c_str());
-		fileDescription = basename(pathDup);
+
+		if (!loadFromPatch) {
+			toSave = false;
+			infoToSave = "";
+			fileDescription = basename(pathDup);
+		} else {
+			if (fileDescription != "_unknown_.wav")
+				fileDescription = basename(pathDup);
+		}
 
 		// *** CHARs CHECK according to font
 		std::string tempFileDisplay = fileDescription.substr(0, fileDescription.size()-4);
@@ -1040,40 +1099,44 @@ struct SickoSampler : Module {
 		fileDisplay = fileDisplay.substr(0, 15);
 
 		free(pathDup);
-		storedPath = path;
-
 		data.clear();
+
+		//storedPath = path;
+		if (!loadFromPatch) {
+			storedPath = path;
 		
-		if (trimOnSave && saveMode == SAVE_LOOP) {
-			// set position knob to 0 and 1
-			knobCueStartPos = 0;
-			knobCueEndPos = 1;
-			knobLoopStartPos = 0;
-			knobLoopEndPos = 1;
-			params[CUESTART_PARAM].setValue(0);
-			params[CUEEND_PARAM].setValue(1);
-			params[LOOPSTART_PARAM].setValue(0);
-			params[LOOPEND_PARAM].setValue(1);
-
-			loadSample(path);
-		} else if (trimOnSave && saveMode == SAVE_CUE) {
-			float tempKnobLoopStartPos = (knobLoopStartPos - knobCueStartPos ) / (knobCueEndPos - knobCueStartPos);
-			float tempKnobLoopEndPos = (knobLoopEndPos - knobCueStartPos ) / (knobCueEndPos - knobCueStartPos);
-			loadSample(path);
-
-			params[CUESTART_PARAM].setValue(0);
-			params[CUEEND_PARAM].setValue(1);
-
-			if (tempKnobLoopStartPos < 0)
+			if (trimOnSave && saveMode == SAVE_LOOP) {
+				// set position knob to 0 and 1
+				knobCueStartPos = 0;
+				knobCueEndPos = 1;
+				knobLoopStartPos = 0;
+				knobLoopEndPos = 1;
+				params[CUESTART_PARAM].setValue(0);
+				params[CUEEND_PARAM].setValue(1);
 				params[LOOPSTART_PARAM].setValue(0);
-			else				
-				params[LOOPSTART_PARAM].setValue(tempKnobLoopStartPos);
-			if (tempKnobLoopEndPos > 1)
 				params[LOOPEND_PARAM].setValue(1);
-			else
-				params[LOOPEND_PARAM].setValue(tempKnobLoopEndPos);
+
+				loadSample(path);
+			} else if (trimOnSave && saveMode == SAVE_CUE) {
+				float tempKnobLoopStartPos = (knobLoopStartPos - knobCueStartPos ) / (knobCueEndPos - knobCueStartPos);
+				float tempKnobLoopEndPos = (knobLoopEndPos - knobCueStartPos ) / (knobCueEndPos - knobCueStartPos);
+				loadSample(path);
+
+				params[CUESTART_PARAM].setValue(0);
+				params[CUEEND_PARAM].setValue(1);
+
+				if (tempKnobLoopStartPos < 0)
+					params[LOOPSTART_PARAM].setValue(0);
+				else				
+					params[LOOPSTART_PARAM].setValue(tempKnobLoopStartPos);
+				if (tempKnobLoopEndPos > 1)
+					params[LOOPEND_PARAM].setValue(1);
+				else
+					params[LOOPEND_PARAM].setValue(tempKnobLoopEndPos);
+			}
 		}
 
+		//INFO (" [SickoCV] FILE SAVED");
 		fileLoaded = true;
 		fileFound = true;
 		channels = fileChannels;
@@ -1093,10 +1156,12 @@ struct SickoSampler : Module {
 		DEFER({osdialog_filters_free(filters);});
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		fileLoaded = false;
+		restoreLoadFromPatch = false;
 		if (path) {
 			loadSample(path);
 			storedPath = std::string(path);
 		} else {
+			restoreLoadFromPatch = true;
 			fileLoaded = true;
 		}
 		if ((storedPath == "" || fileFound == false) && !toSave) {
@@ -1105,7 +1170,8 @@ struct SickoSampler : Module {
 		free(path);
 	}
 
-	void loadSample(std::string path) {
+	void loadSample(std::string fromPath) {
+		std::string path = fromPath;
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
 		tempBuffer[0].clear();
@@ -1292,8 +1358,20 @@ struct SickoSampler : Module {
 				timeDisplay += "0";
 			timeDisplay += std::to_string(seconds);
 
+			if (loadFromPatch) {
+				if (storedPath != "")
+					path = storedPath;
+				else
+					path = "_unknown_.wav";
+			}
+
 			char* pathDup = strdup(path.c_str());
 			fileDescription = basename(pathDup);
+
+			if (loadFromPatch) {
+				if (storedPath != "")
+					fileDescription = "(!)"+fileDescription;
+			}
 
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription.substr(0, fileDescription.size()-4);
@@ -1312,41 +1390,76 @@ struct SickoSampler : Module {
 			channelsDisplay = std::to_string(fileChannels) + "Ch";
 			free(pathDup);
 			storedPath = path;
-			currentFolder = system::getDirectory(path);
-			createCurrentFolder(currentFolder);
-			currentFolderV.clear();
-			currentFolderV = tempTreeData;
-			for (unsigned int i = 0; i < currentFolderV.size(); i++) {
-				if (system::getFilename(path) == system::getFilename(currentFolderV[i])) {
-					currentFile = i;
-					i = currentFolderV.size();
+
+			if (!loadFromPatch) {
+				currentFolder = system::getDirectory(path);
+				createCurrentFolder(currentFolder);
+				currentFolderV.clear();
+				currentFolderV = tempTreeData;
+				for (unsigned int i = 0; i < currentFolderV.size(); i++) {
+					if (system::getFilename(path) == system::getFilename(currentFolderV[i])) {
+						currentFile = i;
+						i = currentFolderV.size();
+					}
 				}
+
+				if (!firstLoad || toSave) {
+					prevKnobCueStartPos = -1.f;
+					prevKnobCueEndPos = 2.f;
+					prevKnobLoopStartPos = -1.f;
+					prevKnobLoopEndPos = 2.f;	
+
+					if (resetCursorsOnLoad) {
+						params[CUESTART_PARAM].setValue(0.f);
+						params[CUEEND_PARAM].setValue(1.f);
+						params[LOOPSTART_PARAM].setValue(0.f);
+						params[LOOPEND_PARAM].setValue(1.f);
+						knobCueStartPos = 0.f;
+						knobCueEndPos = 1.f;
+						knobLoopStartPos = 0.f;
+						knobLoopEndPos = 1.f;
+					}
+				}
+
+				toSave = false;
+				infoToSave = "";
+
+				//INFO ("[ SickoCV ] Loaded from FILE");
+			
+			} else {
+				knobCueStartPos = params[CUESTART_PARAM].getValue();
+				knobCueEndPos = params[CUEEND_PARAM].getValue();
+				prevKnobCueStartPos = knobCueStartPos;
+				prevKnobCueEndPos = knobCueEndPos;
+				knobLoopStartPos = params[LOOPSTART_PARAM].getValue();
+				knobLoopEndPos = params[LOOPEND_PARAM].getValue();
+				prevKnobLoopStartPos = knobLoopStartPos;
+				prevKnobLoopEndPos = knobLoopEndPos;
+
+				cueStartPos = floor(totalSamples * knobCueStartPos);
+				cueEndPos = ceil(totalSamples * knobCueEndPos);
+				loopStartPos = floor(totalSamples * knobLoopStartPos);
+				loopEndPos = ceil(totalSamples * knobLoopEndPos);
+
+				scanCueStartSample = cueStartPos;
+				scanCueEndSample = cueEndPos;
+				scanLoopStartSample = loopStartPos;
+				scanLoopEndSample = loopEndPos;
+
+				toSave = true;
+				infoToSave = "S";
+				/*
+				INFO ("[ SickoCV ] cueStartPos %s\n", (to_string(knobCueStartPos)).c_str());
+				INFO ("[ SickoCV ] cueEndPos %s\n", (to_string(knobCueEndPos)).c_str());
+				INFO ("[ SickoCV ] loopStartPos %s\n", (to_string(knobLoopStartPos)).c_str());
+				INFO ("[ SickoCV ] loopEndPos %s\n", (to_string(knobLoopEndPos)).c_str());
+				INFO ("[ SickoCV ] Loaded from Patch");
+				*/
 			}
 
 			newRecording = false;
 			recSeconds = 0;
 			recMinutes = 0;
-
-			if (!firstLoad || toSave) {
-				prevKnobCueStartPos = -1.f;
-				prevKnobCueEndPos = 2.f;
-				prevKnobLoopStartPos = -1.f;
-				prevKnobLoopEndPos = 2.f;	
-
-				if (resetCursorsOnLoad) {
-					params[CUESTART_PARAM].setValue(0.f);
-					params[CUEEND_PARAM].setValue(1.f);
-					params[LOOPSTART_PARAM].setValue(0.f);
-					params[LOOPEND_PARAM].setValue(1.f);
-					knobCueStartPos = 0.f;
-					knobCueEndPos = 1.f;
-					knobLoopStartPos = 0.f;
-					knobLoopEndPos = 1.f;
-				}
-			}
-
-			toSave = false;
-			infoToSave = "";
 
 			firstLoad = false;
 
@@ -1357,17 +1470,24 @@ struct SickoSampler : Module {
 
 			fileFound = false;
 			fileLoaded = false;
-			storedPath = path;
+			//storedPath = path;
+			if (loadFromPatch)
+				path = storedPath;
 			fileDescription = "(!)"+path;
 			fileDisplay = "";
 			timeDisplay = "";
 			recSamples = 0;
 			recTimeDisplay = "";
 			channelsDisplay = "";
+			//INFO ("[ SickoCV ] FILE NOT FOUND");
 		}
 	};
 	
 	void clearSlot() {
+		fileLoaded = false;
+		fileFound = false;
+		loadFromPatch = false;
+		restoreLoadFromPatch = false;
 		storedPath = "";
 		fileDescription = "--none--";
 		fileDisplay = "";
@@ -1375,8 +1495,6 @@ struct SickoSampler : Module {
 		recSamples = 0;
 		recTimeDisplay = "";
 		channelsDisplay = "";
-		fileLoaded = false;
-		fileFound = false;
 		playBuffer[LEFT][0].clear();
 		playBuffer[RIGHT][0].clear();
 		playBuffer[LEFT][1].clear();
@@ -1390,6 +1508,9 @@ struct SickoSampler : Module {
 		infoToSave= "";
 		for (int i=0; i < 16; i++)
 			fadingValue[i] = 1;
+		
+		//INFO ("[ SickoCV ] Slot Cleared");
+
 	}
 
 	void resetCursors() {
@@ -1397,6 +1518,7 @@ struct SickoSampler : Module {
 		params[CUEEND_PARAM].setValue(1);
 		params[LOOPSTART_PARAM].setValue(0);
 		params[LOOPEND_PARAM].setValue(1);
+		//INFO ("[ SickoCV ] Cursors resetted");
 	}
 
 	void copyCueToLoop() {
@@ -1515,7 +1637,8 @@ struct SickoSampler : Module {
 */
 	void process(const ProcessArgs &args) override {
 
-		if (!disableNav) {
+		//if (!disableNav) {
+		if (!disableNav && !loadFromPatch) {
 			nextSample = params[NEXTSAMPLE_PARAM].getValue();
 			if (fileLoaded && fileFound && recordingState == 0 && nextSample && !prevNextSample) {
 				for (int i = 0; i < 16; i++)
@@ -1673,7 +1796,7 @@ struct SickoSampler : Module {
 				searchingLoopEndPhase = true;
 				searchingLoopStartPhase = true;
 			}
-			
+
 			if (phaseScan) {
 				float tempKnob;
 				if (searchingCueEndPhase) {
@@ -3556,8 +3679,8 @@ struct SickoSampler : Module {
 				if (newRecording) {
 					newRecording = false;
 					channels = recChannels;
-					fileDescription = "unknown";
-					fileDisplay = "unknown";
+					fileDescription = "_unknown_.wav";
+					fileDisplay = "_unknown_";
 					samplerateDisplay = std::to_string(int(args.sampleRate));
 					channelsDisplay = std::to_string(recChannels) + "Ch";
 
@@ -4957,7 +5080,7 @@ struct SickoSamplerDisplay : TransparentWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
 			}
 		}
@@ -4970,7 +5093,14 @@ struct SickoSamplerDisplay : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
+			menu->addChild(createMenuItem("Load Sample", "", [=]() {
+				//module->menuLoadSample();
+				bool temploadFromPatch = module->loadFromPatch;
+				module->loadFromPatch = false;
+				module->menuLoadSample();
+				if (module->restoreLoadFromPatch)
+					module->loadFromPatch = temploadFromPatch;
+			}));
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
@@ -4984,7 +5114,7 @@ struct SickoSamplerDisplay : TransparentWidget {
 								loadSubfolder(menu, module->folderTreeData[0][i]);
 							}));
 						} else {
-							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[0][i]);}));
 						}
 					}
 				}));
@@ -5205,7 +5335,7 @@ struct SickoSamplerWidget : ModuleWidget {
 								loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 						}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
 			}
 		}
@@ -5216,7 +5346,14 @@ struct SickoSamplerWidget : ModuleWidget {
 			assert(module);
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
+		menu->addChild(createMenuItem("Load Sample", "", [=]() {
+			//module->menuLoadSample();
+			bool temploadFromPatch = module->loadFromPatch;
+			module->loadFromPatch = false;
+			module->menuLoadSample();
+			if (module->restoreLoadFromPatch)
+				module->loadFromPatch = temploadFromPatch;
+		}));
 
 		if (module->folderTreeData.size() > 0) {
 			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
@@ -5230,7 +5367,7 @@ struct SickoSamplerWidget : ModuleWidget {
 							loadSubfolder(menu, module->folderTreeData[0][i]);
 						}));
 					} else {
-						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
+						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[0][i]);}));
 					}
 				}
 			}));
@@ -5312,6 +5449,9 @@ struct SickoSamplerWidget : ModuleWidget {
 			menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
 			menu->addChild(createMenuItem("Drum Player", "", [=]() {module->setPreset(2);}));
 		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
 	}
 };
 

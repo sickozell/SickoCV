@@ -1,4 +1,4 @@
-# SickoCV v2.5.10-beta7
+# SickoCV v2.5.10-beta8
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,13 +12,14 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- sickoPlayer
+- all player and sampler modules
+- clocker
 
 ## **to do list:** 
 - module testing  
 
 ## **changelog**  
-- sickoPlayer, wavetabler, drumPlayer, drumPlayer+, drumPlayerXtra: added 'Store Sample in Patch' feature
+- all player and sampler modules: added 'Store Sample in Patch' feature
 - clocker: fixed a bug when time signatures are in eights
 - all module with leds displays: added module drag&drop when over leds displays
 
