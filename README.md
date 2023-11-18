@@ -1,4 +1,4 @@
-# SickoCV v2.5.10-beta6
+# SickoCV v2.5.10-beta7
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,7 +18,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - module testing  
 
 ## **changelog**  
-- sickoPlayer: added 'Store Sample in Patch' feature
+- sickoPlayer, wavetabler, drumPlayer, drumPlayer+, drumPlayerXtra: added 'Store Sample in Patch' feature
+- clocker: fixed a bug when time signatures are in eights
 - all module with leds displays: added module drag&drop when over leds displays
 
 # SickoCV v2.5.10
@@ -268,7 +269,7 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 ### Clock generator with 4 dividers/multipliers and audio metronome
 
 #### - DESCRIPTION
-Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature and integrated audio click.
+Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature, time signatures and integrated audio click.
 
 ![clocker](https://github.com/sickozell/SickoCV/assets/80784296/297e57cc-7338-4dc5-a817-2f4215387c7e)
 
@@ -276,14 +277,14 @@ Clocker is a high precision clock generator and modulator with 4 dividers/multip
 The BPM knob sets the clock speed from 30 to 300 bpm.  
 An external clock can be connected on the EXT input.  
 The RUN button or a trig on its input starts or stops the clock.  
-PW (pulse width) knob adjusts the length of the gate in its high state.  
+PW (pulse width) knob adjusts the length of the gate in its high state (see 'Context menu' paragraph for Swing instructions).  
 Clock and metronome can be reset with RST button or a trig on its input.  
 
 There are 4 clock dividers/multipliers up to 256x each with theirs PW control. Right click on the display to quick select the desired division/multiplication.  
 
-The metronome setting is controlled by the METER knob or with a right click on the display.  
+The metronome setting is controlled by the METER knob or with a right click on the time signature display.  
 Audio click is activated with CLICK button and volume can be adjusted with the knob from 0 to 200%.  
-BEAT and BAR outputs are always active and give a 1ms trigger.
+When clock is runniing BEAT and BAR outputs are always active and give a 1ms trigger.
 
 To get best clock precision the algorithm used may alter the clock lengths, according to working vcv samplerate and BPM setting.  
 There will therefore be clocks of non-fixed length, but which will guarantee the exact number of BPM within a minute.

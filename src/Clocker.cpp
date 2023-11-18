@@ -14,7 +14,7 @@
 
 using namespace std;
 
-struct tpBeat : ParamQuantity {
+struct tpSignature : ParamQuantity {
 	std::string getDisplayValueString() override {
 		const std::string valueDisplay[17] = {"2/4", "3/4", "4/4", "5/4", "6/4", "7/4", "5/8", "6/8", "7/8", "8/8", "9/8", "10/8", "11/8", "12/8", "13/8", "14/8", "15/8"};
 		return valueDisplay[int(getValue())];
@@ -31,7 +31,7 @@ struct tpDivMult : ParamQuantity {
 struct Clocker : Module {
 	enum ParamIds {
 		BPM_KNOB_PARAM,
-		BEAT_KNOB_PARAM,
+		SIGNATURE_KNOB_PARAM,
 		CLICK_BUT_PARAM,
 		CLICKVOL_KNOB_PARAM,
 		PW_KNOB_PARAM,
@@ -82,7 +82,7 @@ struct Clocker : Module {
  	//**************************************************************
 	//   
 
-	const std::string beatDisplay[17] = {"2/4", "3/4", "4/4", "5/4", "6/4", "7/4", "5/8", "6/8", "7/8", "8/8", "9/8", "10/8", "11/8", "12/8", "13/8", "14/8", "15/8"};
+	const std::string signatureDisplay[17] = {"2/4", "3/4", "4/4", "5/4", "6/4", "7/4", "5/8", "6/8", "7/8", "8/8", "9/8", "10/8", "11/8", "12/8", "13/8", "14/8", "15/8"};
 
 	const int beatMaxPerBar[17] = {2, 3, 4, 5, 6, 7, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 	int currentBeatMaxPerBar = 4;
@@ -93,6 +93,7 @@ struct Clocker : Module {
 	const float divMult[41] = {256, 128, 64, 32, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
 							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 32, 64, 128, 256};
 
+	/*
 	// coeffs to multiply with currentBps to get number of samples 
 	double beatSamplesPerSec[17] = {	ceil(0.5 * APP->engine->getSampleRate()),
 										ceil(0.74 * APP->engine->getSampleRate()),
@@ -113,6 +114,7 @@ struct Clocker : Module {
 										ceil(1.875 * APP->engine->getSampleRate())
 
 		};
+	*/
 
 	//**************************************************************
 	//  	
@@ -164,13 +166,13 @@ struct Clocker : Module {
 	double clockSample = 1.0;
 	double clockMaxSample = 0.0;
 	
-	double midBeatMaxSample = 0.0;
-	bool midBeatPlayed = false;
+	//double midBeatMaxSample = 0.0;
+	//bool midBeatPlayed = false;
 
 	double maxPulseSample = 0.0;
 
 	//int beatCounter = 1;
-	int beatCounter = 20;
+	int beatCounter = 20;	// thise ensure that module starts on a new bar
 
 	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
 	bool resetPulse = false;
@@ -220,8 +222,8 @@ struct Clocker : Module {
 		configSwitch(CLICK_BUT_PARAM, 0.f, 1.f, 0.f, "Click", {"OFF", "ON"});
 		configParam(CLICKVOL_KNOB_PARAM, 0.f, 2.f, 1.0f, "Click Level", "%", 0, 100);
 		
-		configParam<tpBeat>(BEAT_KNOB_PARAM, 0.f, 16.0f, 2.f, "Meter");
-		paramQuantities[BEAT_KNOB_PARAM]->snapEnabled = true;
+		configParam<tpSignature>(SIGNATURE_KNOB_PARAM, 0.f, 16.0f, 2.f, "Time Signature");
+		paramQuantities[SIGNATURE_KNOB_PARAM]->snapEnabled = true;
 
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 40.f, 20.f, "Mult/Div #1");
 		paramQuantities[DIVMULT_KNOB_PARAM+0]->snapEnabled = true;
@@ -304,6 +306,7 @@ struct Clocker : Module {
 		sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 		oneMsTime = (APP->engine->getSampleRate()) / 1000;
 
+		/*
 		beatSamplesPerSec[0] = ceil(0.5 * APP->engine->getSampleRate());
 		beatSamplesPerSec[1] = ceil(0.74 * APP->engine->getSampleRate());
 		beatSamplesPerSec[2] = APP->engine->getSampleRate();
@@ -321,6 +324,7 @@ struct Clocker : Module {
 		beatSamplesPerSec[14] = ceil(1.625 * APP->engine->getSampleRate());
 		beatSamplesPerSec[15] = ceil(1.75 * APP->engine->getSampleRate());
 		beatSamplesPerSec[16] = ceil(1.875 * APP->engine->getSampleRate());
+		*/
 
 		for (int i = 0; i < 2; i++) {
 			if (fileLoaded[i]) {
@@ -648,7 +652,7 @@ struct Clocker : Module {
 					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
-				midBeatPlayed = false;
+				//midBeatPlayed = false;
 				beatCounter = 20;
 			}
 			if (resetPulseOnStop) {
@@ -669,7 +673,7 @@ struct Clocker : Module {
 					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
-				midBeatPlayed = false;
+				//midBeatPlayed = false;
 				beatCounter = 20;
 			}
 			if (resetPulseOnRun) {
@@ -706,10 +710,9 @@ struct Clocker : Module {
 					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
-				midBeatPlayed = false;
-				//beatCounter = 1;
+				//midBeatPlayed = false;
 
-				beatCounter = 20;
+				beatCounter = 20; // this ensure beat has reached maximum
 
 				resetPulse = true;
 				resetPulseTime = oneMsTime;
@@ -768,11 +771,12 @@ struct Clocker : Module {
 					}
 				}
 
-				currentBeatMaxPerBar = beatMaxPerBar[int(params[BEAT_KNOB_PARAM].getValue())];
+				currentBeatMaxPerBar = beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())];
 
+				/*
 				// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
 
-				if (params[BEAT_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
+				if (params[SIGNATURE_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
 					beatCounter++;
 					if (beatCounter > currentBeatMaxPerBar) {
 						beatCounter = 1;
@@ -794,14 +798,15 @@ struct Clocker : Module {
 					}
 					midBeatPlayed = true;
 				}
+				*/
 
 				//	*************************  INTERNAL CLOCK  ******************
 
 				clockMaxSample = sampleRateCoeff / bpm;
-				midBeatMaxSample = clockMaxSample / 2;
+				//midBeatMaxSample = clockMaxSample / 2;
 				
 				if (clockSample > clockMaxSample || resetStart)  {
-					midBeatPlayed = false;
+					//midBeatPlayed = false;
 
 					beatCounter++;
 
@@ -908,8 +913,7 @@ struct Clocker : Module {
 			lights[RESET_BUT_LIGHT].setBrightness(resetValue);
 
 			if (resetValue >= 1 && prevResetValue < 1) {
-				//extSync = false;
-				//clockSample = 1.0;
+
 				outputs[CLOCK_OUTPUT].setVoltage(0.f);
 				for (int d = 0; d < 4; d++) {
 					divPulse[d] = false;
@@ -918,7 +922,7 @@ struct Clocker : Module {
 					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
-				midBeatPlayed = false;
+				//midBeatPlayed = false;
 				
 				beatCounter = 1;
 
@@ -935,7 +939,7 @@ struct Clocker : Module {
 
 				if (extSync) {
 					clockMaxSample = clockSample;
-					midBeatMaxSample = clockMaxSample / 2;
+					//midBeatMaxSample = clockMaxSample / 2;
 					clockSample = 1.0;
 
 					// calculate bpms
@@ -1005,11 +1009,12 @@ struct Clocker : Module {
 					}
 				}
 
-				currentBeatMaxPerBar = beatMaxPerBar[int(params[BEAT_KNOB_PARAM].getValue())];
+				currentBeatMaxPerBar = beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())];
 
+				/*
 				// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
 
-				if (params[BEAT_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
+				if (params[SIGNATURE_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
 					beatCounter++;
 					if (beatCounter > currentBeatMaxPerBar) {
 						beatCounter = 1;
@@ -1031,12 +1036,13 @@ struct Clocker : Module {
 					}
 					midBeatPlayed = true;
 				}
+				*/
 
 				// ************************ EXTERNAL CLOCK ******************
 
 				if (extBeat) {
 
-					midBeatPlayed = false;
+					//midBeatPlayed = false;
 					beatCounter++;
 
 					if (extSync) {
@@ -1075,7 +1081,6 @@ struct Clocker : Module {
 									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
 								} else {
 									// ***** CLOCK DIVIDER *****
-									//divMaxSample[d] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 									divMaxSample[d][1] = divMaxSample[d][1];
 									divCount[d]++;
@@ -1299,11 +1304,11 @@ struct ClockerDisplayBeat : TransparentWidget {
 				nvgTextLetterSpacing(args.vg, 0);
 				nvgFillColor(args.vg, nvgRGBA(0xaa, 0xcc, 0xff, 0xe0));
 
-				int tempValue = int(module->params[module->BEAT_KNOB_PARAM].getValue());
+				int tempValue = int(module->params[module->SIGNATURE_KNOB_PARAM].getValue());
 				if (tempValue > 10)
-					nvgTextBox(args.vg, 0, 15, 60, module->beatDisplay[tempValue].c_str(), NULL);
+					nvgTextBox(args.vg, 0, 15, 60, module->signatureDisplay[tempValue].c_str(), NULL);
 				else
-					nvgTextBox(args.vg, 10, 15, 60, module->beatDisplay[tempValue].c_str(), NULL);
+					nvgTextBox(args.vg, 10, 15, 60, module->signatureDisplay[tempValue].c_str(), NULL);
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -1320,14 +1325,14 @@ struct ClockerDisplayBeat : TransparentWidget {
 				Clocker* module;
 				int valueNr;
 				void onAction(const event::Action& e) override {
-					module->params[module->BEAT_KNOB_PARAM].setValue(float(valueNr));
+					module->params[module->SIGNATURE_KNOB_PARAM].setValue(float(valueNr));
 				}
 			};
 
 			std::string menuNames[17] = {"2/4", "3/4", "4/4", "5/4", "6/4", "7/4", "5/8", "6/8", "7/8", "8/8", "9/8", "10/8", "11/8", "12/8", "13/8", "14/8", "15/8"};
 			for (int i = 0; i < 17; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
-				thisItem->rightText = CHECKMARK(int(module->params[module->BEAT_KNOB_PARAM].getValue()) == i);
+				thisItem->rightText = CHECKMARK(int(module->params[module->SIGNATURE_KNOB_PARAM].getValue()) == i);
 				thisItem->module = module;
 				thisItem->valueNr = i;
 				menu->addChild(thisItem);
@@ -1786,7 +1791,7 @@ struct ClockerWidget : ModuleWidget {
 
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yPwClOut)), module, Clocker::PW_KNOB_PARAM));
 		
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xBeatKnob, yClick1 + .9f)), module, Clocker::BEAT_KNOB_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xBeatKnob, yClick1 + .9f)), module, Clocker::SIGNATURE_KNOB_PARAM));
 		
 		addParam(createLightParamCentered<VCVLightBezelLatch<YellowLight>>(mm2px(Vec(xCLickBut, yClick2)), module, Clocker::CLICK_BUT_PARAM, Clocker::CLICK_BUT_LIGHT));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xClickVolKnob, yClick2 + .3f)), module, Clocker::CLICKVOL_KNOB_PARAM));

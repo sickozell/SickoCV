@@ -1,5 +1,6 @@
 ### 2.5.10 (2023-11-xx)
-- sickoPlayer: added 'Store Sample in Patch' feature
+- sickoPlayer, wavetabler, drumPlayer, drumPlayer+, drumPlayerXtra: added 'Store Sample in Patch' feature
+- clocker: fixed a bug when time signatures are in eights
 - all module with leds displays: added module drag&drop when over leds displays
 
 ### 2.5.9 (2023-11-01)

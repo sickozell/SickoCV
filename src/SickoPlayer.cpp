@@ -34,9 +34,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-//#include <filesystem>
-//#include <cstdint>
-
 using namespace std;
 
 struct SickoPlayer : Module {
@@ -100,8 +97,8 @@ struct SickoPlayer : Module {
   
 	unsigned int channels;
 	unsigned int sampleRate;
-	drwav_uint64 totalSampleC;
-	drwav_uint64 totalSamples;
+	drwav_uint64 totalSampleC = 0;
+	drwav_uint64 totalSamples = 0;
 
 	const unsigned int minSamplesToLoad = 124;
 
@@ -201,6 +198,7 @@ struct SickoPlayer : Module {
 	bool sampleInPatch = true;
 	
 	bool loadFromPatch = false;
+	bool restoreLoadFromPatch = false;
 
 	float fadeCoeff = 0.f;
 
@@ -349,7 +347,16 @@ struct SickoPlayer : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
-		system::removeRecursively(getPatchStorageDirectory().c_str());
+		for (int i = 0; i < 16; i++) {
+			play[i] = false;
+			fadingType[i] = NO_FADE;
+			stage[i] = STOP_STAGE;
+			stageLevel[i] = 0;
+			voct[i] = 0.f;
+			prevVoct[i] = 11.f;
+			reversePlaying[i] = FORWARD;
+		}
+		clearSlot();
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		polyOuts = POLYPHONIC;
@@ -368,16 +375,6 @@ struct SickoPlayer : Module {
 		eocFromPong = true;
 		disableNav = false;
 		sampleInPatch = true;
-		clearSlot();
-		for (int i = 0; i < 16; i++) {
-			play[i] = false;
-			fadingType[i] = NO_FADE;
-			stage[i] = STOP_STAGE;
-			stageLevel[i] = 0;
-			voct[i] = 0.f;
-			prevVoct[i] = 11.f;
-			reversePlaying[i] = FORWARD;
-		}
 		prevKnobCueStartPos = -1.f;
 		prevKnobCueEndPos = 2.f;
 		prevKnobLoopStartPos = -1.f;
@@ -387,6 +384,7 @@ struct SickoPlayer : Module {
 		totalSampleC = 0;
 		totalSamples = 0;
 		prevXfade = -1.f;
+		system::removeRecursively(getPatchStorageDirectory().c_str());
 		Module::onReset(e);
 	}
 
@@ -399,50 +397,21 @@ struct SickoPlayer : Module {
 
 	void onAdd(const AddEvent& e) override {
 		if (!fileLoaded) {
-
-			/*
-			char* path = strdup(storedPath.c_str());
-			std::string pathDup = basename(path);
-			std::string patchFile = system::join(getPatchStorageDirectory(), pathDup);
-			INFO("[ sickoCV ] LOAD on add %s\n",(patchFile).c_str());
-			loadFromPatch = true;
-			loadSample(patchFile);
-			loadFromPatch = false;
-			*/
-
-
-			/*char* path = strdup(storedPath.c_str());
-			std::string pathDup = basename(path);
-			std::string pathDup filesystem::
-			*/
 			std::string patchFile = system::join(getPatchStorageDirectory(), "sample.wav");
-
-
-			INFO("[ sickoCV ] LOAD on add %s\n",(patchFile).c_str());
 			loadFromPatch = true;
 			loadSample(patchFile);
-			INFO("[ sickoCV ] EXITING onAdd after fileLoaded \n");
-			//loadFromPatch = false;
-			
-
 		}		
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
+		system::removeRecursively(getPatchStorageDirectory().c_str());
 		if (fileLoaded) {
-			system::removeRecursively(getPatchStorageDirectory().c_str());
 			if (sampleInPatch) {
-				/*
-				char* path = strdup(storedPath.c_str());
-				std::string pathDup = basename(path);
-				std::string patchFile = system::join(createPatchStorageDirectory(), pathDup);
-				*/
 				std::string patchFile = system::join(createPatchStorageDirectory(), "sample.wav");
 				saveSample(patchFile);
 			}
 		}
-
 		Module::onSave(e);
 	}
 
@@ -522,7 +491,6 @@ struct SickoPlayer : Module {
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
 			if (storedPath != "") {
-				INFO("[ sickoCV ] load attempt from JSON %s\n",(storedPath).c_str());
 				loadSample(storedPath);
 			} else
 				firstLoad = false;
@@ -712,10 +680,13 @@ struct SickoPlayer : Module {
 		DEFER({osdialog_filters_free(filters);});
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		fileLoaded = false;
+		restoreLoadFromPatch = false;
 		if (path) {
+			loadFromPatch = false;
 			loadSample(path);
 			storedPath = std::string(path);
 		} else {
+			restoreLoadFromPatch = true;
 			fileLoaded = true;
 		}
 		if (storedPath == "" || fileFound == false) {
@@ -725,9 +696,7 @@ struct SickoPlayer : Module {
 	}
 
 	void loadSample(std::string fromPath) {
-		INFO("[ sickoCV ] loadSample(%s)\n",(fromPath).c_str());
 		std::string path = fromPath;
-		INFO("[ sickoCV ] path = %s\n",(path).c_str());
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 		unsigned int c;
 		unsigned int sr;
@@ -736,8 +705,6 @@ struct SickoPlayer : Module {
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
 		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
-			INFO("[ sickoCV ] pSampleData != NULL && tsc > minSamplesToLoad * c = TRUE\n");
-			INFO("[ sickoCV ] initialize sample vectors\n");
 			fileFound = true;
 			channels = c;
 			sampleRate = sr * 2;
@@ -753,7 +720,6 @@ struct SickoPlayer : Module {
 
 			if (tsc > 52428800)
 				tsc = 52428800;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
-			INFO("[ sickoCV ] creating vector with oversampling holes\n");
 			for (unsigned int i=0; i < tsc; i = i + c) {
 				playBuffer[LEFT][0].push_back(pSampleData[i] * 5);
 				playBuffer[LEFT][0].push_back(0);
@@ -764,10 +730,8 @@ struct SickoPlayer : Module {
 			}
 			totalSampleC = playBuffer[LEFT][0].size();
 			totalSamples = totalSampleC-1;
-			INFO("[ sickoCV ] clear pSampleData\n");
 			drwav_free(pSampleData);
-			INFO("[ sickoCV ] averaging oversampled vector\n");
-			for (unsigned int i = 1; i < totalSamples; i = i+2) {
+			for (unsigned int i = 1; i < totalSamples; i = i+2) {		// averaging oversampled vector
 				playBuffer[LEFT][0][i] = playBuffer[LEFT][0][i-1] * .5f + playBuffer[LEFT][0][i+1] * .5f;
 				if (channels == 2)
 					playBuffer[RIGHT][0][i] = playBuffer[RIGHT][0][i-1] * .5f + playBuffer[RIGHT][0][i+1] * .5f;
@@ -777,22 +741,20 @@ struct SickoPlayer : Module {
 			if (channels == 2)
 				playBuffer[RIGHT][0][totalSamples] = playBuffer[RIGHT][0][totalSamples-1] * .5f;
 
-			INFO("[ sickoCV ] antialiasing vector\n");
-			for (unsigned int i = 0; i < totalSampleC; i++) {
+			for (unsigned int i = 0; i < totalSampleC; i++) {	// populating filtered vector
 				playBuffer[LEFT][1].push_back(biquadLpf(playBuffer[LEFT][0][i]));
 				if (channels == 2)
 					playBuffer[RIGHT][1].push_back(biquadLpf2(playBuffer[RIGHT][0][i]));
 			}
 
-			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at speed 1x
+			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at 1x speed
 
 			prevKnobCueStartPos = -1.f;
 			prevKnobCueEndPos = 2.f;
 			prevKnobLoopStartPos = -1.f;
 			prevKnobLoopEndPos = 2.f;
 
-			INFO("[ sickoCV ] creating display vector\n");
-			vector<double>().swap(displayBuff);
+			vector<double>().swap(displayBuff);		// creating the display vector
 			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/240))
 				displayBuff.push_back(playBuffer[0][0][i]);
 
@@ -805,25 +767,15 @@ struct SickoPlayer : Module {
 				timeDisplay += "0";
 			timeDisplay += std::to_string(seconds);
 
-			INFO("[ sickoCV ] if (loadFromPatch\n");
-			if (loadFromPatch) {
+			if (loadFromPatch)
 				path = storedPath;
-				INFO("[ sickoCV ] path = %s\n",(storedPath).c_str());
-			} 
 
-			INFO("[ sickoCV ] initialize pathDup\n");
 			char* pathDup = strdup(path.c_str());
-			INFO("[ sickoCV ] pathDup = %s\n",pathDup);
 			fileDescription = basename(pathDup);
-			//INFO("[ sickoCV ] basename(pathDup) = %s\n",(basename(to_string(pathDup))).c_str());
-			INFO("[ sickoCV ] basename(pathDup) = %s\n",(basename(pathDup)));
-			INFO("[ sickoCV ] fileDescription = %s\n",(fileDescription).c_str());
 
-			if (loadFromPatch) {
+			if (loadFromPatch)
 				fileDescription = "(!)"+fileDescription;
-			} 
 
-			INFO("[ sickoCV ] CHARS check\n");
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription.substr(0, fileDescription.size()-4);
 			char tempFileChar;
@@ -840,12 +792,10 @@ struct SickoPlayer : Module {
 			samplerateDisplay = std::to_string(int(sampleRate * .5));
 			channelsDisplay = std::to_string(channels) + "Ch";
 
-			INFO("[ sickoCV ] free pathDup\n");
 			free(pathDup);
 			storedPath = path;
 
 			if (!loadFromPatch) {
-				INFO("[ sickoCV ] start pupulating currentFolder\n");
 				currentFolder = system::getDirectory(path);
 				createCurrentFolder(currentFolder);
 				currentFolderV.clear();
@@ -858,7 +808,6 @@ struct SickoPlayer : Module {
 				}
 			}
 
-			INFO("[ sickoCV ] setting knobs\n");
 			if (!firstLoad) {
 				prevKnobCueStartPos = -1.f;
 				prevKnobCueEndPos = 2.f;
@@ -880,34 +829,20 @@ struct SickoPlayer : Module {
 			firstLoad = false;
 
 			fileLoaded = true;
-			INFO("[ sickoCV ] setting firstLoad false and fileLoaded true\n");
 			
 		} else {
-			INFO("[ sickoCV ] pSampleData != NULL && tsc > minSamplesToLoad * c -> FALSE\n");
-			INFO("[ sickoCV ] tsc = %s\n",(fromPath).c_str());
 			fileFound = false;
 			fileLoaded = false;
 			//storedPath = path;
-			if (loadFromPatch) {
+			if (loadFromPatch)
 				path = storedPath;
-				INFO("[ sickoCV ] File not Found: restore storedPath to 'path' and fileDescription(!)\n");
-			} 
+
 			fileDescription = "(!)"+path;
 			fileDisplay = "";
 			timeDisplay = "";
 			channelsDisplay = "";
 		}
 	};
-	
-	/*
-
-																							░██████╗░█████╗░██╗░░░██╗███████╗
-																							██╔════╝██╔══██╗██║░░░██║██╔════╝
-																							╚█████╗░███████║╚██╗░██╔╝█████╗░░
-																							░╚═══██╗██╔══██║░╚████╔╝░██╔══╝░░
-																							██████╔╝██║░░██║░░╚██╔╝░░███████╗
-																							╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
-*/
 
 	void saveSample(std::string path) {
 		drwav_uint64 samples;
@@ -948,13 +883,15 @@ struct SickoPlayer : Module {
 	}
 
 	void clearSlot() {
+		fileLoaded = false;
+		fileFound = false;
 		storedPath = "";
 		fileDescription = "--none--";
 		fileDisplay = "";
 		timeDisplay = "";
 		channelsDisplay = "";
-		fileFound = false;
-		fileLoaded = false;
+		loadFromPatch = false;
+		restoreLoadFromPatch = false;
 		playBuffer[LEFT][0].clear();
 		playBuffer[RIGHT][0].clear();
 		playBuffer[LEFT][1].clear();
@@ -2502,7 +2439,7 @@ struct SickoPlayerDisplay : TransparentWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
 			}
 		}
@@ -2515,7 +2452,14 @@ struct SickoPlayerDisplay : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
+			menu->addChild(createMenuItem("Load Sample", "", [=]() {
+				//module->menuLoadSample();
+				bool temploadFromPatch = module->loadFromPatch;
+				module->loadFromPatch = false;
+				module->menuLoadSample();
+				if (module->restoreLoadFromPatch)
+					module->loadFromPatch = temploadFromPatch;
+			}));
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
@@ -2529,7 +2473,7 @@ struct SickoPlayerDisplay : TransparentWidget {
 								loadSubfolder(menu, module->folderTreeData[0][i]);
 							}));
 						} else {
-							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[0][i]);}));
 						}
 					}
 				}));
@@ -2698,7 +2642,7 @@ struct SickoPlayerWidget : ModuleWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
 			}
 		}
@@ -2710,7 +2654,14 @@ struct SickoPlayerWidget : ModuleWidget {
 		
 		menu->addChild(new MenuSeparator());
 
-		menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
+		menu->addChild(createMenuItem("Load Sample", "", [=]() {
+			//module->menuLoadSample();
+			bool temploadFromPatch = module->loadFromPatch;
+			module->loadFromPatch = false;
+			module->menuLoadSample();
+			if (module->restoreLoadFromPatch)
+				module->loadFromPatch = temploadFromPatch;
+		}));
 
 		if (module->folderTreeData.size() > 0) {
 			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
@@ -2724,7 +2675,7 @@ struct SickoPlayerWidget : ModuleWidget {
 							loadSubfolder(menu, module->folderTreeData[0][i]);
 						}));
 					} else {
-						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
+						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[0][i]);}));
 					}
 				}
 			}));
