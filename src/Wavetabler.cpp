@@ -1338,6 +1338,8 @@ struct WavetablerWidget : ModuleWidget {
 				module->setPolyOuts(poly);
 		}));
 		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
+
+		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
 	}

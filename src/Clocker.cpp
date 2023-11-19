@@ -93,29 +93,6 @@ struct Clocker : Module {
 	const float divMult[41] = {256, 128, 64, 32, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
 							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 32, 64, 128, 256};
 
-	/*
-	// coeffs to multiply with currentBps to get number of samples 
-	double beatSamplesPerSec[17] = {	ceil(0.5 * APP->engine->getSampleRate()),
-										ceil(0.74 * APP->engine->getSampleRate()),
-										APP->engine->getSampleRate(),
-										ceil(1.25 * APP->engine->getSampleRate()),
-										ceil(1.5 * APP->engine->getSampleRate()),
-										ceil(1.75 * APP->engine->getSampleRate()),
-										ceil(0.625 * APP->engine->getSampleRate()),
-										ceil(0.75 * APP->engine->getSampleRate()),
-										ceil(0.875 * APP->engine->getSampleRate()),
-										APP->engine->getSampleRate(),
-										ceil(1.125 * APP->engine->getSampleRate()),
-										ceil(1.25 * APP->engine->getSampleRate()),
-										ceil(1.375 * APP->engine->getSampleRate()),
-										ceil(1.5 * APP->engine->getSampleRate()),
-										ceil(1.625 * APP->engine->getSampleRate()),
-										ceil(1.75 * APP->engine->getSampleRate()),
-										ceil(1.875 * APP->engine->getSampleRate())
-
-		};
-	*/
-
 	//**************************************************************
 	//  	
 
@@ -166,15 +143,16 @@ struct Clocker : Module {
 	double clockSample = 1.0;
 	double clockMaxSample = 0.0;
 	
-	//double midBeatMaxSample = 0.0;
-	//bool midBeatPlayed = false;
+	double midBeatMaxSample = 0.0;
+	bool midBeatPlayed = false;
 
 	double maxPulseSample = 0.0;
 
 	//int beatCounter = 1;
 	int beatCounter = 20;	// thise ensure that module starts on a new bar
 
-	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
+	//float oneMsTime = (APP->engine->getSampleRate()) / 1000;
+	float oneMsTime = (APP->engine->getSampleRate()) / 10;	// for testing purposes
 	bool resetPulse = false;
 	float resetPulseTime = 0.f;
 	bool beatPulse = false;
@@ -304,27 +282,8 @@ struct Clocker : Module {
 
 	void onSampleRateChange() override {
 		sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
-		oneMsTime = (APP->engine->getSampleRate()) / 1000;
-
-		/*
-		beatSamplesPerSec[0] = ceil(0.5 * APP->engine->getSampleRate());
-		beatSamplesPerSec[1] = ceil(0.74 * APP->engine->getSampleRate());
-		beatSamplesPerSec[2] = APP->engine->getSampleRate();
-		beatSamplesPerSec[3] = ceil(1.25 * APP->engine->getSampleRate());
-		beatSamplesPerSec[4] = ceil(1.5 * APP->engine->getSampleRate());
-		beatSamplesPerSec[5] = ceil(1.75 * APP->engine->getSampleRate());
-		beatSamplesPerSec[6] = ceil(0.625 * APP->engine->getSampleRate());
-		beatSamplesPerSec[7] = ceil(0.75 * APP->engine->getSampleRate());
-		beatSamplesPerSec[8] = ceil(0.875 * APP->engine->getSampleRate());
-		beatSamplesPerSec[9] = APP->engine->getSampleRate();
-		beatSamplesPerSec[10] = ceil(1.125 * APP->engine->getSampleRate());
-		beatSamplesPerSec[11] = ceil(1.25 * APP->engine->getSampleRate());
-		beatSamplesPerSec[12] = ceil(1.375 * APP->engine->getSampleRate());
-		beatSamplesPerSec[13] = ceil(1.5 * APP->engine->getSampleRate());
-		beatSamplesPerSec[14] = ceil(1.625 * APP->engine->getSampleRate());
-		beatSamplesPerSec[15] = ceil(1.75 * APP->engine->getSampleRate());
-		beatSamplesPerSec[16] = ceil(1.875 * APP->engine->getSampleRate());
-		*/
+		//oneMsTime = (APP->engine->getSampleRate()) / 1000;
+		oneMsTime = (APP->engine->getSampleRate()) / 10; // for testing purposes
 
 		for (int i = 0; i < 2; i++) {
 			if (fileLoaded[i]) {
@@ -652,7 +611,7 @@ struct Clocker : Module {
 					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
-				//midBeatPlayed = false;
+				midBeatPlayed = false;
 				beatCounter = 20;
 			}
 			if (resetPulseOnStop) {
@@ -673,7 +632,7 @@ struct Clocker : Module {
 					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
-				//midBeatPlayed = false;
+				midBeatPlayed = false;
 				beatCounter = 20;
 			}
 			if (resetPulseOnRun) {
@@ -710,7 +669,7 @@ struct Clocker : Module {
 					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
-				//midBeatPlayed = false;
+				midBeatPlayed = false;
 
 				beatCounter = 20; // this ensure beat has reached maximum
 
@@ -773,7 +732,6 @@ struct Clocker : Module {
 
 				currentBeatMaxPerBar = beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())];
 
-				/*
 				// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
 
 				if (params[SIGNATURE_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
@@ -798,15 +756,15 @@ struct Clocker : Module {
 					}
 					midBeatPlayed = true;
 				}
-				*/
+				
 
 				//	*************************  INTERNAL CLOCK  ******************
 
 				clockMaxSample = sampleRateCoeff / bpm;
-				//midBeatMaxSample = clockMaxSample / 2;
+				midBeatMaxSample = clockMaxSample / 2;
 				
 				if (clockSample > clockMaxSample || resetStart)  {
-					//midBeatPlayed = false;
+					midBeatPlayed = false;
 
 					beatCounter++;
 
@@ -922,9 +880,10 @@ struct Clocker : Module {
 					divMaxSample[d][1] = 0.0;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
-				//midBeatPlayed = false;
+				midBeatPlayed = false;
 				
-				beatCounter = 1;
+				//beatCounter = 1;
+				beatCounter = 20;
 
 				resetPulse = true;
 				resetPulseTime = oneMsTime;
@@ -939,7 +898,7 @@ struct Clocker : Module {
 
 				if (extSync) {
 					clockMaxSample = clockSample;
-					//midBeatMaxSample = clockMaxSample / 2;
+					midBeatMaxSample = clockMaxSample / 2;
 					clockSample = 1.0;
 
 					// calculate bpms
@@ -1011,7 +970,7 @@ struct Clocker : Module {
 
 				currentBeatMaxPerBar = beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())];
 
-				/*
+				
 				// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
 
 				if (params[SIGNATURE_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
@@ -1036,13 +995,13 @@ struct Clocker : Module {
 					}
 					midBeatPlayed = true;
 				}
-				*/
+				
 
 				// ************************ EXTERNAL CLOCK ******************
 
 				if (extBeat) {
 
-					//midBeatPlayed = false;
+					midBeatPlayed = false;
 					beatCounter++;
 
 					if (extSync) {
@@ -1050,27 +1009,7 @@ struct Clocker : Module {
 						// ********** SYNCED BEAT
 
 						for (int d = 0; d < 4; d++) {
-							/*
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								// -----------------------------------------------------------------------------------------------------
-								divClockSample[d] = 1.0;
-								divPulse[d] = true;
-								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-							} else {
-								// ***** CLOCK DIVIDER *****
-								//divMaxSample[d] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divCount[d]++;
-								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
-									divClockSample[d] = 1.0;
-									divCount[d] = 1;
-									divPulse[d] = true;
-									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-								}
-							}
-							*/
+
 							if (!divSwing[d]) {
 								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
 									// ***** CLOCK MULTIPLIER *****
@@ -1855,12 +1794,12 @@ struct ClockerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("On Run", "", [=](Menu* menu) {
-			menu->addChild(createBoolPtrMenuItem("Reset Beat", "", &module->resetOnRun));
-			menu->addChild(createBoolPtrMenuItem("Reset Pulse", "", &module->resetPulseOnRun));
+			menu->addChild(createBoolPtrMenuItem("Reset Bar", "", &module->resetOnRun));
+			menu->addChild(createBoolPtrMenuItem("Pulse to RST out", "", &module->resetPulseOnRun));
 		}));
 		menu->addChild(createSubmenuItem("On Stop", "", [=](Menu* menu) {
-			menu->addChild(createBoolPtrMenuItem("Reset Beat", "", &module->resetOnStop));
-			menu->addChild(createBoolPtrMenuItem("Reset Pulse", "", &module->resetPulseOnStop));
+			menu->addChild(createBoolPtrMenuItem("Reset Bar", "", &module->resetOnStop));
+			menu->addChild(createBoolPtrMenuItem("Pulse to RST out", "", &module->resetPulseOnStop));
 		}));
 	}
 };

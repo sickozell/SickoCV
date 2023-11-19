@@ -1,4 +1,4 @@
-### 2.5.10 (2023-11-xx)
+### 2.5.10 (2023-11-19)
 - all player and sampler modules: added 'Store Sample in Patch' feature
 - clocker: fixed a bug when time signatures are in eights
 - all module with leds displays: added module drag&drop when over leds displays

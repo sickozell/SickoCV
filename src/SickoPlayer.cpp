@@ -2758,10 +2758,6 @@ struct SickoPlayerWidget : ModuleWidget {
 			menu->addChild(createMenuItem("Triggered Sample with Envelope", "", [=]() {module->setPreset(1);}));
 			menu->addChild(createMenuItem("Drum Player", "", [=]() {module->setPreset(2);}));
 		}));
-
-		menu->addChild(new MenuSeparator());
-		
-		
 	}
 };
 

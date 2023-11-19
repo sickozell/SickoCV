@@ -1,4 +1,4 @@
-# SickoCV v2.5.10-beta8
+# SickoCV v2.5.10-beta9
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -309,8 +309,8 @@ Audio clicks can be customized loading wav sample using "Load BEAT" and "Load BA
 When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.  
 
 - **On Run**  
-"Beat Reset" resets metronome when the Run Button is switched on.  
-"Reset Pulse" sends a reset pulse on Reset output when the Run Button is switched on.
+"Reset Bar" resets metronome when the Run Button is switched on.  
+"Pulse to RST out" sends a reset pulse to the Reset output when the Run Button is switched on.
 
 - **On Stop**  
 This submenu is the same as the previous one but when the Run Button is switched off.
@@ -421,6 +421,10 @@ This option enables sample triggering by clicking over the the display area, to 
 **Global Settings** (drumPlayerXtra only)  
 In this menu there are options to clear all the slots or the root folder.  
 It is also used to apply settings to all the slots: Zoom, Lightboxes color and time fading.   
+
+**Store samples in Patch**
+This option allows to save the loaded samples in vcv patch file to use it on other machines or if the orginal sample files are missing.  
+Please note that this could make the patch filesize very large.
 
 #### SLOT CONTEXT MENU
 Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) the slot context menu is open with following options:  
@@ -575,12 +579,12 @@ This submenu sets when the EOC pulses are triggered:
 **Reset Cursors on Load**  
 Always resets Cue/Loop Start/stop to 0 and 100% when a new sample is loaded.  
 
-**Store Sample in Patch**  
-This option enables storing the sample in the patch file when the patch is saved or VCV is closed.  
-When VCV is relaunched, or patch is loaded from another machine, the sample will be loaded from patch file if the original stored reference is not reachable, without loosing it.
-
 **Disable NAV buttons**  
 Disables panel Sample Navigation buttons to avoid utilizing mistakes.  
+
+**Store sample in Patch**
+This option allows to save the loaded samples in vcv patch file to use it on other machines or if the orginal sample files are missing.  
+Please note that this could make the patch filesize very large.
 
 **Presets**
 There are some factory presets stored in the context menu for common using settings.  
