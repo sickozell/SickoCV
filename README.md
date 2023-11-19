@@ -1,4 +1,4 @@
-# SickoCV v2.5.9
+# SickoCV v2.5.10
 VCV Rack plugin modules
 
 ![SickoCV modules 2 5 9](https://github.com/sickozell/SickoCV/assets/80784296/a321311a-45e1-4867-a9d7-b6db90436360)
@@ -245,7 +245,7 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 ### Clock generator with 4 dividers/multipliers and audio metronome
 
 #### - DESCRIPTION
-Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature and integrated audio click.
+Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature, time signatures and integrated audio click.
 
 ![clocker](https://github.com/sickozell/SickoCV/assets/80784296/297e57cc-7338-4dc5-a817-2f4215387c7e)
 
@@ -253,14 +253,14 @@ Clocker is a high precision clock generator and modulator with 4 dividers/multip
 The BPM knob sets the clock speed from 30 to 300 bpm.  
 An external clock can be connected on the EXT input.  
 The RUN button or a trig on its input starts or stops the clock.  
-PW (pulse width) knob adjusts the length of the gate in its high state.  
+PW (pulse width) knob adjusts the length of the gate in its high state (see 'Context menu' paragraph for Swing instructions).  
 Clock and metronome can be reset with RST button or a trig on its input.  
 
 There are 4 clock dividers/multipliers up to 256x each with theirs PW control. Right click on the display to quick select the desired division/multiplication.  
 
-The metronome setting is controlled by the METER knob or with a right click on the display.  
+The metronome setting is controlled by the METER knob or with a right click on the time signature display.  
 Audio click is activated with CLICK button and volume can be adjusted with the knob from 0 to 200%.  
-BEAT and BAR outputs are always active and give a 1ms trigger.
+When clock is runniing BEAT and BAR outputs are always active and give a 1ms trigger.
 
 To get best clock precision the algorithm used may alter the clock lengths, according to working vcv samplerate and BPM setting.  
 There will therefore be clocks of non-fixed length, but which will guarantee the exact number of BPM within a minute.
@@ -284,8 +284,8 @@ Audio clicks can be customized loading wav sample using "Load BEAT" and "Load BA
 When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.  
 
 - **On Run**  
-"Beat Reset" resets metronome when the Run Button is switched on.  
-"Reset Pulse" sends a reset pulse on Reset output when the Run Button is switched on.
+"Reset Bar" resets metronome when the Run Button is switched on.  
+"Pulse to RST out" sends a reset pulse to the Reset output when the Run Button is switched on.
 
 - **On Stop**  
 This submenu is the same as the previous one but when the Run Button is switched off.
@@ -396,6 +396,10 @@ This option enables sample triggering by clicking over the the display area, to 
 **Global Settings** (drumPlayerXtra only)  
 In this menu there are options to clear all the slots or the root folder.  
 It is also used to apply settings to all the slots: Zoom, Lightboxes color and time fading.   
+
+**Store samples in Patch**
+This option allows to save the loaded samples in vcv patch file to use it on other machines or if the orginal sample files are missing.  
+Please note that this could make the patch filesize very large.
 
 #### SLOT CONTEXT MENU
 Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) the slot context menu is open with following options:  
@@ -547,14 +551,15 @@ This submenu sets when the EOC pulses are triggered:
 - PING: reached LOOP END (when pingpong looping on forward playback)
 - PONG: reached LOOP START (when pingpong looping on reverse playback)
 
-**Disable NAV buttons**
-Disables panel Sample Navigation buttons to avoid utilizing mistakes.
-
-**Reset Cursors**  
-Resets Cue/Loop Start/stop to 0 and 100%.  
-
 **Reset Cursors on Load**  
 Always resets Cue/Loop Start/stop to 0 and 100% when a new sample is loaded.  
+
+**Disable NAV buttons**  
+Disables panel Sample Navigation buttons to avoid utilizing mistakes.  
+
+**Store sample in Patch**
+This option allows to save the loaded samples in vcv patch file to use it on other machines or if the orginal sample files are missing.  
+Please note that this could make the patch filesize very large.
 
 **Presets**
 There are some factory presets stored in the context menu for common using settings.  

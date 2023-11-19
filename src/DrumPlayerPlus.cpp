@@ -49,8 +49,8 @@ struct DrumPlayerPlus : Module {
   
 	unsigned int channels[4];
 	unsigned int sampleRate[4];
-	drwav_uint64 totalSampleC[4];
-	drwav_uint64 totalSamples[4];
+	drwav_uint64 totalSampleC[4] = {0, 0, 0, 0};
+	drwav_uint64 totalSamples[4] = {0, 0, 0, 0};
 
 	const unsigned int minSamplesToLoad = 9;
 
@@ -100,6 +100,10 @@ struct DrumPlayerPlus : Module {
 	int outsMode = 0;
 	int antiAlias = 1;
 	int scrolling = 0;
+
+	bool sampleInPatch = true;
+	bool loadFromPatch[4] = {false, false, false, false};
+	bool restoreLoadFromPatch[4] = {false, false, false, false};
 
 	//std::string debugDisplay = "X";
 
@@ -175,17 +179,20 @@ struct DrumPlayerPlus : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
+		for (int slot = 0; slot < 4; slot++) {
+			clearSlot(slot);
+			play[slot] = false;
+			choking[slot] = false;
+			fading[slot] = false;
+			loadFromPatch[slot] = false;
+		}
 		interpolationMode = HERMITE_INTERP;
 		antiAlias = 1;
 		outsMode = NORMALLED_OUTS;
 		scrolling = 0;
-		for (int i = 0; i < 4; i++) {
-			clearSlot(i);
-			play[i] = false;
-			choking[i] = false;
-			fading[i] = false;
-		}
+		sampleInPatch = true;
 		Module::onReset(e);
+		system::removeRecursively(getPatchStorageDirectory().c_str());
 	}
 
 	void onSampleRateChange() override {
@@ -196,12 +203,37 @@ struct DrumPlayerPlus : Module {
 		fadeDecrement = 1000 / (APP->engine->getSampleRate());
 	}
 
+	void onAdd(const AddEvent& e) override {
+		for (int slot = 0; slot < 4; slot++) {
+			if (!fileLoaded[slot] && storedPath[slot] != "") {
+				std::string patchFile = system::join(getPatchStorageDirectory(), ("slot"+to_string(slot+1)+".wav").c_str());
+				loadFromPatch[slot] = true;
+				loadSample(patchFile, slot);
+			}
+		}
+		Module::onAdd(e);
+	}
+
+	void onSave(const SaveEvent& e) override {
+		system::removeRecursively(getPatchStorageDirectory().c_str());
+		if (sampleInPatch) {
+			for (int slot = 0; slot < 4; slot++) {
+				if (fileLoaded[slot]) {
+					std::string patchFile = system::join(createPatchStorageDirectory(), ("slot"+to_string(slot+1)+".wav").c_str());
+					saveSample(patchFile, slot);
+				}
+			}
+		}
+		Module::onSave(e);
+	}
+
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "OutsMode", json_integer(outsMode));
 		json_object_set_new(rootJ, "Scrolling", json_integer(scrolling));
+		json_object_set_new(rootJ, "sampleInPatch", json_boolean(sampleInPatch));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
 		json_object_set_new(rootJ, "Slot3", json_string(storedPath[2].c_str()));
@@ -223,6 +255,9 @@ struct DrumPlayerPlus : Module {
 		json_t* scrollingJ = json_object_get(rootJ, "Scrolling");
 		if (scrollingJ)
 			scrolling = json_integer_value(scrollingJ);
+		json_t* sampleInPatchJ = json_object_get(rootJ, "sampleInPatch");
+		if (sampleInPatchJ)
+			sampleInPatch = json_boolean_value(sampleInPatchJ);
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
@@ -386,17 +421,80 @@ struct DrumPlayerPlus : Module {
 	};
 
 	void swapSlot(int slot1, int slot2) {
-		std::string tempPath1 = storedPath[slot1];
-		std::string tempPath2 = storedPath[slot2];
-		clearSlot(slot2);
-		loadSample(tempPath1, slot2);
+		vector<float> swapBuffer[2];
+		unsigned int swapSampleRate = sampleRate[slot1];
+		drwav_uint64 swapTotalSampleC = totalSampleC[slot1];
+		drwav_uint64 swapTotalSamples = totalSamples[slot1];
+		double swapSampleCoeff = sampleCoeff[slot1];
+		std::string swapStoredPath = storedPath[slot1];
+		std::string swapFileDescription = fileDescription[slot1];
+		std::string swapFileDisplay = fileDisplay[slot1];
+		std::string swapScrollDisplay = scrollDisplay[slot1];
+		std::string swapCurrFileDisplay = currFileDisplay[slot1];
+		bool swapFileFound = fileFound[slot1];
+		bool swapFileLoaded = fileLoaded[slot1];
+		bool swapLoadFromPatch = loadFromPatch[slot1];
+
+		for (unsigned int i = 0; i < totalSampleC[slot1]; i++) {
+			swapBuffer[0].push_back(playBuffer[slot1][0][i]);
+			swapBuffer[1].push_back(playBuffer[slot1][1][i]);
+		}
+
 		clearSlot(slot1);
-		loadSample(tempPath2, slot1);
+		for (unsigned int i = 0; i < totalSampleC[slot2]; i++) {
+			playBuffer[slot1][0].push_back(playBuffer[slot2][0][i]);
+			playBuffer[slot1][1].push_back(playBuffer[slot2][1][i]);
+		}
+		sampleRate[slot1] = sampleRate[slot2];
+		totalSampleC[slot1] = totalSampleC[slot2];
+		totalSamples[slot1] = totalSamples[slot2];
+		sampleCoeff[slot1] = sampleCoeff[slot2];
+		storedPath[slot1] = storedPath[slot2];
+		fileDescription[slot1] = fileDescription[slot2];
+		fileDisplay[slot1] = fileDisplay[slot2];
+		scrollDisplay[slot1] = scrollDisplay[slot2];
+		currFileDisplay[slot1] = currFileDisplay[slot2];
+		fileFound[slot1] = fileFound[slot2];
+		fileLoaded[slot1] = fileLoaded[slot2];
+		loadFromPatch[slot1] = loadFromPatch[slot2];
+
+		clearSlot(slot2);
+		for (unsigned int i = 0; i < swapTotalSampleC; i++) {
+			playBuffer[slot2][0].push_back(swapBuffer[0][i]);
+			playBuffer[slot2][1].push_back(swapBuffer[1][i]);
+		}
+		sampleRate[slot2] = swapSampleRate;
+		totalSampleC[slot2] = swapTotalSampleC;
+		totalSamples[slot2] = swapTotalSamples;
+		sampleCoeff[slot2] = swapSampleCoeff;
+		storedPath[slot2] = swapStoredPath;
+		fileDescription[slot2] = swapFileDescription;
+		fileDisplay[slot2] = swapFileDisplay;
+		scrollDisplay[slot2] = swapScrollDisplay;
+		currFileDisplay[slot2] = swapCurrFileDisplay;
+		fileFound[slot2] = swapFileFound;
+		fileLoaded[slot2] = swapFileLoaded;
+		loadFromPatch[slot2] = swapLoadFromPatch;
 	}
 
 	void copySlot(int slot1, int slot2) {
-		std::string tempPath = storedPath[slot1];
-		loadSample(tempPath, slot2);
+		clearSlot(slot2);
+		sampleRate[slot2] = sampleRate[slot1];
+		totalSampleC[slot2] = totalSampleC[slot1];
+		totalSamples[slot2] = totalSamples[slot1];
+		sampleCoeff[slot2] = sampleCoeff[slot1];
+		storedPath[slot2] = storedPath[slot1];
+		fileDescription[slot2] = fileDescription[slot1];
+		fileDisplay[slot2] = fileDisplay[slot1];
+		scrollDisplay[slot2] = scrollDisplay[slot1];
+		currFileDisplay[slot2] = currFileDisplay[slot1];
+		fileFound[slot2] = fileFound[slot1];
+		fileLoaded[slot2] = fileLoaded[slot1];
+		loadFromPatch[slot2] = loadFromPatch[slot1];
+		for (unsigned int i = 0; i < totalSampleC[slot1]; i++) {
+			playBuffer[slot2][0].push_back(playBuffer[slot1][0][i]);
+			playBuffer[slot2][1].push_back(playBuffer[slot1][1][i]);
+		}
 	}
 
 	void menuLoadSample(int slot) {
@@ -405,10 +503,13 @@ struct DrumPlayerPlus : Module {
 		DEFER({osdialog_filters_free(filters);});
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		fileLoaded[slot] = false;
+		restoreLoadFromPatch[slot] = false;
 		if (path) {
+			loadFromPatch[slot] = false;
 			loadSample(path, slot);
 			storedPath[slot] = std::string(path);
 		} else {
+			restoreLoadFromPatch[slot] = true;
 			fileLoaded[slot] = true;
 		}
 		if (storedPath[slot] == "" || fileFound[slot] == false) {
@@ -417,7 +518,8 @@ struct DrumPlayerPlus : Module {
 		free(path);
 	}
 
-	void loadSample(std::string path, int slot) {
+	void loadSample(std::string fromPath, int slot) {
+		std::string path = fromPath;
 		unsigned int c;
 		unsigned int sr;
 		drwav_uint64 tsc;
@@ -439,18 +541,24 @@ struct DrumPlayerPlus : Module {
 			totalSamples[slot] = totalSampleC[slot]-1;
 			drwav_free(pSampleData);
 
-			for (unsigned int i = 1; i < totalSamples[slot]; i = i + 2)
+			for (unsigned int i = 1; i < totalSamples[slot]; i = i + 2)		// averaging oversampled vector
 				playBuffer[slot][0][i] = playBuffer[slot][0][i-1] * .5f + playBuffer[slot][0][i+1] * .5f;
 
 			playBuffer[slot][0][totalSamples[slot]] = playBuffer[slot][0][totalSamples[slot]-1] * .5f; // halve the last sample
 
-			for (unsigned int i = 0; i < totalSampleC[slot]; i++)
+			for (unsigned int i = 0; i < totalSampleC[slot]; i++)	// populating filtered vector
 				playBuffer[slot][1].push_back(biquadLpf(playBuffer[slot][0][i]));
 
-			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
+			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());		// the % distance between samples at speed 1x
+
+			if (loadFromPatch[slot])
+				path = storedPath[slot];
 
 			fileDescription[slot] = system::getFilename(std::string(path));
 			fileDescription[slot] = fileDescription[slot].substr(0,fileDescription[slot].length()-4);
+
+			if (loadFromPatch[slot])
+				fileDescription[slot] = "(!)"+fileDescription[slot];
 
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription[slot];
@@ -477,22 +585,59 @@ struct DrumPlayerPlus : Module {
 
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
-			storedPath[slot] = path;
+			//storedPath[slot] = path;
+			if (loadFromPatch[slot])
+				path = storedPath[slot];
 			fileDescription[slot] = "(!)"+path;
 			fileDisplay[slot] = "-----";
 			scrollDisplay[slot] = "-----";
 			currFileDisplay[slot] = "-----";
 		}
 	};
+
+	void saveSample(std::string path, int slot) {
+		drwav_uint64 samples;
+
+		samples = playBuffer[slot][0].size();
+
+		std::vector<float> data;
+
+		for (unsigned int i = 0; i <= playBuffer[slot][0].size(); i = i + 2)
+			//data.push_back(playBuffer[slot][0][i] / 5);
+			data.push_back(playBuffer[slot][0][i]);
+
+		drwav_data_format format;
+		format.container = drwav_container_riff;
+		format.format = DR_WAVE_FORMAT_IEEE_FLOAT;
+
+		format.channels = 1;
+
+		samples /= 2;
+
+		format.sampleRate = sampleRate[slot] / 2;
+
+		format.bitsPerSample = 32;
+
+		if (path.substr(path.size() - 4) != ".wav" && path.substr(path.size() - 4) != ".WAV")
+			path += ".wav";
+
+		drwav *pWav = drwav_open_file_write(path.c_str(), &format);
+		drwav_write(pWav, samples, data.data());
+		drwav_close(pWav);
+
+		data.clear();
+	}
 	
 	void clearSlot(int slot) {
+		fileLoaded[slot] = false;
+		fileFound[slot] = false;
+		loadFromPatch[slot] = false;
+		restoreLoadFromPatch[slot] = false;
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
 		fileDisplay[slot] = "-----";
 		scrollDisplay[slot] = "-----";
 		currFileDisplay[slot] = "-----";
-		fileFound[slot] = false;
-		fileLoaded[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
 		totalSampleC[slot] = 0;
@@ -500,111 +645,111 @@ struct DrumPlayerPlus : Module {
 	
 	void process(const ProcessArgs &args) override {
 		summedOutput = 0;
-		for (int i = 0; i < 4; i++){
+		for (int slot = 0; slot < 4; slot++){
 
-			trigValue[i] = inputs[TRIG_INPUT+i].getVoltage();
+			trigValue[slot] = inputs[TRIG_INPUT+slot].getVoltage();
 
-			if (trigValue[i] >= 1 && prevTrigValue[i] < 1){
-				if (play[i]) {
-					fading[i] = true;
-					fadingValue[i] = 1.f;
-					fadedPosition[i] = samplePos[i];
+			if (trigValue[slot] >= 1 && prevTrigValue[slot] < 1){
+				if (play[slot]) {
+					fading[slot] = true;
+					fadingValue[slot] = 1.f;
+					fadedPosition[slot] = samplePos[slot];
 				}
-				play[i] = true;
-				samplePos[i] = 0;
-				currSampleWeight[i] = sampleCoeff[i];
-				prevSamplePos[i] = 0;
-				prevSampleWeight[i] = 0;
+				play[slot] = true;
+				samplePos[slot] = 0;
+				currSampleWeight[slot] = sampleCoeff[slot];
+				prevSamplePos[slot] = 0;
+				prevSampleWeight[slot] = 0;
 				//debugDisplay = "X";
-				if (inputs[ACC_INPUT+i].getVoltage() > 1)
-					level[i] = params[ACCVOL_PARAM+i].getValue() + (inputs[ACCVOL_INPUT+i].getVoltage() * params[ACCVOLATNV_PARAM+i].getValue() * 0.1);
+				if (inputs[ACC_INPUT+slot].getVoltage() > 1)
+					level[slot] = params[ACCVOL_PARAM+slot].getValue() + (inputs[ACCVOL_INPUT+slot].getVoltage() * params[ACCVOLATNV_PARAM+slot].getValue() * 0.1);
 				else
-					level[i] = params[TRIGVOL_PARAM+i].getValue() + (inputs[TRIGVOL_INPUT+i].getVoltage() * params[TRIGVOLATNV_PARAM+i].getValue() * 0.1);
+					level[slot] = params[TRIGVOL_PARAM+slot].getValue() + (inputs[TRIGVOL_INPUT+slot].getVoltage() * params[TRIGVOLATNV_PARAM+slot].getValue() * 0.1);
 
-				if (level[i] > 2)
-					level[i] = 2;
-				else if (level[i] < 0)
-					level[i] = 0;
+				if (level[slot] > 2)
+					level[slot] = 2;
+				else if (level[slot] < 0)
+					level[slot] = 0;
 				
-				if (i < 3 && params[CHOKE_SWITCH+i].getValue()) {
-					choking[i+1] = true;
-					chokeValue[i+1] = 1.f;
+				if (slot < 3 && params[CHOKE_SWITCH+slot].getValue()) {
+					choking[slot+1] = true;
+					chokeValue[slot+1] = 1.f;
 				}
 			}
-			prevTrigValue[i] = trigValue[i];
+			prevTrigValue[slot] = trigValue[slot];
 			currentOutput = 0;
 
-			if (fileLoaded[i] && play[i] && floor(samplePos[i]) < totalSampleC[i]) {
+			if (fileLoaded[slot] && play[slot] && floor(samplePos[slot]) < totalSampleC[slot]) {
 				switch (interpolationMode) {
 					case NO_INTERP:
-						currentOutput = 5 * level[i] * float(playBuffer[i][antiAlias][floor(samplePos[i])]);
+						currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 					break;
 
 					case LINEAR1_INTERP:
-						if (currSampleWeight[i] == 0) {
-							currentOutput = 5 * level[i] * float(playBuffer[i][antiAlias][floor(samplePos[i])]);
+						if (currSampleWeight[slot] == 0) {
+							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[i] * float(
-											(playBuffer[i][antiAlias][floor(samplePos[i])] * (1-currSampleWeight[i])) +
-											(playBuffer[i][antiAlias][floor(samplePos[i])+1] * currSampleWeight[i])
+							currentOutput = 5 * level[slot] * float(
+											(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
+											(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
 											);
 						}
 					break;
 
 					case LINEAR2_INTERP:
-						if (currSampleWeight[i] == 0) {
-							currentOutput = 5 * level[i] * float(playBuffer[i][antiAlias][floor(samplePos[i])]);
+						if (currSampleWeight[slot] == 0) {
+							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[i] * float(
+							currentOutput = 5 * level[slot] * float(
 											(
-												(playBuffer[i][antiAlias][floor(prevSamplePos[i])] * (1-prevSampleWeight[i])) +
-												(playBuffer[i][antiAlias][floor(prevSamplePos[i])+1] * prevSampleWeight[i]) +
-												(playBuffer[i][antiAlias][floor(samplePos[i])] * (1-currSampleWeight[i])) +
-												(playBuffer[i][antiAlias][floor(samplePos[i])+1] * currSampleWeight[i])
+												(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])] * (1-prevSampleWeight[slot])) +
+												(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])+1] * prevSampleWeight[slot]) +
+												(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
+												(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
 											) / 2);
 						}
 					break;
 
 					case HERMITE_INTERP:
-						if (currSampleWeight[i] == 0) {
-							currentOutput = 5 * level[i] * float(playBuffer[i][antiAlias][floor(samplePos[i])]);
+						if (currSampleWeight[slot] == 0) {
+							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							if (floor(samplePos[i]) > 1 && floor(samplePos[i]) < totalSamples[i] - 1) {
+							if (floor(samplePos[slot]) > 1 && floor(samplePos[slot]) < totalSamples[slot] - 1) {
 								/*
-								resampled[i] = hermiteInterpol(playBuffer[i][antiAlias][floor(samplePos[i])-1],
-																playBuffer[i][antiAlias][floor(samplePos[i])],
-																playBuffer[i][antiAlias][floor(samplePos[i])+1],
-																playBuffer[i][antiAlias][floor(samplePos[i])+2],
-																currSampleWeight[i]);
+								resampled[slot] = hermiteInterpol(playBuffer[slot][antiAlias][floor(samplePos[slot])-1],
+																playBuffer[slot][antiAlias][floor(samplePos[slot])],
+																playBuffer[slot][antiAlias][floor(samplePos[slot])+1],
+																playBuffer[slot][antiAlias][floor(samplePos[slot])+2],
+																currSampleWeight[slot]);
 								*/
 								// below is translation of the above function
-								double a1 = .5F * (playBuffer[i][antiAlias][floor(samplePos[i])+1] - playBuffer[i][antiAlias][floor(samplePos[i])-1]);
-								double a2 = playBuffer[i][antiAlias][floor(samplePos[i])-1] - (2.5F * playBuffer[i][antiAlias][floor(samplePos[i])]) + (2 * playBuffer[i][antiAlias][floor(samplePos[i])+1]) - (.5F * playBuffer[i][antiAlias][floor(samplePos[i])+2]);
-								double a3 = (.5F * (playBuffer[i][antiAlias][floor(samplePos[i])+2] - playBuffer[i][antiAlias][floor(samplePos[i])-1])) + (1.5F * (playBuffer[i][antiAlias][floor(samplePos[i])] - playBuffer[i][antiAlias][floor(samplePos[i])+1]));
-								currentOutput = 5 * level[i] * float(
-									(((((a3 * currSampleWeight[i]) + a2) * currSampleWeight[i]) + a1) * currSampleWeight[i]) + playBuffer[i][antiAlias][floor(samplePos[i])]
+								double a1 = .5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+1] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1]);
+								double a2 = playBuffer[slot][antiAlias][floor(samplePos[slot])-1] - (2.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])]) + (2 * playBuffer[slot][antiAlias][floor(samplePos[slot])+1]) - (.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])+2]);
+								double a3 = (.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+2] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1])) + (1.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])] - playBuffer[slot][antiAlias][floor(samplePos[slot])+1]));
+								currentOutput = 5 * level[slot] * float(
+									(((((a3 * currSampleWeight[slot]) + a2) * currSampleWeight[slot]) + a1) * currSampleWeight[slot]) + playBuffer[slot][antiAlias][floor(samplePos[slot])]
 								);
 							} else {
-								currentOutput = 5 * level[i] * float(playBuffer[i][antiAlias][floor(samplePos[i])]);
+								currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 							}
 						}
 					break;
 				}
 
-				if (i > 0 && choking[i]) {
-					if (chokeValue[i] < 0.0) {
-						choking[i] = false;
-						play[i] = false;
+				if (slot > 0 && choking[slot]) {
+					if (chokeValue[slot] < 0.0) {
+						choking[slot] = false;
+						play[slot] = false;
 						currentOutput = 0;
 					} else {
-						currentOutput *= chokeValue[i];
-						chokeValue[i] -= fadeDecrement;
+						currentOutput *= chokeValue[slot];
+						chokeValue[slot] -= fadeDecrement;
 					}
 				}
 
-				prevSamplePos[i] = samplePos[i];
-				if (inputs[SPEED_INPUT+i].isConnected()) {
-					currentSpeed = double(params[SPEED_PARAM+i].getValue() + (inputs[SPEED_INPUT+i].getVoltage() * params[SPEEDATNV_PARAM+i].getValue() * 0.1));
+				prevSamplePos[slot] = samplePos[slot];
+				if (inputs[SPEED_INPUT+slot].isConnected()) {
+					currentSpeed = double(params[SPEED_PARAM+slot].getValue() + (inputs[SPEED_INPUT+slot].getVoltage() * params[SPEEDATNV_PARAM+slot].getValue() * 0.1));
 					if (currentSpeed > 2)
 						currentSpeed = 2;
 					else {
@@ -612,84 +757,84 @@ struct DrumPlayerPlus : Module {
 							currentSpeed = 0.01;
 					}
 				} else {
-					currentSpeed = double(params[SPEED_PARAM+i].getValue());
+					currentSpeed = double(params[SPEED_PARAM+slot].getValue());
 				}
 
-				samplePos[i] += sampleCoeff[i]*currentSpeed;
+				samplePos[slot] += sampleCoeff[slot]*currentSpeed;
 
 				if (interpolationMode > NO_INTERP) {
-					prevSampleWeight[i] = currSampleWeight[i];
-					currSampleWeight[i] = samplePos[i] - floor(samplePos[i]);
+					prevSampleWeight[slot] = currSampleWeight[slot];
+					currSampleWeight[slot] = samplePos[slot] - floor(samplePos[slot]);
 				}
 
-				if (fading[i]) { 					// fades previous samples if retrigged when already playing
-					if (fadingValue[i] > 0) {
-						fadingValue[i] -= fadeDecrement;
-						currentOutput += (playBuffer[i][antiAlias][floor(fadedPosition[i])] * fadingValue[i] * level[i] * 5);
-						fadedPosition[i] += sampleCoeff[i]*currentSpeed;
-						if (fadedPosition[i] > totalSamples[i])
-							fading[i] = false;
+				if (fading[slot]) { 					// fades previous samples if retrigged when already playing
+					if (fadingValue[slot] > 0) {
+						fadingValue[slot] -= fadeDecrement;
+						currentOutput += (playBuffer[slot][antiAlias][floor(fadedPosition[slot])] * fadingValue[slot] * level[slot] * 5);
+						fadedPosition[slot] += sampleCoeff[slot]*currentSpeed;
+						if (fadedPosition[slot] > totalSamples[slot])
+							fading[slot] = false;
 					} else
-						fading[i] = false;
+						fading[slot] = false;
 				}
 			} else {
-				choking[i] = false;
-				play[i] = false;
-				fading[i] = false;
+				choking[slot] = false;
+				play[slot] = false;
+				fading[slot] = false;
 			}
 
 			switch (outsMode) {
 				case NORMALLED_OUTS:
 					summedOutput += currentOutput;
 
-					if (params[LIMIT_SWITCH+i].getValue()) {
+					if (params[LIMIT_SWITCH+slot].getValue()) {
 						if (summedOutput > 5)
 							summedOutput = 5;
 						else if (summedOutput < -5)
 							summedOutput = -5;
 					}
 
-					if (outputs[OUT_OUTPUT+i].isConnected()) {
-						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
+					if (outputs[OUT_OUTPUT+slot].isConnected()) {
+						outputs[OUT_OUTPUT+slot].setVoltage(summedOutput);
 						summedOutput = 0;
 					}
 				break;
 
 				case SOLO_OUTS:
-					if (outputs[OUT_OUTPUT+i].isConnected()) {
+					if (outputs[OUT_OUTPUT+slot].isConnected()) {
 						
-						if (params[LIMIT_SWITCH+i].getValue()) {
+						if (params[LIMIT_SWITCH+slot].getValue()) {
 							if (currentOutput > 5)
 								currentOutput = 5;
 							else if (currentOutput < -5)
 								currentOutput = -5;
 						}
-						outputs[OUT_OUTPUT+i].setVoltage(currentOutput);
+						outputs[OUT_OUTPUT+slot].setVoltage(currentOutput);
 
 					}
 				break;
 
 				case UNCONNECTED_ON_4:
-					if (i == 3) {
+					if (slot == 3) {
 						summedOutput += currentOutput;
-						if (params[LIMIT_SWITCH+i].getValue()) {
+						if (params[LIMIT_SWITCH+slot].getValue()) {
 							if (summedOutput > 5)
 								summedOutput = 5;
 							else if (summedOutput < -5)
 								summedOutput = -5;
 						}
-						outputs[OUT_OUTPUT+i].setVoltage(summedOutput);
-					} else if (outputs[OUT_OUTPUT+i].isConnected()) {
-						if (params[LIMIT_SWITCH+i].getValue()) {
+						outputs[OUT_OUTPUT+slot].setVoltage(summedOutput);
+					} else if (outputs[OUT_OUTPUT+slot].isConnected()) {
+						if (params[LIMIT_SWITCH+slot].getValue()) {
 							if (currentOutput > 5)
 								currentOutput = 5;
 							else if (currentOutput < -5)
 								currentOutput = -5;
 						}
-						outputs[OUT_OUTPUT+i].setVoltage(currentOutput);
+						outputs[OUT_OUTPUT+slot].setVoltage(currentOutput);
 					} else {
 						summedOutput += currentOutput;
-						if (params[LIMIT_SWITCH+i].getValue()) {
+						if (params[LIMIT_SWITCH+slot].getValue()) {
 							if (summedOutput > 5)
 								summedOutput = 5;
 							else if (summedOutput < -5)
@@ -699,8 +844,8 @@ struct DrumPlayerPlus : Module {
 				break;
 			}
 
-			if (!inputs[TRIG_INPUT+i].isConnected())
-				play[i] = false;
+			if (!inputs[TRIG_INPUT+slot].isConnected())
+				play[slot] = false;
 		}
 	}
 };
@@ -714,8 +859,8 @@ struct dppSlot1Display : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
-			e.consume(this);
+		/*if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+			e.consume(this);*/
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -758,7 +903,7 @@ struct dppSlot1Display : TransparentWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i],0);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch[0] = false;module->loadSample(module->folderTreeData[tempIndex][i],0);}));
 				}
 			}
 		}
@@ -771,7 +916,14 @@ struct dppSlot1Display : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			menu->addChild(createMenuItem("Load Sample Slot #1", "", [=]() {module->menuLoadSample(0);}));
+			menu->addChild(createMenuItem("Load Sample Slot #1", "", [=]() {
+				//module->menuLoadSample(0);
+				bool temploadFromPatch = module->loadFromPatch[0];
+				module->loadFromPatch[0] = false;
+				module->menuLoadSample(0);
+				if (module->restoreLoadFromPatch[0])
+					module->loadFromPatch[0] = temploadFromPatch;
+			}));
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
@@ -786,7 +938,7 @@ struct dppSlot1Display : TransparentWidget {
 								loadSubfolder(menu, module->folderTreeData[0][i]);
 							}));
 						} else {
-							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],0);}));
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch[0] = false;module->loadSample(module->folderTreeData[0][i],0);}));
 						}
 					}
 				}));
@@ -821,8 +973,8 @@ struct dppSlot2Display : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
-			e.consume(this);
+		/*if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+			e.consume(this);*/
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -865,7 +1017,7 @@ struct dppSlot2Display : TransparentWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i],1);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch[1] = false;module->loadSample(module->folderTreeData[tempIndex][i],1);}));
 				}
 			}
 		}
@@ -878,7 +1030,14 @@ struct dppSlot2Display : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			menu->addChild(createMenuItem("Load Sample Slot #2", "", [=]() {module->menuLoadSample(1);}));
+			menu->addChild(createMenuItem("Load Sample Slot #2", "", [=]() {
+				//module->menuLoadSample(1);
+				bool temploadFromPatch = module->loadFromPatch[1];
+				module->loadFromPatch[1] = false;
+				module->menuLoadSample(1);
+				if (module->restoreLoadFromPatch[1])
+					module->loadFromPatch[1] = temploadFromPatch;
+			}));
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
@@ -893,7 +1052,7 @@ struct dppSlot2Display : TransparentWidget {
 								loadSubfolder(menu, module->folderTreeData[0][i]);
 							}));
 						} else {
-							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],1);}));
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch[1] = false;module->loadSample(module->folderTreeData[0][i],1);}));
 						}
 					}
 				}));
@@ -928,8 +1087,8 @@ struct dppSlot3Display : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
-			e.consume(this);
+		/*if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+			e.consume(this);*/
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -972,7 +1131,7 @@ struct dppSlot3Display : TransparentWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i],2);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch[2] = false;module->loadSample(module->folderTreeData[tempIndex][i],2);}));
 				}
 			}
 		}
@@ -985,7 +1144,14 @@ struct dppSlot3Display : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			menu->addChild(createMenuItem("Load Sample Slot #3", "", [=]() {module->menuLoadSample(2);}));
+			menu->addChild(createMenuItem("Load Sample Slot #3", "", [=]() {
+				//module->menuLoadSample(2);
+				bool temploadFromPatch = module->loadFromPatch[2];
+				module->loadFromPatch[2] = false;
+				module->menuLoadSample(2);
+				if (module->restoreLoadFromPatch[2])
+					module->loadFromPatch[2] = temploadFromPatch;
+			}));
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
@@ -1000,7 +1166,7 @@ struct dppSlot3Display : TransparentWidget {
 								loadSubfolder(menu, module->folderTreeData[0][i]);
 							}));
 						} else {
-							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],2);}));
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch[2] = false;module->loadSample(module->folderTreeData[0][i],2);}));
 						}
 					}
 				}));
@@ -1035,8 +1201,8 @@ struct dppSlot4Display : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
-			e.consume(this);
+		/*if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+			e.consume(this);*/
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -1079,7 +1245,7 @@ struct dppSlot4Display : TransparentWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i],3);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch[3] = false;module->loadSample(module->folderTreeData[tempIndex][i],3);}));
 				}
 			}
 		}
@@ -1092,7 +1258,14 @@ struct dppSlot4Display : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			menu->addChild(createMenuItem("Load Sample Slot #4", "", [=]() {module->menuLoadSample(3);}));
+			menu->addChild(createMenuItem("Load Sample Slot #4", "", [=]() {
+				//module->menuLoadSample(3);
+				bool temploadFromPatch = module->loadFromPatch[3];
+				module->loadFromPatch[3] = false;
+				module->menuLoadSample(3);
+				if (module->restoreLoadFromPatch[3])
+					module->loadFromPatch[3] = temploadFromPatch;
+			}));
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(new MenuSeparator());
@@ -1107,7 +1280,7 @@ struct dppSlot4Display : TransparentWidget {
 									loadSubfolder(menu, module->folderTreeData[0][i]);
 								}));
 						} else {
-							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i],3);}));
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch[3] = false;module->loadSample(module->folderTreeData[0][i],3);}));
 						}
 					}
 				}));
@@ -1276,10 +1449,44 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Slots"));
+		/*
 		menu->addChild(createMenuItem("1: " + module->fileDescription[0], "", [=]() {module->menuLoadSample(0);}));
 		menu->addChild(createMenuItem("2: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
 		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {module->menuLoadSample(2);}));
 		menu->addChild(createMenuItem("4: " + module->fileDescription[3], "", [=]() {module->menuLoadSample(3);}));
+		*/
+		menu->addChild(createMenuItem("1: " + module->fileDescription[0], "", [=]() {
+			//module->menuLoadSample(0);
+			bool temploadFromPatch = module->loadFromPatch[0];
+			module->loadFromPatch[0] = false;
+			module->menuLoadSample(0);
+			if (module->restoreLoadFromPatch[0])
+				module->loadFromPatch[0] = temploadFromPatch;
+		}));
+		menu->addChild(createMenuItem("2: " + module->fileDescription[1], "", [=]() {
+			//module->menuLoadSample(1);
+			bool temploadFromPatch = module->loadFromPatch[1];
+			module->loadFromPatch[1] = false;
+			module->menuLoadSample(1);
+			if (module->restoreLoadFromPatch[1])
+				module->loadFromPatch[1] = temploadFromPatch;
+		}));
+		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {
+			//module->menuLoadSample(2);
+			bool temploadFromPatch = module->loadFromPatch[0];
+			module->loadFromPatch[2] = false;
+			module->menuLoadSample(2);
+			if (module->restoreLoadFromPatch[2])
+				module->loadFromPatch[2] = temploadFromPatch;
+		}));
+		menu->addChild(createMenuItem("4: " + module->fileDescription[3], "", [=]() {
+			//module->menuLoadSample(3);
+			bool temploadFromPatch = module->loadFromPatch[3];
+			module->loadFromPatch[3] = false;
+			module->menuLoadSample(3);
+			if (module->restoreLoadFromPatch[3])
+				module->loadFromPatch[3] = temploadFromPatch;
+		}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Clear ALL slots", "", [=]() {
@@ -1338,6 +1545,7 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
+		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));
 	}
 };
 

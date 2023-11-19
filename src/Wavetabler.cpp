@@ -66,8 +66,8 @@ struct Wavetabler : Module {
 	};
   
 	unsigned int sampleRate;
-	drwav_uint64 totalSampleC;
-	drwav_uint64 totalSamples;
+	drwav_uint64 totalSampleC = 0;
+	drwav_uint64 totalSamples = 0;
 
 	const unsigned int minSamplesToLoad = 124;
 
@@ -123,7 +123,11 @@ struct Wavetabler : Module {
 	int polyOuts = POLYPHONIC;
 	int polyMaster = POLYPHONIC;
 	bool disableNav = false;
+	bool sampleInPatch = true;
 
+	bool loadFromPatch = false;
+	bool restoreLoadFromPatch = false;
+	
 	float currentOutput;
 	float sumOutput;
 
@@ -221,11 +225,6 @@ struct Wavetabler : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
-		antiAlias = 1;
-		polyOuts = POLYPHONIC;
-		polyMaster = POLYPHONIC;
-		disableNav = false;
-		clearSlot();
 		for (int i = 0; i < 16; i++) {
 			play[i] = false;
 			stage[i] = STOP_STAGE;
@@ -234,10 +233,15 @@ struct Wavetabler : Module {
 			prevVoct[i] = 11.f;
 			reversePlaying[i] = FORWARD;
 		}
+		clearSlot();
+		antiAlias = 1;
+		polyOuts = POLYPHONIC;
+		polyMaster = POLYPHONIC;
+		disableNav = false;
+		sampleInPatch = true;
 		prevTune = -1.f;
 		reverseStart = false;
-		totalSampleC = 0;
-		totalSamples = 0;
+		system::removeRecursively(getPatchStorageDirectory().c_str());
 		Module::onReset(e);
 	}
 
@@ -247,12 +251,33 @@ struct Wavetabler : Module {
 			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at speed 1x
 	}
 
+	void onAdd(const AddEvent& e) override {
+		if (!fileLoaded) {
+			std::string patchFile = system::join(getPatchStorageDirectory(), "sample.wav");
+			loadFromPatch = true;
+			loadSample(patchFile);
+		}		
+		Module::onAdd(e);
+	}
+
+	void onSave(const SaveEvent& e) override {
+		system::removeRecursively(getPatchStorageDirectory().c_str());
+		if (fileLoaded) {
+			if (sampleInPatch) {
+				std::string patchFile = system::join(createPatchStorageDirectory(), "sample.wav");
+				saveSample(patchFile);
+			}
+		}
+		Module::onSave(e);
+	}
+
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
 		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
 		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
+		json_object_set_new(rootJ, "sampleInPatch", json_boolean(sampleInPatch));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
 		return rootJ;
@@ -271,6 +296,9 @@ struct Wavetabler : Module {
 		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
 		if (disableNavJ)
 			disableNav = json_boolean_value(disableNavJ);
+		json_t* sampleInPatchJ = json_object_get(rootJ, "sampleInPatch");
+		if (sampleInPatchJ)
+			sampleInPatch = json_boolean_value(sampleInPatchJ);
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
@@ -455,10 +483,13 @@ struct Wavetabler : Module {
 		DEFER({osdialog_filters_free(filters);});
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		fileLoaded = false;
+		restoreLoadFromPatch = false;
 		if (path) {
+			loadFromPatch = false;
 			loadSample(path);
 			storedPath = std::string(path);
 		} else {
+			restoreLoadFromPatch = true;
 			fileLoaded = true;
 		}
 		if (storedPath == "" || fileFound == false) {
@@ -467,7 +498,8 @@ struct Wavetabler : Module {
 		free(path);
 	}
 
-	void loadSample(std::string path) {
+	void loadSample(std::string fromPath) {
+		std::string path = fromPath;
 		z1 = 0; z2 = 0;
 		unsigned int c;
 		unsigned int sr;
@@ -496,24 +528,28 @@ struct Wavetabler : Module {
 			totalSamples = totalSampleC-1;
 			drwav_free(pSampleData);
 
-			for (unsigned int i = 1; i < totalSamples; i = i+2) {
+			for (unsigned int i = 1; i < totalSamples; i = i + 2)	// averaging oversampled vector
 				playBuffer[0][i] = playBuffer[0][i-1] * .5f + playBuffer[0][i+1] * .5f;
-			}
 			
 			playBuffer[0][totalSamples] = playBuffer[0][totalSamples-1] * .5f; // halve the last sample
 
-			for (unsigned int i = 0; i < totalSampleC; i++) {
+			for (unsigned int i = 0; i < totalSampleC; i++)		// populating filtered vector
 				playBuffer[1].push_back(biquadLpf(playBuffer[0][i]));
-			}
 
-			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at speed 1x
+			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at 1x speed
 
-			vector<double>().swap(displayBuff);
+			vector<double>().swap(displayBuff);			// creating the display vector
 			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/160))
 				displayBuff.push_back(playBuffer[0][i]);
 
+			if (loadFromPatch)
+				path = storedPath;
+
 			char* pathDup = strdup(path.c_str());
 			fileDescription = basename(pathDup);
+
+			if (loadFromPatch)
+				fileDescription = "(!)"+fileDescription;
 
 			// *** CHARs CHECK according to font
 			std::string tempFileDisplay = fileDescription.substr(0, fileDescription.size()-4);
@@ -532,14 +568,17 @@ struct Wavetabler : Module {
 
 			free(pathDup);
 			storedPath = path;
-			currentFolder = system::getDirectory(path);
-			createCurrentFolder(currentFolder);
-			currentFolderV.clear();
-			currentFolderV = tempTreeData;
-			for (unsigned int i = 0; i < currentFolderV.size(); i++) {
-				if (system::getFilename(path) == system::getFilename(currentFolderV[i])) {
-					currentFile = i;
-					i = currentFolderV.size();
+
+			if (!loadFromPatch) {
+				currentFolder = system::getDirectory(path);
+				createCurrentFolder(currentFolder);
+				currentFolderV.clear();
+				currentFolderV = tempTreeData;
+				for (unsigned int i = 0; i < currentFolderV.size(); i++) {
+					if (system::getFilename(path) == system::getFilename(currentFolderV[i])) {
+						currentFile = i;
+						i = currentFolderV.size();
+					}
 				}
 			}
 
@@ -547,18 +586,54 @@ struct Wavetabler : Module {
 		} else {
 			fileFound = false;
 			fileLoaded = false;
-			storedPath = path;
+			//storedPath = path;
+			if (loadFromPatch)
+				path = storedPath;
 			fileDescription = "(!)"+path;
 			fileDisplay = "";
 		}
 	};
+
+	void saveSample(std::string path) {
+		drwav_uint64 samples;
+
+		samples = playBuffer[0].size();
+
+		std::vector<float> data;
+
+		for (unsigned int i = 0; i <= playBuffer[0].size(); i = i + 2)
+			data.push_back(playBuffer[0][i] / 5);
+
+		drwav_data_format format;
+		format.container = drwav_container_riff;
+		format.format = DR_WAVE_FORMAT_IEEE_FLOAT;
+
+		format.channels = 1;
+
+		samples /= 2;
+
+		format.sampleRate = sampleRate / 2;
+
+		format.bitsPerSample = 32;
+
+		if (path.substr(path.size() - 4) != ".wav" && path.substr(path.size() - 4) != ".WAV")
+			path += ".wav";
+
+		drwav *pWav = drwav_open_file_write(path.c_str(), &format);
+		drwav_write(pWav, samples, data.data());
+		drwav_close(pWav);
+
+		data.clear();
+	}
 	
 	void clearSlot() {
+		fileLoaded = false;
+		fileFound = false;
+		loadFromPatch = false;
+		restoreLoadFromPatch = false;
 		storedPath = "";
 		fileDescription = "--none--";
 		fileDisplay = "";
-		fileFound = false;
-		fileLoaded = false;
 		playBuffer[0].clear();
 		playBuffer[1].clear();
 		totalSampleC = 0;
@@ -580,7 +655,8 @@ struct Wavetabler : Module {
 
 	void process(const ProcessArgs &args) override {
 
-		if (!disableNav) {
+		//if (!disableNav) {
+		if (!disableNav && !loadFromPatch) {
 			nextSample = params[NEXTSAMPLE_PARAM].getValue();
 			if (fileLoaded && nextSample && !prevNextSample) {
 				for (int i = 0; i < 16; i++)
@@ -930,8 +1006,8 @@ struct WavetablerDisplay : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
-			e.consume(this);
+		/*if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS)
+			e.consume(this);*/
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
@@ -1035,7 +1111,7 @@ struct WavetablerDisplay : TransparentWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
 			}
 		}
@@ -1048,7 +1124,14 @@ struct WavetablerDisplay : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
+			menu->addChild(createMenuItem("Load Sample", "", [=]() {
+				//module->menuLoadSample();
+				bool temploadFromPatch = module->loadFromPatch;
+				module->loadFromPatch = false;
+				module->menuLoadSample();
+				if (module->restoreLoadFromPatch)
+					module->loadFromPatch = temploadFromPatch;
+			}));
 
 			if (module->folderTreeData.size() > 0) {
 				menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
@@ -1062,7 +1145,7 @@ struct WavetablerDisplay : TransparentWidget {
 								loadSubfolder(menu, module->folderTreeData[0][i]);
 							}));
 						} else {
-							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
+							menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[0][i]);}));
 						}
 					}
 				}));
@@ -1185,7 +1268,7 @@ struct WavetablerWidget : ModuleWidget {
 						loadSubfolder(menu, module->folderTreeData[tempIndex][i]);
 					}));
 				} else {
-					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadSample(module->folderTreeData[tempIndex][i]);}));
+					menu->addChild(createMenuItem(module->folderTreeDisplay[tempIndex][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[tempIndex][i]);}));
 				}
 			}
 		}
@@ -1197,7 +1280,14 @@ struct WavetablerWidget : ModuleWidget {
 		
 		menu->addChild(new MenuSeparator());
 
-		menu->addChild(createMenuItem("Load Sample", "", [=]() {module->menuLoadSample();}));
+		menu->addChild(createMenuItem("Load Sample", "", [=]() {
+			//module->menuLoadSample();
+			bool temploadFromPatch = module->loadFromPatch;
+			module->loadFromPatch = false;
+			module->menuLoadSample();
+			if (module->restoreLoadFromPatch)
+				module->loadFromPatch = temploadFromPatch;
+		}));
 
 		if (module->folderTreeData.size() > 0) {
 			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
@@ -1211,7 +1301,7 @@ struct WavetablerWidget : ModuleWidget {
 							loadSubfolder(menu, module->folderTreeData[0][i]);
 						}));
 					} else {
-						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadSample(module->folderTreeData[0][i]);}));
+						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[0][i]);}));
 					}
 				}
 			}));
@@ -1248,7 +1338,10 @@ struct WavetablerWidget : ModuleWidget {
 				module->setPolyOuts(poly);
 		}));
 		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
+
+		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
+		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
 	}
 };
 

@@ -1,8 +1,8 @@
-git tag v2.5.9-beta2 -m "create v2.5.9-beta2"  
+git tag v2.5.10 -m "create v2.5.10"  
 git push origin --tags  
 
 delete local tag  
-git tag -d v2.5.9-beta
+git tag -d v2.5.10-beta
 
 delete remote
 git push --delete origin v2.5.9-beta
