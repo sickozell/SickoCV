@@ -489,7 +489,7 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### - DESCRIPTION
 'sickoLooper5' is inspired by hardware looper devices with most of their features implemented.
 
-![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/03d4f323-b0f6-42d5-8a11-aa074cacc8e4)  
+![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/cf0f1306-6a11-45cf-aad5-f94fa11ca210)
 
 #### - INSTRUCTIONS
 **Clock section**  
@@ -497,7 +497,6 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 Set clock speed with BPM knob. 
 METER knob sets the meter setting (number of clocks per bar) for all the tracks and affects the length of the loops when track loop sync is active.  
 These are the available meter settings: 2/4, 3/4, 4/4, 5/4, 6/4, 7/4, 5/8, 6/8, 7/8, 8/8, 9/8, 10/8, 11/8, 12/8, 13/8, 14/8, 15/8.
-Tempos in eigths don't change the number of clocks per bar, but only affect the audio click output.
 
 'CLK OUT' sends a 1ms trigger on every clock.  
 
