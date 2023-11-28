@@ -42,6 +42,7 @@ VCV Rack plugin modules
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
+- [sickoLooper5](#sickoLooper5)
 - [sickoPlayer](#sickoplayer)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
@@ -488,7 +489,7 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### - DESCRIPTION
 'sickoLooper5' is inspired by hardware looper devices with most of their features implemented.
 
-. . image . . 
+![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/03d4f323-b0f6-42d5-8a11-aa074cacc8e4)  
 
 #### - INSTRUCTIONS
 **Clock section**  
@@ -636,7 +637,8 @@ Please note that if 'START immediately' is set to OFF, when loop is overdubbing 
 If there are SYNCed and unSYNCed SOLO tracks, the SYNCed ones will start running on the the first bar detection after the unSYNCed has stopped.
 
 
-#### CONTEXT MENU
+#### CONTEXT MENU  
+
 - **SOURCEs to MASTER out** (ticked by default)  
 This routes sources to main outputs. If it is disabled main outputs will receive only tracks playback.  
 
@@ -670,7 +672,7 @@ This saves a ".slp" file with all sickoLooper settings.
 - **Save preset + loops**
 This saves a ".slp" file with all sickoLooper settings and every recorded loop in separate wav files.
 
-- **Click Settings**  
+- **Click Settings**
 
 	- **Click Presets**  
 There are 3 predefined types of audio clicks, each one with beat and bar sample.  
