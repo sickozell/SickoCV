@@ -35,8 +35,10 @@
 #define SLOW_PULSE 1
 #define FAST_PULSE 2
 
-#define EMPTY 0 // trackStatus
-#define NONE 0	// nextStatus
+#define EMPTY 0
+// EMPTY is for trackStatus
+#define NONE 0
+// NONE is for nextStatus
 #define IDLE 1
 #define PREROLLING 2
 #define PLAYING 3
