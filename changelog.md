@@ -1,3 +1,6 @@
+### 2.6.0 (2023-12-xx)
+- added sickoLooper5 module
+
 ### 2.5.10 (2023-11-19)
 - all player and sampler modules: added 'Store Sample in Patch' feature
 - clocker: fixed a bug when time signatures are in eights
