@@ -309,7 +309,6 @@ struct SickoLooper5 : Module {
 	bool fileFound = false;
 	//std::string storedPath[5] = {"", "", "", "", ""};
 
-
 	// *************************************************************
 	// JSON variables
 	//int antiAlias = 1;
