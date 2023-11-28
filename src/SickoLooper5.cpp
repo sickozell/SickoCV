@@ -37,8 +37,8 @@
 
 #define EMPTY 0
 // EMPTY is for trackStatus
-#define NONE 0
-// NONE is for nextStatus
+#define NOTHING 0
+// NOTHING is for nextStatus
 #define IDLE 1
 #define PREROLLING 2
 #define PLAYING 3
@@ -213,7 +213,7 @@ struct SickoLooper5 : Module {
 	// TRACKS
 	
 	int trackStatus[5] = {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY};
-	int nextStatus[5] = {NONE, NONE, NONE, NONE, NONE};
+	int nextStatus[5] = {NOTHING, NOTHING, NOTHING, NOTHING, NOTHING};
 	bool trackRecorded[5] = {false, false, false, false, false};
 	vector<float> trackBuffer[5][2];
 
@@ -1034,14 +1034,14 @@ struct SickoLooper5 : Module {
 		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
 
 			// stop track
-			if ((trackStatus[track] != IDLE && trackStatus[track] != EMPTY) || nextStatus[track] != NONE)
+			if ((trackStatus[track] != IDLE && trackStatus[track] != EMPTY) || nextStatus[track] != NOTHING)
 				busyTracks--;
 			if (track == nextSoloTrack)
 				nextSoloTrack = -1;
 			if (track == currentSoloTrack)
 				currentSoloTrack = -1;
 			trackStatus[track] = EMPTY;
-			nextStatus[track] = NONE;
+			nextStatus[track] = NOTHING;
 			samplePos[track] = 0;
 			setEmptyLed(track);
 
@@ -2014,7 +2014,7 @@ struct SickoLooper5 : Module {
 			setRecLed(track);
 		else if (trackStatus[track] == OVERDUBBING)
 			setOverdubLed(track);
-		nextStatus[track] = NONE;
+		nextStatus[track] = NOTHING;
 	}
 
 	void resetIdleEmptyStatus(int track) {
@@ -2022,7 +2022,7 @@ struct SickoLooper5 : Module {
 			setEmptyLed(track);
 		else
 			setIdleLed(track);
-		nextStatus[track] = NONE;
+		nextStatus[track] = NOTHING;
 	}
 
 /*
@@ -2317,7 +2317,7 @@ struct SickoLooper5 : Module {
 					totalSamples[track] = 0;
 					totalSampleC[track] = 0;
 					trackStatus[track] = EMPTY;
-					nextStatus[track] = NONE;
+					nextStatus[track] = NOTHING;
 					trackRecorded[track] = false;
 					recordedTracks--;
 					lights[PLAY_BUT_LIGHT+track].setBrightness(0.f);
@@ -2346,14 +2346,14 @@ struct SickoLooper5 : Module {
 
 						case IDLE:
 						case EMPTY:
-							if (nextStatus[track] != NONE) {
+							if (nextStatus[track] != NOTHING) {
 								if (solo_setting[track]) {
 									if (currentSoloTrack != track)
 										cancelNextStatus(currentSoloTrack);
 
 									nextSoloTrack = -1;
 								}
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 								resetIdleEmptyStatus(track);
 								busyTracks--;
 							}
@@ -2375,7 +2375,7 @@ struct SickoLooper5 : Module {
 									if (stopImm_setting[track])
 										stopNow[track] = true;
 								} else {	// undo
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 									setPlayLed(track);
 								}
 							}
@@ -2392,7 +2392,7 @@ struct SickoLooper5 : Module {
 								if (solo_setting[track])
 									nextSoloTrack = -1;
 							} else {	// undo
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 								setRecLed(track);
 								}
 						break;
@@ -2419,7 +2419,7 @@ struct SickoLooper5 : Module {
 										stopNow[track] = true;
 
 								} else { // undo
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 									setOverdubLed(track);
 								}
 							}
@@ -2483,7 +2483,7 @@ struct SickoLooper5 : Module {
 
 							} else if (globalStatus == PREROLLING) {		// play press & globalStatus is PREROLLING
 								
-								if (nextStatus[track] == NONE) {	// undo
+								if (nextStatus[track] == NOTHING) {	// undo
 
 									if (!solo_setting[track]) {
 										busyTracks++;
@@ -2491,7 +2491,7 @@ struct SickoLooper5 : Module {
 										if (nextSoloTrack < 0) {
 											busyTracks++;
 										} else {
-											nextStatus[nextSoloTrack] = NONE;
+											nextStatus[nextSoloTrack] = NOTHING;
 											setIdleLed(nextSoloTrack);
 										}
 										nextSoloTrack = track;
@@ -2516,7 +2516,7 @@ struct SickoLooper5 : Module {
 								} else {	// undo or switch from overdub to play
 
 									if (nextStatus[track] == PLAYING) {
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 										busyTracks--;
 										if (nextSoloTrack == track)
 											nextSoloTrack = -1;
@@ -2529,7 +2529,7 @@ struct SickoLooper5 : Module {
 								
 							} else {
 
-								if (nextStatus[track] == NONE) {		// play press & track is IDLE -> go PLAYING
+								if (nextStatus[track] == NOTHING) {		// play press & track is IDLE -> go PLAYING
 									
 									if (solo_setting[track]) {
 
@@ -2617,7 +2617,7 @@ struct SickoLooper5 : Module {
 								setFastPlayLed(track);
 
 							} else {	// undo play press
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 
 								if (solo_setting[track]) {
 									
@@ -2652,7 +2652,7 @@ struct SickoLooper5 : Module {
 								setRecToPlayLed(track);
 							} else {	// undo play press
 
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 
 								setRecLed(track);
 							}
@@ -2695,7 +2695,7 @@ struct SickoLooper5 : Module {
 										busyTracks--;
 									}
 								}
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 								setOverdubLed(track);
 							}
 						} else {
@@ -2754,7 +2754,7 @@ struct SickoLooper5 : Module {
 
 				} else if (globalStatus == PREROLLING) {				// rec press & globalStatus is PREROLLING
 
-					if (nextStatus[track] == NONE ) {
+					if (nextStatus[track] == NOTHING ) {
 
 						if (!solo_setting[track]) {
 							busyTracks++;
@@ -2803,7 +2803,7 @@ struct SickoLooper5 : Module {
 							else
 								setIdleLed(track);
 
-							nextStatus[track] = NONE;
+							nextStatus[track] = NOTHING;
 							busyTracks--;
 							if (nextSoloTrack == track)
 								nextSoloTrack = -1;
@@ -2815,7 +2815,7 @@ struct SickoLooper5 : Module {
 					switch (trackStatus[track]) {
 						case EMPTY:									// rec press & track is empty -> go recording
 
-							if (nextStatus[track] == NONE) {
+							if (nextStatus[track] == NOTHING) {
 
 								if (solo_setting[track]) {
 
@@ -2840,7 +2840,7 @@ struct SickoLooper5 : Module {
 								busyTracks++;
 								setFastRecLed(track);
 							} else {	// UNDO REC PRESS
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 								busyTracks--;
 
 								if (solo_setting[track] && nextSoloTrack == track)
@@ -2855,7 +2855,7 @@ struct SickoLooper5 : Module {
 
 						case IDLE:										// rec press & track is IDLE -> go overdubbinig
 							//if (nextStatus[track] != OVERDUBBING) {
-							if (nextStatus[track] == NONE) {
+							if (nextStatus[track] == NOTHING) {
 
 								if (solo_setting[track]) {
 
@@ -2900,7 +2900,7 @@ struct SickoLooper5 : Module {
 							} else { // UNDO REC PRESS
 
 								if (nextStatus[track] == OVERDUBBING) {
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 									busyTracks--;
 
 									if (solo_setting[track] && nextSoloTrack == track)
@@ -2945,7 +2945,7 @@ struct SickoLooper5 : Module {
 								if (currentSoloTrack >= 0)
 									cancelNextStatus(currentSoloTrack);
 
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 								setPlayLed(track);
 
 							}
@@ -2957,7 +2957,7 @@ struct SickoLooper5 : Module {
 									nextStatus[track] = PLAYING;
 									setRecToPlayLed(track);
 								} else {
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 									setRecLed(track);
 								}
 							} else {
@@ -3016,7 +3016,7 @@ struct SickoLooper5 : Module {
 									}
 								}
 
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 								setOverdubLed(track);
 							}
 						break;
@@ -3398,7 +3398,7 @@ struct SickoLooper5 : Module {
 
 				switch (nextStatus[track]) {
 
-					case NONE:
+					case NOTHING:
 					case IDLE:
 					break;
 
@@ -3446,7 +3446,7 @@ struct SickoLooper5 : Module {
 
 									}
 
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 									trackStatus[track] = PLAYING;
 
 									if (solo_setting[track]) {
@@ -3492,7 +3492,7 @@ struct SickoLooper5 : Module {
 										samplePos[track] = totalSamples[track];
 									}
 
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 									trackStatus[track] = PLAYING;
 
 									setPlayLed(track);
@@ -3505,7 +3505,7 @@ struct SickoLooper5 : Module {
 								} else if (!loopSync_setting[track]) {	// if NOT loopSync
 
 									if (trackStatus[track] == IDLE) {
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 										trackStatus[track] = PLAYING;
 
 										if (solo_setting[track]) {
@@ -3542,7 +3542,7 @@ struct SickoLooper5 : Module {
 										}
 
 										trackStatus[track] = PLAYING;
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 										setPlayLed(track);
 									}
 								}
@@ -3569,7 +3569,7 @@ struct SickoLooper5 : Module {
 								recordedTracks++;
 
 								trackStatus[track] = RECORDING;
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 								recFadeValue[track] = 1.f;
 
 								if (solo_setting[track]) {
@@ -3619,7 +3619,7 @@ struct SickoLooper5 : Module {
 								recFadeDelta[track] = 1.f / fiveMsSamples;
 
 								trackStatus[track] = OVERDUBBING;
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 
 								if (solo_setting[track]) {
 									currentSoloTrack = track;
@@ -3643,7 +3643,7 @@ struct SickoLooper5 : Module {
 								}
 
 								trackStatus[track] = OVERDUBBING;
-								nextStatus[track] = NONE;
+								nextStatus[track] = NOTHING;
 
 								if (solo_setting[track]) {
 									currentSoloTrack = track;
@@ -3656,7 +3656,7 @@ struct SickoLooper5 : Module {
 								
 								if (trackStatus[track] == IDLE) {
 									trackStatus[track] = OVERDUBBING;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									if (solo_setting[track]) {
 										currentSoloTrack = track;
@@ -3679,7 +3679,7 @@ struct SickoLooper5 : Module {
 								} else if (startNow[track]) {	// if it's PLAYING & startNow
 
 									trackStatus[track] = OVERDUBBING;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									// recFadeIn
 									recFade[track] = true;
@@ -3781,7 +3781,7 @@ struct SickoLooper5 : Module {
 
 								if (nextStatus[track] == OVERDUBBING) {
 									trackStatus[track] = OVERDUBBING;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									if (!rev_setting[track]) { 
 										playingDirection[track] = FORWARD;
@@ -3799,7 +3799,7 @@ struct SickoLooper5 : Module {
 								} else {
 									busyTracks--;
 									trackStatus[track] = IDLE;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									if (solo_setting[track]) {
 										startNewSolo = true;
@@ -3814,7 +3814,7 @@ struct SickoLooper5 : Module {
 									case IDLE:
 										busyTracks--;
 										trackStatus[track] = IDLE;
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 
 										setIdleLed(track);
 
@@ -3826,7 +3826,7 @@ struct SickoLooper5 : Module {
 
 									case OVERDUBBING:
 										trackStatus[track] = OVERDUBBING;
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 
 										setOverdubLed(track);
 									break;
@@ -3860,7 +3860,7 @@ struct SickoLooper5 : Module {
 								case IDLE:
 									busyTracks--;
 									trackStatus[track] = IDLE;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									if (solo_setting[track]) {
 										startNewSolo = true;
@@ -3872,7 +3872,7 @@ struct SickoLooper5 : Module {
 
 								case PLAYING:
 									trackStatus[track] = PLAYING;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									setPlayLed(track);
 								break;
@@ -3880,15 +3880,15 @@ struct SickoLooper5 : Module {
 								
 								case OVERDUBBING:	// this is possible only when is NOT loopSync 
 									trackStatus[track] = OVERDUBBING;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									setOverdubLed(track);
 								break;
 								
 
-								case NONE:
+								case NOTHING:
 									if (!oneShot_setting[track]) {
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 
 										if (overdubAfterRec) {
 											trackStatus[track] = OVERDUBBING;
@@ -3901,7 +3901,7 @@ struct SickoLooper5 : Module {
 									} else {
 										busyTracks--;
 										trackStatus[track] = IDLE;
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 
 										if (solo_setting[track]) {
 											startNewSolo = true;
@@ -3966,7 +3966,7 @@ struct SickoLooper5 : Module {
 
 								if (nextStatus[track] == PLAYING) {
 									trackStatus[track] = PLAYING;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									if (!rev_setting[track]) { 
 										xFadePlay(track);
@@ -3982,7 +3982,7 @@ struct SickoLooper5 : Module {
 								} else {
 									busyTracks--;								
 									trackStatus[track] = IDLE;
-									nextStatus[track] = NONE;
+									nextStatus[track] = NOTHING;
 
 									if (solo_setting[track]) {
 										startNewSolo = true;
@@ -3996,7 +3996,7 @@ struct SickoLooper5 : Module {
 									case IDLE:
 										busyTracks--;
 										trackStatus[track] = IDLE;
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 
 										if (solo_setting[track]) {
 											startNewSolo = true;
@@ -4008,7 +4008,7 @@ struct SickoLooper5 : Module {
 
 									case PLAYING:
 										trackStatus[track] = PLAYING;
-										nextStatus[track] = NONE;
+										nextStatus[track] = NOTHING;
 
 										setPlayLed(track);
 
@@ -4042,7 +4042,7 @@ struct SickoLooper5 : Module {
 							switch (nextStatus[nextSoloTrack]) {
 								case PLAYING:
 									trackStatus[nextSoloTrack] = PLAYING;
-									nextStatus[nextSoloTrack] = NONE;
+									nextStatus[nextSoloTrack] = NOTHING;
 
 									/*
 									if (fadeInOnPlay[nextSoloTrack]) {
@@ -4080,7 +4080,7 @@ struct SickoLooper5 : Module {
 
 								case RECORDING:
 									trackStatus[nextSoloTrack] = RECORDING;
-									nextStatus[nextSoloTrack] = NONE;
+									nextStatus[nextSoloTrack] = NOTHING;
 
 									recordedTracks++;
 									trackRecorded[nextSoloTrack] = true;
@@ -4098,7 +4098,7 @@ struct SickoLooper5 : Module {
 
 								case OVERDUBBING:
 									trackStatus[nextSoloTrack] = OVERDUBBING;
-									nextStatus[nextSoloTrack] = NONE;
+									nextStatus[nextSoloTrack] = NOTHING;
 
 									setOverdubLed(nextSoloTrack);
 
