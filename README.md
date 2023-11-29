@@ -494,7 +494,6 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 
 #### - INSTRUCTIONS
 **Clock section**  
-
 Set clock speed with BPM knob. 
 METER knob sets the time-signature (number of clocks per bar) for all the tracks and affects the length of the loops when track loop sync is active.  
 These are the available meter settings: 2/4, 3/4, 4/4, 5/4, 6/4, 7/4, 5/8, 6/8, 7/8, 8/8, 9/8, 10/8, 11/8, 12/8, 13/8, 14/8, 15/8.
@@ -520,7 +519,7 @@ With STOP input connected 'STRT/STOP' input is used only to start all the tracks
 There are 5 separate stereo inputs each one with its gain level and mute button.  
 If only left input is connected it will be duplicated on the other channel.  
 
-**Track section**
+**TRACK SECTION**  
 Every track can be connected to a single source selected via the 'SRC' knob.  
 'MEAS' knob sets the length of the loop from 1 to 16 measures (bars).  
 
@@ -531,20 +530,20 @@ Every track (loop) has a current status:
 - RECORDING: the track is running and the loop it's been recorded for the first time
 - OVERDUBBING: the track is running and the loop it's recording over the previous take
 
-'PLAY' button (or its trig input) starts playing a previously recorded track.
+'PLAY' button (or its trig input) starts playing a previously recorded track.  
 'REC' button (or its trig input) starts recording (if empty) or overdubbing (if already recorded) a track from the selected source.  
 'STOP' button (or its trig input) stops playing/recording/overdubbing a track.  
 'ERASE' button clicked fast twice within 750ms (or its trig input is triggered once) clears a recorded track. It works only if a track is idle.  
 
 A vertical bar display shows the status of the track with different colors and the percentage of loop position. 
 - black: the track is empty
-- full red: the track is recording
+- red: the track is recording
 - blue: track is idle
 - evolving green: track is playing back
 - evolving yellow: track is overdubbing
 
 Over the display there's the track context menu with the following options:
-- Fade IN on playback (when a loop starts to play form idle state it will be faded in according to its XFD knob)
+- Fade IN on playback (when a loop starts to play or overdubbing form idle state it will be faded in according to its XFD knob)
 - Import Wav (loads a wav loop into the track)
 - Export Wav (it's active when a loop has been recorded and it saves a wav audio file, with the half second of extra recording included)  
 - Extra samples (1/2 sec) (If a loop has been recorded with sickoLooper this option should be enabled, it's an information used to sync loops correctly and detect tempo if needed)
@@ -558,39 +557,40 @@ The little 'START immediately' and 'STOP immediately' led buttons start or stop 
 
 '1SHOT' button runs playback/recording/overdubbing only once.  
 
-'SOLO' button lets the playback/recording/overdubbing only for one of the solo tracks at the same time. Solo setting can be changed only if the track is not running.  
+'SOLO' button lets the playback/recording/overdubbing only for one of the solo tracks at the same time. Solo setting can be changed only if the desired track is not running.  
 
 'XFD' knob sets the crossfade time between the end of the loop and the restart of the same. It can be set from 0 to 500ms. Default is 5ms.  
-If 'Fade In on Play' option is enabled for that track in the context menu, when it keeps running the loop will be faded according to its 'XFD' knob timing.
+If 'Fade In on Play' option is enabled for that track in the context menu, when it keeps playing or overdubbing the loop will be faded according to its 'XFD' knob timing.
 
 'PAN' knob simply stereo pans the output of the track. Panning affects source inputs only on each track output, but not on the main outputs, so the first recording of the loop will not be panned if only main outs are used.  
 
 'VOL' knob adjusts the volume of the track.
 
-**Track output section**
-"EoL" output sends a 1ms trigger when loop end is reached.  
+**Track output section**  
+"EoL" output sends a 1ms trigger when loop end is reached, and also when the loop is forced to stop if "Eol pulse on stop" option is active in the context menu.  
 "SRC" button sends the selected source input to the track output. If SRC button is off, source is sent to main outputs only if the 'SOURCEs to MASTER out' option is enabled on general context menu.  
 "OUTs" outputs are the single track stereo outputs.
 
-**Main output section**
+**Main output section**  
 There are two separate stereo outputs called EAR and MASTER.  
-These outputs are the sum of all tracks and all the sources, but depending on context menu 'Only Click on EAR' and 'SOURCEs to MASTER out' (see below).    
+These outputs are the sum of all tracks and all the sources, but depending on the context menu 'Only Click on EAR' and 'SOURCEs to MASTER out' (see below) options.    
 EAR output has the audio click too, just to be connected to earphones.
 MASTER output is usually connected to speakers, but if audio click is needed, MST button on click section, adds it on this output too.
 
-**PLAY/REC buttons leds**
-The following are the button led beahaviour depending on track state:
+**PLAY/REC buttons leds**  
+The followings are the button led beahaviour depending on track status:
 - track empty: no buttons are lit
 - track recorded and stopped (idle). the PLAY button stays fixed green
 - track is playing: the play button blinks
 - track is recording: the rec button blinks
 - track is overdubbing: both the play and rec buttons blink
 
-As explained below, if a command is pending due to tempo 'SYNC', the LED buttons flash quickly.
-Pending commands due to clock or solo synchronization can be revoked with a further button press.
+As explained below, if a command is pending due to tempo 'SYNC', the LED buttons flash quickly.  
+Pending commands due to clock or solo synchronization can be revoked with a further button press (undo).
 
 #### SickoLooper5 in DEPTH
-To avoid clicks between loop end/restart, every loop recording has a half second of extra recording (as the maximum crossfade setting possible), so clicks can be avoided adjusting 'XFD' knob. Please note that when playback or overdubbing starts for the first time it will not be neither crossfaded nor faded in.  
+To avoid clicks between loop end/restart, every loop recording has a half second of extra recording (as the maximum crossfade setting possible), so clicks can be avoided adjusting 'XFD' knob.  
+Please note that when playback or overdubbing starts for the first time it will not be neither crossfaded nor faded in by default, but there's an option in the track context menu to 'Fade IN on playback' according to XFD knob.  
 
 **SYNC ON behavior**  
 If at least one track is running, every PLAY/REC/OVERDUB/STOP command on a 'SYNC' track will wait for the next bar detection to be effective. It can be noticed because the LED buttons flash quickly.  
@@ -612,30 +612,16 @@ Please note that if 'START immediately' is set to OFF, when loop is overdubbing 
 If a track is set to SOLO, 'START immediately' and 'STOP immediately' won't have effect if other SOLO tracks are currently playing/recording/overdubbing.
 
 **SYNC OFF behavior**  
-MEAS knob is ignored when SYNC is off.
+MEAS knob is ignored when SYNC is off, it's only used to "Detect tempo" with its specific track context menu function.  
 Non-SYNCed tracks start to record immediately by pressing the REC button without any clock synchronization.  
 Recording can be stopped by pressing stop button, or restarted immediately to play state by pressing PLAY button, or turned immediately to overdub state by pressing the REC button again.  
 
-If a track is idle, it will start immediately playing or overdubbing by pressing respectively PLAY or REC button.  
-When a loop is playing, if PLAY is pressed, it will wait the end of the loop to stop.  
-When a loop is playing, if REC button is pressed, it will wait the end of the loop to start overdubbing.  
-When a loop is overdubbing, if PLAY or REC button is pressed, it will wait the end of the loop to turn to play state.  
-These changes of state explained above have effect with a crossfade set by XFD knob.  
-
-Previous state changes will have immediate effect when 'START immediately' is ON, but with a 5ms fade.  
-
-When a loop is playing or overdubbing, if STOP button is pressed, it will wait the end of the loop to stop.  
-
-- 'STOP immediately' is ON:
-When a loop is playing or overdubbing, if STOP button is pressed, it immediately stops.  
-When a loop is playing, if PLAY button is pressed, it immediately stops.  
-When a loop is overdubbing, if REC button is pressed, it will immediately turn its state to playing.  
-These changes of state above have effect with a 5 ms fade.  
-Please note that if 'START immediately' is set to OFF, when loop is overdubbing and PLAY button is pressed, it will turn its state to play only when loop end is reached.  
-
+**Miscellaneous**  
 1SHOT setting usually stops looping when the first loop end is detected, but if a PLAY/OVERDUB command is given before, it will run until the end of the next loop is reached.  
 
 If there are SYNCed and unSYNCed SOLO tracks, the SYNCed ones will start running on the the first bar detection after the unSYNCed has stopped.
+
+Undo commands, every pending command due to tempo synchronization or prerolling can be revoked by pressing the same button. Commands sent to solo tracks are cancelled by newer ones.
 
 
 #### CONTEXT MENU  
