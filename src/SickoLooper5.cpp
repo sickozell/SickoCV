@@ -2,14 +2,6 @@
 #define BEAT 0
 #define BAR 1
 
-/*
-#define SIXTEENTH_NOTE 0
-#define EIGHTH_NOTE 1
-#define QUARTER_NOTE 2
-#define HALF_NOTE 3
-*/
-//#define EXTRAREC 4
-
 #define COLOR_RED 0xff, 0x00, 0x00, 0xff
 #define COLOR_DARK_RED 0xaf, 0x00, 0x00, 0xff
 #define COLOR_GREEN 0x00, 0xff, 0x00, 0xff
@@ -27,9 +19,6 @@
 
 #define FORWARD 0
 #define REVERSE 1
-
-//#define recOutChan 0
-//#define sampleCoeff 2
 
 #define NO_PULSE 0
 #define SLOW_PULSE 1
@@ -171,17 +160,15 @@ struct SickoLooper5 : Module {
 	// COMMON variables
 
 	unsigned int fileChannels;
-	//unsigned int channels;
 	unsigned int sampleRate = APP->engine->getSampleRate();
 	unsigned int prevSampleRate = APP->engine->getSampleRate();
 
-	vector<float> undoBuffer[2];
+	//vector<float> undoBuffer[2];
 	vector<float> tempBuffer[2];
 
 	int globalStatus = IDLE;
 	int recordedTracks = 0;
 	int busyTracks = 0;
-	//bool alreadyDecremented[5] = {false, false, false, false, false};
 	bool preRoll = false;
 	int preRollCount = 0;
 
@@ -202,9 +189,6 @@ struct SickoLooper5 : Module {
 	int nextSoloTrack = -1;
 	bool startNewSolo = false;
 
-	double currentTempoCoeff = 0.0;
-	//double currentBps = 0.0;
-
 	float panKnobValue = 0.f;
 	float panLeftCoeff = 1.f;
 	float panRightCoeff = 1.f;
@@ -219,11 +203,9 @@ struct SickoLooper5 : Module {
 
 	drwav_uint64 totalSampleC[5] = {0, 0, 0, 0, 0};
 	drwav_uint64 totalSamples[5] = {0, 0, 0, 0, 0};
-	//drwav_uint64 highestSample = 0;
 
-	int trackStage[5] = {0, 0, 0, 0, 0};
 	double samplePos[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
-	float trackLevel[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
+	//float trackLevel[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 	int currentSource[5] = {0, 0, 0, 0, 0};
 	int playingDirection[5] = {0, 0, 0, 0, 0};
 
@@ -237,11 +219,11 @@ struct SickoLooper5 : Module {
 	float prevEraseTrig[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 
 	float inputValue[5][2];
-	float recValue[5][2];
+	//float recValue[5][2];
 	float volTrack[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 
-	drwav_uint64 sampleEndPos[5] = {0, 0, 0, 0, 0};
-	drwav_uint64 sampleEdgePos[5] = {0, 0, 0, 0, 0};
+	//drwav_uint64 sampleEndPos[5] = {0, 0, 0, 0, 0};
+	//drwav_uint64 sampleEdgePos[5] = {0, 0, 0, 0, 0};
 	drwav_uint64 extraRecPos[5] = {0, 0, 0, 0, 0};
 	drwav_uint64 extraPlayPos[5] = {0, 0, 0, 0, 0};
 	int extraRecCount[5] = {0, 0, 0, 0, 0};
@@ -261,7 +243,6 @@ struct SickoLooper5 : Module {
 	float srcToTrackDelta[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 
 	float xFade_setting[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
-
 	float xFadeValue[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 	float xFadeDelta[5] = {1.f, 1.f, 1.f, 1.f, 1.f};
 
@@ -281,19 +262,18 @@ struct SickoLooper5 : Module {
 	float eolPulseTime[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 	bool notEolPulse[5] = {false, false, false, false, false};
 
-	drwav_uint64 maxSamplesToRec[5] = {0, 0, 0, 0, 0};
-	drwav_uint64 maxAftRecSamplesToRec[5] = {0, 0, 0, 0, 0};
-	int measValue[5] = {0, 0, 0, 0, 0};
+	//drwav_uint64 maxSamplesToRec[5] = {0, 0, 0, 0, 0};
+	//drwav_uint64 maxAftRecSamplesToRec[5] = {0, 0, 0, 0, 0};
+	//int measValue[5] = {0, 0, 0, 0, 0};
 	int trackLoopMeas[5] = {0, 0, 0, 0, 0};
 	int loopCount[5] = {0, 0, 0, 0, 0};
 
 	bool extraRecording[5] = {false, false, false, false, false};
 	bool extraPlaying[5] = {false, false, false, false, false};
 
-	bool extraSamples[5] = {true, true, true, true, true};
-
 	// *************************************************************
 	// OUTPUTS
+
 	float earLevel = 0;
 	float masterLevel = 0.f;
 
@@ -304,17 +284,11 @@ struct SickoLooper5 : Module {
 	//**************************************************************
 	// FILE MANAGEMENT
 
-	//unsigned int fileSampleRate;
-	//bool fileLoaded[5] = {false, false, false, false, false};
 	bool fileLoaded = false;
-	//bool fileFound[5] = {false, false, false, false, false};
 	bool fileFound = false;
-	//std::string storedPath[5] = {"", "", "", "", ""};
 
 	// *************************************************************
 	// JSON variables
-	//int antiAlias = 1;
-	//int polyOuts = POLYPHONIC;
 
 	bool srcToMaster = true;
 	bool onlyClickOnEar = false;
@@ -323,30 +297,27 @@ struct SickoLooper5 : Module {
 	bool instantStop = true;
 	bool overdubAfterRec = true;
 	bool fadeInOnPlay[5] = {false, false, false, false, false};
-	//bool hackTempo = false;
-
-	bool firstLoad = true;
-
+	bool extraSamples[5] = {true, true, true, true, true};
 
 	// ***************************************************************************************************
 	// exponential time knkobs
+
 	static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
-	const float maxAdsrTime = 10.f;
-	const float minAdsrTime = 0.001f;
-	const float noEnvTime = 0.00101f;
+	//const float maxAdsrTime = 10.f;
+	//const float minAdsrTime = 0.001f;
+	//const float noEnvTime = 0.00101f;
 
 	// ***************************************************************************************************
 	// PANEL settings
 
 	float clickToMaster_setting = 0.f;
-	float source[5] = {0.f,0.f,0.f,0.f,0.f};
-	float meas_knob[5] = {0.f,0.f,0.f,0.f,0.f};
+	//float source[5] = {0.f,0.f,0.f,0.f,0.f};
+	//float meas_knob[5] = {0.f,0.f,0.f,0.f,0.f};
 	float play_but[5] = {0.f,0.f,0.f,0.f,0.f};
 	float rec_but[5] = {0.f,0.f,0.f,0.f,0.f};
 	float stop_but[5] = {0.f,0.f,0.f,0.f,0.f};
 	float erase_but[5] = {0.f,0.f,0.f,0.f,0.f};
-	//float loopRec_setting[5] = {0.f,0.f,0.f,0.f,0.f};
 	float loopSync_setting[5] = {0.f,0.f,0.f,0.f,0.f};
 	float startImm_setting[5] = {0.f,0.f,0.f,0.f,0.f};
 	float stopImm_setting[5] = {0.f,0.f,0.f,0.f,0.f};
@@ -354,15 +325,6 @@ struct SickoLooper5 : Module {
 	float prevSolo_setting[5] = {-1.f, -1.f, -1.f, -1.f, -1.f};
 	float oneShot_setting[5] = {0.f,0.f,0.f,0.f,0.f};
 	float rev_setting[5] = {0.f,0.f,0.f,0.f,0.f};
-
-	// ***************************************************************************************************
-	// ***************************************************************************************************
-	//                                          P  R  E  S  E  T
-	// ***************************************************************************************************
-	// ***************************************************************************************************
-
-	//bool presetFileLoaded = false;
-	//std::string presetStoredPath = "";
 
 	// ***************************************************************************************************
 	// ***************************************************************************************************
@@ -385,7 +347,7 @@ struct SickoLooper5 : Module {
 	double bpm = 0.1;
 
 	drwav_uint64 clickTotalSampleC[2];
-	drwav_uint64 clickTotalSamples[2];           // not used ?
+	//drwav_uint64 clickTotalSamples[2];           // not used ?
 
 	const unsigned int minSamplesToLoad = 9;
 
@@ -394,7 +356,7 @@ struct SickoLooper5 : Module {
 	vector<float> clickTempBuffer2;
 
 	bool clickFileLoaded[2] = {false, false};
-	bool clickFileFound[2] = {false, false};
+	//bool clickFileFound[2] = {false, false};
 	bool clickPlay[2] = {false, false};
 	double clickSamplePos[2] = {0,0};
 
@@ -416,13 +378,11 @@ struct SickoLooper5 : Module {
 	bool resetStart = true;
 
 	int runSetting = 0;
-	//int runSetting = 1;
-	//int prevRunSetting = 0;
-	bool firstBar = false;
+	//bool firstBar = false;
 
-	float runButton = 0;
-	float runTrig = 0.f;
-	float prevRunTrig = 0.f;
+	//float runButton = 0;
+	//float runTrig = 0.f;
+	//float prevRunTrig = 0.f;
 
 	double clockSample = 1.0;
 	double clockMaxSample = 0.0;
@@ -431,10 +391,10 @@ struct SickoLooper5 : Module {
 	double midBeatMaxSample = 0.0;
 	bool midBeatPlayed = false;
 
-	double maxPulseSample = 0.0;
+	//double maxPulseSample = 0.0;
 
 	//int beatCounter = 1;
-	int beatCounter = 20;
+	int beatCounter = 20;	// this hack let stars clock immediately on bar
 
 	float oneMsSamples = (APP->engine->getSampleRate()) / 1000;
 	float fiveMsSamples = (APP->engine->getSampleRate()) / 200;
@@ -453,22 +413,22 @@ struct SickoLooper5 : Module {
 	bool stopButtonPulse[5] = {false, false, false, false};
 	float stopButtonPulseTime[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 
-	bool resetPulse = false;
-	float resetPulseTime = 0.f;
-	bool beatPulse = false;
-	float beatPulseTime = 0.f;
-	bool barPulse = false;
-	float barPulseTime = 0.f;
+	//bool resetPulse = false;
+	//float resetPulseTime = 0.f;
+	//bool beatPulse = false;
+	//float beatPulseTime = 0.f;
+	//bool barPulse = false;
+	//float barPulseTime = 0.f;
 
 	bool clockPulse = false;
 	float clockPulseTime = 0.f;
 
-	bool beatOnBar = false;
+	//bool beatOnBar = false;
 
-	bool resetOnRun = true;
-	bool resetPulseOnRun = false;
-	bool resetOnStop = false;
-	bool resetPulseOnStop = false;
+	//bool resetOnRun = true;
+	//bool resetPulseOnRun = false;
+	//bool resetOnStop = false;
+	//bool resetPulseOnStop = false;
 
 	bool extSync = false;
 	bool extConn = false;
@@ -506,14 +466,12 @@ struct SickoLooper5 : Module {
 		configSwitch(ALLSTARTSTOP_BUT_PARAM, 0.f, 1.f, 0.f, "All Start/Stop", {"OFF", "ON"});
 		configInput(ALLSTOP_TRIG_INPUT,"All Stop Trig");
 		//configSwitch(UNDOREDO_BUT_PARAM, 0.f, 1.f, 0.f, "Undo/Redo", {"OFF", "ON"});
-		//configParam(XFADE_KNOB_PARAM, 0.f, 100.f, 10.f, "Crossfade", "ms");
 
 		configSwitch(CLICK_BUT_PARAM, 0.f, 1.f, 0.f, "Click", {"OFF", "ON"});
 		configParam(CLICKVOL_KNOB_PARAM, 0.f, 2.0f, 1.f, "Click Volume", "%", 0, 100);
 		configSwitch(CLICKTOMASTER_SWITCH, 0.f, 1.f, 0.f, "Click to Master", {"Off", "On"});
 
 		configSwitch(PREROLL_BUT_PARAM, 0.f, 1.f, 0.f, "Pre-Roll", {"OFF", "ON"});
-		//configSwitch(PREROLL_SWITCH, 0.f, 2.f, 1.f, "Pre-Roll", {"1/2", "1", "2"});
 		configSwitch(PREROLL_SWITCH, 1.f, 2.f, 1.f, "Pre-Roll", {"1 bar", "2 bar"});
 		
 		configParam(EARVOL_KNOB_PARAM, 0.f, 1.0f, 1.f, "Ear Volume", "%", 0, 100);
@@ -539,10 +497,7 @@ struct SickoLooper5 : Module {
 			configParam(SOURCELVL_KNOB_PARAM+i, 0.f, 2.0f, 1.f, "Source Level", "%", 0, 100);
 			configSwitch(MUTE_SWITCH+i, 0.f, 1.f, 1.f, "Mute", {"Mute OFF", "Mute ON"});
 
-			//configParam<tpMeasureSl5>(MEAS_KNOB_PARAM+i, 0.f, 12.f, 5.f, "Loop Measure");	// 1/16 1/8 1/4 1/2 1 2 3 4 5 6 7 8 16
-			/*configParam<tpMeasureSl5>(MEAS_KNOB_PARAM+i, 0.f, 15.f, 0.f, "Loop Measure");	// 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
-			paramQuantities[MEAS_KNOB_PARAM+i]->snapEnabled = true;*/
-			configParam(MEAS_KNOB_PARAM+i, 1.f, 16.f, 1.f, "Loop Measure");	// 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+			configParam(MEAS_KNOB_PARAM+i, 1.f, 16.f, 1.f, "Loop Measure");
 			paramQuantities[MEAS_KNOB_PARAM+i]->snapEnabled = true;
 
 			configInput(PLAY_TRIG_INPUT+i,"Play Trig");
@@ -558,7 +513,6 @@ struct SickoLooper5 : Module {
 			configSwitch(ERASE_BUT_PARAM+i, 0.f, 1.f, 0.f, "Erase", {"OFF", "ON"});
 
 			configSwitch(LOOPSYNC_SWITCH+i, 0.f, 1.f, 1.f, "Loop Sync", {"Off", "On"});
-			//configSwitch(LOOPREC_SWITCH+i, 0.f, 1.f, 1.f, "Loop Rec", {"Off", "On"});
 
 			configSwitch(STARTIMM_SWITCH+i, 0.f, 1.f, 0.f, "Start Immediately", {"Off", "On"});
 			configSwitch(STOPIMM_SWITCH+i, 0.f, 1.f, 0.f, "Stop Immediately", {"Off", "On"});
@@ -594,8 +548,8 @@ struct SickoLooper5 : Module {
 		trackBuffer[3][1].resize(0);
 		trackBuffer[4][0].resize(0);
 		trackBuffer[4][1].resize(0);
-		undoBuffer[0].resize(0);
-		undoBuffer[1].resize(0);
+		//undoBuffer[0].resize(0);
+		//undoBuffer[1].resize(0);
 		tempBuffer[0].resize(0);
 		tempBuffer[1].resize(0);
 
@@ -620,7 +574,7 @@ struct SickoLooper5 : Module {
 		json_object_set_new(rootJ, "SrcToMaster", json_boolean(srcToMaster));
 		json_object_set_new(rootJ, "OnlyClickOnEar", json_boolean(onlyClickOnEar));
 		json_object_set_new(rootJ, "EolPulseOnStop", json_boolean(eolPulseOnStop));
-		json_object_set_new(rootJ, "playSequence", json_boolean(playSequence));
+		json_object_set_new(rootJ, "playSequence", json_integer(playSequence));
 		json_object_set_new(rootJ, "InstantStop", json_boolean(instantStop));
 		json_object_set_new(rootJ, "overdubAfterRec", json_boolean(overdubAfterRec));
 		json_object_set_new(rootJ, "extraSamples0", json_boolean(extraSamples[0]));
@@ -649,11 +603,9 @@ struct SickoLooper5 : Module {
 		json_t* eolPulseOnStopJ = json_object_get(rootJ, "EolPulseOnStop");
 		if (eolPulseOnStopJ)
 			eolPulseOnStop = json_boolean_value(eolPulseOnStopJ);
-
 		json_t* playSequenceJ = json_object_get(rootJ, "playSequence");
 		if (playSequenceJ)
 			playSequence = json_integer_value(playSequenceJ);
-
 		json_t* instantStopJ = json_object_get(rootJ, "InstantStop");
 		if (instantStopJ)
 			instantStop = json_boolean_value(instantStopJ);
@@ -703,14 +655,6 @@ struct SickoLooper5 : Module {
 			clickStoredPath[1] = json_string_value(clickSlot2J);
 			clickLoadSample(clickStoredPath[1], 1);
 		}
-
-		/*
-		json_t *presetPathJ = json_object_get(rootJ, "presetPath");
-		if (presetPathJ) {
-			presetStoredPath = json_string_value(presetPathJ);
-			loadPreset(presetStoredPath);
-		}
-		*/
 
 	}
 
@@ -1215,7 +1159,10 @@ struct SickoLooper5 : Module {
 		json_object_set_new(rootJ, "srcToMaster", json_boolean(srcToMaster));
 		json_object_set_new(rootJ, "onlyClickOnEar", json_boolean(onlyClickOnEar));
 		json_object_set_new(rootJ, "eolPulseOnStop", json_boolean(eolPulseOnStop));
+		json_object_set_new(rootJ, "playSequence", json_integer(playSequence));
 		json_object_set_new(rootJ, "instantStop", json_boolean(instantStop));
+		json_object_set_new(rootJ, "clickSlot1", json_string(clickStoredPath[0].c_str()));
+		json_object_set_new(rootJ, "clickSlot2", json_string(clickStoredPath[1].c_str()));
 		json_object_set_new(rootJ, "click", json_integer(click_setting));
 		json_object_set_new(rootJ, "clickVol", json_real(params[CLICKVOL_KNOB_PARAM].getValue()));
 		json_object_set_new(rootJ, "clickToMaster", json_integer(int(clickToMaster_setting)));
@@ -1265,9 +1212,22 @@ struct SickoLooper5 : Module {
 		if (eolPulseOnStopJ) {
 			eolPulseOnStop = json_boolean_value(eolPulseOnStopJ);
 		}
+		json_t *playSequenceJ = json_object_get(rootJ, "playSequence");
+		if (playSequenceJ)
+			playSequence = json_integer_value(playSequenceJ);
 		json_t *instantStopJ = json_object_get(rootJ, "instantStop");
 		if (instantStopJ) {
 			instantStop = json_boolean(instantStopJ);
+		}
+		json_t *clickSlot1J = json_object_get(rootJ, "clickSlot1");
+		if (clickSlot1J) {
+			clickStoredPath[0] = json_string_value(clickSlot1J);
+			clickLoadSample(clickStoredPath[0], 0);
+		}
+		json_t *clickSlot2J = json_object_get(rootJ, "clickSlot2");
+		if (clickSlot2J) {
+			clickStoredPath[1] = json_string_value(clickSlot2J);
+			clickLoadSample(clickStoredPath[1], 1);
 		}
 		json_t *clickJ = json_object_get(rootJ, "click");
 		if (clickJ) {
@@ -1722,7 +1682,7 @@ struct SickoLooper5 : Module {
 		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 
 		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
-			clickFileFound[slot] = true;
+			//clickFileFound[slot] = true;
 			clickSampleRate[slot] = sr * 2;
 			
 			clickPlayBuffer[slot].clear();
@@ -1738,7 +1698,7 @@ struct SickoLooper5 : Module {
 					clickPlayBuffer[slot].push_back(pSampleData[i] * 5);
 				}
 				clickTotalSampleC[slot] = clickPlayBuffer[slot].size();
-				clickTotalSamples[slot] = clickTotalSampleC[slot]-1;
+				//clickTotalSamples[slot] = clickTotalSampleC[slot]-1;
 				drwav_free(pSampleData);
 
 				//sampleRate = APP->engine->getSampleRate() * 2;
@@ -1817,7 +1777,7 @@ struct SickoLooper5 : Module {
 					clickPlayBuffer[slot].push_back(clickTempBuffer[i]);
 
 				clickTotalSampleC[slot] = clickPlayBuffer[slot].size();
-				clickTotalSamples[slot] = clickTotalSampleC[slot]-1;
+				//clickTotalSamples[slot] = clickTotalSampleC[slot]-1;
 				clickSampleRate[slot] = APP->engine->getSampleRate();
 
 			}
@@ -1834,7 +1794,7 @@ struct SickoLooper5 : Module {
 			clickFileLoaded[slot] = true;
 
 		} else {
-			clickFileFound[slot] = false;
+			//clickFileFound[slot] = false;
 			clickFileLoaded[slot] = false;
 			clickStoredPath[slot] = path;
 			clickFileDescription[slot] = "(!)"+path;
@@ -1845,7 +1805,7 @@ struct SickoLooper5 : Module {
 	void clickClearSlot(int slot) {
 		clickStoredPath[slot] = "";
 		clickFileDescription[slot] = "--none--";
-		clickFileFound[slot] = false;
+		//clickFileFound[slot] = false;
 		clickFileLoaded[slot] = false;
 		clickPlayBuffer[slot].clear();
 		clickTotalSampleC[slot] = 0;
@@ -3068,7 +3028,6 @@ struct SickoLooper5 : Module {
 				// *********** BPM CALC
 				
 				bpm = (double)params[BPM_KNOB_PARAM].getValue()/10;
-				//currentBps = bpm / 60;										// <------------- FACOLTATIVO ?!?!?
 
 				// **************   RUN PROCESS   ***************
 
@@ -3087,18 +3046,18 @@ struct SickoLooper5 : Module {
 							clickSamplePos[BAR] = 0;
 							clickPlay[BAR] = true;
 							clickPlay[BEAT] = false;
-							barPulse = true;
-							barPulseTime = oneMsSamples;
-							if (beatOnBar) {
+							//barPulse = true;
+							//barPulseTime = oneMsSamples;
+							/*if (beatOnBar) {
 								beatPulse = true;
 								beatPulseTime = oneMsSamples;
-							}
+							}*/
 						} else {
 							clickSamplePos[BEAT] = 0;
 							clickPlay[BEAT] = true;
 							clickPlay[BAR] = false;
-							beatPulse = true;
-							beatPulseTime = oneMsSamples;
+							//beatPulse = true;
+							//beatPulseTime = oneMsSamples;
 						}
 						midBeatPlayed = true;
 					}
@@ -3141,12 +3100,12 @@ struct SickoLooper5 : Module {
 							clickSamplePos[BAR] = 0;
 							clickPlay[BAR] = true;
 							clickPlay[BEAT] = false;
-							barPulse = true;
-							barPulseTime = oneMsSamples;
-							if (beatOnBar) {
+							//barPulse = true;
+							//barPulseTime = oneMsSamples;
+							/*if (beatOnBar) {
 								beatPulse = true;
 								beatPulseTime = oneMsSamples;
-							}
+							}*/
 							// ----------
 							barSample = -1;
 							// ----------
@@ -3154,8 +3113,8 @@ struct SickoLooper5 : Module {
 							clickSamplePos[BEAT] = 0;
 							clickPlay[BEAT] = true;
 							clickPlay[BAR] = false;
-							beatPulse = true;
-							beatPulseTime = oneMsSamples;
+							//beatPulse = true;
+							//beatPulseTime = oneMsSamples;
 						}
 						
 						//outputs[CLOCK_OUTPUT].setVoltage(10.f);
@@ -3228,18 +3187,18 @@ struct SickoLooper5 : Module {
 							clickSamplePos[BAR] = 0;
 							clickPlay[BAR] = true;
 							clickPlay[BEAT] = false;
-							barPulse = true;
-							barPulseTime = oneMsSamples;
-							if (beatOnBar) {
+							//barPulse = true;
+							//barPulseTime = oneMsSamples;
+							/*if (beatOnBar) {
 								beatPulse = true;
 								beatPulseTime = oneMsSamples;
-							}
+							}*/
 						} else {
 							clickSamplePos[BEAT] = 0;
 							clickPlay[BEAT] = true;
 							clickPlay[BAR] = false;
-							beatPulse = true;
-							beatPulseTime = oneMsSamples;
+							//beatPulse = true;
+							//beatPulseTime = oneMsSamples;
 						}
 						midBeatPlayed = true;
 					}
@@ -3268,12 +3227,12 @@ struct SickoLooper5 : Module {
 								clickSamplePos[BAR] = 0;
 								clickPlay[BAR] = true;
 								clickPlay[BEAT] = false;
-								barPulse = true;
-								barPulseTime = oneMsSamples;
-								if (beatOnBar) {
+								//barPulse = true;
+								//barPulseTime = oneMsSamples;
+								/*if (beatOnBar) {
 									beatPulse = true;
 									beatPulseTime = oneMsSamples;
-								}
+								}*/
 								// ----------
 								barSample = -1;
 								// ----------
@@ -3282,8 +3241,8 @@ struct SickoLooper5 : Module {
 								clickSamplePos[BEAT] = 0;
 								clickPlay[BEAT] = true;
 								clickPlay[BAR] = false;
-								beatPulse = true;
-								beatPulseTime = oneMsSamples;
+								//beatPulse = true;
+								//beatPulseTime = oneMsSamples;
 							}
 							
 							clockPulse = true;
@@ -3297,8 +3256,8 @@ struct SickoLooper5 : Module {
 							clickSamplePos[BEAT] = 0;
 							clickPlay[BEAT] = true;
 							clickPlay[BAR] = false;
-							beatPulse = true;
-							beatPulseTime = oneMsSamples;
+							//beatPulse = true;
+							//beatPulseTime = oneMsSamples;
 
 						}
 					}
@@ -4044,14 +4003,6 @@ struct SickoLooper5 : Module {
 									trackStatus[nextSoloTrack] = PLAYING;
 									nextStatus[nextSoloTrack] = NOTHING;
 
-									/*
-									if (fadeInOnPlay[nextSoloTrack]) {
-										fadeIn[nextSoloTrack] = true;
-										fadeInValue[nextSoloTrack] = 0.f;
-										fadeInDelta[track] = 1000 / (xFade_setting[track] * sampleRate);
-									}
-									*/
-
 									if (fadeInOnPlay[nextSoloTrack]) {
 										if (!extraPlaying[nextSoloTrack])
 											fadeInValue[nextSoloTrack] = 0.f;
@@ -4216,8 +4167,6 @@ struct SickoLooper5 : Module {
 
 				break;
 			}
-
-			//alreadyDecremented[track] = false;
 
 			if (extraPlaying[track]) {
 				xFadeValue[track] -= xFadeDelta[track];
