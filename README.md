@@ -503,7 +503,7 @@ External clock input can be connected to 'EXT CLK' input. In this case clock is 
 
 'CLK OUT' sends a 1ms trigger on every clock.  
 
-**Click section**
+**Click section**  
 Enabling "CLICK" button an audio click is sent to 'EAR' output according to meter setting.  
 Click volume can be adjusted with 'LVL' knob.  
 'MST' button sends the click also to 'MASTER' output.  
