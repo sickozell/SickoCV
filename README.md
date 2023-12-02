@@ -1,4 +1,4 @@
-# SickoCV v2.6.0-beta2
+# SickoCV v2.6.0-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta3: fixed issue on loop fade out when synced loops play at greater measures than recorded  
+changed default crossfade and minimum start/stop fade to 6ms  
+fixed issue on "save preset + loops" that didn't delete wav files if tracks are empty  
+fixed missing "SOURCEs to MASTER out" and "Only Click on EAR" settings when saving preset  
 - beta2: fixed missing 'Play Button Sequence' setting and click audio files path when saving preset.
 - beta1: added sickoLooper5 module
 
@@ -559,7 +563,7 @@ The little 'START immediately' and 'STOP immediately' led buttons start or stop 
 
 'SOLO' button lets the playback/recording/overdubbing only for one of the solo tracks at the same time. Solo setting can be changed only if the desired track is not running.  
 
-'XFD' knob sets the crossfade time between the end of the loop and the restart of the same. It can be set from 0 to 500ms. Default is 5ms.  
+'XFD' knob sets the crossfade time between the end of the loop and the restart of the same. It can be set from 0 to 500ms. Default is 6ms.  
 If 'Fade In on Play' option is enabled for that track in the context menu, when it keeps playing or overdubbing the loop will be faded according to its 'XFD' knob timing.
 
 'PAN' knob simply stereo pans the output of the track. Panning affects source inputs only on each track output, but not on the main outputs, so the first recording of the loop will not be panned if only main outs are used.  
@@ -577,6 +581,8 @@ These outputs are the sum of all tracks and all the sources, but depending on th
 EAR output has the audio click too, just to be connected to earphones.
 MASTER output is usually connected to speakers, but if audio click is needed, MST button on click section, adds it on this output too.
 
+If track outputs are already used for separate processing, keep in mind that they are also routed to main outputs.
+
 **PLAY/REC buttons leds**  
 The followings are the button led beahaviour depending on track status:
 - track empty: no buttons are lit
@@ -589,8 +595,12 @@ As explained below, if a command is pending due to tempo 'SYNC', the LED buttons
 Pending commands due to clock or solo synchronization can be revoked with a further button press (undo).
 
 #### SickoLooper5 in DEPTH
-To avoid clicks between loop end/restart, every loop recording has a half second of extra recording (as the maximum crossfade setting possible), so clicks can be avoided adjusting 'XFD' knob.  
+To avoid clicks between loop end/restart, every loop is recorded with a half second of extra recording (as the maximum crossfade setting possible), so clicks can be avoided adjusting 'XFD' knob.  
+To maintain tempo synchronization the crossfade will start from the beginning of extra recorded samples, just when the loop restarts from the beginning.  
+If clicks occur on imported loops, which usually haven't extra samples, it may be helpful to tick "Extra Recording (1/2 sec)" on track context menu and readjust XFD knob, keeping in mind that the loop will be half a second shorter.  
 Please note that when playback or overdubbing starts for the first time it will not be neither crossfaded nor faded in by default, but there's an option in the track context menu to 'Fade IN on playback' according to XFD knob.  
+
+When overdubbing a track that has no "Extra Recording" option enabled, the half second of extra samples will be recorded and "extra Recording" option will automatically be ticked.
 
 **SYNC ON behavior**  
 If at least one track is running, every PLAY/REC/OVERDUB/STOP command on a 'SYNC' track will wait for the next bar detection to be effective. It can be noticed because the LED buttons flash quickly.  
