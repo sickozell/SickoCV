@@ -1,4 +1,4 @@
-# SickoCV v2.6.0-beta3
+# SickoCV v2.6.0-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta4: fixed a fade issue when the loop restarts while still fading out from the previous stop  
 - beta3: fixed issue on loop fade out when synced loops play at greater measures than recorded  
 changed default crossfade and minimum start/stop fade to 6ms  
 fixed issue on "save preset + loops" that didn't delete wav files if tracks are empty  

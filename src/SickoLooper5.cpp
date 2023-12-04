@@ -300,7 +300,7 @@ struct SickoLooper5 : Module {
 	// ***************************************************************************************************
 	// PANEL settings
 
-	float clickToMaster_setting = 0.f;
+	//float clickToMaster_setting = 0.f;
 	float play_but[5] = {0.f,0.f,0.f,0.f,0.f};
 	float rec_but[5] = {0.f,0.f,0.f,0.f,0.f};
 	float stop_but[5] = {0.f,0.f,0.f,0.f,0.f};
@@ -351,7 +351,7 @@ struct SickoLooper5 : Module {
 
 	float clickOutput;
 
-	int click_setting;
+	//int click_setting;
 	
 	float resetBut = 0;
 	float resetValue = 0;
@@ -1127,9 +1127,11 @@ struct SickoLooper5 : Module {
 		json_object_set_new(rootJ, "instantStop", json_boolean(instantStop));
 		json_object_set_new(rootJ, "clickSlot1", json_string(clickStoredPath[0].c_str()));
 		json_object_set_new(rootJ, "clickSlot2", json_string(clickStoredPath[1].c_str()));
-		json_object_set_new(rootJ, "click", json_integer(click_setting));
+		//json_object_set_new(rootJ, "click", json_integer(click_setting));
+		json_object_set_new(rootJ, "click", json_integer(int(params[CLICK_BUT_PARAM].getValue())));
 		json_object_set_new(rootJ, "clickVol", json_real(params[CLICKVOL_KNOB_PARAM].getValue()));
-		json_object_set_new(rootJ, "clickToMaster", json_integer(int(clickToMaster_setting)));
+		//json_object_set_new(rootJ, "clickToMaster", json_integer(int(clickToMaster_setting)));
+		json_object_set_new(rootJ, "clickToMaster", json_integer(int(params[CLICKTOMASTER_SWITCH].getValue())));
 		json_object_set_new(rootJ, "preRoll", json_boolean(preRoll));
 		json_object_set_new(rootJ, "preRollBars", json_integer((int)params[PREROLL_SWITCH].getValue()));
 		json_object_set_new(rootJ, "earLevel", json_real(earLevel));
@@ -1145,7 +1147,6 @@ struct SickoLooper5 : Module {
 			json_object_set_new(rootJ, ("oneShot"+to_string(track)).c_str(), json_integer(int(oneShot_setting[track])));
 			json_object_set_new(rootJ, ("rev"+to_string(track)).c_str(), json_integer(int(rev_setting[track])));
 			json_object_set_new(rootJ, ("solo"+to_string(track)).c_str(), json_integer(int(solo_setting[track])));
-			//json_object_set_new(rootJ, ("xFade"+to_string(track)).c_str(), json_real(xFade_setting[track]));
 			json_object_set_new(rootJ, ("xFade"+to_string(track)).c_str(), json_real(params[XFADE_KNOB_PARAM+track].getValue()));
 			json_object_set_new(rootJ, ("pan"+to_string(track)).c_str(), json_real(params[PAN_KNOB_PARAM+track].getValue()));
 			json_object_set_new(rootJ, ("volTrack"+to_string(track)).c_str(), json_real(volTrack[track]));
@@ -1891,7 +1892,6 @@ struct SickoLooper5 : Module {
 		extraPlayDirection[track] = playingDirection[track];
 		xFadeValue[track] = 1.f;
 		if (!stopNow[track])
-			//xFadeDelta[track] = 1000 / (xFade_setting[track] * APP->engine->getSampleRate());
 			xFadeDelta[track] = 1000 / (params[XFADE_KNOB_PARAM+track].getValue() * APP->engine->getSampleRate());
 		else
 			xFadeDelta[track] = 1 / sixMsSamples;
@@ -1972,8 +1972,9 @@ struct SickoLooper5 : Module {
 
 		lights[CLICK_BUT_LIGHT].setBrightness(params[CLICK_BUT_PARAM].getValue());
 
-		clickToMaster_setting = params[CLICKTOMASTER_SWITCH].getValue();
-		lights[CLICKTOMASTER_LIGHT].setBrightness(clickToMaster_setting);
+		//clickToMaster_setting = params[CLICKTOMASTER_SWITCH].getValue();
+		//lights[CLICKTOMASTER_LIGHT].setBrightness(clickToMaster_setting);
+		lights[CLICKTOMASTER_LIGHT].setBrightness(params[CLICKTOMASTER_SWITCH].getValue());
 
 		if (params[PREROLL_BUT_PARAM].getValue())
 			preRoll = true;
@@ -2162,8 +2163,6 @@ struct SickoLooper5 : Module {
 
 			rev_setting[track] = params[REV_SWITCH+track].getValue();
 			lights[REV_LIGHT+track].setBrightness(rev_setting[track]);
-
-			//xFade_setting[track] = params[XFADE_KNOB_PARAM+track].getValue();
 
 			srcToTrack[track] = params[SRC_TO_TRACK_SWITCH+track].getValue();
 			lights[SRC_TO_TRACK_LIGHT+track].setBrightness(srcToTrack[track]);
@@ -2968,8 +2967,9 @@ struct SickoLooper5 : Module {
 		{
 			clickOutput = 0.f;
 
-			click_setting = params[CLICK_BUT_PARAM].getValue();
-			lights[CLICK_BUT_LIGHT].setBrightness(click_setting);
+			//click_setting = params[CLICK_BUT_PARAM].getValue();
+			//lights[CLICK_BUT_LIGHT].setBrightness(click_setting);
+			lights[CLICK_BUT_LIGHT].setBrightness(params[CLICK_BUT_PARAM].getValue());
 
 			// ********* EXTERNAL CONNECTION
 
@@ -3234,7 +3234,8 @@ struct SickoLooper5 : Module {
 
 			//	************ AUDIO CLICK
 
-			if (click_setting) {
+			//if (click_setting) {
+			if (params[CLICK_BUT_PARAM].getValue()) {
 				for (int i = 0; i < 2; i++) {
 					if (clickFileLoaded[i] && clickPlay[i] && floor(clickSamplePos[i]) < clickTotalSampleC[i]) {
 						clickOutput = clickPlayBuffer[i][clickSamplePos[i]] * params[CLICKVOL_KNOB_PARAM].getValue();
@@ -3242,17 +3243,6 @@ struct SickoLooper5 : Module {
 					} else {
 						clickPlay[i] = false;
 					}
-
-					// click output is managed on output section
-					/*
-					earOutput[LEFT] += clickOutput;
-					earOutput[RIGHT] += clickOutput;
-					if (clickToMaster_setting) {
-						sumOutput[LEFT] += clickOutput;
-						sumOutput[RIGHT] += clickOutput;
-					}
-					*/
-
 				}
 			} else {
 				clickPlay[BEAT] = false;
@@ -3287,16 +3277,6 @@ struct SickoLooper5 : Module {
 				}
 			}
 		}
-
-/*
-
-																								████████╗██████╗░░█████╗░░█████╗░██╗░░██╗░██████╗
-																								╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██║░██╔╝██╔════╝
-																								░░░██║░░░██████╔╝███████║██║░░╚═╝█████═╝░╚█████╗░
-																								░░░██║░░░██╔══██╗██╔══██║██║░░██╗██╔═██╗░░╚═══██╗
-																								░░░██║░░░██║░░██║██║░░██║╚█████╔╝██║░╚██╗██████╔╝
-																								░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚═╝░╚════╝░╚═╝░░╚═╝╚═════╝░
-*/
 
 /*
 																	██╗░░░░░░█████╗░░█████╗░██████╗░  ░██████╗████████╗░█████╗░██████╗░████████╗
@@ -3345,12 +3325,7 @@ struct SickoLooper5 : Module {
 											samplePos[track] = totalSamples[track] - barSample;
 										}
 
-										if (!extraPlaying[track])
-											fadeInValue[track] = 0.f;
-										else {
-											extraPlaying[track] = false;
-											fadeInValue[track] = 1-xFadeValue[track];
-										}
+										fadeInValue[track] = 0.f;
 										fadeIn[track] = true;
 										fadeInDelta[track] = 1.f / sixMsSamples;
 										
@@ -3393,14 +3368,8 @@ struct SickoLooper5 : Module {
 									} else {
 
 										if (fadeInOnPlay[track]) {
-											if (!extraPlaying[track])
-												fadeInValue[track] = 0.f;
-											else {
-												extraPlaying[track] = false;
-												fadeInValue[track] = 1-xFadeValue[track];
-											}
+											fadeInValue[track] = 0.f;
 											fadeIn[track] = true;
-											//fadeInDelta[track] = 1000 / (xFade_setting[track] * sampleRate);
 											fadeInDelta[track] = 1000 / (params[XFADE_KNOB_PARAM+track].getValue() * sampleRate);
 										}
 									}
@@ -3437,14 +3406,8 @@ struct SickoLooper5 : Module {
 										}
 
 										if (fadeInOnPlay[track]) {
-											if (!extraPlaying[track])
-												fadeInValue[track] = 0.f;
-											else {
-												extraPlaying[track] = false;
-												fadeInValue[track] = 1-xFadeValue[track];
-											}
+											fadeInValue[track] = 0.f;
 											fadeIn[track] = true;
-											//fadeInDelta[track] = 1000 / (xFade_setting[track] * sampleRate);
 											fadeInDelta[track] = 1000 / (params[XFADE_KNOB_PARAM+track].getValue() * sampleRate);
 										}
 
@@ -3528,12 +3491,7 @@ struct SickoLooper5 : Module {
 										samplePos[track] = totalSamples[track] - barSample;
 									}
 
-									if (!extraPlaying[track])
-										fadeInValue[track] = 0.f;
-									else {
-										extraPlaying[track] = false;
-										fadeInValue[track] = 1-xFadeValue[track];
-									}
+									fadeInValue[track] = 0.f;
 									fadeIn[track] = true;
 									fadeInDelta[track] = 1.f / sixMsSamples;
 								}
@@ -3558,7 +3516,10 @@ struct SickoLooper5 : Module {
 
 								eolPulse[track] = true;
 								eolPulseTime[track] = oneMsSamples;		// eol pulse when an overdubbing is starting
+
 								if (!rev_setting[track]) {
+									if (trackStatus[track] == PLAYING) 
+										xFadePlay(track);
 									samplePos[track] = 0;
 									playingDirection[track] = FORWARD;
 								} else {
@@ -3588,14 +3549,8 @@ struct SickoLooper5 : Module {
 									}
 
 									if (fadeInOnPlay[track]) {
-										if (!extraPlaying[track])
-											fadeInValue[track] = 0.f;
-										else {
-											extraPlaying[track] = false;
-											fadeInValue[track] = 1-xFadeValue[track];
-										}
+										fadeInValue[track] = 0.f;
 										fadeIn[track] = true;
-										//fadeInDelta[track] = 1000 / (xFade_setting[track] * sampleRate);
 										fadeInDelta[track] = 1000 / (params[XFADE_KNOB_PARAM+track].getValue() * sampleRate);
 									}
 
@@ -4011,7 +3966,6 @@ struct SickoLooper5 : Module {
 											fadeInValue[nextSoloTrack] = 1-xFadeValue[nextSoloTrack];
 										}
 										fadeIn[nextSoloTrack] = true;
-										//fadeInDelta[nextSoloTrack] = 1000 / (xFade_setting[nextSoloTrack] * sampleRate);
 										fadeInDelta[nextSoloTrack] = 1000 / (params[XFADE_KNOB_PARAM+nextSoloTrack].getValue() * sampleRate);
 									}
 
@@ -4092,19 +4046,13 @@ struct SickoLooper5 : Module {
 
 			switch (trackStatus[track]) {
 				case PLAYING:
-				
+
 					if (samplePos[track] > totalSamples[track] && !extraPlayingFadeOut[track]) {
-						/*
-						fadeIn[track] = true;
-						fadeInValue[track] = 1;
-						fadeInDelta[track] = - 1000 / (params[XFADE_KNOB_PARAM+track].getValue() * sampleRate);
-						*/
 						extraPlayingFadeOut[track] = true;
 						xFadePlay(track);
 						samplePos[track] = totalSampleC[track];
 					}
-				
-					//if (samplePos[track] < trackBuffer[track][LEFT].size() && samplePos[track] >= 0) {
+
 					if (samplePos[track] < totalSampleC[track] && samplePos[track] >= 0) {
 
 						if (!fadeIn[track]) {
@@ -4190,7 +4138,7 @@ struct SickoLooper5 : Module {
 
 						currentOutput[track][LEFT] += trackBuffer[track][LEFT][extraPlayPos[track]] * xFadeValue[track];
 						currentOutput[track][RIGHT] += trackBuffer[track][RIGHT][extraPlayPos[track]] * xFadeValue[track];
-						//extraPlayPos[track]++;
+
 						if (extraPlayDirection[track] == FORWARD)
 							extraPlayPos[track]++;
 						else
@@ -4424,7 +4372,8 @@ struct SickoLooper5 : Module {
 			sumOutput[RIGHT] += tempSourcesRight;
 		}
 
-		if (clickToMaster_setting) {
+		//if (clickToMaster_setting) {
+		if (params[CLICKTOMASTER_SWITCH].getValue()) {
 			sumOutput[LEFT] += clickOutput;
 			sumOutput[RIGHT] += clickOutput;
 		}
