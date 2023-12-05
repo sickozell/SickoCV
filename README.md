@@ -31,7 +31,7 @@ fixed missing "SOURCEs to MASTER out" and "Only Click on EAR" settings when savi
 # SickoCV v2.6.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/2af9b036-5ca0-463d-8371-45b3395aa139)
+![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/1a4542a5-7c09-493c-8dee-a5d2a69c5420)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -799,7 +799,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler](https://github.com/sickozell/SickoCV/assets/80784296/48c9dee5-1ae1-49c2-8ffd-e43b6f2de9fa)
+![sickosampler](https://github.com/sickozell/SickoCV/assets/80784296/a0157a5a-8e37-45ad-95dc-927873548122)
 
 #### - INSTRUCTIONS
 
