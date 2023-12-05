@@ -1,4 +1,4 @@
-# SickoCV v2.6.0-beta5
+# SickoCV v2.6.0-beta6
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta6: added "Clear Sample Input" on sickoSampler
 - beta5: added sickoLooper3 module
 - beta4: fixed a fade issue when the loop restarts while still fading out from the previous stop  
 - beta3: fixed issue on loop fade out when synced loops play at greater measures than recorded  
@@ -835,6 +836,8 @@ MON switch selects inputs routing to the outs: always [ON], while recording only
 
 Recording speed follows v/oct and tune settings.  
 As recording is not polyphonic, polyphony is disabled when the REC button is switched on, and the record playhead will follow only channel nr 0 on the polyphonic cables connected to v/oct.  
+
+"Sample Clear" input: if this input is triggered, it erases the recorded sample.
 
 **HINT**: If it's planned to record a sample to play it polyphonically with a master keyboard, please connect gate and v/oct to a MIDI>CV module with 'Reset' polyphony mode selected. Clear any previous sample in memory, select GATE mode, switch the LOOP button on, arm recording and consider adjusting envelope knobs. On key press (C4 for example) sickoSampler will start recording until key is unpressed, then the sample can be played immediately.
 

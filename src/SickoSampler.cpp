@@ -95,6 +95,7 @@ struct SickoSampler : Module {
 		ENUMS(IN_INPUT,2),
 		REC_INPUT,
 		RECSTOP_INPUT,
+		CLEAR_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -318,6 +319,8 @@ struct SickoSampler : Module {
 	float prevRecTrig = 0.f;
 	float recStopTrig = 0.f;
 	float prevRecStopTrig = 0.f;
+	float clearTrig = 0.f;
+	float prevClearTrig = 0.f;
 	int recordingState = 0;
 	bool newRecording = true;
 	bool armRec = false;
@@ -472,6 +475,8 @@ struct SickoSampler : Module {
 		configSwitch(STOPONREC_SWITCH, 0.f, 1.f, 0.f, "Stop on REC", {"Off", "On"});
 		
 		configSwitch(MONITOR_SWITCH, 0.f, 2.f, 0.f, "Monitor", {"Off", "Rec Only", "Always"});
+
+		configInput(CLEAR_INPUT,"Clear Sample");
 
 		playBuffer[0][0].resize(0);
 		playBuffer[0][1].resize(0);
@@ -1637,7 +1642,6 @@ struct SickoSampler : Module {
 */
 	void process(const ProcessArgs &args) override {
 
-		//if (!disableNav) {
 		if (!disableNav && !loadFromPatch) {
 			nextSample = params[NEXTSAMPLE_PARAM].getValue();
 			if (fileLoaded && fileFound && recordingState == 0 && nextSample && !prevNextSample) {
@@ -1740,6 +1744,12 @@ struct SickoSampler : Module {
 			}
 			
 		} else {
+
+			clearTrig = inputs[CLEAR_INPUT].getVoltage();
+			if (clearTrig >= 1 && prevClearTrig < 1)
+				clearSlot();
+			prevClearTrig = clearTrig;
+
 			knobCueEndPos = params[CUEEND_PARAM].getValue();
 			if (knobCueEndPos != prevKnobCueEndPos) {
 				if (knobCueEndPos < prevKnobCueEndPos)
@@ -5247,7 +5257,8 @@ struct SickoSamplerWidget : ModuleWidget {
 
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, yTunVol+2.5)), module, SickoSampler::VO_INPUT));
+		//addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, yTunVol+2.5)), module, SickoSampler::VO_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, 105.3)), module, SickoSampler::VO_INPUT));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23, yTunVol)), module, SickoSampler::TUNE_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18, yTunVol2)), module, SickoSampler::TUNE_INPUT));
@@ -5297,6 +5308,8 @@ struct SickoSamplerWidget : ModuleWidget {
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(100.4, yStartRec+52)), module, SickoSampler::STOPONREC_SWITCH, SickoSampler::STOPONREC_LIGHT));
 
 		addParam(createParamCentered<CKSSThree>(mm2px(Vec(94, yStartRec+62.3)), module, SickoSampler::MONITOR_SWITCH));
+
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7, yTunVol2+0.3)), module, SickoSampler::CLEAR_INPUT));
 
 	}
 
