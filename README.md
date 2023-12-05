@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta5: added sickoLooper3 module
 - beta4: fixed a fade issue when the loop restarts while still fading out from the previous stop  
 - beta3: fixed issue on loop fade out when synced loops play at greater measures than recorded  
 changed default crossfade and minimum start/stop fade to 6ms  

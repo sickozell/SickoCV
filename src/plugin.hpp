@@ -32,6 +32,7 @@ extern Model* modelDrumPlayerXtra;
 extern Model* modelParking;
 extern Model* modelShifter;
 extern Model* modelSickoAmp;
+extern Model* modelSickoLooper3;
 extern Model* modelSickoLooper5;
 extern Model* modelSickoPlayer;
 extern Model* modelSickoSampler;

@@ -33,6 +33,7 @@ void init(Plugin* p) {
 	p->addModel(modelParking);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
+	p->addModel(modelSickoLooper3);
 	p->addModel(modelSickoLooper5);
 	p->addModel(modelSickoPlayer);
 	p->addModel(modelSickoSampler);

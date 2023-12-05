@@ -1,4 +1,4 @@
-#define MAX_TRACKS 5
+#define MAX_TRACKS 3
 #define BEAT 0
 #define BAR 1
 
@@ -51,14 +51,14 @@
 
 using namespace std;
 
-struct tpSignatureSl5 : ParamQuantity {
+struct tpSignatureSl3 : ParamQuantity {
 	std::string getDisplayValueString() override {
 		const std::string valueDisplay[17] = {"2/4", "3/4", "4/4", "5/4", "6/4", "7/4", "5/8", "6/8", "7/8", "8/8", "9/8", "10/8", "11/8", "12/8", "13/8", "14/8", "15/8"};
 		return valueDisplay[int(getValue())];
 	}
 };
 
-struct SickoLooper5 : Module {
+struct SickoLooper3 : Module {
 	enum ParamIds {
 		CLOCK_RST_SWITCH,
 		BPM_KNOB_PARAM,
@@ -399,7 +399,7 @@ struct SickoLooper5 : Module {
 	// ***************************************************************************************************
 	// ***************************************************************************************************
 
-	SickoLooper5() {
+	SickoLooper3() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
 		configInput(LEFT_INPUT+0,"Left #1");
@@ -408,10 +408,6 @@ struct SickoLooper5 : Module {
 		configInput(RIGHT_INPUT+1,"Right #2");
 		configInput(LEFT_INPUT+2,"Left #3");
 		configInput(RIGHT_INPUT+2,"Right #3");
-		configInput(LEFT_INPUT+3,"Left #4");
-		configInput(RIGHT_INPUT+3,"Right #4");
-		configInput(LEFT_INPUT+4,"Left #5");
-		configInput(RIGHT_INPUT+4,"Right #5");
 
 		configInput(EXTCLOCK_INPUT,"External Clock");
 		configSwitch(CLOCK_RST_SWITCH, 0.f, 1.f, 0.f, "Bar Reset", {"OFF", "ON"});
@@ -420,7 +416,7 @@ struct SickoLooper5 : Module {
 		configParam(BPM_KNOB_PARAM, 300.f, 3000.f, 1200.f, "Tempo", " bpm", 0, 0.1);
 		paramQuantities[BPM_KNOB_PARAM]->snapEnabled = true;
 
-		configParam<tpSignatureSl5>(SIGNATURE_KNOB_PARAM, 0.f, 16.0f, 2.f, "Time Signature");
+		configParam<tpSignatureSl3>(SIGNATURE_KNOB_PARAM, 0.f, 16.0f, 2.f, "Time Signature");
 		paramQuantities[SIGNATURE_KNOB_PARAM]->snapEnabled = true;
 
 		configInput(ALLSTARTSTOP_TRIG_INPUT,"All Start/Stop Trig");
@@ -448,10 +444,6 @@ struct SickoLooper5 : Module {
 		paramQuantities[SOURCE_KNOB_PARAM+1]->snapEnabled = true;
 		configParam(SOURCE_KNOB_PARAM+2, 1.f, 5.f, 3.f, "Source Input");
 		paramQuantities[SOURCE_KNOB_PARAM+2]->snapEnabled = true;
-		configParam(SOURCE_KNOB_PARAM+3, 1.f, 5.f, 4.f, "Source Input");
-		paramQuantities[SOURCE_KNOB_PARAM+3]->snapEnabled = true;
-		configParam(SOURCE_KNOB_PARAM+4, 1.f, 5.f, 5.f, "Source Input");
-		paramQuantities[SOURCE_KNOB_PARAM+4]->snapEnabled = true;
 
 		for (int i=0; i < MAX_TRACKS; i++) {
 
@@ -505,10 +497,6 @@ struct SickoLooper5 : Module {
 		trackBuffer[1][1].resize(0);
 		trackBuffer[2][0].resize(0);
 		trackBuffer[2][1].resize(0);
-		trackBuffer[3][0].resize(0);
-		trackBuffer[3][1].resize(0);
-		trackBuffer[4][0].resize(0);
-		trackBuffer[4][1].resize(0);
 		//undoBuffer[0].resize(0);
 		//undoBuffer[1].resize(0);
 		tempBuffer[0].resize(0);
@@ -543,13 +531,9 @@ struct SickoLooper5 : Module {
 		json_object_set_new(rootJ, "extraSamples0", json_boolean(extraSamples[0]));
 		json_object_set_new(rootJ, "extraSamples1", json_boolean(extraSamples[1]));
 		json_object_set_new(rootJ, "extraSamples2", json_boolean(extraSamples[2]));
-		json_object_set_new(rootJ, "extraSamples3", json_boolean(extraSamples[3]));
-		json_object_set_new(rootJ, "extraSamples4", json_boolean(extraSamples[4]));
 		json_object_set_new(rootJ, "fadeInOnPlay0", json_boolean(fadeInOnPlay[0]));
 		json_object_set_new(rootJ, "fadeInOnPlay1", json_boolean(fadeInOnPlay[1]));
 		json_object_set_new(rootJ, "fadeInOnPlay2", json_boolean(fadeInOnPlay[2]));
-		json_object_set_new(rootJ, "fadeInOnPlay3", json_boolean(fadeInOnPlay[3]));
-		json_object_set_new(rootJ, "fadeInOnPlay4", json_boolean(fadeInOnPlay[4]));
 		json_object_set_new(rootJ, "ClickSlot1", json_string(clickStoredPath[0].c_str()));
 		json_object_set_new(rootJ, "ClickSlot2", json_string(clickStoredPath[1].c_str()));
 		return rootJ;
@@ -588,12 +572,6 @@ struct SickoLooper5 : Module {
 		json_t* extraSamples2J = json_object_get(rootJ, "extraSamples2");
 		if (extraSamples2J)
 			extraSamples[2] = json_boolean_value(extraSamples2J);
-		json_t* extraSamples3J = json_object_get(rootJ, "extraSamples3");
-		if (extraSamples3J)
-			extraSamples[3] = json_boolean_value(extraSamples3J);
-		json_t* extraSamples4J = json_object_get(rootJ, "extraSamples4");
-		if (extraSamples4J)
-			extraSamples[4] = json_boolean_value(extraSamples4J);
 
 		json_t* fadeInOnPlay0J = json_object_get(rootJ, "fadeInOnPlay0");
 		if (fadeInOnPlay0J)
@@ -604,12 +582,6 @@ struct SickoLooper5 : Module {
 		json_t* fadeInOnPlay2J = json_object_get(rootJ, "fadeInOnPlay2");
 		if (fadeInOnPlay2J)
 			fadeInOnPlay[2] = json_boolean_value(fadeInOnPlay2J);
-		json_t* fadeInOnPlay3J = json_object_get(rootJ, "fadeInOnPlay3");
-		if (fadeInOnPlay3J)
-			fadeInOnPlay[3] = json_boolean_value(fadeInOnPlay3J);
-		json_t* fadeInOnPlay4J = json_object_get(rootJ, "fadeInOnPlay4");
-		if (fadeInOnPlay4J)
-			fadeInOnPlay[4] = json_boolean_value(fadeInOnPlay4J);
 
 		json_t *clickSlot1J = json_object_get(rootJ, "ClickSlot1");
 		if (clickSlot1J) {
@@ -1377,106 +1349,6 @@ struct SickoLooper5 : Module {
 		json_t *fadeInOnPlay2J = json_object_get(rootJ, "fadeInOnPlay2");
 		if (fadeInOnPlay2J)
 			fadeInOnPlay[2] = json_boolean_value(fadeInOnPlay2J);
-
-		// ************    T R A C K    3    ***************
-		json_t *sourceLvl3J = json_object_get(rootJ, "sourceLvl3");
-		if (sourceLvl3J)
-			params[SOURCELVL_KNOB_PARAM+3].setValue(json_real_value(sourceLvl3J));
-		json_t *sourceMute3J = json_object_get(rootJ, "sourceMute3");
-		if (sourceMute3J)
-			params[MUTE_SWITCH+3].setValue(json_integer_value(sourceMute3J));
-		json_t *currentSource3J = json_object_get(rootJ, "currentSource3");
-		if (currentSource3J)
-			params[SOURCE_KNOB_PARAM+3].setValue(json_integer_value(currentSource3J)+1);
-		json_t *trackLoopMeas3J = json_object_get(rootJ, "trackLoopMeas3");
-		if (currentSource3J)
-			params[MEAS_KNOB_PARAM+3].setValue(json_integer_value(trackLoopMeas3J));
-		json_t *startImm3J = json_object_get(rootJ, "startImm3");
-		if (startImm3J)
-			params[STARTIMM_SWITCH+3].setValue(json_integer_value(startImm3J));
-		json_t *stopImm3J = json_object_get(rootJ, "stopImm3");
-		if (stopImm3J)
-			params[STOPIMM_SWITCH+3].setValue(json_integer_value(stopImm3J));
-		json_t *oneShot3J = json_object_get(rootJ, "oneShot3");
-		if (oneShot3J)
-			params[ONESHOT_SWITCH+3].setValue(json_integer_value(oneShot3J));
-		json_t *loopSync3J = json_object_get(rootJ, "loopSync3");
-		if (loopSync3J)
-			params[LOOPSYNC_SWITCH+3].setValue(json_integer_value(loopSync3J));
-		json_t *rev3J = json_object_get(rootJ, "rev3");
-		if (rev3J)
-			params[REV_SWITCH+3].setValue(json_integer_value(rev3J));
-		json_t *solo3J = json_object_get(rootJ, "solo3");
-		if (solo3J)
-			params[SOLO_SWITCH+3].setValue(json_integer_value(solo3J));
-		json_t *xFade_setting3J = json_object_get(rootJ, "xFade3");
-		if (xFade_setting3J)
-			params[XFADE_KNOB_PARAM+3].setValue(json_real_value(xFade_setting3J));
-		json_t *pan3J = json_object_get(rootJ, "pan3");
-		if (pan3J)
-			params[PAN_KNOB_PARAM+3].setValue(json_real_value(pan3J));
-		json_t *volTrack3J = json_object_get(rootJ, "volTrack3");
-		if (volTrack3J)
-			params[VOLTRACK_KNOB_PARAM+3].setValue(json_real_value(volTrack3J));
-		json_t *srcToTrack3J = json_object_get(rootJ, "srcToTrack3");
-		if (srcToTrack3J)
-			params[SRC_TO_TRACK_SWITCH+3].setValue(json_integer_value(srcToTrack3J));
-		json_t *extraSamples3J = json_object_get(rootJ, "extraSamples3");
-		if (extraSamples3J)
-			extraSamples[3] = json_boolean_value(extraSamples3J);
-		json_t *fadeInOnPlay3J = json_object_get(rootJ, "fadeInOnPlay3");
-		if (fadeInOnPlay3J)
-			fadeInOnPlay[3] = json_boolean_value(fadeInOnPlay3J);
-
-		// ************    T R A C K    4    ***************
-		json_t *sourceLvl4J = json_object_get(rootJ, "sourceLvl4");
-		if (sourceLvl4J)
-			params[SOURCELVL_KNOB_PARAM+4].setValue(json_real_value(sourceLvl4J));
-		json_t *sourceMute4J = json_object_get(rootJ, "sourceMute4");
-		if (sourceMute4J)
-			params[MUTE_SWITCH+4].setValue(json_integer_value(sourceMute4J));
-		json_t *currentSource4J = json_object_get(rootJ, "currentSource4");
-		if (currentSource4J)
-			params[SOURCE_KNOB_PARAM+4].setValue(json_integer_value(currentSource4J)+1);
-		json_t *trackLoopMeas4J = json_object_get(rootJ, "trackLoopMeas4");
-		if (currentSource4J)
-			params[MEAS_KNOB_PARAM+4].setValue(json_integer_value(trackLoopMeas4J));
-		json_t *startImm4J = json_object_get(rootJ, "startImm4");
-		if (startImm4J)
-			params[STARTIMM_SWITCH+4].setValue(json_integer_value(startImm4J));
-		json_t *stopImm4J = json_object_get(rootJ, "stopImm4");
-		if (stopImm4J)
-			params[STOPIMM_SWITCH+4].setValue(json_integer_value(stopImm4J));
-		json_t *oneShot4J = json_object_get(rootJ, "oneShot4");
-		if (oneShot4J)
-			params[ONESHOT_SWITCH+4].setValue(json_integer_value(oneShot4J));
-		json_t *loopSync4J = json_object_get(rootJ, "loopSync4");
-		if (loopSync4J)
-			params[LOOPSYNC_SWITCH+4].setValue(json_integer_value(loopSync4J));
-		json_t *rev4J = json_object_get(rootJ, "rev4");
-		if (rev4J)
-			params[REV_SWITCH+4].setValue(json_integer_value(rev4J));
-		json_t *solo4J = json_object_get(rootJ, "solo4");
-		if (solo4J)
-			params[SOLO_SWITCH+4].setValue(json_integer_value(solo4J));
-		json_t *xFade_setting4J = json_object_get(rootJ, "xFade4");
-		if (xFade_setting4J)
-			params[XFADE_KNOB_PARAM+4].setValue(json_real_value(xFade_setting4J));
-		json_t *pan4J = json_object_get(rootJ, "pan4");
-		if (pan4J)
-			params[PAN_KNOB_PARAM+4].setValue(json_real_value(pan4J));
-		json_t *volTrack4J = json_object_get(rootJ, "volTrack4");
-		if (volTrack4J)
-			params[VOLTRACK_KNOB_PARAM+4].setValue(json_real_value(volTrack4J));
-		json_t *srcToTrack4J = json_object_get(rootJ, "srcToTrack4");
-		if (srcToTrack4J)
-			params[SRC_TO_TRACK_SWITCH+4].setValue(json_integer_value(srcToTrack4J));
-		json_t *extraSamples4J = json_object_get(rootJ, "extraSamples4");
-		if (extraSamples4J)
-			extraSamples[4] = json_boolean_value(extraSamples4J);
-		json_t *fadeInOnPlay4J = json_object_get(rootJ, "fadeInOnPlay4");
-		if (fadeInOnPlay4J)
-			fadeInOnPlay[4] = json_boolean_value(fadeInOnPlay4J);
 	}
 
 	void menuLoadPreset() {
@@ -4427,10 +4299,10 @@ struct SickoLooper5 : Module {
 
 
 
-struct SickoLooper5DisplaySrc1 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplaySrc1 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplaySrc1() {
+	SickoLooper3DisplaySrc1() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -4449,10 +4321,10 @@ struct SickoLooper5DisplaySrc1 : TransparentWidget {
 	}
 };
 
-struct SickoLooper5DisplayMeas1 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplayMeas1 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplayMeas1() {
+	SickoLooper3DisplayMeas1() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -4474,10 +4346,10 @@ struct SickoLooper5DisplayMeas1 : TransparentWidget {
 	}
 };
 
-struct SickoLooper5DisplayLoop1 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplayLoop1 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplayLoop1() {
+	SickoLooper3DisplayLoop1() {
 	}
 
 	void onButton(const event::Button &e) override {
@@ -4555,7 +4427,7 @@ struct SickoLooper5DisplayLoop1 : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		SickoLooper5 *module = dynamic_cast<SickoLooper5 *>(this->module);
+		SickoLooper3 *module = dynamic_cast<SickoLooper3 *>(this->module);
 		assert(module);
 
 		if (module) {
@@ -4583,10 +4455,10 @@ struct SickoLooper5DisplayLoop1 : TransparentWidget {
 };
 // ------------------------------------------------------------------------------------------------------------------
 
-struct SickoLooper5DisplaySrc2 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplaySrc2 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplaySrc2() {
+	SickoLooper3DisplaySrc2() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -4606,10 +4478,10 @@ struct SickoLooper5DisplaySrc2 : TransparentWidget {
 
 };
 
-struct SickoLooper5DisplayMeas2 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplayMeas2 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplayMeas2() {
+	SickoLooper3DisplayMeas2() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -4631,10 +4503,10 @@ struct SickoLooper5DisplayMeas2 : TransparentWidget {
 	}
 };
 
-struct SickoLooper5DisplayLoop2 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplayLoop2 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplayLoop2() {
+	SickoLooper3DisplayLoop2() {
 	}
 
 	void onButton(const event::Button &e) override {
@@ -4712,7 +4584,7 @@ struct SickoLooper5DisplayLoop2 : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		SickoLooper5 *module = dynamic_cast<SickoLooper5 *>(this->module);
+		SickoLooper3 *module = dynamic_cast<SickoLooper3 *>(this->module);
 		assert(module);
 
 		if (module) {
@@ -4740,10 +4612,10 @@ struct SickoLooper5DisplayLoop2 : TransparentWidget {
 };
 // ------------------------------------------------------------------------------------------------------------------
 
-struct SickoLooper5DisplaySrc3 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplaySrc3 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplaySrc3() {
+	SickoLooper3DisplaySrc3() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -4762,10 +4634,10 @@ struct SickoLooper5DisplaySrc3 : TransparentWidget {
 	}
 };
 
-struct SickoLooper5DisplayMeas3 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplayMeas3 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplayMeas3() {
+	SickoLooper3DisplayMeas3() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -4787,10 +4659,10 @@ struct SickoLooper5DisplayMeas3 : TransparentWidget {
 	}
 };
 
-struct SickoLooper5DisplayLoop3 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplayLoop3 : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplayLoop3() {
+	SickoLooper3DisplayLoop3() {
 	}
 
 	void onButton(const event::Button &e) override {
@@ -4868,7 +4740,7 @@ struct SickoLooper5DisplayLoop3 : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		SickoLooper5 *module = dynamic_cast<SickoLooper5 *>(this->module);
+		SickoLooper3 *module = dynamic_cast<SickoLooper3 *>(this->module);
 		assert(module);
 
 		if (module) {
@@ -4896,321 +4768,13 @@ struct SickoLooper5DisplayLoop3 : TransparentWidget {
 };
 // ------------------------------------------------------------------------------------------------------------------
 
-struct SickoLooper5DisplaySrc4 : TransparentWidget {
-	SickoLooper5 *module;
-	int frame = 0;
-	SickoLooper5DisplaySrc4() {
-	}
 
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 10);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED)); 
-				nvgTextBox(args.vg, 7, 17, 60, to_string(int(module->params[module->SOURCE_KNOB_PARAM+3].getValue())).c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-};
-
-struct SickoLooper5DisplayMeas4 : TransparentWidget {
-	SickoLooper5 *module;
-	int frame = 0;
-	SickoLooper5DisplayMeas4() {
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 10);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED)); 
-				if (module->trackLoopMeas[3] > 9)
-					nvgTextBox(args.vg, 3, 17, 60, to_string(module->trackLoopMeas[3]).c_str(), NULL);
-				else
-					nvgTextBox(args.vg, 11, 17, 60, to_string(module->trackLoopMeas[3]).c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-};
-
-struct SickoLooper5DisplayLoop4 : TransparentWidget {
-	SickoLooper5 *module;
-	int frame = 0;
-	SickoLooper5DisplayLoop4() {
-	}
-
-	void onButton(const event::Button &e) override {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				switch (module->trackStatus[3]) {
-					case IDLE:
-						nvgStrokeColor(args.vg, nvgRGBA(COLOR_BLUE));
-						nvgStrokeWidth(args.vg, 15);
-						{
-							nvgBeginPath(args.vg);
-							nvgMoveTo(args.vg, 9, 76);
-							nvgLineTo(args.vg, 9, 1);
-							nvgClosePath(args.vg);
-						}
-						nvgStroke(args.vg);
-					break;
-
-					case PLAYING:
-						nvgStrokeWidth(args.vg, 15);
-						{
-							nvgBeginPath(args.vg);
-							nvgMoveTo(args.vg, 9, 76);
-							if (module->samplePos[3] < module->totalSamples[0]) {
-								nvgStrokeColor(args.vg, nvgRGBA(COLOR_GREEN));
-								nvgLineTo(args.vg, 9, 76-(75*module->samplePos[3]/module->totalSamples[3]));
-							} else {
-								nvgStrokeColor(args.vg, nvgRGBA(COLOR_DARK_GREEN));
-								nvgLineTo(args.vg, 9, 1);
-							}
-							nvgClosePath(args.vg);
-						}
-						nvgStroke(args.vg);
-					break;
-
-					case RECORDING:
-						nvgStrokeColor(args.vg, nvgRGBA(COLOR_RED));
-						nvgStrokeWidth(args.vg, 15);
-						{
-							nvgBeginPath(args.vg);
-							nvgMoveTo(args.vg, 9, 76);
-							nvgLineTo(args.vg, 9, 1);
-							nvgClosePath(args.vg);
-						}
-						nvgStroke(args.vg);
-					break;
-
-					case OVERDUBBING:
-						nvgStrokeWidth(args.vg, 15);
-						{
-							nvgBeginPath(args.vg);
-							nvgMoveTo(args.vg, 9, 76);
-							if (module->samplePos[3] < module->totalSamples[3]) {
-								nvgStrokeColor(args.vg, nvgRGBA(COLOR_YELLOW));
-								nvgLineTo(args.vg, 9, 76-(75*module->samplePos[3]/module->totalSamples[3]));
-							} else {
-								nvgStrokeColor(args.vg, nvgRGBA(COLOR_DARK_YELLOW));
-								nvgLineTo(args.vg, 9, 1);
-							}
-							nvgClosePath(args.vg);
-						}
-						nvgStroke(args.vg);
-					break;
-				}
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-
-	void createContextMenu() {
-		SickoLooper5 *module = dynamic_cast<SickoLooper5 *>(this->module);
-		assert(module);
-
-		if (module) {
-			ui::Menu *menu = createMenu();
-
-			const int track = 3;
-
-			menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
-			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
-			if (module->trackStatus[track] != EMPTY)
-				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
-			
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createBoolMenuItem("Extra samples (1/2 sec)", "", [=]() {
-					return module->isExtraSamples(track);
-				}, [=](bool xtraSamples) {
-					module->setExtraSamples(track, xtraSamples);
-			}));
-			if (module->trackStatus[track] != EMPTY)
-				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
-		}
-	}
-};
 // ------------------------------------------------------------------------------------------------------------------
 
-struct SickoLooper5DisplaySrc5 : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplayTempo : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplaySrc5() {
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 10);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED)); 
-				nvgTextBox(args.vg, 7, 17, 60, to_string(int(module->params[module->SOURCE_KNOB_PARAM+4].getValue())).c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-};
-
-struct SickoLooper5DisplayMeas5 : TransparentWidget {
-	SickoLooper5 *module;
-	int frame = 0;
-	SickoLooper5DisplayMeas5() {
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 10);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED)); 
-				if (module->trackLoopMeas[4] > 9)
-					nvgTextBox(args.vg, 3, 17, 60, to_string(module->trackLoopMeas[4]).c_str(), NULL);
-				else
-					nvgTextBox(args.vg, 11, 17, 60, to_string(module->trackLoopMeas[4]).c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-};
-
-struct SickoLooper5DisplayLoop5 : TransparentWidget {
-	SickoLooper5 *module;
-	int frame = 0;
-	SickoLooper5DisplayLoop5() {
-	}
-
-	void onButton(const event::Button &e) override {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				switch (module->trackStatus[4]) {
-					case IDLE:
-						nvgStrokeColor(args.vg, nvgRGBA(COLOR_BLUE));
-						nvgStrokeWidth(args.vg, 15);
-						{
-							nvgBeginPath(args.vg);
-							nvgMoveTo(args.vg, 9, 76);
-							nvgLineTo(args.vg, 9, 1);
-							nvgClosePath(args.vg);
-						}
-						nvgStroke(args.vg);
-					break;
-					case PLAYING:
-						nvgStrokeWidth(args.vg, 15);
-						{
-							nvgBeginPath(args.vg);
-							nvgMoveTo(args.vg, 9, 76);
-							if (module->samplePos[4] < module->totalSamples[4]) {
-								nvgStrokeColor(args.vg, nvgRGBA(COLOR_GREEN));
-								nvgLineTo(args.vg, 9, 76-(75*module->samplePos[4]/module->totalSamples[4]));
-							} else {
-								nvgStrokeColor(args.vg, nvgRGBA(COLOR_DARK_GREEN));
-								nvgLineTo(args.vg, 9, 1);
-							}
-							nvgClosePath(args.vg);
-						}
-						nvgStroke(args.vg);
-					break;
-
-					case RECORDING:
-						nvgStrokeColor(args.vg, nvgRGBA(COLOR_RED));
-						nvgStrokeWidth(args.vg, 15);
-						{
-							nvgBeginPath(args.vg);
-							nvgMoveTo(args.vg, 9, 76);
-							nvgLineTo(args.vg, 9, 1);
-							nvgClosePath(args.vg);
-						}
-						nvgStroke(args.vg);
-					break;
-
-					case OVERDUBBING:
-						nvgStrokeWidth(args.vg, 15);
-						{
-							nvgBeginPath(args.vg);
-							nvgMoveTo(args.vg, 9, 76);
-							if (module->samplePos[4] < module->totalSamples[4]) {
-								nvgStrokeColor(args.vg, nvgRGBA(COLOR_YELLOW));
-								nvgLineTo(args.vg, 9, 76-(75*module->samplePos[4]/module->totalSamples[4]));
-							} else {
-								nvgStrokeColor(args.vg, nvgRGBA(COLOR_DARK_YELLOW));
-								nvgLineTo(args.vg, 9, 1);
-							}
-							nvgClosePath(args.vg);
-						}
-						nvgStroke(args.vg);
-					break;
-				}
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-
-	void createContextMenu() {
-		SickoLooper5 *module = dynamic_cast<SickoLooper5 *>(this->module);
-		assert(module);
-
-		if (module) {
-			ui::Menu *menu = createMenu();
-
-			const int track = 4;
-
-			menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
-			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
-			if (module->trackStatus[track] != EMPTY)
-				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
-			
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createBoolMenuItem("Extra samples (1/2 sec)", "", [=]() {
-					return module->isExtraSamples(track);
-				}, [=](bool xtraSamples) {
-					module->setExtraSamples(track, xtraSamples);
-			}));
-			if (module->trackStatus[track] != EMPTY)
-				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
-		}
-	}
-};
-// ------------------------------------------------------------------------------------------------------------------
-
-struct SickoLooper5DisplayTempo : TransparentWidget {
-	SickoLooper5 *module;
-	int frame = 0;
-	SickoLooper5DisplayTempo() {
+	SickoLooper3DisplayTempo() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -5256,10 +4820,10 @@ struct SickoLooper5DisplayTempo : TransparentWidget {
 	}
 };
 
-struct SickoLooper5DisplayBeat : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DisplayBeat : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DisplayBeat() {
+	SickoLooper3DisplayBeat() {
 	}
 	
 	void onButton(const event::Button &e) override {
@@ -5292,14 +4856,14 @@ struct SickoLooper5DisplayBeat : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		SickoLooper5 *module = dynamic_cast<SickoLooper5 *>(this->module);
+		SickoLooper3 *module = dynamic_cast<SickoLooper3 *>(this->module);
 		assert(module);
 
 		if (module) {
 			ui::Menu *menu = createMenu();
 
 			struct ThisItem : MenuItem {
-				SickoLooper5* module;
+				SickoLooper3* module;
 				int valueNr;
 				void onAction(const event::Action& e) override {
 					module->params[module->SIGNATURE_KNOB_PARAM].setValue(float(valueNr));
@@ -5319,10 +4883,10 @@ struct SickoLooper5DisplayBeat : TransparentWidget {
 };
 
 /*
-struct SickoLooper5DebugDisplay : TransparentWidget {
-	SickoLooper5 *module;
+struct SickoLooper3DebugDisplay : TransparentWidget {
+	SickoLooper3 *module;
 	int frame = 0;
-	SickoLooper5DebugDisplay() {
+	SickoLooper3DebugDisplay() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -5346,10 +4910,10 @@ struct SickoLooper5DebugDisplay : TransparentWidget {
 };
 */
 
-struct SickoLooper5Widget : ModuleWidget {
-	SickoLooper5Widget(SickoLooper5 *module) {
+struct SickoLooper3Widget : ModuleWidget {
+	SickoLooper3Widget(SickoLooper3 *module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SickoLooper5.svg")));
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SickoLooper3.svg")));
 
 		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
@@ -5359,24 +4923,24 @@ struct SickoLooper5Widget : ModuleWidget {
 		const float xTrackShift = 44;
 
 		{
-			SickoLooper5DisplaySrc1 *display = new SickoLooper5DisplaySrc1();
-			display->box.pos = mm2px(Vec(13.1, 31.2));
+			SickoLooper3DisplaySrc1 *display = new SickoLooper3DisplaySrc1();
+			display->box.pos = mm2px(Vec(13.1 + 0.8, 31.2));
 			display->box.size = mm2px(Vec(8, 8));
 			display->module = module;
 			addChild(display);
 		}
 
 		{
-			SickoLooper5DisplayMeas1 *display = new SickoLooper5DisplayMeas1();
-			display->box.pos = mm2px(Vec(32.5, 31.2));
+			SickoLooper3DisplayMeas1 *display = new SickoLooper3DisplayMeas1();
+			display->box.pos = mm2px(Vec(32.5 + 0.8, 31.2));
 			display->box.size = mm2px(Vec(10, 8));
 			display->module = module;
 			addChild(display);
 		}
 
 		{
-			SickoLooper5DisplayLoop1 *display = new SickoLooper5DisplayLoop1();
-			display->box.pos = mm2px(Vec(23, 78));
+			SickoLooper3DisplayLoop1 *display = new SickoLooper3DisplayLoop1();
+			display->box.pos = mm2px(Vec(23 + 0.8, 78));
 			display->box.size = mm2px(Vec(6, 26));
 			display->module = module;
 			addChild(display);
@@ -5384,24 +4948,24 @@ struct SickoLooper5Widget : ModuleWidget {
 		
 		// ----------------------------------------------------------------------------
 		{
-			SickoLooper5DisplaySrc2 *display = new SickoLooper5DisplaySrc2();
-			display->box.pos = mm2px(Vec(13.1 + (xTrackShift), 31.2));
+			SickoLooper3DisplaySrc2 *display = new SickoLooper3DisplaySrc2();
+			display->box.pos = mm2px(Vec(13.1 + 0.8 + (xTrackShift), 31.2));
 			display->box.size = mm2px(Vec(8, 8));
 			display->module = module;
 			addChild(display);
 		}
 
 		{
-			SickoLooper5DisplayMeas2 *display = new SickoLooper5DisplayMeas2();
-			display->box.pos = mm2px(Vec(32.5 + (xTrackShift), 31.2));
+			SickoLooper3DisplayMeas2 *display = new SickoLooper3DisplayMeas2();
+			display->box.pos = mm2px(Vec(32.5 + 0.8 + (xTrackShift), 31.2));
 			display->box.size = mm2px(Vec(10, 8));
 			display->module = module;
 			addChild(display);
 		}
 		
 		{
-			SickoLooper5DisplayLoop2 *display = new SickoLooper5DisplayLoop2();
-			display->box.pos = mm2px(Vec(23 + (xTrackShift), 78));
+			SickoLooper3DisplayLoop2 *display = new SickoLooper3DisplayLoop2();
+			display->box.pos = mm2px(Vec(23 + 0.8 + (xTrackShift), 78));
 			display->box.size = mm2px(Vec(6, 26));
 			display->module = module;
 			addChild(display);
@@ -5409,91 +4973,43 @@ struct SickoLooper5Widget : ModuleWidget {
 		
 		// ----------------------------------------------------------------------------
 		{
-			SickoLooper5DisplaySrc3 *display = new SickoLooper5DisplaySrc3();
-			display->box.pos = mm2px(Vec(13.1 + (xTrackShift*2), 31.2));
+			SickoLooper3DisplaySrc3 *display = new SickoLooper3DisplaySrc3();
+			display->box.pos = mm2px(Vec(13.1 + 0.8 + (xTrackShift*2), 31.2));
 			display->box.size = mm2px(Vec(8, 8));
 			display->module = module;
 			addChild(display);
 		}
 
 		{
-			SickoLooper5DisplayMeas3 *display = new SickoLooper5DisplayMeas3();
-			display->box.pos = mm2px(Vec(32.5 + (xTrackShift*2), 31.2));
+			SickoLooper3DisplayMeas3 *display = new SickoLooper3DisplayMeas3();
+			display->box.pos = mm2px(Vec(32.5 + 0.8 + (xTrackShift*2), 31.2));
 			display->box.size = mm2px(Vec(10, 8));
 			display->module = module;
 			addChild(display);
 		}
 		
 		{
-			SickoLooper5DisplayLoop3 *display = new SickoLooper5DisplayLoop3();
-			display->box.pos = mm2px(Vec(23 + (xTrackShift*2), 78));
+			SickoLooper3DisplayLoop3 *display = new SickoLooper3DisplayLoop3();
+			display->box.pos = mm2px(Vec(23 + 0.8 + (xTrackShift*2), 78));
 			display->box.size = mm2px(Vec(6, 26));
 			display->module = module;
 			addChild(display);
 		}
 		
 		// ----------------------------------------------------------------------------
-		{
-			SickoLooper5DisplaySrc4 *display = new SickoLooper5DisplaySrc4();
-			display->box.pos = mm2px(Vec(13.1 + (xTrackShift*3), 31.2));
-			display->box.size = mm2px(Vec(8, 8));
-			display->module = module;
-			addChild(display);
-		}
-
-		{
-			SickoLooper5DisplayMeas4 *display = new SickoLooper5DisplayMeas4();
-			display->box.pos = mm2px(Vec(32.5 + (xTrackShift*3), 31.2));
-			display->box.size = mm2px(Vec(10, 8));
-			display->module = module;
-			addChild(display);
-		}
-		
-		{
-			SickoLooper5DisplayLoop4 *display = new SickoLooper5DisplayLoop4();
-			display->box.pos = mm2px(Vec(23 + (xTrackShift*3), 78));
-			display->box.size = mm2px(Vec(6, 26));
-			display->module = module;
-			addChild(display);
-		}
-		
-		// ----------------------------------------------------------------------------
-		{
-			SickoLooper5DisplaySrc5 *display = new SickoLooper5DisplaySrc5();
-			display->box.pos = mm2px(Vec(13.1 + (xTrackShift*4), 31.2));
-			display->box.size = mm2px(Vec(8, 8));
-			display->module = module;
-			addChild(display);
-		}
-
-		{
-			SickoLooper5DisplayMeas5 *display = new SickoLooper5DisplayMeas5();
-			display->box.pos = mm2px(Vec(32.5 + (xTrackShift*4), 31.2));
-			display->box.size = mm2px(Vec(10, 8));
-			display->module = module;
-			addChild(display);
-		}
-		
-		{
-			SickoLooper5DisplayLoop5 *display = new SickoLooper5DisplayLoop5();
-			display->box.pos = mm2px(Vec(23 + (xTrackShift*4), 78));
-			display->box.size = mm2px(Vec(6, 26));
-			display->module = module;
-			addChild(display);
-		}
 
 		// ----------------------------------------------------------------------------
 		{
-			SickoLooper5DisplayTempo *display = new SickoLooper5DisplayTempo();
-			display->box.pos = mm2px(Vec(242.4, 28));
+			SickoLooper3DisplayTempo *display = new SickoLooper3DisplayTempo();
+			display->box.pos = mm2px(Vec(242.4 + 0.8 - 87.842, 28));
 			display->box.size = mm2px(Vec(13.6, 7.9));
 			display->module = module;
 			addChild(display);
 		}
 
 		{
-			SickoLooper5DisplayBeat *display = new SickoLooper5DisplayBeat();
-			display->box.pos = mm2px(Vec(242.4, 37.5));
+			SickoLooper3DisplayBeat *display = new SickoLooper3DisplayBeat();
+			display->box.pos = mm2px(Vec(242.4 + 0.8 - 87.842, 37.5));
 			display->box.size = mm2px(Vec(13.6, 7.9));
 			display->module = module;
 			addChild(display);
@@ -5501,7 +5017,7 @@ struct SickoLooper5Widget : ModuleWidget {
 
 		/*
 		{
-			SickoLooper5DebugDisplay *display = new SickoLooper5DebugDisplay();
+			SickoLooper3DebugDisplay *display = new SickoLooper3DebugDisplay();
 			display->box.pos = Vec(23, 3);
 			display->box.size = Vec(307, 100);
 			display->module = module;
@@ -5509,121 +5025,101 @@ struct SickoLooper5Widget : ModuleWidget {
 		}
 		*/
 
-		const float xInL = 7;
-		const float xInR = 17;
-		const float xInLvl = 28;
-		const float xMute = 38.5;
+		const float xInL = 7 + 0.8;
+		const float xInR = 17 + 0.8;
+		const float xInLvl = 28 + 0.8;
+		const float xMute = 38.5 + 0.8;
 		const float yIn = 18;
-		//const float xInShift = 31;
 
-		const float xSrc = 7;
+		const float xSrc = 7 + 0.8;
 		const float ySrc = 35;
 
-		//const float ySrcLvl = 35;
-		const float xMeasKnob = 27.5;
+		const float xMeasKnob = 27.5 + 0.8;
 		const float yMeasKnob = 35;
-		//const float yAftRecSync = 61;
 
-		//const float xSrcLvlKnob = 32;
-
-		const float xStartImm = 9;
-		const float xStopImm = 23;
-		const float xSyncBut = 36.4;
+		const float xStartImm = 9 + 0.8;
+		const float xStopImm = 23 + 0.8;
+		const float xSyncBut = 36.4 + 0.8;
 		const float ySyncBut = 46.9;
 		const float yStartImm = 46.9;
 	
-		/*
-		const float xOneShotBut = 27.5;
-		const float yOneShotBut = 58.5;
-
-		const float xRevBut = 38;
-		const float yRevBut = 62.5;
-
-		//const float xLoopRec = 27.5;
-		//const float yLoopRec = 72.5;
-
-		const float xSoloBut = 38;
-		const float ySoloBut = 76.5;
-		*/
-
-		const float xRevBut = 26.5;
+		const float xRevBut = 26.5 + 0.8;
 		const float yRevBut = 58.5;
 
-		const float xSoloBut = 37;
+		const float xSoloBut = 37 + 0.8;
 		const float ySoloBut = 58.5;
 
-		const float xOneShotBut = 26.5;
+		const float xOneShotBut = 26.5 + 0.8;
 		const float yOneShotBut = 72.5;
 
-		const float xPlayTrig = 7;
-		const float xPlayBut = 17;
+		const float xPlayTrig = 7 + 0.8;
+		const float xPlayBut = 17 + 0.8;
 		const float yPlay = 58.5;
 		const float yRec = 72.5;
 		const float yStop = 86.5;
 		const float yErase = 100;
 
 
-		const float xXFade = 36.7;
+		const float xXFade = 36.7 + 0.8;
 		const float yXFade = 72;
 
 		//const float xPan = 28;
-		const float xPan = 36.7;
+		const float xPan = 36.7 + 0.8;
 		const float yPan = 85;
 
-		const float xVol = 36.7;
+		const float xVol = 36.7 + 0.8;
 		const float yVol = 99;
 
 
-		const float xEol = 8;
-		const float xSrcToTrack = 17.3;
-		const float xOutL = 27.3;
-		const float xOutR = 37.1;
+		const float xEol = 8 + 0.8 + 0.8;
+		const float xSrcToTrack = 17.3 + 0.8 + 0.8;
+		const float xOutL = 27.3 + 0.8 + 0.8;
+		const float xOutR = 37.1 + 0.8 + 0.8;
 
 		const float yOutput = 117.f;
 
 
 		// ******************************
 		
-		const float xBpm = 236.6;
+		const float xBpm = 236.6 - 87.842 + 0.8;
 		const float yBpm = 31.6;
-		const float xBeat = 236.7;
+		const float xBeat = 236.7 - 87.842 + 0.8;
 		const float yBeat = 41.7;
 
 		//const float xExtClock = 230;
-		const float xExtClock = 228.5;
+		const float xExtClock = 228.5 - 87.842 + 0.8;
 		const float yExtClock = 18;
-		const float xClockRst = 239;
+		const float xClockRst = 239 - 87.842 + 0.8;
 		const float yClockRst = 18;
 		//const float xClockOut = 249;
-		const float xClockOut = 252;
+		const float xClockOut = 252 - 87.842 + 0.8;
 		const float yClockOut = 18;
 
-		const float xClick = 228;
+		const float xClick = 228 - 87.842 + 0.8;
 		const float yClick = 57.5;
-		const float xClickVol = 239.7;
+		const float xClickVol = 239.7 - 87.842 + 0.8;
 		const float yClickVol = 57.7;
-		const float xClickMst = 251;
+		const float xClickMst = 251 - 87.842 + 0.8;
 
-		const float xPrerollBut = 239.2;
-		const float xPrerollSwitch = 250;
+		const float xPrerollBut = 239.2 - 87.842 + 0.8;
+		const float xPrerollSwitch = 250 - 87.842 + 0.8;
 		const float yPreroll = 66;
 
 		const float yAll = 82.6;
-		const float xAllStartTrig = 228.4;
-		const float xAllStartBut = 238.4;
-		const float xAllStop = 251.4;
+		const float xAllStartTrig = 228.4 - 87.842 + 0.8;
+		const float xAllStartBut = 238.4 - 87.842 + 0.8;
+		const float xAllStop = 251.4 - 87.842 + 0.8;
 
-		const float xEarVol = 228.6;
+		const float xEarVol = 228.6 - 87.842 + 0.8;
 		const float yEarVol = 99.4;
-		const float xEarL = 241.4;
-		const float xEarR = 251.4;
+		const float xEarL = 241.4 - 87.842 + 0.8;
+		const float xEarR = 251.4 - 87.842 + 0.8;
 		const float yEar = 99.5;
-		const float xMastVol = 228.7;
+		const float xMastVol = 228.7 - 87.842 + 0.8 + 0.8;
 		const float yMastVol = 116;
-		const float xMastL = 241.4;
-		const float xMastR = 251.4;
+		const float xMastL = 241.4 - 87.842 + 0.8 + 0.8;
+		const float xMastR = 251.4 - 87.842 + 0.8 + 0.8;
 		const float yMast = 117;
-
 
 
 		// buttons --- 4.1
@@ -5633,80 +5129,80 @@ struct SickoLooper5Widget : ModuleWidget {
 		// roundBlackKnob --- x 5.7 --- y 6.4
 		// input/output --- 4.5
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xBpm, yBpm)), module, SickoLooper5::BPM_KNOB_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xBeat, yBeat)), module, SickoLooper5::SIGNATURE_KNOB_PARAM));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xBpm, yBpm)), module, SickoLooper3::BPM_KNOB_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(xBeat, yBeat)), module, SickoLooper3::SIGNATURE_KNOB_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xExtClock, yExtClock)), module, SickoLooper5::EXTCLOCK_INPUT));
-		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(xClockRst, yClockRst)), module, SickoLooper5::CLOCK_RST_SWITCH, SickoLooper5::CLOCK_RST_LIGHT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xClockOut, yClockOut)), module, SickoLooper5::CLOCK_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xExtClock, yExtClock)), module, SickoLooper3::EXTCLOCK_INPUT));
+		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(xClockRst, yClockRst)), module, SickoLooper3::CLOCK_RST_SWITCH, SickoLooper3::CLOCK_RST_LIGHT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xClockOut, yClockOut)), module, SickoLooper3::CLOCK_OUTPUT));
 
-		addParam(createLightParamCentered<VCVLightBezelLatch<YellowLight>>(mm2px(Vec(xClick, yClick)), module, SickoLooper5::CLICK_BUT_PARAM, SickoLooper5::CLICK_BUT_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xClickVol, yClickVol)), module, SickoLooper5::CLICKVOL_KNOB_PARAM));
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xClickMst, yClickVol)), module, SickoLooper5::CLICKTOMASTER_SWITCH, SickoLooper5::CLICKTOMASTER_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezelLatch<YellowLight>>(mm2px(Vec(xClick, yClick)), module, SickoLooper3::CLICK_BUT_PARAM, SickoLooper3::CLICK_BUT_LIGHT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(xClickVol, yClickVol)), module, SickoLooper3::CLICKVOL_KNOB_PARAM));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xClickMst, yClickVol)), module, SickoLooper3::CLICKTOMASTER_SWITCH, SickoLooper3::CLICKTOMASTER_LIGHT));
 
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xPrerollBut, yPreroll)), module, SickoLooper5::PREROLL_BUT_PARAM, SickoLooper5::PREROLL_BUT_LIGHT));
-		addParam(createParamCentered<CKSS>(mm2px(Vec(xPrerollSwitch, yPreroll)), module, SickoLooper5::PREROLL_SWITCH));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xPrerollBut, yPreroll)), module, SickoLooper3::PREROLL_BUT_PARAM, SickoLooper3::PREROLL_BUT_LIGHT));
+		addParam(createParamCentered<CKSS>(mm2px(Vec(xPrerollSwitch, yPreroll)), module, SickoLooper3::PREROLL_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xAllStartTrig, yAll)), module, SickoLooper5::ALLSTARTSTOP_TRIG_INPUT));
-		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xAllStartBut, yAll)), module, SickoLooper5::ALLSTARTSTOP_BUT_PARAM, SickoLooper5::ALLSTARTSTOP_BUT_LIGHT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xAllStartTrig, yAll)), module, SickoLooper3::ALLSTARTSTOP_TRIG_INPUT));
+		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xAllStartBut, yAll)), module, SickoLooper3::ALLSTARTSTOP_BUT_PARAM, SickoLooper3::ALLSTARTSTOP_BUT_LIGHT));
 
-		//addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xAllStop, yAll)), module, SickoLooper5::UNDOREDO_BUT_PARAM, SickoLooper5::UNDOREDO_BUT_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xAllStop, yAll)), module, SickoLooper5::ALLSTOP_TRIG_INPUT));
+		//addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xAllStop, yAll)), module, SickoLooper3::UNDOREDO_BUT_PARAM, SickoLooper3::UNDOREDO_BUT_LIGHT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xAllStop, yAll)), module, SickoLooper3::ALLSTOP_TRIG_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEarVol, yEarVol)), module, SickoLooper5::EARVOL_KNOB_PARAM));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEarL, yEar)), module, SickoLooper5::EAR_LEFT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEarR, yEar)), module, SickoLooper5::EAR_RIGHT_OUTPUT));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEarVol, yEarVol)), module, SickoLooper3::EARVOL_KNOB_PARAM));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEarL, yEar)), module, SickoLooper3::EAR_LEFT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEarR, yEar)), module, SickoLooper3::EAR_RIGHT_OUTPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xMastVol, yMastVol)), module, SickoLooper5::MASTERVOL_KNOB_PARAM));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xMastL, yMast)), module, SickoLooper5::MASTER_LEFT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xMastR, yMast)), module, SickoLooper5::MASTER_RIGHT_OUTPUT));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xMastVol, yMastVol)), module, SickoLooper3::MASTERVOL_KNOB_PARAM));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xMastL, yMast)), module, SickoLooper3::MASTER_LEFT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xMastR, yMast)), module, SickoLooper3::MASTER_RIGHT_OUTPUT));
 
 		for (int i = 0; i < MAX_TRACKS; i++) {
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInL+(xTrackShift*i), yIn)), module, SickoLooper5::LEFT_INPUT+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInR+(xTrackShift*i), yIn)), module, SickoLooper5::RIGHT_INPUT+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xInLvl+(xTrackShift*i), yIn)), module, SickoLooper5::SOURCELVL_KNOB_PARAM+i));
-			addParam(createLightParamCentered<VCVLightLatch<LargeSimpleLight<RedLight>>>(mm2px(Vec(xMute+(xTrackShift*i), yIn)), module, SickoLooper5::MUTE_SWITCH+i, SickoLooper5::MUTE_LIGHT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInL+(xTrackShift*i), yIn)), module, SickoLooper3::LEFT_INPUT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInR+(xTrackShift*i), yIn)), module, SickoLooper3::RIGHT_INPUT+i));
+			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xInLvl+(xTrackShift*i), yIn)), module, SickoLooper3::SOURCELVL_KNOB_PARAM+i));
+			addParam(createLightParamCentered<VCVLightLatch<LargeSimpleLight<RedLight>>>(mm2px(Vec(xMute+(xTrackShift*i), yIn)), module, SickoLooper3::MUTE_SWITCH+i, SickoLooper3::MUTE_LIGHT+i));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xSrc+(xTrackShift*i), ySrc)), module, SickoLooper5::SOURCE_KNOB_PARAM+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(xSrc+(xTrackShift*i), ySrc)), module, SickoLooper3::SOURCE_KNOB_PARAM+i));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xMeasKnob+(xTrackShift*i), yMeasKnob)), module, SickoLooper5::MEAS_KNOB_PARAM+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(xMeasKnob+(xTrackShift*i), yMeasKnob)), module, SickoLooper3::MEAS_KNOB_PARAM+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yPlay)), module, SickoLooper5::PLAY_TRIG_INPUT+i));
-			addParam(createLightParamCentered<VCVLightBezel<GreenLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yPlay)), module, SickoLooper5::PLAY_BUT_PARAM+i, SickoLooper5::PLAY_BUT_LIGHT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yPlay)), module, SickoLooper3::PLAY_TRIG_INPUT+i));
+			addParam(createLightParamCentered<VCVLightBezel<GreenLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yPlay)), module, SickoLooper3::PLAY_BUT_PARAM+i, SickoLooper3::PLAY_BUT_LIGHT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yRec)), module, SickoLooper5::REC_TRIG_INPUT+i));
-			addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yRec)), module, SickoLooper5::REC_BUT_PARAM+i, SickoLooper5::REC_BUT_LIGHT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yRec)), module, SickoLooper3::REC_TRIG_INPUT+i));
+			addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yRec)), module, SickoLooper3::REC_BUT_PARAM+i, SickoLooper3::REC_BUT_LIGHT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yStop)), module, SickoLooper5::STOP_TRIG_INPUT+i));
-			addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yStop)), module, SickoLooper5::STOP_BUT_PARAM+i, SickoLooper5::STOP_BUT_LIGHT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yStop)), module, SickoLooper3::STOP_TRIG_INPUT+i));
+			addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yStop)), module, SickoLooper3::STOP_BUT_PARAM+i, SickoLooper3::STOP_BUT_LIGHT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yErase)), module, SickoLooper5::ERASE_TRIG_INPUT+i));
-			addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yErase)), module, SickoLooper5::ERASE_BUT_PARAM+i, SickoLooper5::ERASE_BUT_LIGHT+i));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yErase)), module, SickoLooper3::ERASE_TRIG_INPUT+i));
+			addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yErase)), module, SickoLooper3::ERASE_BUT_PARAM+i, SickoLooper3::ERASE_BUT_LIGHT+i));
 
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xStartImm+(xTrackShift*i), yStartImm)), module, SickoLooper5::STARTIMM_SWITCH+i, SickoLooper5::STARTIMM_LIGHT+i));
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xStopImm+(xTrackShift*i), yStartImm)), module, SickoLooper5::STOPIMM_SWITCH+i, SickoLooper5::STOPIMM_LIGHT+i));
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xSyncBut+(xTrackShift*i), ySyncBut)), module, SickoLooper5::LOOPSYNC_SWITCH+i, SickoLooper5::LOOPSYNC_LIGHT+i));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xStartImm+(xTrackShift*i), yStartImm)), module, SickoLooper3::STARTIMM_SWITCH+i, SickoLooper3::STARTIMM_LIGHT+i));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xStopImm+(xTrackShift*i), yStartImm)), module, SickoLooper3::STOPIMM_SWITCH+i, SickoLooper3::STOPIMM_LIGHT+i));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xSyncBut+(xTrackShift*i), ySyncBut)), module, SickoLooper3::LOOPSYNC_SWITCH+i, SickoLooper3::LOOPSYNC_LIGHT+i));
 
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xOneShotBut+(xTrackShift*i), yOneShotBut)), module, SickoLooper5::ONESHOT_SWITCH+i, SickoLooper5::ONESHOT_LIGHT+i));
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xRevBut+(xTrackShift*i), yRevBut)), module, SickoLooper5::REV_SWITCH+i, SickoLooper5::REV_LIGHT+i));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xOneShotBut+(xTrackShift*i), yOneShotBut)), module, SickoLooper3::ONESHOT_SWITCH+i, SickoLooper3::ONESHOT_LIGHT+i));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xRevBut+(xTrackShift*i), yRevBut)), module, SickoLooper3::REV_SWITCH+i, SickoLooper3::REV_LIGHT+i));
 
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xSoloBut+(xTrackShift*i), ySoloBut)), module, SickoLooper5::SOLO_SWITCH+i, SickoLooper5::SOLO_LIGHT+i));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xSoloBut+(xTrackShift*i), ySoloBut)), module, SickoLooper3::SOLO_SWITCH+i, SickoLooper3::SOLO_LIGHT+i));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xXFade+(xTrackShift*i), yXFade)), module, SickoLooper5::XFADE_KNOB_PARAM+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xPan+(xTrackShift*i), yPan)), module, SickoLooper5::PAN_KNOB_PARAM+i));
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xVol+(xTrackShift*i), yVol)), module, SickoLooper5::VOLTRACK_KNOB_PARAM+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(xXFade+(xTrackShift*i), yXFade)), module, SickoLooper3::XFADE_KNOB_PARAM+i));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(xPan+(xTrackShift*i), yPan)), module, SickoLooper3::PAN_KNOB_PARAM+i));
+			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xVol+(xTrackShift*i), yVol)), module, SickoLooper3::VOLTRACK_KNOB_PARAM+i));
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEol+(xTrackShift*i), yOutput)), module, SickoLooper5::EOL_OUTPUT+i));
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xSrcToTrack+(xTrackShift*i), yOutput)), module, SickoLooper5::SRC_TO_TRACK_SWITCH+i, SickoLooper5::SRC_TO_TRACK_LIGHT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOutL+(xTrackShift*i), yOutput)), module, SickoLooper5::TRACK_LEFT_OUTPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOutR+(xTrackShift*i), yOutput)), module, SickoLooper5::TRACK_RIGHT_OUTPUT+i));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEol+(xTrackShift*i), yOutput)), module, SickoLooper3::EOL_OUTPUT+i));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xSrcToTrack+(xTrackShift*i), yOutput)), module, SickoLooper3::SRC_TO_TRACK_SWITCH+i, SickoLooper3::SRC_TO_TRACK_LIGHT+i));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOutL+(xTrackShift*i), yOutput)), module, SickoLooper3::TRACK_LEFT_OUTPUT+i));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOutR+(xTrackShift*i), yOutput)), module, SickoLooper3::TRACK_RIGHT_OUTPUT+i));
 		}
 	}
 
 
 	void appendContextMenu(Menu *menu) override {
-	   	SickoLooper5 *module = dynamic_cast<SickoLooper5*>(this->module);
+	   	SickoLooper3 *module = dynamic_cast<SickoLooper3*>(this->module);
 			assert(module);
 
 		//menu->addChild(new MenuSeparator());
@@ -5720,7 +5216,7 @@ struct SickoLooper5Widget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 
 		struct ModeItem : MenuItem {
-			SickoLooper5* module;
+			SickoLooper3* module;
 			int playSequence;
 			void onAction(const event::Action& e) override {
 				module->playSequence = playSequence;
@@ -5794,4 +5290,4 @@ struct SickoLooper5Widget : ModuleWidget {
 	}
 };
 
-Model *modelSickoLooper5 = createModel<SickoLooper5, SickoLooper5Widget>("SickoLooper5");
+Model *modelSickoLooper3 = createModel<SickoLooper3, SickoLooper3Widget>("SickoLooper3");
