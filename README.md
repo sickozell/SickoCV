@@ -48,7 +48,7 @@ VCV Rack plugin modules
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
-- [sickoLooper5](#sickoLooper5)
+- [sickoLooper3 / sickoLooper5](#sickolooper3--sickolooper5)
 - [sickoPlayer](#sickoplayer)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
