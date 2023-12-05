@@ -143,12 +143,14 @@ struct SickoLooper3 : Module {
 	//**************************************************************
 	//  DEBUG 
 
+	/*
 	std::string debugDisplay = "X";
 	std::string debugDisplay2 = "X";
 	std::string debugDisplay3 = "X";
 	std::string debugDisplay4 = "X";
 	int debugInt = 0;
 	bool debugBool = false;
+	*/
 
 	//**************************************************************
 	// ANTIALIAS variables
@@ -4220,17 +4222,9 @@ struct SickoLooper3 : Module {
 																							░╚════╝░░╚═════╝░░░░╚═╝░░░╚═╝░░░░░░╚═════╝░░░░╚═╝░░░
 */
 
-		float tempSourcesLeft = inputValue[0][LEFT] + inputValue[1][LEFT] + inputValue[2][LEFT] + inputValue[3][LEFT] + inputValue[4][LEFT];
-		float tempSourcesRight = inputValue[0][RIGHT] + inputValue[1][RIGHT] + inputValue[2][RIGHT] + inputValue[3][RIGHT] + inputValue[4][RIGHT];
+		float tempSourcesLeft = inputValue[0][LEFT] + inputValue[1][LEFT] + inputValue[2][LEFT];
+		float tempSourcesRight = inputValue[0][RIGHT] + inputValue[1][RIGHT] + inputValue[2][RIGHT];
 		
-		/*
-		if (srcToMaster) {
-			sumOutput[LEFT] += inputValue[0][LEFT] + inputValue[1][LEFT] + inputValue[2][LEFT] + inputValue[3][LEFT] + inputValue[4][LEFT];
-			sumOutput[RIGHT] += inputValue[0][RIGHT] + inputValue[1][RIGHT] + inputValue[2][RIGHT] + inputValue[3][RIGHT] + inputValue[4][RIGHT];
-		}*/
-
-		
-
 		earOutput[LEFT] = clickOutput;
 		earOutput[RIGHT] = clickOutput;
 
@@ -4244,7 +4238,6 @@ struct SickoLooper3 : Module {
 			sumOutput[RIGHT] += tempSourcesRight;
 		}
 
-		//if (clickToMaster_setting) {
 		if (params[CLICKTOMASTER_SWITCH].getValue()) {
 			sumOutput[LEFT] += clickOutput;
 			sumOutput[RIGHT] += clickOutput;
