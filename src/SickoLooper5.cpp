@@ -288,8 +288,8 @@ struct SickoLooper5 : Module {
 	bool onlyClickOnEar = false;
 	bool eolPulseOnStop = false;
 	int playSequence = 0;
-	bool instantStop = true;
-	bool overdubAfterRec = true;
+	bool instantStop = false;
+	bool overdubAfterRec = false;
 	bool fadeInOnPlay[5] = {false, false, false, false, false};
 	bool extraSamples[5] = {true, true, true, true, true};
 
@@ -634,8 +634,8 @@ struct SickoLooper5 : Module {
 		onlyClickOnEar = false;
 		eolPulseOnStop = false;
 		playSequence = 0;
-		instantStop = true;
-		overdubAfterRec = true;
+		instantStop = false;
+		overdubAfterRec = false;
 		recordedTracks = 0;
 		for (int track = 0; track < MAX_TRACKS; track++) {
 			extraSamples[track] = true;

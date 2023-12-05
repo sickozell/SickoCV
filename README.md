@@ -18,7 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta7: fixed a master out bug on sickoLooper3
+- beta7: set "OVERDUB after REC" unticked byu default. Fixed a master out bug on sickoLooper3
 - beta6: added "Clear Sample Input" on sickoSampler
 - beta5: added sickoLooper3 module
 - beta4: fixed a fade issue when the loop restarts while still fading out from the previous stop  
@@ -643,7 +643,7 @@ Undo commands, every pending command due to tempo synchronization or prerolling 
 - **SOURCEs to MASTER out** (ticked by default)  
 This routes sources to main outputs. If it is disabled main outputs will receive only tracks playback.  
 
-- **Only Click on EAR**  
+- **Only Click on EAR** (unticked by default)    
 With this option enabled, the EAR outs will output only the audio click.  
 
 - **EOL pulse on STOP** (unticked by default)  
@@ -651,14 +651,14 @@ With this option enabled EoL outputs the trigger also when a manual stop is comm
 
 - **PLAY Button Sequence**
 Play button (or trigger) behavior  can be set in three different modes:  
-1) Play -> Stop : Play button will Play or Stop the loop.  
+1) Play -> Stop (default): Play button will Play or Stop the loop.  
 2) Rec -> Play -> Overdub : When a track is empty it will go recording loop. If the track is idle it will go playing loop, another button press will go overdubbing loop.  Only STOP button will stop the loop
 3) Rec -> Overdub -> Play : When a track is empty it will go recording loop. If the track is idle it will go overdubbing loop, another button press will go playing loop.  Only STOP button will stop the loop  
 
 - **Instant STOP button** (unticked by default)  
 if this option is enabled when pressing the STOP but button it will immediately stop track looping, even if SYNC is on. Only SYNC first recording is not affected by this option.
 
-- **OVERDUB after REC** (ticked by default)  
+- **OVERDUB after REC** (unticked by default)  
 If this option is disabled, after a track is recorded and no incident command has been provided, track state goes automatically to playing state instead of overdub.
 
 - **TRACK settings**  
