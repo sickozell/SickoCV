@@ -18,7 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta7: set "OVERDUB after REC" unticked byu default. Fixed a master out bug on sickoLooper3
+- beta7: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
 - beta6: added "Clear Sample Input" on sickoSampler
 - beta5: added sickoLooper3 module
 - beta4: fixed a fade issue when the loop restarts while still fading out from the previous stop  
