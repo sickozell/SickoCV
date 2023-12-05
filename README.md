@@ -1,4 +1,4 @@
-# SickoCV v2.6.0-beta4
+# SickoCV v2.6.0-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -29,7 +29,7 @@ fixed missing "SOURCEs to MASTER out" and "Only Click on EAR" settings when savi
 # SickoCV v2.6.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/20d63bf4-d76f-45d5-8398-9499a4a25f83)
+![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/2af9b036-5ca0-463d-8371-45b3395aa139)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -490,10 +490,10 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 - Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
 
 
-## sickoLooper5
-### 5 track looper with builtin clock generator, click and meter.
+## sickoLooper3 / sickoLooper5
+### 3/5 track looper with builtin clock generator, click and meter.
 #### - DESCRIPTION
-'sickoLooper5' is inspired by hardware looper devices with most of their features implemented.
+sickoLooper is inspired by hardware looper devices with most of their features implemented.
 
 ![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/cf0f1306-6a11-45cf-aad5-f94fa11ca210)
 
