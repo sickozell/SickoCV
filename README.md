@@ -491,7 +491,7 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 
 
 ## sickoLooper3 / sickoLooper5
-### 3/5 track looper with builtin clock generator, click and meter.
+### 3/5 track loopers with builtin clock generator, click and meter.
 #### - DESCRIPTION
 sickoLooper is inspired by hardware looper devices with most of their features implemented.
 
