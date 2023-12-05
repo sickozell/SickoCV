@@ -495,7 +495,7 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### - DESCRIPTION
 sickoLooper is inspired by hardware looper devices with most of their features implemented.
 
-![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/cf0f1306-6a11-45cf-aad5-f94fa11ca210)
+![sickolooper35](https://github.com/sickozell/SickoCV/assets/80784296/db934edb-9b2f-4d06-b089-20fd64f28a13)
 
 #### - INSTRUCTIONS
 **Clock section**  
