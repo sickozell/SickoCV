@@ -1,4 +1,4 @@
-# SickoCV v2.6.0-beta7
+# SickoCV v2.6.0-beta8
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta8: minor design changes on sickoLooper3/5, sickoSampler, sickoPlayer
 - beta7: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
 - beta6: added "Clear Sample Input" on sickoSampler
 - beta5: added sickoLooper3 module

@@ -3397,7 +3397,7 @@ struct SickoSampler2Widget : ModuleWidget {
 
 		const float xInL = 6.f;
 		const float xInR = 15.f;
-		const float xGain = 25.f;
+		const float xGain = 25.5f;
 		const float yGain = 17.1f;
 		const float xRecBut = 36.f;
 		const float xMon = 45.f;
