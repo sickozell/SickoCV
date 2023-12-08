@@ -34,7 +34,7 @@ fixed missing "SOURCEs to MASTER out" and "Only Click on EAR" settings when savi
 # SickoCV v2.6.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/1a4542a5-7c09-493c-8dee-a5d2a69c5420)
+![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/9b13e8bb-d7d9-4614-9993-07dbd839ecc9)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -500,7 +500,7 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### - DESCRIPTION
 sickoLooper is inspired by hardware looper devices with most of their features implemented.
 
-![sickolooper35](https://github.com/sickozell/SickoCV/assets/80784296/db934edb-9b2f-4d06-b089-20fd64f28a13)
+![sickolooper35](https://github.com/sickozell/SickoCV/assets/80784296/974c1793-9f4b-41ea-bf57-f7db84136ea7)
 
 #### - INSTRUCTIONS
 **Clock section**  
@@ -693,7 +693,7 @@ Audio click can be customized loading mono wav samples using "Load BEAT" and "Lo
 - envelope generator, loop, reverse, pingpong
 - different interpolation modes, anti-aliasing filter, phase-scan feature
 
-![sickoplayer](https://user-images.githubusercontent.com/80784296/233733849-2ccd0fb3-a556-4785-ad42-b952642ccd11.JPG)
+![sickoplayer](https://github.com/sickozell/SickoCV/assets/80784296/4dc300e9-a2e4-4ed0-93f1-466d41f128d8)
 
 #### - INSTRUCTIONS
 Load sample using context menu or right-click in the waveform display area to access quick load menu.  
@@ -802,7 +802,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler](https://github.com/sickozell/SickoCV/assets/80784296/a0157a5a-8e37-45ad-95dc-927873548122)
+![sickosampler](https://github.com/sickozell/SickoCV/assets/80784296/33f276f9-e9ef-410a-946f-990dad0677de)
 
 #### - INSTRUCTIONS
 
@@ -869,7 +869,7 @@ Please refer to sickoPlayer for context menu, in sickoSampler following options 
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/4363a39f-10a8-402a-835d-22c137623198)
+![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/ec021062-dbbd-4afc-95c9-e7bb5c886dbf)
 
 #### - INSTRUCTIONS
 This audio sampling module simplifies the functionalities of sickoSampler by eliminating overdubbing, tuning and modulation of many parameters, but at the same time it implements a 90s style cyclic time stretch algorithm.  
