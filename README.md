@@ -19,7 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog**  
 - beta8: sickoLooper: added detect tempo function on first recorded sample if unsynced.  
-Minor design changes also on sickoSampler, sickoPlayer
+Minor design changes also on sickoPlayer, sickoSampler, sickoSampler2
 - beta7: sickoLooper: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
 - beta6: sickoSampler: added "Clear Sample Input"
 - beta5: added sickoLooper3 module
