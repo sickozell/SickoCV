@@ -3752,8 +3752,14 @@ struct SickoLooper5 : Module {
 							extraRecMaxSamples = halfSecondSamples;
 							extraRecPos[track] = samplePos[track];
 
-							if (!loopSync_setting[track] && recordedTracks == 1)
+							if (!loopSync_setting[track] && recordedTracks == 1) {
 								detectTempo(track);
+								if (!extConn) {
+									clockSample = 1.0;
+									resetStart = true;
+									beatCounter = 20;
+								}
+							}
 							
 							switch (nextStatus[track]) {
 								case IDLE:
