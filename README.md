@@ -18,16 +18,17 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta8: minor design changes on sickoLooper3/5, sickoSampler, sickoPlayer
-- beta7: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
-- beta6: added "Clear Sample Input" on sickoSampler
+- beta8: sickoLooper: added detect tempo function on first recorded sample if unsynced.  
+Minor design changes also on sickoSampler, sickoPlayer
+- beta7: sickoLooper: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
+- beta6: sickoSampler: added "Clear Sample Input"
 - beta5: added sickoLooper3 module
-- beta4: fixed a fade issue when the loop restarts while still fading out from the previous stop  
-- beta3: fixed issue on loop fade out when synced loops play at greater measures than recorded  
+- beta4: sickoLooper: fixed a fade issue when the loop restarts while still fading out from the previous stop  
+- beta3: sickoLooper: fixed issue on loop fade out when synced loops play at greater measures than recorded  
 changed default crossfade and minimum start/stop fade to 6ms  
 fixed issue on "save preset + loops" that didn't delete wav files if tracks are empty  
 fixed missing "SOURCEs to MASTER out" and "Only Click on EAR" settings when saving preset  
-- beta2: fixed missing 'Play Button Sequence' setting and click audio files path when saving preset.
+- beta2: sickoLooper: fixed missing 'Play Button Sequence' setting and click audio files path when saving preset.
 - beta1: added sickoLooper5 module
 
 # SickoCV v2.6.0

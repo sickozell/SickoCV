@@ -2569,9 +2569,8 @@ struct SickoLooper5 : Module {
 								
 								nextStatus[track] = PLAYING;
 								
-								if (!loopSync_setting[track]) {					// if not loopSync
+								if (!loopSync_setting[track])				// if not loopSync
 									stopNow[track] = true;
-								}
 
 								setRecToPlayLed(track);
 							} else {	// undo play press
@@ -2993,6 +2992,9 @@ struct SickoLooper5 : Module {
 				// *********** BPM CALC
 				
 				bpm = (double)params[BPM_KNOB_PARAM].getValue()/10;
+
+				if (bpm > 999)
+					bpm = 999;
 
 				// **************   RUN PROCESS   ***************
 
@@ -3749,6 +3751,9 @@ struct SickoLooper5 : Module {
 							extraRecCount[track] = 0;
 							extraRecMaxSamples = halfSecondSamples;
 							extraRecPos[track] = samplePos[track];
+
+							if (!loopSync_setting[track] && recordedTracks == 1)
+								detectTempo(track);
 							
 							switch (nextStatus[track]) {
 								case IDLE:
