@@ -18,7 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta8: sickoLooper: added detect tempo function on first recorded sample if unsynced.  
+- beta8: sickoLooper: added detect tempo function on first recorded loop if unsynced.  
 Minor design changes also on sickoPlayer, sickoSampler, sickoSampler2
 - beta7: sickoLooper: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
 - beta6: sickoSampler: added "Clear Sample Input"
@@ -631,6 +631,8 @@ If a track is set to SOLO, 'START immediately' and 'STOP immediately' won't have
 MEAS knob is ignored when SYNC is off, it's only used to "Detect tempo" with its specific track context menu function.  
 Non-SYNCed tracks start to record immediately by pressing the REC button without any clock synchronization.  
 Recording can be stopped by pressing stop button, or restarted immediately to play state by pressing PLAY button, or turned immediately to overdub state by pressing the REC button again.  
+
+If the first track recorded is unsynced, tempo will be automatically detected and bpm knob set according also to measure knob.
 
 **Miscellaneous**  
 1SHOT setting usually stops looping when the first loop end is detected, but if a PLAY/OVERDUB command is given before, it will run until the end of the next loop is reached.  
