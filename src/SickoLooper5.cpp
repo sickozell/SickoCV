@@ -250,6 +250,9 @@ struct SickoLooper5 : Module {
 	float recFadeValue[5] = {1.f, 1.f, 1.f, 1.f, 1.f};
 	float recFadeDelta[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 
+	bool fadeTail[5] = {false, false, false, false, false};
+	float fadeTailValue[5] = {1.f, 1.f, 1.f, 1.f, 1.f};
+
 	bool eraseWait[5] = {false, false, false, false, false};
 	float eraseTime[5] = {0, 0, 0, 0, 0};
 	float eraseSamples = APP->engine->getSampleRate() / 1.5f;
@@ -264,6 +267,8 @@ struct SickoLooper5 : Module {
 	bool extraRecording[5] = {false, false, false, false, false};
 	bool extraPlaying[5] = {false, false, false, false, false};
 	bool extraPlayingFadeOut[5] = {false, false, false, false, false};
+
+	bool playTail[5] = {false, false, false, false, false};
 
 	// *************************************************************
 	// OUTPUTS
@@ -292,6 +297,7 @@ struct SickoLooper5 : Module {
 	bool overdubAfterRec = false;
 	bool fadeInOnPlay[5] = {false, false, false, false, false};
 	bool extraSamples[5] = {true, true, true, true, true};
+	bool playFullTail[5] = {true, true, true, true, true};
 
 	// ***************************************************************************************************
 	// exponential time knkobs
@@ -372,11 +378,15 @@ struct SickoLooper5 : Module {
 	//int beatCounter = 1;
 	int beatCounter = 20;	// this hack let stars clock immediately on bar
 
-	float oneMsSamples = (APP->engine->getSampleRate()) / 1000;
-	//float fiveMsSamples = (APP->engine->getSampleRate()) / 200;
-	float sixMsSamples = (APP->engine->getSampleRate()) / 166.67f;
-	//float sixMsSamples = (APP->engine->getSampleRate()) / 5; // use this for fade testing
-	float halfSecondSamples = (APP->engine->getSampleRate()) / 2;
+	//float fiveMsSamples = (APP->engine->getSampleRate()) / 200;		// samples in 5ms
+	//float sixMsSamples = (APP->engine->getSampleRate()) / 166.67f;	// samples in 6ms
+	//float halfSecondSamples = (APP->engine->getSampleRate()) / 2;		// samples in half second
+
+	//float minTimeSamples = (APP->engine->getSampleRate()) / 5;	// use this for fade testing (200ms)
+	float minTimeSamples = (APP->engine->getSampleRate()) / 166.67f;	// samples in 6ms
+	float tailSamples = APP->engine->getSampleRate();					// samples in one second
+	float fadeTailDelta = 1.f / minTimeSamples;
+	float oneMsSamples = (APP->engine->getSampleRate()) / 1000;			// samples in 1ms
 
 	float fastPulseTime = (APP->engine->getSampleRate()) / 50;
 	float slowPulseTime = (APP->engine->getSampleRate()) / 5;
@@ -486,7 +496,7 @@ struct SickoLooper5 : Module {
 
 			configSwitch(ONESHOT_SWITCH+i, 0.f, 1.f, 0.f, "1 shot", {"Off", "On"});
 
-			configParam(XFADE_KNOB_PARAM+i, 0.f, 500.f, 6.f, "Crossfade", "ms");
+			configParam(XFADE_KNOB_PARAM+i, 0.f, 1000.f, 6.f, "Crossfade", "ms");
 		
 			configParam(PAN_KNOB_PARAM+i, -1.f, 1.f, 0.f, "Pan");
 
@@ -547,6 +557,11 @@ struct SickoLooper5 : Module {
 		json_object_set_new(rootJ, "extraSamples2", json_boolean(extraSamples[2]));
 		json_object_set_new(rootJ, "extraSamples3", json_boolean(extraSamples[3]));
 		json_object_set_new(rootJ, "extraSamples4", json_boolean(extraSamples[4]));
+		json_object_set_new(rootJ, "playFullTail0", json_boolean(playFullTail[0]));
+		json_object_set_new(rootJ, "playFullTail1", json_boolean(playFullTail[1]));
+		json_object_set_new(rootJ, "playFullTail2", json_boolean(playFullTail[2]));
+		json_object_set_new(rootJ, "playFullTail3", json_boolean(playFullTail[3]));
+		json_object_set_new(rootJ, "playFullTail4", json_boolean(playFullTail[4]));
 		json_object_set_new(rootJ, "fadeInOnPlay0", json_boolean(fadeInOnPlay[0]));
 		json_object_set_new(rootJ, "fadeInOnPlay1", json_boolean(fadeInOnPlay[1]));
 		json_object_set_new(rootJ, "fadeInOnPlay2", json_boolean(fadeInOnPlay[2]));
@@ -597,6 +612,23 @@ struct SickoLooper5 : Module {
 		if (extraSamples4J)
 			extraSamples[4] = json_boolean_value(extraSamples4J);
 
+		json_t* playFullTail0J = json_object_get(rootJ, "playFullTail0");
+		if (playFullTail0J)
+			playFullTail[0] = json_boolean_value(playFullTail0J);
+		json_t* playFullTail1J = json_object_get(rootJ, "playFullTail1");
+		if (playFullTail1J)
+			playFullTail[1] = json_boolean_value(playFullTail1J);
+		json_t* playFullTail2J = json_object_get(rootJ, "playFullTail2");
+		if (playFullTail2J)
+			playFullTail[2] = json_boolean_value(playFullTail2J);
+
+		json_t* playFullTail3J = json_object_get(rootJ, "playFullTail3");
+		if (playFullTail3J)
+			playFullTail[3] = json_boolean_value(playFullTail3J);
+		json_t* playFullTail4J = json_object_get(rootJ, "playFullTail4");
+		if (playFullTail4J)
+			playFullTail[4] = json_boolean_value(playFullTail4J);
+
 		json_t* fadeInOnPlay0J = json_object_get(rootJ, "fadeInOnPlay0");
 		if (fadeInOnPlay0J)
 			fadeInOnPlay[0] = json_boolean_value(fadeInOnPlay0J);
@@ -639,6 +671,9 @@ struct SickoLooper5 : Module {
 		recordedTracks = 0;
 		for (int track = 0; track < MAX_TRACKS; track++) {
 			extraSamples[track] = true;
+			playTail[track] = false;
+			playFullTail[track] = true;
+			fadeTail[track] = false;
 			fadeInOnPlay[track] = false;
 			trackBuffer[track][LEFT].clear();
 			trackBuffer[track][RIGHT].clear();
@@ -700,10 +735,11 @@ struct SickoLooper5 : Module {
 
 		sampleRateCoeff = (double)sampleRate * 60;
 		oneMsSamples = sampleRate / 1000;
-		//fiveMsSamples = sampleRate / 200;
-		sixMsSamples = sampleRate / 166.67f;
-		//fiveMsSamples = (APP->engine->getSampleRate()) / 5;	// use this for fade testing
-		halfSecondSamples = sampleRate / 2;
+		minTimeSamples = sampleRate / 166.67f;
+		//minTimeSamples = (APP->engine->getSampleRate()) / 5;	// use this for fade testing
+		tailSamples = sampleRate;
+		fadeTailDelta = 1.f / minTimeSamples;
+
 		eraseSamples = sampleRate / 1.5f;
 		fastPulseTime = sampleRate / 50;
 		slowPulseTime = sampleRate / 5;
@@ -833,7 +869,7 @@ struct SickoLooper5 : Module {
 				totalSamples[track] = totalSampleC[track]-1;
 
 				if (extraSamples[track])
-					totalSampleC[track] = trackBuffer[track][LEFT].size() - halfSecondSamples;
+					totalSampleC[track] = trackBuffer[track][LEFT].size() - tailSamples;
 				else
 					totalSampleC[track] = trackBuffer[track][LEFT].size();
 				totalSamples[track] = totalSampleC[track]-1;
@@ -979,7 +1015,7 @@ struct SickoLooper5 : Module {
 				}
 
 				if (extraSamples[track])
-					totalSampleC[track] = trackBuffer[track][LEFT].size() - halfSecondSamples;
+					totalSampleC[track] = trackBuffer[track][LEFT].size() - tailSamples;
 				else
 					totalSampleC[track] = trackBuffer[track][LEFT].size();
 				totalSamples[track] = totalSampleC[track]-1;
@@ -1098,7 +1134,7 @@ struct SickoLooper5 : Module {
 			}
 
 			if (extraSamples[track])
-				totalSampleC[track] = trackBuffer[track][LEFT].size() - halfSecondSamples;
+				totalSampleC[track] = trackBuffer[track][LEFT].size() - tailSamples;
 			else
 				totalSampleC[track] = trackBuffer[track][LEFT].size();
 			totalSamples[track] = totalSampleC[track]-1;
@@ -1154,6 +1190,7 @@ struct SickoLooper5 : Module {
 			json_object_set_new(rootJ, ("volTrack"+to_string(track)).c_str(), json_real(volTrack[track]));
 			json_object_set_new(rootJ, ("srcToTrack"+to_string(track)).c_str(), json_integer(int(srcToTrack[track])));
 			json_object_set_new(rootJ, ("extraSamples"+to_string(track)).c_str(), json_boolean(extraSamples[track]));
+			json_object_set_new(rootJ, ("playFullTail"+to_string(track)).c_str(), json_boolean(playFullTail[track]));
 			json_object_set_new(rootJ, ("fadeInOnPlay"+to_string(track)).c_str(), json_boolean(fadeInOnPlay[track]));
 		}
 		return rootJ;
@@ -1276,6 +1313,9 @@ struct SickoLooper5 : Module {
 		json_t *extraSamples0J = json_object_get(rootJ, "extraSamples0");
 		if (extraSamples0J)
 			extraSamples[0] = json_boolean_value(extraSamples0J);
+		json_t *playFullTail0J = json_object_get(rootJ, "playFullTail0");
+		if (playFullTail0J)
+			playFullTail[0] = json_boolean_value(playFullTail0J);
 		json_t *fadeInOnPlay0J = json_object_get(rootJ, "fadeInOnPlay0");
 		if (fadeInOnPlay0J)
 			fadeInOnPlay[0] = json_boolean_value(fadeInOnPlay0J);
@@ -1326,6 +1366,9 @@ struct SickoLooper5 : Module {
 		json_t *extraSamples1J = json_object_get(rootJ, "extraSamples1");
 		if (extraSamples1J)
 			extraSamples[1] = json_boolean_value(extraSamples1J);
+		json_t *playFullTail1J = json_object_get(rootJ, "playFullTail1");
+		if (playFullTail1J)
+			playFullTail[1] = json_boolean_value(playFullTail1J);
 		json_t *fadeInOnPlay1J = json_object_get(rootJ, "fadeInOnPlay1");
 		if (fadeInOnPlay1J)
 			fadeInOnPlay[1] = json_boolean_value(fadeInOnPlay1J);
@@ -1376,6 +1419,9 @@ struct SickoLooper5 : Module {
 		json_t *extraSamples2J = json_object_get(rootJ, "extraSamples2");
 		if (extraSamples2J)
 			extraSamples[2] = json_boolean_value(extraSamples2J);
+		json_t *playFullTail2J = json_object_get(rootJ, "playFullTail2");
+		if (playFullTail2J)
+			playFullTail[2] = json_boolean_value(playFullTail2J);
 		json_t *fadeInOnPlay2J = json_object_get(rootJ, "fadeInOnPlay2");
 		if (fadeInOnPlay2J)
 			fadeInOnPlay[2] = json_boolean_value(fadeInOnPlay2J);
@@ -1426,6 +1472,9 @@ struct SickoLooper5 : Module {
 		json_t *extraSamples3J = json_object_get(rootJ, "extraSamples3");
 		if (extraSamples3J)
 			extraSamples[3] = json_boolean_value(extraSamples3J);
+		json_t *playFullTail3J = json_object_get(rootJ, "playFullTail3");
+		if (playFullTail3J)
+			playFullTail[3] = json_boolean_value(playFullTail3J);
 		json_t *fadeInOnPlay3J = json_object_get(rootJ, "fadeInOnPlay3");
 		if (fadeInOnPlay3J)
 			fadeInOnPlay[3] = json_boolean_value(fadeInOnPlay3J);
@@ -1476,6 +1525,9 @@ struct SickoLooper5 : Module {
 		json_t *extraSamples4J = json_object_get(rootJ, "extraSamples4");
 		if (extraSamples4J)
 			extraSamples[4] = json_boolean_value(extraSamples4J);
+		json_t *playFullTail4J = json_object_get(rootJ, "playFullTail4");
+		if (playFullTail4J)
+			playFullTail[4] = json_boolean_value(playFullTail4J);
 		json_t *fadeInOnPlay4J = json_object_get(rootJ, "fadeInOnPlay4");
 		if (fadeInOnPlay4J)
 			fadeInOnPlay[4] = json_boolean_value(fadeInOnPlay4J);
@@ -1896,7 +1948,7 @@ struct SickoLooper5 : Module {
 		if (!stopNow[track])
 			xFadeDelta[track] = 1000 / (params[XFADE_KNOB_PARAM+track].getValue() * APP->engine->getSampleRate());
 		else
-			xFadeDelta[track] = 1 / sixMsSamples;
+			xFadeDelta[track] = 1 / minTimeSamples;
 	}
 
 	bool isExtraSamples(int track) {
@@ -1905,9 +1957,9 @@ struct SickoLooper5 : Module {
 
 	void setExtraSamples(int track, bool poly) {
 		if (poly) {
-			if (totalSampleC[track] > halfSecondSamples) {
+			if (totalSampleC[track] > tailSamples) {
 				extraSamples[track] = true;
-				totalSampleC[track] = trackBuffer[track][LEFT].size() - halfSecondSamples;
+				totalSampleC[track] = trackBuffer[track][LEFT].size() - tailSamples;
 				totalSamples[track] = totalSampleC[track]-1;
 			} else {
 				extraSamples[track] = false;
@@ -2000,10 +2052,10 @@ struct SickoLooper5 : Module {
 				muteFade[track] = true;
 				if (mute[track]){
 					muteValue[track] = 1;
-					muteDelta[track] = -1.f / sixMsSamples;
+					muteDelta[track] = -1.f / minTimeSamples;
 				} else {
 					muteValue[track] = 0;
-					muteDelta[track] = 1.f / sixMsSamples;
+					muteDelta[track] = 1.f / minTimeSamples;
 				}
 				prevMute[track] = mute[track];
 			}
@@ -2173,10 +2225,10 @@ struct SickoLooper5 : Module {
 				srcToTrackFade[track] = true;
 				if (srcToTrack[track]){
 					srcToTrackValue[track] = 0;
-					srcToTrackDelta[track] = 1.f / sixMsSamples;
+					srcToTrackDelta[track] = 1.f / minTimeSamples;
 				} else {
 					srcToTrackValue[track] = 1;
-					srcToTrackDelta[track] = -1.f / sixMsSamples;
+					srcToTrackDelta[track] = -1.f / minTimeSamples;
 				}
 				prevSrcToTrack[track] = srcToTrack[track];
 			}
@@ -3331,18 +3383,18 @@ struct SickoLooper5 : Module {
 
 										fadeInValue[track] = 0.f;
 										fadeIn[track] = true;
-										fadeInDelta[track] = 1.f / sixMsSamples;
+										fadeInDelta[track] = 1.f / minTimeSamples;
 										
 									} else {		// if it's OVERDUBBING & startNow -> rec fade out
 										// rec fade out
 										recFade[track] = true;
 										recFadeValue[track] = 1.f;
-										recFadeDelta[track] = -1 / sixMsSamples;
+										recFadeDelta[track] = -1 / minTimeSamples;
 
 										extraRecording[track] = true;
 										extraRecDirection[track] = playingDirection[track];
 										extraRecCount[track] = 0;
-										extraRecMaxSamples = sixMsSamples;
+										extraRecMaxSamples = minTimeSamples;
 										extraRecPos[track] = samplePos[track];
 
 									}
@@ -3365,7 +3417,7 @@ struct SickoLooper5 : Module {
 										extraSamples[track] = true;
 										extraRecDirection[track] = playingDirection[track];
 										extraRecCount[track] = 0;
-										extraRecMaxSamples = halfSecondSamples;
+										extraRecMaxSamples = tailSamples;
 										extraRecPos[track] = samplePos[track];
 
 										xFadePlay(track);
@@ -3422,12 +3474,12 @@ struct SickoLooper5 : Module {
 										if (trackStatus[track] == OVERDUBBING) {
 											recFade[track] = true;					// rec fade out
 											recFadeValue[track] = 1.f;
-											recFadeDelta[track] = -1 / sixMsSamples;
+											recFadeDelta[track] = -1 / minTimeSamples;
 
 											extraRecording[track] = true;
 											extraRecDirection[track] = playingDirection[track];
 											extraRecCount[track] = 0;
-											extraRecMaxSamples = sixMsSamples;
+											extraRecMaxSamples = minTimeSamples;
 											extraRecPos[track] = samplePos[track];
 
 										}
@@ -3497,12 +3549,12 @@ struct SickoLooper5 : Module {
 
 									fadeInValue[track] = 0.f;
 									fadeIn[track] = true;
-									fadeInDelta[track] = 1.f / sixMsSamples;
+									fadeInDelta[track] = 1.f / minTimeSamples;
 								}
 
 								recFade[track] = true;
 								recFadeValue[track] = 0.f;
-								recFadeDelta[track] = 1.f / sixMsSamples;
+								recFadeDelta[track] = 1.f / minTimeSamples;
 
 								trackStatus[track] = OVERDUBBING;
 								nextStatus[track] = NOTHING;
@@ -3568,7 +3620,7 @@ struct SickoLooper5 : Module {
 									// recFadeIn
 									recFade[track] = true;
 									recFadeValue[track] = 0.f;
-									recFadeDelta[track] = 1 / sixMsSamples;
+									recFadeDelta[track] = 1 / minTimeSamples;
 
 									setOverdubLed(track);
 								}
@@ -3690,6 +3742,9 @@ struct SickoLooper5 : Module {
 									if (solo_setting[track]) {
 										startNewSolo = true;
 										currentSoloTrack = -1;
+									} else {
+										if (!rev_setting[track] && playFullTail[track])
+											playTail[track] = true;
 									}
 
 									setIdleLed(track);
@@ -3707,6 +3762,9 @@ struct SickoLooper5 : Module {
 										if (solo_setting[track]) {
 											startNewSolo = true;
 											currentSoloTrack = -1;
+										} else {
+											if (!rev_setting[track] && playFullTail[track])
+												playTail[track] = true;
 										}
 									break;
 
@@ -3749,7 +3807,7 @@ struct SickoLooper5 : Module {
 							extraSamples[track] = true;
 							extraRecDirection[track] = FORWARD;
 							extraRecCount[track] = 0;
-							extraRecMaxSamples = halfSecondSamples;
+							extraRecMaxSamples = tailSamples;
 							extraRecPos[track] = samplePos[track];
 
 							if (!loopSync_setting[track] && recordedTracks == 1) {
@@ -3839,13 +3897,13 @@ struct SickoLooper5 : Module {
 								extraRecDirection[track] = FORWARD;
 								extraRecCount[track] = 0;
 								if (!stopNow[track]) {
-									extraRecMaxSamples = halfSecondSamples;
+									extraRecMaxSamples = tailSamples;
 									extraSamples[track] = true;
 								} else {
-									extraRecMaxSamples = sixMsSamples;
+									extraRecMaxSamples = minTimeSamples;
 									recFade[track] = true;
 									recFadeValue[track] = 0.f;
-									recFadeDelta[track] = -1 / sixMsSamples;
+									recFadeDelta[track] = -1 / minTimeSamples;
 								}
 									
 								extraRecPos[track] = samplePos[track];
@@ -3859,12 +3917,12 @@ struct SickoLooper5 : Module {
 							} else if (stopNow[track]) {	// if it's REVERSE and it's stopNow
 								recFade[track] = true;
 								recFadeValue[track] = 0.f;
-								recFadeDelta[track] = -1 / sixMsSamples;
+								recFadeDelta[track] = -1 / minTimeSamples;
 
 								extraRecording[track] = true;
 								extraRecDirection[track] = REVERSE;
 								extraRecCount[track] = 0;
-								extraRecMaxSamples = sixMsSamples;
+								extraRecMaxSamples = minTimeSamples;
 								extraRecPos[track] = samplePos[track];
 
 								//xFadePlay(track);
@@ -3905,6 +3963,9 @@ struct SickoLooper5 : Module {
 									if (solo_setting[track]) {
 										startNewSolo = true;
 										currentSoloTrack = -1;
+									} else {
+										if (!rev_setting[track] && playFullTail[track])
+											playTail[track] = true;
 									}
 
 									setIdleLed(track);
@@ -3919,6 +3980,9 @@ struct SickoLooper5 : Module {
 										if (solo_setting[track]) {
 											startNewSolo = true;
 											currentSoloTrack = -1;
+										} else {
+											if (!rev_setting[track] && playFullTail[track])
+												playTail[track] = true;
 										}
 
 										setIdleLed(track);
@@ -4141,23 +4205,48 @@ struct SickoLooper5 : Module {
 			}
 
 			if (extraPlaying[track]) {
-				xFadeValue[track] -= xFadeDelta[track];
-				if (xFadeValue[track] < 0) {
-					extraPlaying[track] = false;
-				} else {
-					if (extraPlayPos[track] < trackBuffer[track][LEFT].size()) {
-						currentOutput[track][LEFT] *= 1-xFadeValue[track];
-						currentOutput[track][RIGHT] *= 1-xFadeValue[track];
-
-						currentOutput[track][LEFT] += trackBuffer[track][LEFT][extraPlayPos[track]] * xFadeValue[track];
-						currentOutput[track][RIGHT] += trackBuffer[track][RIGHT][extraPlayPos[track]] * xFadeValue[track];
-
-						if (extraPlayDirection[track] == FORWARD)
-							extraPlayPos[track]++;
-						else
-							extraPlayPos[track]--;
-					} else {
+				if (!playTail[track]) {
+					xFadeValue[track] -= xFadeDelta[track];
+					if (xFadeValue[track] < 0) {
 						extraPlaying[track] = false;
+					} else {
+						if (extraPlayPos[track] < trackBuffer[track][LEFT].size()) {
+							currentOutput[track][LEFT] *= 1-xFadeValue[track];
+							currentOutput[track][RIGHT] *= 1-xFadeValue[track];
+
+							currentOutput[track][LEFT] += trackBuffer[track][LEFT][extraPlayPos[track]] * xFadeValue[track];
+							currentOutput[track][RIGHT] += trackBuffer[track][RIGHT][extraPlayPos[track]] * xFadeValue[track];
+
+							if (extraPlayDirection[track] == FORWARD)
+								extraPlayPos[track]++;
+							else
+								extraPlayPos[track]--;
+						} else {
+							extraPlaying[track] = false;
+						}
+					}
+				} else {	// if it's playing full tail, only if direction is FORWARD
+					if (extraPlayPos[track] < trackBuffer[track][LEFT].size() - minTimeSamples) {
+						currentOutput[track][LEFT] += trackBuffer[track][LEFT][extraPlayPos[track]];
+						currentOutput[track][RIGHT] += trackBuffer[track][RIGHT][extraPlayPos[track]];
+
+						extraPlayPos[track]++;
+
+					} else {
+						if (!fadeTail[track]) {
+							fadeTail[track] = true;
+							fadeTailValue[track] = 1 - fadeTailDelta;
+						}
+						if (extraPlayPos[track] < trackBuffer[track][LEFT].size()) {
+							fadeTailValue[track] -= fadeTailDelta;
+							currentOutput[track][LEFT] += trackBuffer[track][LEFT][extraPlayPos[track]] * fadeTailValue[track];
+							currentOutput[track][RIGHT] += trackBuffer[track][RIGHT][extraPlayPos[track]] * fadeTailValue[track];
+							extraPlayPos[track]++;
+						} else {
+							extraPlaying[track] = false;
+							playTail[track] = false;
+							fadeTail[track] = false;
+						}
 					}
 				}
 			}
@@ -4575,11 +4664,12 @@ struct SickoLooper5DisplayLoop1 : TransparentWidget {
 				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
 			
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createBoolMenuItem("Extra samples (1/2 sec)", "", [=]() {
+			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
 					return module->isExtraSamples(track);
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(track, xtraSamples);
 			}));
+			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			if (module->trackStatus[track] != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 		}
@@ -4732,11 +4822,12 @@ struct SickoLooper5DisplayLoop2 : TransparentWidget {
 				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
 			
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createBoolMenuItem("Extra samples (1/2 sec)", "", [=]() {
+			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
 					return module->isExtraSamples(track);
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(track, xtraSamples);
 			}));
+			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			if (module->trackStatus[track] != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 		}
@@ -4888,11 +4979,12 @@ struct SickoLooper5DisplayLoop3 : TransparentWidget {
 				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
 			
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createBoolMenuItem("Extra samples (1/2 sec)", "", [=]() {
+			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
 					return module->isExtraSamples(track);
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(track, xtraSamples);
 			}));
+			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			if (module->trackStatus[track] != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 		}
@@ -5044,11 +5136,12 @@ struct SickoLooper5DisplayLoop4 : TransparentWidget {
 				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
 			
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createBoolMenuItem("Extra samples (1/2 sec)", "", [=]() {
+			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
 					return module->isExtraSamples(track);
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(track, xtraSamples);
 			}));
+			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			if (module->trackStatus[track] != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 		}
@@ -5199,11 +5292,12 @@ struct SickoLooper5DisplayLoop5 : TransparentWidget {
 				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
 			
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createBoolMenuItem("Extra samples (1/2 sec)", "", [=]() {
+			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
 					return module->isExtraSamples(track);
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(track, xtraSamples);
 			}));
+			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			if (module->trackStatus[track] != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 		}
@@ -5758,11 +5852,12 @@ struct SickoLooper5Widget : ModuleWidget {
 						menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
 
 					menu->addChild(new MenuSeparator());
-					menu->addChild(createBoolMenuItem("Extra samples (1/2 sec)", "", [=]() {
+					menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
 							return module->isExtraSamples(track);
 						}, [=](bool xtraSamples) {
 							module->setExtraSamples(track, xtraSamples);
 					}));
+					menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 
 					if (module->trackStatus[track] != EMPTY)
 						menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));

@@ -1,4 +1,4 @@
-# SickoCV v2.6.0-beta8
+# SickoCV v2.6.0-beta9
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,7 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta8: sickoLooper: added detect tempo function on first recorded loop if it's unsynced and if internal clock is used, the metronome is reset.  
+- beta9: sickoLooper: added 'Play Full Tail on Stop' feature on context menu.  
+Changed extra samples tail length to 1 second;
+- beta8: sickoLooper: added detect tempo function on first recorded loop if it's unsynced and metronome is reset if internal clock is used.  
 Minor design changes also on sickoPlayer, sickoSampler, sickoSampler2
 - beta7: sickoLooper: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
 - beta6: sickoSampler: added "Clear Sample Input"
@@ -545,6 +547,7 @@ Every track (loop) has a current status:
 'STOP' button (or its trig input) stops playing/recording/overdubbing a track.  
 'ERASE' button clicked fast twice within 750ms (or its trig input is triggered once) clears a recorded track. It works only if a track is idle.  
 
+**Track display bar**
 A vertical bar display shows the status of the track with different colors and the percentage of loop position. 
 - black: the track is empty
 - red: the track is recording
@@ -552,13 +555,16 @@ A vertical bar display shows the status of the track with different colors and t
 - evolving green: track is playing back
 - evolving yellow: track is overdubbing
 
-Over the display there's the track context menu with the following options:
-- Fade IN on playback (when a loop starts to play or overdubbing form idle state it will be faded in according to its XFD knob)
-- Import Wav (loads a wav loop into the track)
-- Export Wav (it's active when a loop has been recorded and it saves a wav audio file, with the half second of extra recording included)  
-- Extra samples (1/2 sec) (If a loop has been recorded with sickoLooper this option should be enabled, it's an information used to sync loops correctly and detect tempo if needed)
-- Detect tempo and set bpm (This option calculates the tempo of the loop and sets the bpm knob. Please note that it is calculated on the length of loop, the number of measure set and if there's the Extra Samples option enabled)  
+**Track context menu**  
+Right clicking over each track display bar will show the track context menu with the following options:
+- Fade IN on playback: when a loop starts to play or overdubbing form idle state it will be faded in according to its XFD knob
+- Import Wav: loads a wav loop into the track)
+- Export Wav: it's active when a loop has been recorded and it saves a wav audio file, with the half second of extra recording included
+- Extra samples Tail (1sec): this indicates that the loop has been recorded with the tail. If a loop has been recorded with sickoLooper this option should be enabled, it's an information used to sync loops correctly and detect tempo if needed
+- Play Full Tail on Stop: if this option is enabled, when the loop stops at the end, the entire tail will be played without fading (except for a 6ms fade out before its final stop), otherwise the tail will be played with a fade out according to 'XFD' knob setting
+- Detect tempo and set bpm: clicking this function calculates the tempo of the loop and sets the bpm knob. Please note that it is calculated on the length of loop, the number of measure set and if the Extra Samples Tail option is enabled  
 
+**Other track buttons and knobs**  
 The little 'START immediately' and 'STOP immediately' led buttons start or stop immediately playback/overdub without waiting for loop sync, as explained below.  
 
 'SYNC' led button activates loop/tempo synchronization.  
@@ -569,8 +575,8 @@ The little 'START immediately' and 'STOP immediately' led buttons start or stop 
 
 'SOLO' button lets the playback/recording/overdubbing only for one of the solo tracks at the same time. Solo setting can be changed only if the desired track is not running.  
 
-'XFD' knob sets the crossfade time between the end of the loop and the restart of the same. It can be set from 0 to 500ms. Default is 6ms.  
-If 'Fade In on Play' option is enabled for that track in the context menu, when it keeps playing or overdubbing the loop will be faded according to its 'XFD' knob timing.
+'XFD' knob sets the crossfade time between the end of the loop and the restart of the same. It can be set from 0 to 1000ms. Default is 6ms.  
+If 'Fade In on Play' option is enabled for that track in the context menu, when it starts playing or overdubbing the loop will be faded in according to its 'XFD' knob setting.
 
 'PAN' knob simply stereo pans the output of the track. Panning affects source inputs only on each track output, but not on the main outputs, so the first recording of the loop will not be panned if only main outs are used.  
 
@@ -601,12 +607,12 @@ As explained below, if a command is pending due to tempo 'SYNC', the LED buttons
 Pending commands due to clock or solo synchronization can be revoked with a further button press (undo).
 
 #### SickoLooper5 in DEPTH
-To avoid clicks between loop end/restart, every loop is recorded with a half second of extra recording (as the maximum crossfade setting possible), so clicks can be avoided adjusting 'XFD' knob.  
-To maintain tempo synchronization the crossfade will start from the beginning of extra recorded samples, just when the loop restarts from the beginning.  
-If clicks occur on imported loops, which usually haven't extra samples, it may be helpful to tick "Extra Recording (1/2 sec)" on track context menu and readjust XFD knob, keeping in mind that the loop will be half a second shorter.  
+To avoid clicks between loop end/restart, every loop is recorded with a second of extra recording tail (as the maximum crossfade setting possible), so clicks can be avoided adjusting 'XFD' knob.  
+To maintain tempo synchronization the crossfade will start from the beginning of the tail, just when the loop restarts from the beginning.  
+If clicks occur on imported loops, which usually haven't extra samples recorded, it may be helpful to tick 'Extra Recording Tail (1sec)'' on track context menu and readjust XFD knob, keeping in mind that the loop will be a second shorter.  
 Please note that when playback or overdubbing starts for the first time it will not be neither crossfaded nor faded in by default, but there's an option in the track context menu to 'Fade IN on playback' according to XFD knob.  
 
-When overdubbing a track that has no "Extra Recording" option enabled, the half second of extra samples will be recorded and "extra Recording" option will automatically be ticked.
+When overdubbing a track that has no 'Extra Samples Tail' option enabled, the second of extra samples will be recorded and added, and "Extra Samples Tail" option will be automatically ticked.
 
 **SYNC ON behavior**  
 If at least one track is running, every PLAY/REC/OVERDUB/STOP command on a 'SYNC' track will wait for the next bar detection to be effective. It can be noticed because the LED buttons flash quickly.  
@@ -616,13 +622,13 @@ These track state changes have effect with a crossfade set by XFD knob.
 When track is idle, it will start playing or overdubbing from the reached bar position of the meter by pressing PLAY or REC button.  
 Please note that if the measure setting on the MEAS knob is greater than 1, the loop will start running from the bar position in the first measure of it, so pay attention on when commands are given.  
 When loop is already playing or overdubbing, it will turn in the other state immediately by pressing respectively REC or PLAY button.  
-These changes of state explained above have effect witha 5 ms fade.  
+These changes of state explained above have effect with a 6 ms fade.  
 
 - 'STOP immediately' is ON:  
 When loop is playing or overdubbing, it can be stopped immediately, going to idle state by pressing STOP button.  
 When the loop is playing, it can be stopped immediately, going to idle state by pressing the PLAY button.  
 When the loop is overdubbing, it can be turned directly to play state by pressing the REC button.  
-These changes of state explained above have effect with a 5 ms fade.  
+These changes of state explained above have effect with a 6 ms fade.  
 Please note that if 'START immediately' is set to OFF, when loop is overdubbing and PLAY button is pressed, it will turn its state to playing only when loop end is reached.  
 
 If a track is set to SOLO, 'START immediately' and 'STOP immediately' won't have effect if other SOLO tracks are currently playing/recording/overdubbing.
