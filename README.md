@@ -19,7 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog**  
 - beta9: sickoLooper: added 'Play Full Tail on Stop' feature on context menu.  
-Changed extra samples tail length to 1 second;
+Changed extra samples tail length to 1 second
 - beta8: sickoLooper: added detect tempo function on first recorded loop if it's unsynced and metronome is reset if internal clock is used.  
 Minor design changes also on sickoPlayer, sickoSampler, sickoSampler2
 - beta7: sickoLooper: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
@@ -547,8 +547,8 @@ Every track (loop) has a current status:
 'STOP' button (or its trig input) stops playing/recording/overdubbing a track.  
 'ERASE' button clicked fast twice within 750ms (or its trig input is triggered once) clears a recorded track. It works only if a track is idle.  
 
-**Track display bar**
-A vertical bar display shows the status of the track with different colors and the percentage of loop position. 
+**Track display bar**  
+A vertical display bar shows the status of the track with different colors and the percentage of loop position. 
 - black: the track is empty
 - red: the track is recording
 - blue: track is idle
