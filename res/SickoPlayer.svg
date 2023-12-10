@@ -24,15 +24,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="3.9999998"
-     inkscape:cx="198.12501"
-     inkscape:cy="20.250001"
+     inkscape:zoom="2.828427"
+     inkscape:cx="218.67278"
+     inkscape:cy="345.42168"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1272"
-     inkscape:window-y="6"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer7"
+     inkscape:current-layer="layer4"
      showguides="true" /><defs
      id="defs2"><rect
        x="22.799086"
@@ -596,7 +596,22 @@
        style="display:inline;fill:#000000;stroke:#a3a3c2;stroke-width:0.4;stroke-opacity:0.5"
        d="m 29.63629,63.986585 -0.890265,0.02683"
        id="path2347"
-       sodipodi:nodetypes="cc" /></g><g
+       sodipodi:nodetypes="cc" /><circle
+       style="display:inline;fill:#ffff00;fill-opacity:1;stroke-width:0.42927;stroke-opacity:0.5"
+       id="circle19072"
+       cx="9"
+       cy="110.5"
+       r="4.4000001" /><circle
+       style="display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.42927;stroke-opacity:0.5"
+       id="circle41552"
+       cx="70.199997"
+       cy="105.3"
+       r="4.4000001" /><circle
+       style="display:inline;fill:#ff0000;fill-opacity:1;stroke-width:0.42927;stroke-opacity:0.5"
+       id="circle41554"
+       cx="80.199997"
+       cy="105.3"
+       r="4.4000001" /></g><g
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Etichette Testo"
@@ -1134,8 +1149,7 @@
          d="m 13.930103,105.06948 v -2.11666 h -0.705555 v -0.35278 h 2.116665 v 0.35278 h -0.705555 v 2.11666 z"
          style="stroke-width:0.265;fill:#000000"
          id="path13345" /></g><g
-       aria-label="REL
-"
+       aria-label="REL "
        id="text13180"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#000000;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="RELEASE"><path
@@ -1539,8 +1553,7 @@
          d="m 13.930103,105.06948 v -2.11666 h -0.705555 v -0.35278 h 2.116665 v 0.35278 h -0.705555 v 2.11666 z"
          style="stroke-width:0.265"
          id="path13566" /></g><g
-       aria-label="REL
-"
+       aria-label="REL "
        id="g13576"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="RELEASE"><path

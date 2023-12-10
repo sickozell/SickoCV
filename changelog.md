@@ -1,3 +1,8 @@
+### 2.6.0 (2023-12-10)
+- added sickoLooper3 and sickoLooper5 modules
+- added "Clear Sample Input" on sickoSampler
+- minor design changes on sickoPlayer, sickoSampler, sickoSampler2
+
 ### 2.5.10 (2023-11-19)
 - all player and sampler modules: added 'Store Sample in Patch' feature
 - clocker: fixed a bug when time signatures are in eights

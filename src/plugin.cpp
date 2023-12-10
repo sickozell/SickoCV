@@ -12,33 +12,35 @@ void init(Plugin* p) {
 
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
+	p->addModel(modelAdder8);
+	p->addModel(modelBgates);
+	p->addModel(modelBlender);
+	p->addModel(modelBlender8);
+	p->addModel(modelBtogglerSt);
+	p->addModel(modelBtogglerStCompact);
 	p->addModel(modelBtoggler);
 	p->addModel(modelBtogglerPlus);
 	p->addModel(modelCalcs);
-	p->addModel(modelToggler);
-	p->addModel(modelTogglerCompact);	
-	p->addModel(modelBtogglerSt);
-	p->addModel(modelBtogglerStCompact);
-	p->addModel(modelBlender);
-	p->addModel(modelBlender8);
-	p->addModel(modelSwitcher);
-	p->addModel(modelSwitcherSt);
+	p->addModel(modelClocker);
+	p->addModel(modelCVrouter);
+	p->addModel(modelCVswitcher);
 	p->addModel(modelDrummer);
 	p->addModel(modelDrummer4);
-	p->addModel(modelParking);
-	p->addModel(modelShifter);
+	p->addModel(modelDrummer4Plus);
 	p->addModel(modelDrumPlayer);
 	p->addModel(modelDrumPlayerPlus);
-	p->addModel(modelSickoPlayer);
-	p->addModel(modelDrummer4Plus);
-	p->addModel(modelSickoSampler);
 	p->addModel(modelDrumPlayerXtra);
-	p->addModel(modelWavetabler);
-	p->addModel(modelCVswitcher);
-	p->addModel(modelCVrouter);
-	p->addModel(modelAdder8);
-	p->addModel(modelClocker);
-	p->addModel(modelSickoSampler2);
+	p->addModel(modelParking);
+	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
-	p->addModel(modelBgates);
+	p->addModel(modelSickoLooper3);
+	p->addModel(modelSickoLooper5);
+	p->addModel(modelSickoPlayer);
+	p->addModel(modelSickoSampler);
+	p->addModel(modelSickoSampler2);
+	p->addModel(modelSwitcher);
+	p->addModel(modelSwitcherSt);
+	p->addModel(modelToggler);
+	p->addModel(modelTogglerCompact);
+	p->addModel(modelWavetabler);
 }
