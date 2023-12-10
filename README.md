@@ -1,12 +1,3 @@
-# SickoCV v2.6.0-beta10
-VCV Rack plugin modules (BETA TEST AREA)  
-Compile or **download binary for ANY platform** on the releases page  
-
-## IMPORTANT INSTALLATION NOTE
-If you don't use VCV development environment and run regular VCV install,  
-the new modules will be shown up only if you have a **full subscription** to Sickozell plugin modules.  
-
-So if you have added only some Sickozell modules to VCV you will not see the new ones.
 # SickoCV v2.6.0
 VCV Rack plugin modules
 
