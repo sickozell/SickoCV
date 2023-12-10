@@ -1,4 +1,4 @@
-# SickoCV v2.6.0-beta9
+# SickoCV v2.6.0-beta10
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta10: sickoLooper: fixed a bug when playing extra samples tail  
+changed clickk default setting to on and default crossfade setting to 8ms
 - beta9: sickoLooper: added 'Play Full Tail on Stop' feature on context menu.  
 Changed extra samples tail length to 1 second
 - beta8: sickoLooper: added detect tempo function on first recorded loop if it's unsynced and metronome is reset if internal clock is used.  
@@ -561,7 +563,7 @@ Right clicking over each track display bar will show the track context menu with
 - Import Wav: loads a wav loop into the track)
 - Export Wav: it's active when a loop has been recorded and it saves a wav audio file, with the half second of extra recording included
 - Extra samples Tail (1sec): this indicates that the loop has been recorded with the tail. If a loop has been recorded with sickoLooper this option should be enabled, it's an information used to sync loops correctly and detect tempo if needed
-- Play Full Tail on Stop: if this option is enabled, when the loop stops at the end, the entire tail will be played without fading (except for a 6ms fade out before its final stop), otherwise the tail will be played with a fade out according to 'XFD' knob setting
+- Play Full Tail on Stop: if this option is enabled, when the loop stops at the end, the entire tail will be played without fading (except for a 8ms fade out before its final stop), otherwise the tail will be played with a fade out according to 'XFD' knob setting
 - Detect tempo and set bpm: clicking this function calculates the tempo of the loop and sets the bpm knob. Please note that it is calculated on the length of loop, the number of measure set and if the Extra Samples Tail option is enabled  
 
 **Other track buttons and knobs**  
@@ -575,7 +577,7 @@ The little 'START immediately' and 'STOP immediately' led buttons start or stop 
 
 'SOLO' button lets the playback/recording/overdubbing only for one of the solo tracks at the same time. Solo setting can be changed only if the desired track is not running.  
 
-'XFD' knob sets the crossfade time between the end of the loop and the restart of the same. It can be set from 0 to 1000ms. Default is 6ms.  
+'XFD' knob sets the crossfade time between the end of the loop and the restart of the same. It can be set from 0 to 1000ms. Default is 8ms.  
 If 'Fade In on Play' option is enabled for that track in the context menu, when it starts playing or overdubbing the loop will be faded in according to its 'XFD' knob setting.
 
 'PAN' knob simply stereo pans the output of the track. Panning affects source inputs only on each track output, but not on the main outputs, so the first recording of the loop will not be panned if only main outs are used.  
