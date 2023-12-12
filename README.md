@@ -506,6 +506,10 @@ sickoLooper is inspired by hardware looper devices with most of their features i
 
 ![sickolooper35](https://github.com/sickozell/SickoCV/assets/80784296/974c1793-9f4b-41ea-bf57-f7db84136ea7)
 
+#### - QUICK START
+![card_sickolooper1](https://github.com/sickozell/SickoCV/assets/80784296/a67e8499-ab05-42f0-94cd-f6db1b19e5f6)
+![card_sickolooper2](https://github.com/sickozell/SickoCV/assets/80784296/252ed2ef-d652-4254-8935-0050ad594c56)
+
 #### - INSTRUCTIONS
 **Clock section**  
 Set clock speed with BPM knob. 
