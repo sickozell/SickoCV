@@ -507,7 +507,7 @@ sickoLooper is inspired by hardware looper devices with most of their features i
 ![sickolooper35](https://github.com/sickozell/SickoCV/assets/80784296/974c1793-9f4b-41ea-bf57-f7db84136ea7)
 
 #### - QUICK START
-![card_sickolooper1](https://github.com/sickozell/SickoCV/assets/80784296/a67e8499-ab05-42f0-94cd-f6db1b19e5f6)
+![card_sickolooper1](https://github.com/sickozell/SickoCV/assets/80784296/de175519-11f6-4a5e-9c38-4e6dc5e79a0a)
 ![card_sickolooper2](https://github.com/sickozell/SickoCV/assets/80784296/252ed2ef-d652-4254-8935-0050ad594c56)
 
 #### - INSTRUCTIONS
