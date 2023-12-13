@@ -1,4 +1,7 @@
-### 2.6.0 (2023-12-xx)
+### 2.6.1 (2023-12-xx)
+- sickoLooper: added dark green color to the display bar when the loop is still playing even if its recording is finished
+
+### 2.6.0 (2023-12-10)
 - added sickoLooper3 and sickoLooper5 modules
 - added "Clear Sample Input" on sickoSampler
 - minor design changes on sickoPlayer, sickoSampler, sickoSampler2

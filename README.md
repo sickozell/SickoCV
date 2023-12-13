@@ -1,4 +1,4 @@
-# SickoCV v2.6.0-beta10
+# SickoCV v2.6.1-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,24 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta10: sickoLooper: fixed a bug when playing extra samples tail  
-changed clickk default setting to on and default crossfade setting to 8ms
-- beta9: sickoLooper: added 'Play Full Tail on Stop' feature on context menu.  
-Changed extra samples tail length to 1 second
-- beta8: sickoLooper: added detect tempo function on first recorded loop if it's unsynced and metronome is reset if internal clock is used.  
-Minor design changes also on sickoPlayer, sickoSampler, sickoSampler2
-- beta7: sickoLooper: set "OVERDUB after REC" and "Instant Stop" unticked by default. Fixed a master out bug on sickoLooper3
-- beta6: sickoSampler: added "Clear Sample Input"
-- beta5: added sickoLooper3 module
-- beta4: sickoLooper: fixed a fade issue when the loop restarts while still fading out from the previous stop  
-- beta3: sickoLooper: fixed issue on loop fade out when synced loops play at greater measures than recorded  
-changed default crossfade and minimum start/stop fade to 6ms  
-fixed issue on "save preset + loops" that didn't delete wav files if tracks are empty  
-fixed missing "SOURCEs to MASTER out" and "Only Click on EAR" settings when saving preset  
-- beta2: sickoLooper: fixed missing 'Play Button Sequence' setting and click audio files path when saving preset.
-- beta1: added sickoLooper5 module
+- beta1: sickoLooper: added dark green color to the display bar when the loop is still playing even if its recording is finished.
 
-# SickoCV v2.6.0
+# SickoCV v2.6.1
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/9b13e8bb-d7d9-4614-9993-07dbd839ecc9)
