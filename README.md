@@ -1,4 +1,4 @@
-# SickoCV v2.6.0
+# SickoCV v2.6.1
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/9b13e8bb-d7d9-4614-9993-07dbd839ecc9)
@@ -475,7 +475,6 @@ Due to the complexity of these modules, a PDF user manual has been written
 [Download ENGLISH user manual](./docs/sickoLooper%20user%20manual%20%5BEN%5D.pdf?raw=true) (right-click -> save link as)
 
 [Download manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20%5BIT%5D.pdf?raw=true) (right-click -> save link as)
-
 
 ## sickoPlayer
 ### wav sample player

@@ -3,9 +3,9 @@
 #define BAR 1
 
 #define COLOR_RED 0xff, 0x00, 0x00, 0xff
-#define COLOR_DARK_RED 0xaf, 0x00, 0x00, 0xff
+//#define COLOR_DARK_RED 0xaf, 0xa0, 0x00, 0xff
 #define COLOR_GREEN 0x00, 0xff, 0x00, 0xff
-#define COLOR_DARK_GREEN 0x00, 0xff, 0x00, 0xff
+#define COLOR_DARK_GREEN 0x00, 0xaf, 0x00, 0xff
 #define COLOR_BLUE 0x00, 0x00, 0xff, 0xff
 #define COLOR_YELLOW 0xff, 0xff, 0x00, 0xff
 #define COLOR_DARK_YELLOW 0xaf, 0xaf, 0x00, 0xff
@@ -182,6 +182,10 @@ struct SickoLooper5 : Module {
 	float allSSTrig = 0.f;
 	float prevAllSSTrig = 0.f;
 
+	float allStopTrig = 0.f;
+	float prevAllStopTrig = 0.f;
+	bool allStop = false;
+	
 	const std::string signatureDisplay[17] = {"2/4", "3/4", "4/4", "5/4", "6/4", "7/4", "5/8", "6/8", "7/8", "8/8", "9/8", "10/8", "11/8", "12/8", "13/8", "14/8", "15/8"};
 
 	float extraRecMaxSamples = 0.f;
@@ -2101,10 +2105,23 @@ struct SickoLooper5 : Module {
 //																						██║░░░░░███████╗██║░░██║░░░██║░░░  ██║░░██║███████╗███████╗
 //																						╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░  ╚═╝░░╚═╝╚══════╝╚══════╝
 		
+		/*
 		if (inputs[ALLSTARTSTOP_TRIG_INPUT].getVoltage() > 1.f)
 			allSSTrig = 1;
 		else
 			allSSTrig = 0;
+		*/
+		if (inputs[ALLSTARTSTOP_TRIG_INPUT].getVoltage() > 1.f) {
+			if (!inputs[ALLSTOP_TRIG_INPUT].isConnected()) {
+				allSSTrig = 1;
+			} else if (globalStatus == IDLE) {
+				allSSTrig = 1;
+			} else {
+				allSSTrig = 0;
+			}
+		} else {
+			allSSTrig = 0;
+		}
 
 		allSSTrig += params[ALLSTARTSTOP_BUT_PARAM].getValue();
 		if (allSSTrig >= 1 && prevAllSSTrig == 0) {
@@ -2161,6 +2178,41 @@ struct SickoLooper5 : Module {
 			
 		}
 		prevAllSSTrig = allSSTrig;
+
+		allStopTrig = inputs[ALLSTOP_TRIG_INPUT].getVoltage();
+		if (allStopTrig > 1.f && prevAllStopTrig <= 1.f) {
+			allStop = true;
+		} else {
+			allStop = false;
+		}
+		prevAllStopTrig = allStopTrig;
+
+		if (allStop && globalStatus == PLAYING) {
+			for (int track = 0; track < MAX_TRACKS; track++) {
+				switch (trackStatus[track]) {
+					case EMPTY:
+					case IDLE:
+					break;
+
+					case PLAYING:
+						setFastPlayLed(track);
+						if (stopImm_setting[track])
+							stopNow[track] = true;
+					break;
+
+					case RECORDING:
+						setFastRecLed(track);
+					break;
+
+					case OVERDUBBING:
+						setFastOverdubLed(track);
+						if (stopImm_setting[track])
+							stopNow[track] = true;
+					break;
+				}
+				nextStatus[track] = IDLE;
+			}
+		}
 
 		// ***************************************************************************************************************************
 		// **********************************************************************   T R A C K    M A N A G E M E N T   ***************
