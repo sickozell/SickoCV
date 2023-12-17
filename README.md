@@ -18,7 +18,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta1: sickoLooper: added dark green color to the display bar when the loop is still playing even if its recording is finished.
+- beta1: sickoLooper: added dark green color to the display bar when the loop is still playing even if its recording is finished.  
+fixed a bug on 'stop all' trig input
 
 # SickoCV v2.6.1
 VCV Rack plugin modules
