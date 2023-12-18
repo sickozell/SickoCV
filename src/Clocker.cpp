@@ -151,8 +151,8 @@ struct Clocker : Module {
 	//int beatCounter = 1;
 	int beatCounter = 20;	// thise ensure that module starts on a new bar
 
-	//float oneMsTime = (APP->engine->getSampleRate()) / 1000;
-	float oneMsTime = (APP->engine->getSampleRate()) / 10;	// for testing purposes
+	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
+	//float oneMsTime = (APP->engine->getSampleRate()) / 10;	// for testing purposes
 	bool resetPulse = false;
 	float resetPulseTime = 0.f;
 	bool beatPulse = false;
@@ -282,8 +282,8 @@ struct Clocker : Module {
 
 	void onSampleRateChange() override {
 		sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
-		//oneMsTime = (APP->engine->getSampleRate()) / 1000;
-		oneMsTime = (APP->engine->getSampleRate()) / 10; // for testing purposes
+		oneMsTime = (APP->engine->getSampleRate()) / 1000;
+		//oneMsTime = (APP->engine->getSampleRate()) / 10; // for testing purposes
 
 		for (int i = 0; i < 2; i++) {
 			if (fileLoaded[i]) {
