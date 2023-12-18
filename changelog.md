@@ -1,6 +1,7 @@
-### 2.6.1 (2023-12-17)
+### 2.6.1 (2023-12-18)
 - sickoLooper: added dark green color to the display bar when the loop is still playing even if its recording is finished  
-fixed a bug on 'stop all' trig input
+fixed a bug on 'stop all' trig input  
+- clocker: fixed a bug on swing control
 
 ### 2.6.0 (2023-12-10)
 - added sickoLooper3 and sickoLooper5 modules
