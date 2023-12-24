@@ -23,7 +23,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.2
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/9b13e8bb-d7d9-4614-9993-07dbd839ecc9)
+![SickoCV modules 2 6 2](https://github.com/sickozell/SickoCV/assets/80784296/b037e9cd-2bb8-4b88-b806-88fda601baa1)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -437,6 +437,13 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 - Zoom Waveform (zooms the waveform from start to end (full), half, quarter, eighth of the sample length)
 - Light Box color (if Light Boxes option is enabled in the general context menu, a predefined color or a custom one can be set here)
 - Light Box Fade (Fade time of Light Boxes is set here: Slow (0.5s), Normal (0.25s), Fast (0.1s)
+
+
+## holder / holder8
+### Sample & Hold or Track & Hold with noise generator, probability and range
+
+![holder](https://github.com/sickozell/SickoCV/assets/80784296/92b1d5b1-265a-489a-848e-f504e30c96e5)
+
 
 ## parking
 ### Set of unconnected inputs and outputs just to park unused cables
