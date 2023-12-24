@@ -1,4 +1,4 @@
-# SickoCV v2.6.1-beta1
+# SickoCV v2.6.2-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,10 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta1: sickoLooper: added dark green color to the display bar when the loop is still playing even if its recording is finished.  
-fixed a bug on 'stop all' trig input
+- beta1: added holder and holder8 modules
 
-# SickoCV v2.6.1
+# SickoCV v2.6.2
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 0](https://github.com/sickozell/SickoCV/assets/80784296/9b13e8bb-d7d9-4614-9993-07dbd839ecc9)
