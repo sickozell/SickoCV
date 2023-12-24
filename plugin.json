@@ -184,7 +184,7 @@
     {
       "slug": "Holder",
       "name": "holder",
-      "description": "Sample & Hold or Track & Hold with probability and range",
+      "description": "Sample & Hold or Track & Hold with noise generator, probability and range",
       "tags": [
         "Sample and hold",
         "Polyphonic"
@@ -193,7 +193,7 @@
     {
       "slug": "Holder8",
       "name": "holder8",
-      "description": "8 Sample & Hold or Track & Hold with probability and range",
+      "description": "8 Sample & Hold or Track & Hold with with noise generator, probability and range",
       "tags": [
         "Sample and hold",
         "Quad",
