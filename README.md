@@ -446,7 +446,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ![holder](https://github.com/sickozell/SickoCV/assets/80784296/92b1d5b1-265a-489a-848e-f504e30c96e5)
 
 #### - INSTRUCTIONS
-S&H / T&H selector let change the mode between Sample&Hold and Track & Hold
+S&H / T&H switch changes the mode between Sample&Hold and Track & Hold
 
 Sample & Hold: a trigger on TRIG input samples the last received signal on IN input that is sent to the OUT  
 Track & Hold: until the gate on GATE input is LOW the IN signal is sent to the OUT. The last received signal is sent to the OUT until the GATE is LOW.
@@ -461,19 +461,19 @@ OUT output is feeded with sampled or tracked signal.
 TRIG output sends a trigger when sample occurs. If Track & Hold is selected, it sends a trigger on tracking start and/or end, or a gate depending by the options ticked on context menu.
 
 #### CONTEXT MENU
-**White Noise Type**
-There are two types of white noise generator
-- FULL generates random ±5v voltages
-- CENTERED generates random ±5v voltages but the weight is more centered, and occasionally may exceed the range
+**White Noise Type**  
+There are two types of white noise generator.  
+- FULL generates random ±5v voltages.
+- CENTERED generates random ±5v voltages but the weight is more centered, and occasionally may exceed the range.
 
-Comparison:
+Comparison:  
 ![Holder_b](https://github.com/sickozell/SickoCV/assets/80784296/72ed6cb8-7372-4c4d-9670-c5d4de5d1c5b)
 
 **Track & Hold options**
 - Gate Out instead Trig: sends a HIGH gate on TRG out when the signal is sampled.
-- Gate Inversion: sends a HIGH gate on TRG out when the signal is not sampled
-- Trig on Start: sends a trigger on TRG out when the signal is sampled
-- Trig on End: sends a trigger on TRG out when the signal stops being sampled
+- Gate Inversion: sends a HIGH gate on TRG out when the signal is not sampled.
+- Trig on Start: sends a trigger on TRG out when the signal is sampled.
+- Trig on End: sends a trigger on TRG out when the signal stops being sampled.
 
 ## parking
 ### Set of unconnected inputs and outputs just to park unused cables
