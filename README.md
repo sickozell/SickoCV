@@ -41,7 +41,7 @@ VCV Rack plugin modules
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
-- [holder / holder8](#holder--holder8)
+- [holder / holder compact / holder8](#holder--holder-compact--holder8)
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
