@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta4: added holder compact module
 - beta3: on sickoLooper added visible context menu options even if unselectable
 - beta2: added sample on HIGH gate option in context menu for track&hold
 - beta1: added holder and holder8 modules
