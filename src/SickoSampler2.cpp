@@ -3335,7 +3335,7 @@ struct SickoSampler2Display : TransparentWidget {
 						}
 					}
 				}));
-				}
+			}
 
 			if (module->fileLoaded) {
 				menu->addChild(new MenuSeparator());
@@ -3581,7 +3581,7 @@ struct SickoSampler2Widget : ModuleWidget {
 			module->menuLoadSample();
 			if (module->restoreLoadFromPatch)
 				module->loadFromPatch = temploadFromPatch;
-		;}));
+		}));
 
 		if (module->folderTreeData.size() > 0) {
 			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
