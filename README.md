@@ -1,4 +1,4 @@
-# SickoCV v2.6.2-beta2
+# SickoCV v2.6.2-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta3: on sickoLooper added visible context menu options even if unselectable
 - beta2: added sample on HIGH gate option in context menu for track&hold
 - beta1: added holder and holder8 modules
 
