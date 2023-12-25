@@ -42,8 +42,8 @@ struct Holder : Module {
 	
 	bool trigOnStart = true;
 	bool trigOnEnd = true;
+	int sampleOnGate = 0;
 	bool gateOnTH = false;
-	bool gateInv = false;
 
 	float out = 0.f;
 	int chan = 1;
@@ -51,7 +51,7 @@ struct Holder : Module {
 	float probSetup = 1.f;
 	float probValue = 0.f;
 
-	bool tracking = false;
+	bool holding = false;
 
 	float oneMsSamples = (APP->engine->getSampleRate()) / 1000;			// samples in 1ms
 	float outTrigSample = 0;
@@ -100,8 +100,8 @@ struct Holder : Module {
 
 		trigOnStart = true;
 		trigOnEnd = true;
+		sampleOnGate = 0;
 		gateOnTH = false;
-		gateInv = false;
 
 		noiseType = FULL_NOISE;
 
@@ -119,8 +119,8 @@ struct Holder : Module {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "noiseType", json_boolean(noiseType));
+		json_object_set_new(rootJ, "sampleOnGate", json_integer(sampleOnGate));
 		json_object_set_new(rootJ, "gateOnTH", json_boolean(gateOnTH));
-		json_object_set_new(rootJ, "gateInv", json_boolean(gateInv));
 		json_object_set_new(rootJ, "trigOnStart", json_boolean(trigOnStart));
 		json_object_set_new(rootJ, "trigOnEnd", json_boolean(trigOnEnd));
 		return rootJ;
@@ -131,13 +131,13 @@ struct Holder : Module {
 		if (noiseTypeJ)
 			noiseType = json_boolean_value(noiseTypeJ);
 
+		json_t* sampleOnGateJ = json_object_get(rootJ, "sampleOnGate");
+		if (sampleOnGateJ)
+			sampleOnGate = json_integer_value(sampleOnGateJ);
+
 		json_t* gateOnTHJ = json_object_get(rootJ, "gateOnTH");
 		if (gateOnTHJ)
 			gateOnTH = json_boolean_value(gateOnTHJ);
-
-		json_t* gateInvJ = json_object_get(rootJ, "gateInv");
-		if (gateInvJ)
-			gateInv = json_boolean_value(gateInvJ);
 
 		json_t* trigOnStartJ = json_object_get(rootJ, "trigOnStart");
 		if (trigOnStartJ)
@@ -147,6 +147,21 @@ struct Holder : Module {
 		if (trigOnEndJ)
 			trigOnEnd = json_boolean_value(trigOnEndJ);
 
+	}
+
+	bool isSampleOnHighGate() {
+		return sampleOnGate;
+	}
+
+	void setSampleOnGate(bool sampleOnHighGate) {
+		if (sampleOnHighGate) {
+			sampleOnGate = 1;
+			holding = true;
+		} else {
+			sampleOnGate = 0;
+			holding = false;
+		}
+		
 	}
 
 	bool isGateOut() {
@@ -235,142 +250,319 @@ struct Holder : Module {
 				break;
 
 				case TRACK_HOLD:
-					if (inputs[IN_INPUT].isConnected()) {
-						trigValue = inputs[TRIG_INPUT].getVoltage();
-						chan = std::max(1, inputs[IN_INPUT].getChannels());
-						if (trigValue >= 1.f && prevTrigValue < 1.f) {
-							probValue = random::uniform();
-							if (probSetup >= probValue) {
-								tracking = true;
-								for (int c = 0; c < chan; c++) {
+					switch (sampleOnGate) {
+						case 0:	// sample on LOW GATE
+							if (inputs[IN_INPUT].isConnected()) {
+								trigValue = inputs[TRIG_INPUT].getVoltage();
+								chan = std::max(1, inputs[IN_INPUT].getChannels());
 
-									out = ( inputs[IN_INPUT].getVoltage(c) *
-										(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-										(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+								if (trigValue >= 1.f && prevTrigValue < 1.f) {
+									probValue = random::uniform();
+									if (probSetup >= probValue) {
+										for (int c = 0; c < chan; c++) {
+
+											out = ( inputs[IN_INPUT].getVoltage(c) *
+													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+
+											if (out > 10.f)
+												out = 10.f;
+											else if (out < -10.f)
+												out = -10.f;
+
+											outputs[OUT_OUTPUT].setVoltage(out, c);
+
+										}
+
+										if (!gateOnTH && trigOnStart) {
+											outTrig = true;
+											outTrigSample = oneMsSamples;
+										}
+
+										holding = false;
+									}
+								} else if (trigValue >= 1.f && !holding) {
+									for (int c = 0; c < chan; c++) {
+
+										out = ( inputs[IN_INPUT].getVoltage(c) *
+												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+
+										if (out > 10.f)
+											out = 10.f;
+										else if (out < -10.f)
+											out = -10.f;
+
+										outputs[OUT_OUTPUT].setVoltage(out, c);
+
+									}
+
+									if (!gateOnTH && trigOnStart && prevTrigValue < 1.f) {
+										outTrig = true;
+										outTrigSample = oneMsSamples;
+									}
+
+								} else if (trigValue < 1) {
+									if (!holding) {
+										holding = true;
+										for (int c = 0; c < chan; c++) {
+
+											out = ( inputs[IN_INPUT].getVoltage(c) *
+													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+
+											if (out > 10.f)
+												out = 10.f;
+											else if (out < -10.f)
+												out = -10.f;
+
+											outputs[OUT_OUTPUT].setVoltage(out, c);
+
+										}
+
+										if (!gateOnTH && trigOnEnd) {
+											outTrig = true;
+											outTrigSample = oneMsSamples;
+										}
+									}
+								}
+
+								prevTrigValue = trigValue;
+								outputs[OUT_OUTPUT].setChannels(chan);
+
+								if (gateOnTH) {
+									if (holding) {
+										outputs[TRIG_OUTPUT].setVoltage(0.f);
+									} else {
+										outputs[TRIG_OUTPUT].setVoltage(10.f);
+									}
+								}
+
+							} else {
+
+								trigValue = inputs[TRIG_INPUT].getVoltage();
+
+								if (trigValue >= 1.f && prevTrigValue < 1.f) {
+									probValue = random::uniform();
+									if (probSetup >= probValue) {
+										if (noiseType == FULL_NOISE) 
+											out = ( (random::uniform() * 10 - 5.f) *
+													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+										else
+											out = ( random::normal() *
+													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+
+										if (out > 10.f)
+											out = 10.f;
+										else if (out < -10.f)
+											out = -10.f;
+
+										outputs[OUT_OUTPUT].setVoltage(out, 0);
+
+										if (!gateOnTH && trigOnStart) {
+											outTrig = true;
+											outTrigSample = oneMsSamples;
+										}
+
+										holding = false;
+									}
+								} else if (trigValue >= 1.f && !holding) {
+
+									if (noiseType == FULL_NOISE) 
+										out = ( (random::uniform() * 10 - 5.f) *
+												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+									else
+										out = ( random::normal() *
+												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
 
 									if (out > 10.f)
 										out = 10.f;
 									else if (out < -10.f)
 										out = -10.f;
-									outputs[OUT_OUTPUT].setVoltage(out, c);
-								}
-								if (gateOnTH) {
-									if (!gateInv)
-										outputs[TRIG_OUTPUT].setVoltage(10.f);
-									else
-										outputs[TRIG_OUTPUT].setVoltage(0.f);
-								} else {
-									if (trigOnStart) {
+
+									outputs[OUT_OUTPUT].setVoltage(out, 0);
+
+									if (!gateOnTH && trigOnStart && prevTrigValue < 1.f) {
 										outTrig = true;
 										outTrigSample = oneMsSamples;
 									}
-								}
-							} else {
-								tracking = false;
-							}
-						} else if (trigValue < 1.f) {
-							if (gateOnTH) {
-								if (!gateInv)
-									outputs[TRIG_OUTPUT].setVoltage(0.f);
-								else
-									outputs[TRIG_OUTPUT].setVoltage(10.f);
-							} else {
-								if (tracking && trigOnEnd) {
-									outTrig = true;
-									outTrigSample = oneMsSamples;
-								}
-							}
 
-							tracking = false;
-						}
-						prevTrigValue = trigValue;
+								} else if (trigValue < 1) {
+									if (!holding) {
+										holding = true;
 
-						if (!tracking) {
-							for (int c = 0; c < chan; c++) {
+										if (noiseType == FULL_NOISE) 
+											out = ( (random::uniform() * 10 - 5.f) *
+													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+										else
+											out = ( random::normal() *
+													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
 
-								out = ( inputs[IN_INPUT].getVoltage(c) *
-										(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-										(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+										if (out > 10.f)
+											out = 10.f;
+										else if (out < -10.f)
+											out = -10.f;
 
-								if (out > 10.f)
-									out = 10.f;
-								else if (out < -10.f)
-									out = -10.f;
+										outputs[OUT_OUTPUT].setVoltage(out, 0);
 
-								outputs[OUT_OUTPUT].setVoltage(out, c);
-							}							
-						}
-
-						outputs[OUT_OUTPUT].setChannels(chan);
-						
-					} else {
-
-						if (noiseType == FULL_NOISE) 
-							out = ( (random::uniform() * 10 - 5.f) *
-									(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-									(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-						else
-							out = ( random::normal() *
-									(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-									(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-
-						trigValue = inputs[TRIG_INPUT].getVoltage();
-						if (trigValue >= 1.f && prevTrigValue < 1.f) {
-							probValue = random::uniform();
-							if (probSetup >= probValue) {
-								tracking = true;
-								if (out > 10.f)
-									out = 10.f;
-								else if (out < -10.f)
-									out = -10.f;
-
-								outputs[OUT_OUTPUT].setVoltage(out, 0);
-								if (gateOnTH) {
-									if (!gateInv)
-										outputs[TRIG_OUTPUT].setVoltage(10.f);
-									else
-										outputs[TRIG_OUTPUT].setVoltage(0.f);
-								} else {
-									if (trigOnStart) {
-										outTrig = true;
-										outTrigSample = oneMsSamples;
+										if (!gateOnTH && trigOnEnd) {
+											outTrig = true;
+											outTrigSample = oneMsSamples;
+										}
 									}
 								}
-							} else {
-								tracking = false;
-							}
-						} else if (trigValue < 1.f) {
-							if (gateOnTH) {
-								if (!gateInv)
-									outputs[TRIG_OUTPUT].setVoltage(0.f);
-								else
-									outputs[TRIG_OUTPUT].setVoltage(10.f);
-							} else {
-								if (tracking && trigOnEnd) {
-									outTrig = true;
-									outTrigSample = oneMsSamples;
+
+								prevTrigValue = trigValue;
+								outputs[OUT_OUTPUT].setChannels(1);
+
+								if (gateOnTH) {
+									if (holding) {
+										outputs[TRIG_OUTPUT].setVoltage(0.f);
+									} else {
+										outputs[TRIG_OUTPUT].setVoltage(10.f);
+									}
 								}
 							}
-							tracking = false;
-						}
-						prevTrigValue = trigValue;
 
-						if (!tracking) {
-							if (out > 10.f)
-								out = 10.f;
-							else if (out < -10.f)
-								out = -10.f;
+						break;
 
-							outputs[OUT_OUTPUT].setVoltage(out, 0);
-						}
-						outputs[OUT_OUTPUT].setChannels(1);
-					}
+						case 1:		// sample on HIGH GATE	
+							if (inputs[IN_INPUT].isConnected()) {
+								trigValue = inputs[TRIG_INPUT].getVoltage();
+								chan = std::max(1, inputs[IN_INPUT].getChannels());
 
+								if (trigValue >= 1.f && prevTrigValue < 1.f) {
+									probValue = random::uniform();
+									if (probSetup >= probValue) {
+										holding = true;
+										for (int c = 0; c < chan; c++) {
+
+											out = ( inputs[IN_INPUT].getVoltage(c) *
+												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+
+											if (out > 10.f)
+												out = 10.f;
+											else if (out < -10.f)
+												out = -10.f;
+											outputs[OUT_OUTPUT].setVoltage(out, c);
+										}
+
+										if (gateOnTH) {
+											outputs[TRIG_OUTPUT].setVoltage(10.f);
+										} else {
+											if (trigOnStart) {
+												outTrig = true;
+												outTrigSample = oneMsSamples;
+											}
+										}
+									} else {
+										holding = false;
+									}
+								} else if (trigValue < 1.f) {
+
+									if (gateOnTH) {
+										outputs[TRIG_OUTPUT].setVoltage(0.f);
+									} else {
+										if (holding && trigOnEnd) {
+											outTrig = true;
+											outTrigSample = oneMsSamples;
+										}
+									}
+
+									holding = false;
+								}
+								prevTrigValue = trigValue;
+
+								if (!holding) {
+									for (int c = 0; c < chan; c++) {
+
+										out = ( inputs[IN_INPUT].getVoltage(c) *
+												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+
+										if (out > 10.f)
+											out = 10.f;
+										else if (out < -10.f)
+											out = -10.f;
+
+										outputs[OUT_OUTPUT].setVoltage(out, c);
+									}							
+								}
+
+								outputs[OUT_OUTPUT].setChannels(chan);
+								
+							} else {
+
+								if (noiseType == FULL_NOISE) 
+									out = ( (random::uniform() * 10 - 5.f) *
+											(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+											(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+								else
+									out = ( random::normal() *
+											(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
+											(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
+
+								trigValue = inputs[TRIG_INPUT].getVoltage();
+								if (trigValue >= 1.f && prevTrigValue < 1.f) {
+									probValue = random::uniform();
+									if (probSetup >= probValue) {
+										holding = true;
+										if (out > 10.f)
+											out = 10.f;
+										else if (out < -10.f)
+											out = -10.f;
+
+										outputs[OUT_OUTPUT].setVoltage(out, 0);
+										if (gateOnTH) {
+											outputs[TRIG_OUTPUT].setVoltage(10.f);
+										} else {
+											if (trigOnStart) {
+												outTrig = true;
+												outTrigSample = oneMsSamples;
+											}
+										}
+									} else {
+										holding = false;
+									}
+								} else if (trigValue < 1.f) {
+
+									if (gateOnTH) {
+										outputs[TRIG_OUTPUT].setVoltage(0.f);
+									} else {
+										if (holding && trigOnEnd) {
+											outTrig = true;
+											outTrigSample = oneMsSamples;
+										}
+									}
+									holding = false;
+								}
+								prevTrigValue = trigValue;
+
+								if (!holding) {
+									if (out > 10.f)
+										out = 10.f;
+									else if (out < -10.f)
+										out = -10.f;
+
+									outputs[OUT_OUTPUT].setVoltage(out, 0);
+								}
+								outputs[OUT_OUTPUT].setChannels(1);
+							}
+						break;
+					}	
 				break;
 			}
 		} else {
 			outputs[OUT_OUTPUT].setVoltage(0.f, 0);
 			outputs[OUT_OUTPUT].setChannels(1);
+			outputs[TRIG_OUTPUT].setVoltage(0.f);
 		}
 
 		if (outTrig) {
@@ -487,23 +679,26 @@ struct HolderWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Track & Hold options:"));
-		//menu->addChild(createBoolPtrMenuItem("Gate Out instead Trig", "", &module->gateOnTH));
+
+		menu->addChild(createBoolMenuItem("Sample on HIGH Gate", "", [=]() {
+					return module->isSampleOnHighGate();
+				}, [=](bool sampleOnHighGate) {
+					module->setSampleOnGate(sampleOnHighGate);
+			}));
+
+		if (module->gateOnTH == true) {
+			menu->addChild(createMenuLabel("Trig on start"));
+			menu->addChild(createMenuLabel("Trig on end"));
+		} else {
+			menu->addChild(createBoolPtrMenuItem("Trig on start", "", &module->trigOnStart));
+			menu->addChild(createBoolPtrMenuItem("Trig on end", "", &module->trigOnEnd));
+		}
 
 		menu->addChild(createBoolMenuItem("Gate Out instead Trig", "", [=]() {
 					return module->isGateOut();
 				}, [=](bool gateOut) {
 					module->setGateOut(gateOut);
 			}));
-
-		if (module->gateOnTH == true) {
-			menu->addChild(createBoolPtrMenuItem("Gate Inversion", "", &module->gateInv));
-			menu->addChild(createMenuLabel("Trig on start"));
-			menu->addChild(createMenuLabel("Trig on end"));
-		} else {
-			menu->addChild(createMenuLabel("Gate Inversion"));
-			menu->addChild(createBoolPtrMenuItem("Trig on start", "", &module->trigOnStart));
-			menu->addChild(createBoolPtrMenuItem("Trig on end", "", &module->trigOnEnd));
-		}
 	}
 };
 

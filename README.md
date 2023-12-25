@@ -1,4 +1,4 @@
-# SickoCV v2.6.2-beta1
+# SickoCV v2.6.2-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta2: added sample on HIGH gate option in context menu for track&hold
 - beta1: added holder and holder8 modules
 
 # SickoCV v2.6.2
@@ -449,7 +450,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 S&H / T&H switch changes the mode between Sample&Hold and Track & Hold
 
 Sample & Hold: a trigger on TRIG input samples the last received signal on IN input that is sent to the OUT  
-Track & Hold: until the gate on GATE input is LOW the IN signal is sent to the OUT. The last received signal is sent to the OUT until the GATE is LOW.
+Track & Hold: until the gate on GATE input is HIGH the IN signal is sent to the OUT. The last received signal is sent to the OUT until the GATE is LOW.
 
 PROB knob, with its modulation input and attenuverter, sets the probability to sample the input signal.  
 SCL knob, with its modulation input and attenuverter, rescale the output signal.  
@@ -470,10 +471,11 @@ Comparison:
 ![Holder_b](https://github.com/sickozell/SickoCV/assets/80784296/72ed6cb8-7372-4c4d-9670-c5d4de5d1c5b)
 
 **Track & Hold options**
-- Gate Out instead Trig: sends a HIGH gate on TRG out when the signal is sampled.
-- Gate Inversion: sends a HIGH gate on TRG out when the signal is not sampled.
+
+- Sample on HIGH Gate: this inverts standard track&hold usage, on LOW gate the signal passes and on HIGH gate the signal is held.
 - Trig on Start: sends a trigger on TRG out when the signal is sampled.
 - Trig on End: sends a trigger on TRG out when the signal stops being sampled.
+- Gate Out instead Trig: sends a HIGH gate on TRG out when the signal is sampled.
 
 ## parking
 ### Set of unconnected inputs and outputs just to park unused cables
