@@ -441,11 +441,10 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 - Light Box color (if Light Boxes option is enabled in the general context menu, a predefined color or a custom one can be set here)
 - Light Box Fade (Fade time of Light Boxes is set here: Slow (0.5s), Normal (0.25s), Fast (0.1s)
 
-
-## holder / holder8
+## holder / holder compact / holder8
 ### Sample & Hold or Track & Hold with noise generator, probability and range
 
-![holder](https://github.com/sickozell/SickoCV/assets/80784296/92b1d5b1-265a-489a-848e-f504e30c96e5)
+![holder](https://github.com/sickozell/SickoCV/assets/80784296/cbcc05b1-f874-429b-8856-f191381aa2d0)
 
 #### - INSTRUCTIONS
 S&H / T&H switch changes the mode between Sample&Hold and Track & Hold
