@@ -197,9 +197,10 @@ struct Holder8 : Module {
 									outputs[OUT_OUTPUT+track].setVoltage(out, 0);
 
 								}
-								outputs[OUT_OUTPUT+track].setChannels(1);
 							}
+							
 							prevTrigValue[track] = trigValue[track];
+							outputs[OUT_OUTPUT+track].setChannels(1);
 						}
 					
 					break;

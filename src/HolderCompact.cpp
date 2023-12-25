@@ -10,18 +10,12 @@ struct HolderCompact : Module {
 	enum ParamId {
 		MODE_SWITCH,
 		PROB_PARAM,
-		//PROBATNV_PARAM,
 		SCALE_PARAM,
-		//SCALEATNV_PARAM,
 		OFFSET_PARAM,
-		//OFFSETATNV_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
 		TRIG_INPUT,
-		//PROB_INPUT,
-		//SCALE_INPUT,
-		//OFFSET_INPUT,
 		IN_INPUT,
 		INPUTS_LEN
 	};
@@ -72,22 +66,15 @@ struct HolderCompact : Module {
 
 	HolderCompact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		//configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Track & Hold", "Sample & Hold"});
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 0.f, "Mode", {"Sample & Hold", "Track & Hold"});
 		configInput(TRIG_INPUT, "Trig/Gate");
 		configInput(IN_INPUT, "Signal");
 
 		configParam(PROB_PARAM, 0, 1.f, 1.f, "Probability", "%", 0, 100);
-		//configParam(PROBATNV_PARAM, -1.f, 1.f, 0.f, "Probability CV", "%", 0, 100);
-		//configInput(PROB_INPUT, "Probability");
 
 		configParam(SCALE_PARAM, -1.f, 1.f, 1.f, "Scale", "%", 0, 100);
-		//configParam(SCALEATNV_PARAM, -1.f, 1.f, 0.f, "Scale CV", "%", 0, 100);
-		//configInput(SCALE_INPUT, "Scale");
 
 		configParam(OFFSET_PARAM, -10.f, 10.f, 0.f, "Offset", "v");
-		//configParam(OFFSETATNV_PARAM, -1.f, 1.f, 0.f, "Offset CV", "%", 0, 100);
-		//configInput(OFFSET_INPUT, "Offset");
 
 		configOutput(OUT_OUTPUT, "Signal");
 		configOutput(TRIG_OUTPUT, "Gate");
@@ -186,7 +173,6 @@ struct HolderCompact : Module {
 
 		if (outputs[OUT_OUTPUT].isConnected()) {
 			
-			//probSetup = params[PROB_PARAM].getValue() + (inputs[PROB_INPUT].getVoltage() * params[PROBATNV_PARAM].getValue() * .1);
 			probSetup = params[PROB_PARAM].getValue();
 			if (probSetup > 1)
 				probSetup = 1;
@@ -203,10 +189,6 @@ struct HolderCompact : Module {
 							if (probSetup >= probValue) {
 								for (int c = 0; c < chan; c++) {
 
-									/*out = ( inputs[IN_INPUT].getVoltage(c) *
-										(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-										(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-									*/
 									out = ( inputs[IN_INPUT].getVoltage(c) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 									if (out > 10.f)
@@ -232,16 +214,8 @@ struct HolderCompact : Module {
 							if (probSetup >= probValue) { 
 
 								if (noiseType == FULL_NOISE) 
-									/*out = ( (random::uniform() * 10 - 5.f) *
-											(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-											(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-									*/
 									out = ( (random::uniform() * 10 - 5.f) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 								else
-									/*out = ( random::normal() *
-											(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-											(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-									*/
 									out = ( random::normal() * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 								if (out > 10.f)
@@ -253,9 +227,9 @@ struct HolderCompact : Module {
 								outTrig = true;
 								outTrigSample = oneMsSamples;
 							}
-							outputs[OUT_OUTPUT].setChannels(1);
 						}
 						prevTrigValue = trigValue;
+						outputs[OUT_OUTPUT].setChannels(1);
 					}
 				
 				break;
@@ -272,10 +246,6 @@ struct HolderCompact : Module {
 									if (probSetup >= probValue) {
 										for (int c = 0; c < chan; c++) {
 
-											/*out = ( inputs[IN_INPUT].getVoltage(c) *
-													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-											*/
 											out = ( inputs[IN_INPUT].getVoltage(c) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 											if (out > 10.f)
 												out = 10.f;
@@ -296,10 +266,6 @@ struct HolderCompact : Module {
 								} else if (trigValue >= 1.f && !holding) {
 									for (int c = 0; c < chan; c++) {
 
-										/*out = ( inputs[IN_INPUT].getVoltage(c) *
-												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-										*/
 										out = ( inputs[IN_INPUT].getVoltage(c) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 										if (out > 10.f)
@@ -321,10 +287,6 @@ struct HolderCompact : Module {
 										holding = true;
 										for (int c = 0; c < chan; c++) {
 
-											/*out = ( inputs[IN_INPUT].getVoltage(c) *
-													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-											*/
 											out = ( inputs[IN_INPUT].getVoltage(c) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 											if (out > 10.f)
@@ -362,16 +324,8 @@ struct HolderCompact : Module {
 									probValue = random::uniform();
 									if (probSetup >= probValue) {
 										if (noiseType == FULL_NOISE) 
-											/*out = ( (random::uniform() * 10 - 5.f) *
-													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-											*/
 											out = ( (random::uniform() * 10 - 5.f) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 										else
-											/*out = ( random::normal() *
-													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-											*/
 											out = ( random::normal() * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 										if (out > 10.f)
@@ -391,16 +345,8 @@ struct HolderCompact : Module {
 								} else if (trigValue >= 1.f && !holding) {
 
 									if (noiseType == FULL_NOISE) 
-										/*out = ( (random::uniform() * 10 - 5.f) *
-												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-										*/
 										out = ( (random::uniform() * 10 - 5.f) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 									else
-										/*out = ( random::normal() *
-												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-										*/
 										out = ( random::normal() * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 									if (out > 10.f)
@@ -420,16 +366,8 @@ struct HolderCompact : Module {
 										holding = true;
 
 										if (noiseType == FULL_NOISE) 
-											/*out = ( (random::uniform() * 10 - 5.f) *
-													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-											*/
 											out = ( (random::uniform() * 10 - 5.f) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 										else
-											/*out = ( random::normal() *
-													(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-													(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-											*/
 											out = ( random::normal() * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 										if (out > 10.f)
@@ -471,10 +409,6 @@ struct HolderCompact : Module {
 										holding = true;
 										for (int c = 0; c < chan; c++) {
 
-											/*out = ( inputs[IN_INPUT].getVoltage(c) *
-												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-											*/
 											out = ( inputs[IN_INPUT].getVoltage(c) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 											if (out > 10.f)
@@ -513,10 +447,6 @@ struct HolderCompact : Module {
 								if (!holding) {
 									for (int c = 0; c < chan; c++) {
 
-										/*out = ( inputs[IN_INPUT].getVoltage(c) *
-												(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-												(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-										*/
 										out = ( inputs[IN_INPUT].getVoltage(c) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 										if (out > 10.f)
@@ -533,16 +463,8 @@ struct HolderCompact : Module {
 							} else {
 
 								if (noiseType == FULL_NOISE) 
-									/*out = ( (random::uniform() * 10 - 5.f) *
-											(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-											(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-									*/
 									out = ( (random::uniform() * 10 - 5.f) * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 								else
-									/*out = ( random::normal() *
-											(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * params[SCALEATNV_PARAM].getValue() * .1)) ) +
-											(params[OFFSET_PARAM].getValue() + (inputs[OFFSET_INPUT].getVoltage() * params[OFFSETATNV_PARAM].getValue()) );
-									*/
 									out = ( random::normal() * params[SCALE_PARAM].getValue() ) + params[OFFSET_PARAM].getValue();
 
 								trigValue = inputs[TRIG_INPUT].getVoltage();
@@ -657,8 +579,6 @@ struct HolderCompactWidget : ModuleWidget {
 		*/
 
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		//addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		//addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// buttons --- 4.1
@@ -670,27 +590,17 @@ struct HolderCompactWidget : ModuleWidget {
 
 		const float xCenter = 7.62f;
 
-		//addParam(createParamCentered<CKSS>(mm2px(Vec(xCenter, 18.65)), module, HolderCompact::MODE_SWITCH));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xCenter, 16.4)), module, HolderCompact::MODE_SWITCH, HolderCompact::MODE_LIGHT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xCenter, 28.8)), module, HolderCompact::TRIG_INPUT));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xCenter, 45.5)), module, HolderCompact::IN_INPUT));
 
-		//addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xCenter, 50)), module, HolderCompact::PROB_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xCenter, 61)), module, HolderCompact::PROB_PARAM));
-		//addParam(createParamCentered<Trimpot>(mm2px(Vec(18.4, 42.7)), module, HolderCompact::PROBATNV_PARAM));
-		//addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.1, 42.7)), module, HolderCompact::PROB_INPUT));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xCenter, 74.5)), module, HolderCompact::SCALE_PARAM));
-		//addParam(createParamCentered<Trimpot>(mm2px(Vec(10.48, 76.5)), module, HolderCompact::SCALEATNV_PARAM));
-		//addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.48, 85.2)), module, HolderCompact::SCALE_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xCenter, 88.7)), module, HolderCompact::OFFSET_PARAM));
-		//addParam(createParamCentered<Trimpot>(mm2px(Vec(25.1, 76.5)), module, HolderCompact::OFFSETATNV_PARAM));
-		//addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.1, 85.5)), module, HolderCompact::OFFSET_INPUT));
-
-		
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xCenter, 104.1)), module, HolderCompact::OUT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xCenter, 117.5)), module, HolderCompact::TRIG_OUTPUT));

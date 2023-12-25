@@ -242,9 +242,9 @@ struct Holder : Module {
 								outTrig = true;
 								outTrigSample = oneMsSamples;
 							}
-							outputs[OUT_OUTPUT].setChannels(1);
 						}
 						prevTrigValue = trigValue;
+						outputs[OUT_OUTPUT].setChannels(1);
 					}
 				
 				break;
