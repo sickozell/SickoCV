@@ -30,6 +30,7 @@ extern Model* modelDrumPlayer;
 extern Model* modelDrumPlayerPlus;
 extern Model* modelDrumPlayerXtra;
 extern Model* modelHolder;
+extern Model* modelHolderCompact;
 extern Model* modelHolder8;
 extern Model* modelParking;
 extern Model* modelShifter;
