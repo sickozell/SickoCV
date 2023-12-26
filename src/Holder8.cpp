@@ -468,10 +468,10 @@ struct Holder8Widget : ModuleWidget {
 		}
 		*/
 
-		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	 
 
 		// buttons --- 4.1
 		// trimpot --- x  3.7 --- y 4.3
@@ -479,28 +479,33 @@ struct Holder8Widget : ModuleWidget {
 		// smallRoundKnob --- x 4.6 --- y 5.1
 		// roundBlackKnob --- x 5.7 --- y 6.4
 		// input/output --- 4.5
-
-		constexpr float xStart = 6.6f;
-		constexpr float xDelta = 9.7f;
 		
 		constexpr float yStart = 19.f;
 		constexpr float yDelta = 14.f;
 
+		const float xTrg = 6.6;
+		const float xMode = 15.6;
+		const float xIn = 24.6;
+		const float xProb = 34.7;
+		const float xScale = 45;
+		const float xOffset = 55.1;
+		const float xOut = 64.8;
+
 		for (int track = 0; track < MAX_TRACKS; track++) {
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xStart, yStart+(track*yDelta))), module, Holder8::TRIG_INPUT+track));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xTrg, yStart+(track*yDelta))), module, Holder8::TRIG_INPUT+track));
 
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xStart+xDelta, yStart+(track*yDelta))), module, Holder8::MODE_SWITCH+track, Holder8::MODE_LIGHT+track));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xMode, yStart+(track*yDelta))), module, Holder8::MODE_SWITCH+track, Holder8::MODE_LIGHT+track));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xStart+(2*xDelta), yStart+(track*yDelta))), module, Holder8::IN_INPUT+track));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xIn, yStart+(track*yDelta))), module, Holder8::IN_INPUT+track));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xStart+(3*xDelta), yStart+(track*yDelta))), module, Holder8::PROB_PARAM+track));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(xProb, yStart+(track*yDelta))), module, Holder8::PROB_PARAM+track));
 
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart+(4*xDelta), yStart+(track*yDelta))), module, Holder8::SCALE_PARAM+track));
+			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xScale, yStart+(track*yDelta))), module, Holder8::SCALE_PARAM+track));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xStart+(5*xDelta), yStart+(track*yDelta))), module, Holder8::OFFSET_PARAM+track));
+			addParam(createParamCentered<Trimpot>(mm2px(Vec(xOffset, yStart+(track*yDelta))), module, Holder8::OFFSET_PARAM+track));
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xStart+(6*xDelta), yStart+(track*yDelta))), module, Holder8::OUT_OUTPUT+track));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut, yStart+(track*yDelta))), module, Holder8::OUT_OUTPUT+track));
 		}
 	}
 

@@ -1,5 +1,6 @@
 ### 2.6.2 (2023-12-26)
 - added holder, holder Compact and holder8 modules  
+- sickoLooper: added visible context menu options even if unselectable
 
 ### 2.6.1 (2023-12-17)
 - sickoLooper: added dark green color to the display bar when the loop is still playing even if its recording is finished  
