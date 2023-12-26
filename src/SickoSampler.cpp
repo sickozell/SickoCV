@@ -5128,7 +5128,7 @@ struct SickoSamplerDisplay : TransparentWidget {
 						}
 					}
 				}));
-				}
+			}
 
 			if (module->fileLoaded) {
 				menu->addChild(new MenuSeparator());

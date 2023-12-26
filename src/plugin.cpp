@@ -30,6 +30,9 @@ void init(Plugin* p) {
 	p->addModel(modelDrumPlayer);
 	p->addModel(modelDrumPlayerPlus);
 	p->addModel(modelDrumPlayerXtra);
+	p->addModel(modelHolder);
+	p->addModel(modelHolderCompact);
+	p->addModel(modelHolder8);
 	p->addModel(modelParking);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
