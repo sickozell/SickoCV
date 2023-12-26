@@ -1,5 +1,5 @@
-### 2.6.2 (2023-12-24)
-- added holder and holder8 modules  
+### 2.6.2 (2023-12-26)
+- added holder holder compact and holder8 modules  
 
 ### 2.6.1 (2023-12-17)
 - sickoLooper: added dark green color to the display bar when the loop is still playing even if its recording is finished  

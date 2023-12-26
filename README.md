@@ -1,4 +1,4 @@
-# SickoCV v2.6.2-beta4
+# SickoCV v2.6.2-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,9 +18,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta4: added holder compact module
+- beta5: holder: added Noise Generator Preset function in context menu
+- beta4: added holder compact module, fixed a bug when polyphony signal cables are disconnected
 - beta3: on sickoLooper added visible context menu options even if unselectable
-- beta2: added sample on HIGH gate option in context menu for track&hold
+- beta2: holder: added sample on HIGH gate option in context menu for track&hold
 - beta1: added holder and holder8 modules
 
 # SickoCV v2.6.2
@@ -459,8 +460,10 @@ OFS knob, with its modulation input and attenuverter, offsets the output signal.
 
 If IN input is not connected a ±5v Noise Generator is taken as input source.
 
-OUT output is feeded with sampled or tracked signal.
+OUT output is feeded with sampled or tracked signal.  
 TRIG output sends a trigger when sample occurs. If Track & Hold is selected, it sends a trigger on tracking start and/or end, or a gate depending by the options ticked on context menu.
+
+Holder can be used as a simple white noise generator if in T&H mode with Sample on HIGH gate option ticked. There's a specific function in the context menu to achieve this setting with one click.
 
 #### CONTEXT MENU
 **White Noise Type**  
@@ -477,6 +480,9 @@ Comparison:
 - Trig on Start: sends a trigger on TRG out when the signal is sampled.
 - Trig on End: sends a trigger on TRG out when the signal stops being sampled.
 - Gate Out instead Trig: sends a HIGH gate on TRG out when the signal is sampled.
+
+**Noise Generator preset**
+This function set the module to Track & Hold mode, sample on HIGH gate, scale on 100% and offset to 0v, just to output white noise if trig/gate input is not connected or not triggered.
 
 ## parking
 ### Set of unconnected inputs and outputs just to park unused cables

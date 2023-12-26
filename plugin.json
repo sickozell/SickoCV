@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.6.2-beta4",
+  "version": "2.6.2-beta5",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -187,6 +187,7 @@
       "description": "Sample & Hold or Track & Hold with noise generator, probability and range",
       "tags": [
         "Sample and hold",
+        "Noise",
         "Polyphonic"
       ]
     },
@@ -196,6 +197,7 @@
       "description": "Sample & Hold or Track & Hold with noise generator, probability and range in a compact form factor",
       "tags": [
         "Sample and hold",
+        "Noise",
         "Polyphonic"
       ]
     },
@@ -205,6 +207,7 @@
       "description": "8 Sample & Hold or Track & Hold with with noise generator, probability and range",
       "tags": [
         "Sample and hold",
+        "Noise",
         "Quad",
         "Polyphonic"
       ]

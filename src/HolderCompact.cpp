@@ -165,6 +165,13 @@ struct HolderCompact : Module {
 		outputs[TRIG_OUTPUT].setVoltage(0.f);
 	}
 
+	void setNoisePreset() {
+		params[MODE_SWITCH].setValue(TRACK_HOLD);
+		params[SCALE_PARAM].setValue(1);
+		params[OFFSET_PARAM].setValue(0);
+		sampleOnGate = 1;
+	}
+
 	void process(const ProcessArgs& args) override {
 
 		mode = params[MODE_SWITCH].getValue();
@@ -651,6 +658,9 @@ struct HolderCompactWidget : ModuleWidget {
 				}, [=](bool gateOut) {
 					module->setGateOut(gateOut);
 			}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Noise Generator preset", "", [=]() {module->setNoisePreset();}));
 	}
 };
 
