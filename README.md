@@ -573,9 +573,9 @@ sickoLooper is inspired by hardware looper devices with most of their features i
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
 
-Download [ENGLISH user manual](./docs/sickoLooper%20user%20manual%20%5BEN%5D.pdf?raw=true) (right-click -> save link as)
+Download [ENGLISH user manual](./docs/sickoLooper%20user%20manual%20%5BEN%5D.pdf?raw=true)
 
-Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20%5BIT%5D.pdf?raw=true) (right-click -> save link as)
+Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20%5BIT%5D.pdf?raw=true)
 
 [back to index](#table-of-contents)
 
