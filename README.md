@@ -507,7 +507,7 @@ Comparison:
 - Trig on End: sends a trigger on TRG out when the signal stops being sampled.
 - Gate Out instead Trig: sends a HIGH gate on TRG out when the signal is sampled.
 
-**Noise Generator preset**
+**Noise Generator preset**  
 This function set the module to Track & Hold mode, sample on HIGH gate, scale on 100% and offset to 0v, just to output white noise if trig/gate input is not connected or not triggered.
 
 [back to index](#table-of-contents)
