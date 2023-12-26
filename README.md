@@ -82,6 +82,8 @@ if it's used as a fixed pitch adder (without input CV connection) maybe it's use
 otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
 - **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
 
+[back to index](#table-of-contents)
+
 ## bGates
 ### 8 buffered gates and triggers
 #### - DESCRIPTION
