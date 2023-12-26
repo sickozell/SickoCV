@@ -449,7 +449,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ![holder](https://github.com/sickozell/SickoCV/assets/80784296/cbcc05b1-f874-429b-8856-f191381aa2d0)
 
 #### - INSTRUCTIONS
-S&H / T&H switch changes the mode between Sample&Hold and Track & Hold
+S&H / T&H switch changes the mode between Sample & Hold and Track & Hold
 
 Sample & Hold: a trigger on TRIG input samples the last received signal on IN input that is sent to the OUT  
 Track & Hold: until the gate on GATE input is HIGH the IN signal is sent to the OUT. The last received signal is sent to the OUT until the GATE is LOW.
@@ -464,6 +464,8 @@ OUT output is feeded with sampled or tracked signal.
 TRIG output sends a trigger when sample occurs. If Track & Hold is selected, it sends a trigger on tracking start and/or end, or a gate depending by the options ticked on context menu.
 
 Holder can be used as a simple white noise generator if in T&H mode with Sample on HIGH gate option ticked. There's a specific function in the context menu to achieve this setting with one click.
+
+holder8 is composed of 8 independent holder modules without attenuators and trig output.
 
 #### CONTEXT MENU
 **White Noise Type**  
