@@ -43,7 +43,7 @@ VCV Rack plugin modules
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
-- [holder / holder compact / holder8](#holder--holder-compact--holder8)
+- [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
@@ -467,7 +467,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 
 [back to index](#table-of-contents)
 
-## holder / holder compact / holder8
+## holder / holder Compact / holder8
 ### Sample & Hold or Track & Hold with noise generator, probability and range
 
 ![holder](https://github.com/sickozell/SickoCV/assets/80784296/cbcc05b1-f874-429b-8856-f191381aa2d0)
