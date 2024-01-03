@@ -1,5 +1,19 @@
 #define BEAT 0
 #define BAR 1
+#define PPQN1 0
+#define PPQN2 1
+#define PPQN4 2
+#define PPQN8 3
+#define PPQN12 4
+#define PPQN16 5
+#define PPQN24 6
+//#define REGISTER_SIZE 96
+#define REGISTER_SIZE 300
+
+#define NONE_SMOOTH 0
+#define LOW_SMOOTH 1
+#define MEDIUM_SMOOTH 2
+#define HIGH_SMOOTH 3
 
 #include "plugin.hpp"
 #include "osdialog.h"
@@ -23,8 +37,8 @@ struct tpSignature : ParamQuantity {
 
 struct tpDivMult : ParamQuantity {
 	std::string getDisplayValueString() override {
-		const std::string valueDisplay[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
+		const std::string valueDisplay[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
 		return valueDisplay[int(getValue())];
 	}
 };
@@ -67,7 +81,7 @@ struct Clocker : Module {
 	//**************************************************************
 	//  DEBUG 
 
-	/*	
+	
 	std::string debugDisplay = "X";
 	std::string debugDisplay2 = "X";
 	std::string debugDisplay3 = "X";
@@ -77,7 +91,7 @@ struct Clocker : Module {
 	std::string debugDisplay7 = "X";
 	int debugInt = 0;
 	bool debugBool = false;
-	*/
+	
 
  	//**************************************************************
 	//   
@@ -87,11 +101,11 @@ struct Clocker : Module {
 	const int beatMaxPerBar[17] = {2, 3, 4, 5, 6, 7, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 	int currentBeatMaxPerBar = 4;
 
-	const std::string divMultDisplay[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
+	const std::string divMultDisplay[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
 
-	const float divMult[41] = {256, 128, 64, 32, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
-							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 32, 64, 128, 256};
+	const float divMult[43] = {256, 128, 64, 32, 24, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
+							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24, 32, 64, 128, 256};
 
 	//**************************************************************
 	//  	
@@ -141,12 +155,74 @@ struct Clocker : Module {
 	float prevRunTrig = 0.f;
 
 	double clockSample = 1.0;
+	//double prevClockSample = 1.0;
 	double clockMaxSample = 0.0;
+
+	double extClockSample = 1.0;
+	double prevExtClockSample = 1.0;
+	double extClockMaxSample = 0.0;
 	
 	double midBeatMaxSample = 0.0;
 	bool midBeatPlayed = false;
 
 	double maxPulseSample = 0.0;
+
+	//int ppqnTable[2] = {0, 23};
+	//int ppqnTable[7] = {0, 1, 3, 7, 11, 15, 23}; // 1 2 4 8 12 16 24
+	int ppqnTable[7] = {1, 2, 4, 8, 12, 16, 24}; // 1 2 4 8 12 16 24
+
+	int ppqn = PPQN24;
+	int ppqnValue = ppqnTable[ppqn];
+	int ppqnComparison = ppqnValue - 1;
+
+	int pulseNr = 0;
+	int pulseSample = 0;
+	double avgPulse = 0.0;
+
+	int smooth = HIGH_SMOOTH;
+
+	/*
+	// ppqn   	1	2	4	8	12	16	24
+
+	// None 	1	1	1	1	1	1	1
+	// low 		1	2	4	8	12	16	24
+	// medium 	2	4	8	16	24	32	48
+	// high 	5	10	20	40	60	80	120
+	*/
+	int smoothTable[7][4] = {{1, 2, 3, 5},
+							{1, 2, 4, 10},
+							{1, 4, 8, 20},
+							{1, 8, 16, 40},
+							{1, 12, 24, 60},
+							{1, 16, 32, 80},
+							{1, 24, 48, 120}};
+
+	
+	/*
+	int registerValue[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0};
+	*/
+	
+	int registerValue[REGISTER_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	int registerSum = 0;
+	int registerSize[4] = {1, 24, 48, 120};
+
+	int registerWidth = registerSize[HIGH_SMOOTH];
+	int registerPos = 0;
+	bool firstRegSync = true;
 
 	//int beatCounter = 1;
 	int beatCounter = 20;	// thise ensure that module starts on a new bar
@@ -203,19 +279,19 @@ struct Clocker : Module {
 		configParam<tpSignature>(SIGNATURE_KNOB_PARAM, 0.f, 16.0f, 2.f, "Time Signature");
 		paramQuantities[SIGNATURE_KNOB_PARAM]->snapEnabled = true;
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 40.f, 20.f, "Mult/Div #1");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 42.f, 21.f, "Mult/Div #1");
 		paramQuantities[DIVMULT_KNOB_PARAM+0]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+0, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 40.f, 20.f, "Mult/Div #2");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 42.f, 21.f, "Mult/Div #2");
 		paramQuantities[DIVMULT_KNOB_PARAM+1]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+1, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 40.f, 20.f, "Mult/Div #3");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 42.f, 21.f, "Mult/Div #3");
 		paramQuantities[DIVMULT_KNOB_PARAM+2]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+2, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 40.f, 20.f, "Mult/Div #4");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 42.f, 21.f, "Mult/Div #4");
 		paramQuantities[DIVMULT_KNOB_PARAM+3]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+3, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
@@ -271,6 +347,9 @@ struct Clocker : Module {
 			divCount[d] = 1;
 			divSwing[d] = false;
 		}
+
+		for (int i = 0; i < REGISTER_SIZE; i++)
+			registerValue[i] = 0;
 		
 		for (int i = 0; i < 2; i++) {
 			clearSlot(i);
@@ -295,6 +374,8 @@ struct Clocker : Module {
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "ppqn", json_integer(ppqn));
+		json_object_set_new(rootJ, "smooth", json_integer(smooth));
 		json_object_set_new(rootJ, "BeatOnBar", json_boolean(beatOnBar));
 		json_object_set_new(rootJ, "ResetOnRun", json_boolean(resetOnRun));
 		json_object_set_new(rootJ, "ResetPulseOnRun", json_boolean(resetPulseOnRun));
@@ -310,6 +391,22 @@ struct Clocker : Module {
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+		json_t* ppqnJ = json_object_get(rootJ, "ppqn");
+		if (ppqnJ) {
+			ppqn = json_integer_value(ppqnJ);
+			if (ppqn < 0 || ppqn > 6)
+				ppqn = 0;
+		}
+
+		json_t* smoothJ = json_object_get(rootJ, "smooth");
+		if (smoothJ) {
+			smooth = json_integer_value(smoothJ);
+			if (smooth < 0 || smooth > 3)
+				smooth = 0;
+			//registerWidth = registerSize[smooth];
+			registerWidth = smoothTable[ppqn][smooth];
+		}
+
 		json_t* beatOnBarJ = json_object_get(rootJ, "BeatOnBar");
 		if (beatOnBarJ)
 			beatOnBar = json_boolean_value(beatOnBarJ);
@@ -577,6 +674,13 @@ struct Clocker : Module {
 		if (extConn && !prevExtConn) {
 			extSync = false;
 			bpm = 0.0;
+			firstRegSync = true;
+			registerSum = 0;
+			registerPos = 0;
+			pulseNr = 0;
+			pulseSample = 0;
+			extClockSample = 1.0;
+			prevExtClockSample = 1.0;
 		}
 		prevExtConn = extConn;
 
@@ -643,253 +747,42 @@ struct Clocker : Module {
 
 		prevRunSetting = runSetting;
 
-		// ************************* INTERNAL CLOCK
+		// ---------------------------------------------------------------------------------
+		// ---------------------------------------------------------------------------------
+
+		// **********  RESET
+
+		resetBut = params[RESET_BUT_PARAM].getValue();
+		if (resetBut)
+			resetValue = 1;
+		else
+			resetValue = inputs[RESET_INPUT].getVoltage();
+
+		lights[RESET_BUT_LIGHT].setBrightness(resetValue);
+
+		if (resetValue >= 1 && prevResetValue < 1) {
+
+			outputs[CLOCK_OUTPUT].setVoltage(0.f);
+			for (int d = 0; d < 4; d++) {
+				divPulse[d] = false;
+				divClockSample[d] = 1.0;
+				divMaxSample[d][0] = 0.0;
+				divMaxSample[d][1] = 0.0;
+				outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+			}
+			midBeatPlayed = false;
+			
+			//beatCounter = 1;
+			beatCounter = 20;
+
+			resetPulse = true;
+			resetPulseTime = oneMsTime;
+		}
+		prevResetValue = resetValue;
 
 		if (!extConn) {
-
-			// **********  RESET
-
-			resetBut = params[RESET_BUT_PARAM].getValue();
-			if (resetBut)
-				resetValue = 1;
-			else
-				resetValue = inputs[RESET_INPUT].getVoltage();
-
-			lights[RESET_BUT_LIGHT].setBrightness(resetValue);
-
-			if (resetValue >= 1 && prevResetValue < 1) {
-				resetStart = true;
-				clockSample = 1.0;
-				outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				for (int d = 0; d < 4; d++) {
-					divPulse[d] = false;
-					divPulseTime[d] = 0;
-					divClockSample[d] = 1.0;
-					divMaxSample[d][0] = 0.0;
-					divMaxSample[d][1] = 0.0;
-					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-				}
-				midBeatPlayed = false;
-
-				beatCounter = 20; // this ensure beat has reached maximum
-
-				resetPulse = true;
-				resetPulseTime = oneMsTime;
-			}
-			prevResetValue = resetValue;
-
-			// *********** BPM CALC
-			
 			bpm = (double)params[BPM_KNOB_PARAM].getValue()/10;
-
-			// **************   RUN PROCESS   ***************
-
-			if (runSetting && resetPulseTime <= 0) {
-
-				// ****** CLOCK PULSE WIDTH
-
-				maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
-				if (clockSample > maxPulseSample)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
-
-				// ************ DIV / MULT
-
-				for (int d = 0; d < 4; d++) {
-
-					if (!divSwing[d]) {
-
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][0]) {
-							// ***** CLOCK MULTIPLIER *****
-							divClockSample[d] = 1.0;
-							divPulse[d] = true;
-							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-						}
-
-						// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
-						if (divPulse[d] && divClockSample[d] > divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue()) {
-							divPulse[d] = false;
-							outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-						}
-						
-					} else {
-
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
-							// ***** CLOCK MULTIPLIER *****
-							divPulse[d] = true;
-							divPulseTime[d] = oneMsTime;
-							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-	
-							if (divOddCounter[d] == 0) {
-								divClockSample[d] = 1.0;
-								divOddCounter[d] = 1;
-							}	else {
-								divClockSample[d] = 1.0 + divMaxSample[d][1] - divMaxSample[d][0];
-								divOddCounter[d] = 0;
-							}
-						}
-					}
-				}
-
-				currentBeatMaxPerBar = beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())];
-
-				// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
-
-				if (params[SIGNATURE_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
-					beatCounter++;
-					if (beatCounter > currentBeatMaxPerBar) {
-						beatCounter = 1;
-						samplePos[BAR] = 0;
-						play[BAR] = true;
-						play[BEAT] = false;
-						barPulse = true;
-						barPulseTime = oneMsTime;
-						if (beatOnBar) {
-							beatPulse = true;
-							beatPulseTime = oneMsTime;
-						}
-					} else {
-						samplePos[BEAT] = 0;
-						play[BEAT] = true;
-						play[BAR] = false;
-						beatPulse = true;
-						beatPulseTime = oneMsTime;
-					}
-					midBeatPlayed = true;
-				}
-				
-
-				//	*************************  INTERNAL CLOCK  ******************
-
-				clockMaxSample = sampleRateCoeff / bpm;
-				midBeatMaxSample = clockMaxSample / 2;
-				
-				if (clockSample > clockMaxSample || resetStart)  {
-					midBeatPlayed = false;
-
-					beatCounter++;
-
-					if (resetStart) {
-						clockSample = 1.0;
-						resetStart = false;
-					} else
-						clockSample -= clockMaxSample;
-					
-					for (int d = 0; d < 4; d++) {
-						
-						if (!divSwing[d]) {
-
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divClockSample[d] = 1.0;
-								divPulse[d] = true;
-								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-							} else {
-								// ***** CLOCK DIVIDER *****
-								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divCount[d]++;
-								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
-									divClockSample[d] = 1.0;
-									divCount[d] = 1;
-									divPulse[d] = true;
-									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-								}
-							}
-						} else {
-							
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
-								divOddCounter[d] = 1;
-								divClockSample[d] = 1.0;
-								divPulse[d] = true;
-								divPulseTime[d] = oneMsTime;
-								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-							} else {
-								// ***** CLOCK DIVIDER *****
-								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divCount[d]++;
-								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
-									divOddCounter[d] = 1;
-									divClockSample[d] = 1.0;
-									divCount[d] = 1;
-									divPulse[d] = true;
-									divPulseTime[d] = oneMsTime;
-									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-								}
-							}
-						}
-					}
-
-					if (beatCounter > currentBeatMaxPerBar) {
-						beatCounter = 1;
-						samplePos[BAR] = 0;
-						play[BAR] = true;
-						play[BEAT] = false;
-						barPulse = true;
-						barPulseTime = oneMsTime;
-						if (beatOnBar) {
-							beatPulse = true;
-							beatPulseTime = oneMsTime;
-						}
-					} else {
-						samplePos[BEAT] = 0;
-						play[BEAT] = true;
-						play[BAR] = false;
-						beatPulse = true;
-						beatPulseTime = oneMsTime;
-					}
-					
-					outputs[CLOCK_OUTPUT].setVoltage(10.f);
-					
-				}
-
-				clockSample++;
-				divClockSample[0]++;
-				divClockSample[1]++;
-				divClockSample[2]++;
-				divClockSample[3]++;
-				
-			}
-
 		} else {
-
-			// ************************************************ EXTERNAL CLOCK
-
-			// **********  RESET
-
-			resetBut = params[RESET_BUT_PARAM].getValue();
-			if (resetBut)
-				resetValue = 1;
-			else
-				resetValue = inputs[RESET_INPUT].getVoltage();
-
-			lights[RESET_BUT_LIGHT].setBrightness(resetValue);
-
-			if (resetValue >= 1 && prevResetValue < 1) {
-
-				outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				for (int d = 0; d < 4; d++) {
-					divPulse[d] = false;
-					divClockSample[d] = 1.0;
-					divMaxSample[d][0] = 0.0;
-					divMaxSample[d][1] = 0.0;
-					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-				}
-				midBeatPlayed = false;
-				
-				//beatCounter = 1;
-				beatCounter = 20;
-
-				resetPulse = true;
-				resetPulseTime = oneMsTime;
-			}
-			prevResetValue = resetValue;
-
 			// ********** EXTERNAL SYNC
 
 			extTrigValue = inputs[EXTCLOCK_INPUT].getVoltage();
@@ -897,204 +790,244 @@ struct Clocker : Module {
 			if (extTrigValue >= 1 && prevExtTrigValue < 1) {
 
 				if (extSync) {
-					clockMaxSample = clockSample;
-					midBeatMaxSample = clockMaxSample / 2;
-					clockSample = 1.0;
+
+					pulseSample = extClockSample - prevExtClockSample;
+					prevExtClockSample = extClockSample;
+
+					if (firstRegSync) {
+						registerSum += pulseSample;
+
+						registerValue[registerPos] = pulseSample;
+
+						registerPos++;
+
+						avgPulse = registerSum / registerPos;
+
+						if (registerPos >= registerWidth) {
+							registerPos = 0;
+							firstRegSync = false;
+						}
+
+					} else {
+						registerSum += pulseSample - registerValue[registerPos];
+						registerValue[registerPos] = pulseSample;
+						registerPos++;
+
+						if (registerPos >= registerWidth)
+							registerPos = 0;
+						
+						avgPulse = registerSum / registerWidth;
+
+					}
+
+					//extClockMaxSample = avgPulse * (ppqnTable[ppqn]+1);
+					extClockMaxSample = avgPulse * (ppqnValue);
 
 					// calculate bpms
-					bpm = round(sampleRateCoeff / clockMaxSample);
+					bpm = round(sampleRateCoeff / extClockMaxSample);		// esempio 120bpm = 2646000 / 22050 = 120 bpm
+
+					//debugDisplay = to_string(sampleRateCoeff / extClockMaxSample);
+
 					if (bpm > 999)
 						bpm = 999;
+
+					pulseNr++;
+					//if (pulseNr > ppqnTable[ppqn]) {
+					if (pulseNr > ppqnComparison) {
+						pulseNr = 0;
+						pulseSample = 0;
+						extClockSample = 1.0;
+						prevExtClockSample = 1.0;
+					}
 
 				} else {
 					bpm = 0.0;
 					extSync = true;
-					clockSample = 1.0;
+					extClockSample = 0.0;
+					prevExtClockSample = 0.0;
 
 				}
-
-				if (runSetting)
-					extBeat = true;
 
 			} else {
 				extBeat = false;
 			}
 			prevExtTrigValue = extTrigValue;
+			extClockSample++;
+		}
 
-			// **************   RUN PROCESS   ***************
 
-			if (runSetting && resetPulseTime <= 0) {
+		// ---------------------------------------------------------------------------------
+		// ---------------------------------------------------------------------------------
 
-				// ****** CLOCK PULSE WIDTH
 
-				maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
-				if (clockSample > maxPulseSample)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
 
-				// ************ DIV / MULT
+		// **************   RUN PROCESS   ***************
 
-				for (int d = 0; d < 4; d++) {
 
-					if(!divSwing[d]) {
+		if (runSetting && resetPulseTime <= 0) {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][0]) {
-							// ***** CLOCK MULTIPLIER *****
+			// ****** CLOCK PULSE WIDTH
+
+			maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
+			if (clockSample > maxPulseSample)
+				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+
+			// ************ DIV / MULT
+
+			for (int d = 0; d < 4; d++) {
+
+				if (!divSwing[d]) {
+
+					if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][0]) {
+						// ***** CLOCK MULTIPLIER *****
+						divClockSample[d] = 1.0;
+						divPulse[d] = true;
+						outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+					}
+
+					// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
+					if (divPulse[d] && divClockSample[d] > divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue()) {
+						divPulse[d] = false;
+						outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+					}
+					
+				} else {
+
+					if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						// ***** CLOCK MULTIPLIER *****
+						divPulse[d] = true;
+						divPulseTime[d] = oneMsTime;
+						outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+
+						if (divOddCounter[d] == 0) {
 							divClockSample[d] = 1.0;
-							divPulse[d] = true;
-							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+							divOddCounter[d] = 1;
+						}	else {
+							divClockSample[d] = 1.0 + divMaxSample[d][1] - divMaxSample[d][0];
+							divOddCounter[d] = 0;
 						}
-
-						// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
-						if (divPulse[d] && divClockSample[d] > divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue()) {
-							divPulse[d] = false;
-							outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-						}
-
-					} else {
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
-							// ***** CLOCK MULTIPLIER *****
-							divPulse[d] = true;
-							divPulseTime[d] = oneMsTime;
-							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-	
-							if (divOddCounter[d] == 0) {
-								divClockSample[d] = 1.0;
-								divOddCounter[d] = 1;
-							}	else {
-								divClockSample[d] = 1.0 + divMaxSample[d][1] - divMaxSample[d][0];
-								divOddCounter[d] = 0;
-							}
-						}
-					}
-				}
-
-				currentBeatMaxPerBar = beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())];
-
-				
-				// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
-
-				if (params[SIGNATURE_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
-					beatCounter++;
-					if (beatCounter > currentBeatMaxPerBar) {
-						beatCounter = 1;
-						samplePos[BAR] = 0;
-						play[BAR] = true;
-						play[BEAT] = false;
-						barPulse = true;
-						barPulseTime = oneMsTime;
-						if (beatOnBar) {
-							beatPulse = true;
-							beatPulseTime = oneMsTime;
-						}
-					} else {
-						samplePos[BEAT] = 0;
-						play[BEAT] = true;
-						play[BAR] = false;
-						beatPulse = true;
-						beatPulseTime = oneMsTime;
-					}
-					midBeatPlayed = true;
-				}
-				
-
-				// ************************ EXTERNAL CLOCK ******************
-
-				if (extBeat) {
-
-					midBeatPlayed = false;
-					beatCounter++;
-
-					if (extSync) {
-
-						// ********** SYNCED BEAT
-
-						for (int d = 0; d < 4; d++) {
-
-							if (!divSwing[d]) {
-								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
-									// ***** CLOCK MULTIPLIER *****
-									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-									divMaxSample[d][1] = divMaxSample[d][0];
-									divClockSample[d] = 1.0;
-									divPulse[d] = true;
-									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-								} else {
-									// ***** CLOCK DIVIDER *****
-									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-									divMaxSample[d][1] = divMaxSample[d][1];
-									divCount[d]++;
-									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
-										divClockSample[d] = 1.0;
-										divCount[d] = 1;
-										divPulse[d] = true;
-										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-									}
-								}
-							} else {
-								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
-									// ***** CLOCK MULTIPLIER *****
-									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-									divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
-									divOddCounter[d] = 1;
-									divClockSample[d] = 1.0;
-									divPulse[d] = true;
-									divPulseTime[d] = oneMsTime;
-									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-								} else {
-									// ***** CLOCK DIVIDER *****
-									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-									divMaxSample[d][1] = divMaxSample[d][0];
-									divCount[d]++;
-									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
-										divOddCounter[d] = 1;
-										divClockSample[d] = 1.0;
-										divCount[d] = 1;
-										divPulse[d] = true;
-										divPulseTime[d] = oneMsTime;
-										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-									}
-								}
-							}
-						}
-
-						if (beatCounter > currentBeatMaxPerBar) {
-							// ***** BAR DETECTED *****
-							beatCounter = 1;
-							samplePos[BAR] = 0;
-							play[BAR] = true;
-							play[BEAT] = false;
-							barPulse = true;
-							barPulseTime = oneMsTime;
-							if (beatOnBar) {
-								beatPulse = true;
-								beatPulseTime = oneMsTime;
-							}
-						} else {
-							// ***** BEAT DETECTED *****
-							samplePos[BEAT] = 0;
-							play[BEAT] = true;
-							play[BAR] = false;
-							beatPulse = true;
-							beatPulseTime = oneMsTime;
-						}
-						
-						outputs[CLOCK_OUTPUT].setVoltage(10.f);
-					
-					} else {
-
-						//	************ UNSYNCED BEAT
-					
-						beatCounter++;
-						samplePos[BEAT] = 0;
-						play[BEAT] = true;
-						play[BAR] = false;
-						beatPulse = true;
-						beatPulseTime = oneMsTime;
-
 					}
 				}
 			}
+
+			currentBeatMaxPerBar = beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())];
+
+			// ***********  MID BEAT PULSES WHEN USING TEMPOS WITH EIGHTH NOTES
+
+			if (params[SIGNATURE_KNOB_PARAM].getValue() > 5 && !midBeatPlayed && clockSample > midBeatMaxSample)  {
+				beatCounter++;
+				if (beatCounter > currentBeatMaxPerBar) {
+					beatCounter = 1;
+					samplePos[BAR] = 0;
+					play[BAR] = true;
+					play[BEAT] = false;
+					barPulse = true;
+					barPulseTime = oneMsTime;
+					if (beatOnBar) {
+						beatPulse = true;
+						beatPulseTime = oneMsTime;
+					}
+				} else {
+					samplePos[BEAT] = 0;
+					play[BEAT] = true;
+					play[BAR] = false;
+					beatPulse = true;
+					beatPulseTime = oneMsTime;
+				}
+				midBeatPlayed = true;
+			}
+			
+
+			//	*************************  INTERNAL CLOCK  ******************
+
+			clockMaxSample = sampleRateCoeff / bpm;
+			midBeatMaxSample = clockMaxSample / 2;
+			
+			if (clockSample > clockMaxSample || resetStart)  {
+				midBeatPlayed = false;
+
+				beatCounter++;
+
+				if (resetStart) {
+					clockSample = 1.0;
+					resetStart = false;
+				} else
+					clockSample -= clockMaxSample;
 				
+				for (int d = 0; d < 4; d++) {
+					
+					if (!divSwing[d]) {
+
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+							// ***** CLOCK MULTIPLIER *****
+							divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+							divMaxSample[d][1] = divMaxSample[d][0];
+							divClockSample[d] = 1.0;
+							divPulse[d] = true;
+							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+						} else {
+							// ***** CLOCK DIVIDER *****
+							divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+							divMaxSample[d][1] = divMaxSample[d][0];
+							divCount[d]++;
+							if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+								divClockSample[d] = 1.0;
+								divCount[d] = 1;
+								divPulse[d] = true;
+								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+							}
+						}
+					} else {
+						
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+							// ***** CLOCK MULTIPLIER *****
+							divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+							divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
+							divOddCounter[d] = 1;
+							divClockSample[d] = 1.0;
+							divPulse[d] = true;
+							divPulseTime[d] = oneMsTime;
+							outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+						} else {
+							// ***** CLOCK DIVIDER *****
+							divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+							divMaxSample[d][1] = divMaxSample[d][0];
+							divCount[d]++;
+							if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+								divOddCounter[d] = 1;
+								divClockSample[d] = 1.0;
+								divCount[d] = 1;
+								divPulse[d] = true;
+								divPulseTime[d] = oneMsTime;
+								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+							}
+						}
+					}
+				}
+
+				if (beatCounter > currentBeatMaxPerBar) {
+					beatCounter = 1;
+					samplePos[BAR] = 0;
+					play[BAR] = true;
+					play[BEAT] = false;
+					barPulse = true;
+					barPulseTime = oneMsTime;
+					if (beatOnBar) {
+						beatPulse = true;
+						beatPulseTime = oneMsTime;
+					}
+				} else {
+					samplePos[BEAT] = 0;
+					play[BEAT] = true;
+					play[BAR] = false;
+					beatPulse = true;
+					beatPulseTime = oneMsTime;
+				}
+				
+				outputs[CLOCK_OUTPUT].setVoltage(10.f);
+				
+			}
+
 			clockSample++;
 			divClockSample[0]++;
 			divClockSample[1]++;
@@ -1102,6 +1035,8 @@ struct Clocker : Module {
 			divClockSample[3]++;
 			
 		}
+
+
 
 		// ***************************** COMMON PROCESS
 
@@ -1190,6 +1125,7 @@ struct ClockerDisplayTempo : TransparentWidget {
 				std::string tempBpmInt;
 				std::string tempBpmDec;
 
+				
 				if (!module->inputs[module->EXTCLOCK_INPUT].isConnected()) {
 					tempBpmInteger = int(module->bpm * 10 + .5);
 
@@ -1335,9 +1271,9 @@ struct ClockerDisplayDiv1 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 41; i++) {
+			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+			for (int i = 0; i < 43; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue()) == i);
 				thisItem->module = module;
@@ -1403,9 +1339,9 @@ struct ClockerDisplayDiv2 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 41; i++) {
+			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+			for (int i = 0; i < 43; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue()) == i);
 				thisItem->module = module;
@@ -1471,9 +1407,9 @@ struct ClockerDisplayDiv3 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 41; i++) {
+			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+			for (int i = 0; i < 43; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue()) == i);
 				thisItem->module = module;
@@ -1539,9 +1475,9 @@ struct ClockerDisplayDiv4 : TransparentWidget {
 				}
 			};
 
-			std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 41; i++) {
+			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+			for (int i = 0; i < 43; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue()) == i);
 				thisItem->module = module;
@@ -1573,9 +1509,9 @@ struct ClockerDebugDisplay : TransparentWidget {
 				nvgTextBox(args.vg, 9, 10,120, module->debugDisplay2.c_str(), NULL);
 				nvgTextBox(args.vg, 9, 20,120, module->debugDisplay3.c_str(), NULL);
 				nvgTextBox(args.vg, 9, 30,120, module->debugDisplay4.c_str(), NULL);
-				nvgTextBox(args.vg, 9, 40,120, module->debugDisplay5.c_str(), NULL);
-				nvgTextBox(args.vg, 9, 50,120, module->debugDisplay6.c_str(), NULL);
-				nvgTextBox(args.vg, 9, 60,120, module->debugDisplay7.c_str(), NULL);
+				//nvgTextBox(args.vg, 9, 40,120, module->debugDisplay5.c_str(), NULL);
+				//nvgTextBox(args.vg, 9, 50,120, module->debugDisplay6.c_str(), NULL);
+				//nvgTextBox(args.vg, 9, 60,120, module->debugDisplay7.c_str(), NULL);
 				
 			}
 		}
@@ -1594,7 +1530,7 @@ struct ClockerWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH))); 
 
-		/*		
+		/*
 		{
 			ClockerDebugDisplay *display = new ClockerDebugDisplay();
 			display->box.pos = Vec(0, 10);
@@ -1602,7 +1538,7 @@ struct ClockerWidget : ModuleWidget {
 			display->module = module;
 			addChild(display);
 		}
-		*/	
+		*/
 
 		{
 			ClockerDisplayTempo *display = new ClockerDisplayTempo();
@@ -1770,6 +1706,75 @@ struct ClockerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #2", "", &module->divSwing[1]));
 		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #3", "", &module->divSwing[2]));
 		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #4", "", &module->divSwing[3]));
+
+		struct PpqnItem : MenuItem {
+			Clocker* module;
+			int ppqn;
+			void onAction(const event::Action& e) override {
+				module->ppqn = ppqn;
+				module->ppqnValue = module->ppqnTable[ppqn];
+				module->ppqnComparison = module->ppqnValue - 1;
+				module->registerSum = 0;
+				module->registerPos = 0;
+				module->pulseNr = 0;
+				module->pulseSample = 0;
+				module->extClockSample = 1.0;
+				module->prevExtClockSample = 1.0;
+				module->firstRegSync = true;
+				module->extSync = false;
+				//for (int i=0; i < REGISTER_SIZE; i++)
+				//	module->registerValue[i] = 0;
+				module->registerWidth = module->smoothTable[ppqn][module->smooth];
+
+				if (module->extConn)
+					module->clockSample = 1.0;
+
+			}
+		};
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("External Clock"));
+		std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
+		menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
+			for (int i = 0; i < 7; i++) {
+				PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
+				ppqnItem->rightText = CHECKMARK(module->ppqn == i);
+				ppqnItem->module = module;
+				ppqnItem->ppqn = i;
+				menu->addChild(ppqnItem);
+			}
+		}));
+
+
+		struct SmoothItem : MenuItem {
+			Clocker* module;
+			int smooth;
+			void onAction(const event::Action& e) override {
+				module->smooth = smooth;
+				module->registerSum = 0;
+				module->registerPos = 0;
+				module->pulseNr = 0;
+				module->pulseSample = 0;
+				module->extClockSample = 1.0;
+				module->prevExtClockSample = 1.0;
+				module->firstRegSync = true;
+				module->extSync = false;
+				//for (int i = 0; i < REGISTER_SIZE; i++)
+				//	module->registerValue[i] = 0;
+				module->registerWidth = module->smoothTable[module->ppqn][smooth];
+			}
+		};
+
+		std::string smoothNames[4] = {"None", "Low", "Medium", "High"};
+		menu->addChild(createSubmenuItem("Smoothing", smoothNames[module->smooth], [=](Menu * menu) {
+			for (int i = 0; i < 4; i++) {
+				SmoothItem* smoothItem = createMenuItem<SmoothItem>(smoothNames[i]);
+				smoothItem->rightText = CHECKMARK(module->smooth == i);
+				smoothItem->module = module;
+				smoothItem->smooth = i;
+				menu->addChild(smoothItem);
+			}
+		}));
 
 		menu->addChild(new MenuSeparator());
 

@@ -1,4 +1,4 @@
-# SickoCV v2.6.2-beta5
+# SickoCV v2.6.3-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,13 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta5: holder: added Noise Generator Preset function in context menu
-- beta4: added holder compact module, fixed a bug when polyphony signal cables are disconnected
-- beta3: on sickoLooper added visible context menu options even if unselectable
-- beta2: holder: added sample on HIGH gate option in context menu for track&hold
-- beta1: added holder and holder8 modules
+- beta1: clocker: improved midi external sync by adding ppqn and smoothing options in context menu
 
-# SickoCV v2.6.2
+# SickoCV v2.6.3
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 2](https://github.com/sickozell/SickoCV/assets/80784296/752c5b87-5991-43a6-94fa-47f05531cb17)

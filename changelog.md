@@ -1,3 +1,5 @@
+### 2.6.3 (2024-01-xx)
+
 ### 2.6.2 (2023-12-26)
 - added holder, holder Compact and holder8 modules  
 - sickoLooper: added visible context menu options even if unselectable
