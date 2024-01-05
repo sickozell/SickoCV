@@ -1,4 +1,4 @@
-# SickoCV v2.6.3-beta1
+# SickoCV v2.6.3-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,7 +18,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta1: clocker: improved midi external sync by adding ppqn and smoothing options in context menu
+- beta2: clocker: added External Clock Auto Stop feature in context menu  
+- beta1: clocker: improved midi external sync by adding ppqn and smoothing options in context menu  
 
 # SickoCV v2.6.3
 VCV Rack plugin modules
