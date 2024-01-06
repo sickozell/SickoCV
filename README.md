@@ -307,7 +307,10 @@ When clock is runniing BEAT and BAR outputs are always active and give a 1ms tri
 To get best clock precision the algorithm used may alter the clock lengths, according to working vcv samplerate and BPM setting.  
 There will therefore be clocks of non-fixed length, but which will guarantee the exact number of BPM within a minute.
 
-Best results using external clock source, especially when using midi clock, are achieved by adjusting the specific options in the context menu. If it's planned to change tempo or start and stop clock during performing, smoothing option should be set to lowest possible setting with a stable clock. When performing at higher tempos, a low PPQN resolution could improve stability.
+Best results using external clock source, especially when using midi clock, are achieved by adjusting the specific options in the context menu.  
+If it's planned to change tempo or start and stop clock during performing, smoothing option should be set to lowest possible setting with a stable clock.  
+When performing at higher tempos, a low PPQN resolution could improve stability.  
+In the context menu it is good to set the 'On Run/Reset Bar', and 'On Stop/Reset Bar' options ticked to be sure to get the first incoming external clock pulse.
 
 #### Context Menu
 
