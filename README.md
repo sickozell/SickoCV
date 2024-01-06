@@ -307,6 +307,8 @@ When clock is runniing BEAT and BAR outputs are always active and give a 1ms tri
 To get best clock precision the algorithm used may alter the clock lengths, according to working vcv samplerate and BPM setting.  
 There will therefore be clocks of non-fixed length, but which will guarantee the exact number of BPM within a minute.
 
+Best results using external clock source, especially when using midi clock, are achieved by adjusting the specific options in the context menu. If it's planned to change tempo or start and stop clock during performing, smoothing option should be set to lowest possible setting with a stable clock. When performing at higher tempos, a low PPQN resolution could improve stability.
+
 #### Context Menu
 
 - **Trig/Swing on Div**  
@@ -315,6 +317,11 @@ A little blue led is turned on near the PW knob. This knob will control the swin
 Swing control at 0% means no swing, so every pulse has equal timing. Increasing swing ratio it delays the even pulses by its percentage until 100% that means the even pulses fall on the next odd ones.  
 Please note that every clock timing (beat detection) resets the odd pulses, so every pulse that is a beat will be an odd one.
 This is beacause it has to match metronome and don't mess when odd clock divisions are selected.
+
+- **External Clock**  
+Resolution: This option sets the resolution of incoming external pulse clocks expressed in PPQN. It can be set to 1, 2, 4, 8, 12, 16, 24 PPQN.  
+Smoothing: Averages incoming pulses duration to achieve a stable tmepo, especially when using external midi clock. It can be set to none, low, medium or high smoothing and it's influenced by PPQN resolution setting.  
+Auto Stop sensitivity: if no incoming external clock pulses are detected for a while, the RUN button is automatically switched off. If external pulses come back, RUN button is switched on again. This option can be set to off, low, medium or high sensitivity.  
 
 - **Click Presets**  
 There are 3 predefined types of audio clicks, each one with beat and bar sample.  
