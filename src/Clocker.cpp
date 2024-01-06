@@ -7,8 +7,7 @@
 #define PPQN12 4
 #define PPQN16 5
 #define PPQN24 6
-//#define REGISTER_SIZE 96
-#define REGISTER_SIZE 300
+#define REGISTER_SIZE 168
 
 #define NONE_SMOOTH 0
 #define LOW_SMOOTH 1
@@ -196,6 +195,8 @@ struct Clocker : Module {
 	// medium 	2	4	8	16	24	32	48
 	// high 	5	10	20	40	60	80	120
 	*/
+
+	/*
 	int smoothTable[7][4] = {{1, 2, 3, 5},
 							{1, 2, 4, 10},
 							{1, 4, 8, 20},
@@ -203,13 +204,17 @@ struct Clocker : Module {
 							{1, 12, 24, 60},
 							{1, 16, 32, 80},
 							{1, 24, 48, 120}};
+	*/
+
+	int smoothTable[7][4] = {{1, 2, 4, 6},
+							{1, 2, 6, 14},
+							{1, 4, 12, 28},
+							{1, 8, 24, 56},
+							{1, 12, 36, 84},
+							{1, 16, 48, 112},
+							{1, 24, 72, 168}};
 
 	
-	/*
-	int registerValue[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-								0, 0, 0, 0, 0};
-	*/
 	
 	int registerValue[REGISTER_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -222,12 +227,18 @@ struct Clocker : Module {
 								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-								0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0};
 
 	int registerSum = 0;
-	int registerSize[4] = {1, 24, 48, 120};
+	//int registerSize[4] = {1, 24, 48, 120};
 
-	int registerWidth = registerSize[HIGH_SMOOTH];
+	//int registerWidth = registerSize[HIGH_SMOOTH];
+	int registerWidth = smoothTable[ppqn][HIGH_SMOOTH];
 	int registerPos = 0;
 	bool firstRegSync = true;
 
@@ -915,6 +926,12 @@ struct Clocker : Module {
 						extSync = false;
 						runSetting = 0;
 						params[RUN_BUT_PARAM].setValue(0);
+					}
+				} else {
+					if (extClockSample > avgPulse * (ppqnValue+10)) {
+						lastGoodAvg = avgPulse;
+						extClockPaused = true;
+						extSync = false;
 					}
 				}
 			}

@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta3: clocker: improved midi resync when Auto Stop is off and there are no incoming external clock for a while  
 - beta2: clocker: added External Clock Auto Stop feature in context menu  
 - beta1: clocker: improved midi external sync by adding ppqn and smoothing options in context menu  
 
