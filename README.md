@@ -317,7 +317,7 @@ Synchronization of clocker to external gear as master can be usually done by fee
 
 With clocker also midi connection can be used to get a solid clock, just by adding smoothness with a specific option in the context menu. Remember to set the resoultion to 24PPQN standard midi clock rate.  
 
-Different combinations of resolution and smoothness have to be tested to get the best result, depending by needed sync/resync reactivity and BPM setting.  
+Different combinations of resolution and smoothness have to be tested to get the best result, depending also by needed sync/resync reactivity and BPM setting.  
 In general, due to samplerate inaccuracy, the higher the bpm setting, the more unstable the clock becomes.
 Low resolution lowers reactivity on tempo variations, but it may get a more stable clock. High resolution increases reactivity but it makes BPM more unstable.
 Low smoothing let the BPM fluctuate, but let it reacts quickier. On the other hand, higher smoothing get solid clock, but it reacts slower.
