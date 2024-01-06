@@ -353,7 +353,8 @@ When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 "Pulse to RST out" sends a reset pulse to the Reset output when the Run Button is switched on.
 
 - **On Stop**  
-This submenu is the same as the previous one but when the Run Button is switched off.
+This submenu is the same as the previous one, but when the Run Button is switched off.  
+Please note that "On Stop/Reset bar" option sets the clock gate output to low if clocker is currently sending a high gate.  
 
 [back to index](#table-of-contents)
 
