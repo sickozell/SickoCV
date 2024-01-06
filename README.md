@@ -319,9 +319,9 @@ Please note that every clock timing (beat detection) resets the odd pulses, so e
 This is beacause it has to match metronome and don't mess when odd clock divisions are selected.
 
 - **External Clock**  
-Resolution: This option sets the resolution of incoming external pulse clocks expressed in PPQN. It can be set to 1, 2, 4, 8, 12, 16, 24 PPQN.  
-Smoothing: Averages incoming pulses duration to achieve a stable tmepo, especially when using external midi clock. It can be set to none, low, medium or high smoothing and it's influenced by PPQN resolution setting.  
-Auto Stop sensitivity: if no incoming external clock pulses are detected for a while, the RUN button is automatically switched off. If external pulses come back, RUN button is switched on again. This option can be set to off, low, medium or high sensitivity.  
+**Resolution**: This option sets the resolution of incoming external pulse clocks expressed in PPQN. It can be set to 1, 2, 4, 8, 12, 16, 24 PPQN.  
+**Smoothing**: Averages incoming pulses duration to achieve a stable tempo, especially when using external midi clock. It can be set to none, low, medium or high smoothing and it's influenced by PPQN resolution setting.  
+**Auto Stop sensitivity**: if no incoming external clock pulses are detected for a while, the RUN button is automatically switched off. If external pulses come back, RUN button is switched on again. This option can be set to off, low, medium or high sensitivity.  
 
 - **Click Presets**  
 There are 3 predefined types of audio clicks, each one with beat and bar sample.  
