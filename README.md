@@ -12,7 +12,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- modules testing
+- sickoLooper3
+- sickoLooper5
+- clocker
 
 ## **to do list:** 
 - nothing in queue
