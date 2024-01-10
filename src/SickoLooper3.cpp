@@ -2060,6 +2060,8 @@ struct SickoLooper3 : Module {
 
 						case RECORDING:
 							setFastRecLed(track);
+							if (!loopSync_setting[track])
+								stopNow[track] = true;
 						break;
 
 						case OVERDUBBING:
@@ -2098,6 +2100,8 @@ struct SickoLooper3 : Module {
 
 					case RECORDING:
 						setFastRecLed(track);
+						if (!loopSync_setting[track])
+							stopNow[track] = true;
 					break;
 
 					case OVERDUBBING:

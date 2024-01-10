@@ -1,4 +1,4 @@
-# SickoCV v2.6.3-beta4
+# SickoCV v2.6.3-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -20,6 +20,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
+- beta5: sickoLooper: fixed a bug with PLAY/STOP ALL button that doesn't stop recording when recording a non-synced track.
 - beta4: sickoLooper: allowed sources with poly cables, and 'Internal Clock Always ON' option in the right-click menu
 - beta3: clocker: improved midi resync when Auto Stop is off and there are no incoming external clock for a while  
 - beta2: clocker: added External Clock Auto Stop feature in the right-click menu  
