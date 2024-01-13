@@ -176,7 +176,7 @@ struct Clocker : Module {
 	bool ppqnChange = false;
 
 	int ppqnValue = ppqnTable[ppqn];
-	int ppqnValue2 = ppqnValue + 1;
+	//int ppqnValue2 = ppqnValue + 1;
 	int ppqnComparison = ppqnValue - 1;
 
 	int pulseNr = 0;
@@ -687,7 +687,7 @@ struct Clocker : Module {
 		ppqnChange = false;
 		ppqn = tempPpqn;
 		ppqnValue = ppqnTable[ppqn];
-		ppqnValue2 = ppqnValue + 1;
+		//ppqnValue2 = ppqnValue + 1;
 		ppqnComparison = ppqnValue - 1;
 		pulseNr = 0;
 		extSync = false;
@@ -1077,13 +1077,13 @@ struct Clocker : Module {
 					}
 					*/
 
-					clockMaxSample = clockSample * (ppqnValue2 - pulseNr);
-					midBeatMaxSample = clockMaxSample / 2;
+					//clockMaxSample = clockSample * (ppqnValue2 - pulseNr);
+					//midBeatMaxSample = clockMaxSample / 2;
 
 					if (pulseNr > ppqnComparison) {
 						pulseNr = 0;
-						//clockMaxSample = clockSample;
-						//midBeatMaxSample = clockMaxSample / 2;
+						clockMaxSample = clockSample;
+						midBeatMaxSample = clockMaxSample / 2;
 						clockSample = 0.0;
 						
 						if (runSetting)
@@ -1937,10 +1937,10 @@ struct ClockerWidget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker::DIVPW_KNOB_PARAM+2));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker::DIVPW_KNOB_PARAM+3));
 
-		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg1)), module, Clocker::DIVSWING_LIGHT+0));
-		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg2)), module, Clocker::DIVSWING_LIGHT+1));
-		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg3)), module, Clocker::DIVSWING_LIGHT+2));
-		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg4)), module, Clocker::DIVSWING_LIGHT+3));
+		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg1)), module, Clocker::DIVSWING_LIGHT+0));
+		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg2)), module, Clocker::DIVSWING_LIGHT+1));
+		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg3)), module, Clocker::DIVSWING_LIGHT+2));
+		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg4)), module, Clocker::DIVSWING_LIGHT+3));
 		
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yClockOut)), module, Clocker::CLOCK_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yResetOut)), module, Clocker::RESET_OUTPUT));

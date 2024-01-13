@@ -20,9 +20,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog**  
-- beta6: clocker: added external clock ppqn option in context menu and fixed reset bar bug when using external clock
+- beta6: clocker: added external clock ppqn option in context menu and fixed reset bar bug when using external clock. Changed trig/swing led to color red.
 - beta5: sickoLooper: fixed a bug with PLAY/STOP ALL button that doesn't stop recording when recording a non-synced track.
-- beta4: sickoLooper: allowed poly cable sources, and 'Internal Clock Always ON' option in the right-click menu
+- beta4: sickoLooper: allowed poly cable sources, and 'Internal Clock Always ON' option in the right-click menu.
 
 # SickoCV v2.6.3
 VCV Rack plugin modules
