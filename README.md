@@ -296,7 +296,7 @@ Connect the clock output of the external master device to one audio input of you
 
 - **Trig/Swing on Div**  
 With this option enabled the selected divider/multiplier outputs a 1ms trigger instead of gate.  
-A little blue led is turned on near the PW knob. This knob will control the swing amount instead of pulse width, but only for clock multiplications.  
+A little red led is turned on near the PW knob. This knob will control the swing amount instead of pulse width, but only for clock multiplications.  
 Swing control at 0% means no swing, so every pulse has equal timing. Increasing swing ratio it delays the even pulses by its percentage until 100% that means the even pulses fall on the next odd ones.  
 Please note that every clock timing (beat detection) resets the odd pulses, so every pulse that is a beat will be an odd one.
 This is beacause it has to match metronome and don't mess when odd clock divisions are selected.
