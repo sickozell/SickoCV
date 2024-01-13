@@ -1,3 +1,11 @@
+### 2.6.3 (2024-01-13)
+- sickoLooper: fixed a bug with PLAY/STOP ALL button that doesn't stop recording a non-synced track.  
+Allowed poly cable sources.  
+Added 'Internal Clock Always ON' option in the right-click menu.  
+- clocker: added external clock ppqn option in the context menu.  
+Fixed a bug on bar detection when using external clock.  
+Changed trig/swing led to color red.
+
 ### 2.6.2 (2023-12-26)
 - added holder, holder Compact and holder8 modules  
 - sickoLooper: added visible context menu options even if unselectable

@@ -1,6 +1,20 @@
 #define BEAT 0
 #define BAR 1
 
+#define PPQN1 0
+#define PPQN2 1
+#define PPQN4 2
+#define PPQN8 3
+#define PPQN12 4
+#define PPQN16 5
+#define PPQN24 6
+#define REGISTER_SIZE 168
+
+#define NO_SMOOTH 0
+#define LOW_SMOOTH 1
+#define MEDIUM_SMOOTH 2
+#define HIGH_SMOOTH 3
+
 #include "plugin.hpp"
 #include "osdialog.h"
 //#define DR_WAV_IMPLEMENTATION
@@ -23,11 +37,12 @@ struct tpSignature : ParamQuantity {
 
 struct tpDivMult : ParamQuantity {
 	std::string getDisplayValueString() override {
-		const std::string valueDisplay[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
+		const std::string valueDisplay[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
 		return valueDisplay[int(getValue())];
 	}
 };
+
 struct Clocker : Module {
 	enum ParamIds {
 		BPM_KNOB_PARAM,
@@ -87,11 +102,11 @@ struct Clocker : Module {
 	const int beatMaxPerBar[17] = {2, 3, 4, 5, 6, 7, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 	int currentBeatMaxPerBar = 4;
 
-	const std::string divMultDisplay[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
+	const std::string divMultDisplay[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
 
-	const float divMult[41] = {256, 128, 64, 32, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
-							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 32, 64, 128, 256};
+	const float divMult[43] = {256, 128, 64, 32, 24, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
+							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24, 32, 64, 128, 256};
 
 	//**************************************************************
 	//  	
@@ -142,11 +157,80 @@ struct Clocker : Module {
 
 	double clockSample = 1.0;
 	double clockMaxSample = 0.0;
+
+	/*
+	double extClockSample = 1.0;
+	double prevExtClockSample = 1.0;
+	double extClockMaxSample = 0.0;
+	double lastGoodAvg = 1.0;
+	*/
 	
 	double midBeatMaxSample = 0.0;
 	bool midBeatPlayed = false;
 
 	double maxPulseSample = 0.0;
+
+	int ppqnTable[7] = {1, 2, 4, 8, 12, 16, 24}; // 1 2 4 8 12 16 24
+	int ppqn = PPQN1;
+	int tempPpqn = ppqn;
+	bool ppqnChange = false;
+
+	int ppqnValue = ppqnTable[ppqn];
+	//int ppqnValue2 = ppqnValue + 1;
+	int ppqnComparison = ppqnValue - 1;
+
+	int pulseNr = 0;
+	int pulseSample = 0;
+
+	//double avgPulse = 0.0;
+	double avgPulse = 999999999.0;
+
+	/*
+	// **************************** experimental: EXTERNAL CLOCK AUTO STOP
+	bool extClockPaused = false;
+	int extStop = 0;
+	int extStopTable[4] = {0, 7, 5, 3};
+	int extStopValue = 0;
+	*/
+
+	/* 
+	//experimental: EXTERNAL CLOCK SMOOTHING
+	int smooth = NO_SMOOTH;
+	int tempSmooth = NO_SMOOTH;
+	bool smoothChange = false;
+
+	int smoothTable[7][4] = {{1, 2, 4, 6},
+							{1, 2, 6, 14},
+							{1, 4, 12, 28},
+							{1, 8, 24, 56},
+							{1, 12, 36, 84},
+							{1, 16, 48, 112},
+							{1, 24, 72, 168}};
+	
+	int registerValue[REGISTER_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+								0, 0, 0, 0, 0, 0, 0, 0};
+
+	int registerSum = 0;
+
+	int registerWidth = smoothTable[ppqn][HIGH_SMOOTH];
+	int registerPos = 0;
+	bool firstRegSync = true;
+	*/
 
 	//int beatCounter = 1;
 	int beatCounter = 20;	// thise ensure that module starts on a new bar
@@ -203,19 +287,19 @@ struct Clocker : Module {
 		configParam<tpSignature>(SIGNATURE_KNOB_PARAM, 0.f, 16.0f, 2.f, "Time Signature");
 		paramQuantities[SIGNATURE_KNOB_PARAM]->snapEnabled = true;
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 40.f, 20.f, "Mult/Div #1");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 42.f, 21.f, "Mult/Div #1");
 		paramQuantities[DIVMULT_KNOB_PARAM+0]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+0, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 40.f, 20.f, "Mult/Div #2");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 42.f, 21.f, "Mult/Div #2");
 		paramQuantities[DIVMULT_KNOB_PARAM+1]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+1, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 40.f, 20.f, "Mult/Div #3");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 42.f, 21.f, "Mult/Div #3");
 		paramQuantities[DIVMULT_KNOB_PARAM+2]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+2, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 40.f, 20.f, "Mult/Div #4");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 42.f, 21.f, "Mult/Div #4");
 		paramQuantities[DIVMULT_KNOB_PARAM+3]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+3, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
@@ -271,6 +355,11 @@ struct Clocker : Module {
 			divCount[d] = 1;
 			divSwing[d] = false;
 		}
+
+		/*
+		for (int i = 0; i < REGISTER_SIZE; i++)
+			registerValue[i] = 0;
+		*/
 		
 		for (int i = 0; i < 2; i++) {
 			clearSlot(i);
@@ -295,6 +384,9 @@ struct Clocker : Module {
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "ppqn", json_integer(ppqn));
+		//json_object_set_new(rootJ, "smooth", json_integer(smooth));		// experimental: EXTERNAL CLOCK SMOOTH
+		//json_object_set_new(rootJ, "extStop", json_integer(extStop));		// expertimental: EXTERNAL CLOCK AUTO STOP
 		json_object_set_new(rootJ, "BeatOnBar", json_boolean(beatOnBar));
 		json_object_set_new(rootJ, "ResetOnRun", json_boolean(resetOnRun));
 		json_object_set_new(rootJ, "ResetPulseOnRun", json_boolean(resetPulseOnRun));
@@ -310,6 +402,39 @@ struct Clocker : Module {
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+		json_t* ppqnJ = json_object_get(rootJ, "ppqn");
+		if (ppqnJ) {
+			tempPpqn = json_integer_value(ppqnJ);
+			if (tempPpqn < 0 || tempPpqn > 6)
+				tempPpqn = 0;
+			if (tempPpqn != ppqn)
+				changePpqnSetting();
+		}
+
+		/*
+		// expertimental: EXTERNAL CLOCK SMOOTH
+
+		json_t* smoothJ = json_object_get(rootJ, "smooth");
+		if (smoothJ) {
+			tempSmooth = json_integer_value(smoothJ);
+			if (tempSmooth < 0 || tempSmooth > 3)
+				tempSmooth = 0;
+			if (tempSmooth != smooth)
+				changeSmoothSetting();
+		}
+		*/
+
+		/*
+		// expertimental: EXTERNAL CLOCK AUTO STOP
+		json_t* extStopJ = json_object_get(rootJ, "extStop");
+		if (extStopJ) {
+			extStop = json_integer_value(extStopJ);
+			if (extStop < 0 || extStop > 3)
+				extStop = 0;
+			extStopValue = extStopTable[extStop];
+		}
+		*/
+
 		json_t* beatOnBarJ = json_object_get(rootJ, "BeatOnBar");
 		if (beatOnBarJ)
 			beatOnBar = json_boolean_value(beatOnBarJ);
@@ -530,7 +655,6 @@ struct Clocker : Module {
 		}
 	};
 	
-
 	void clearSlot(int slot) {
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
@@ -559,6 +683,49 @@ struct Clocker : Module {
 		}
 	}
 
+	void changePpqnSetting() {
+		ppqnChange = false;
+		ppqn = tempPpqn;
+		ppqnValue = ppqnTable[ppqn];
+		//ppqnValue2 = ppqnValue + 1;
+		ppqnComparison = ppqnValue - 1;
+		pulseNr = 0;
+		extSync = false;
+
+		if (extConn)
+			clockSample = 1.0;
+
+		/*
+		registerSum = 0;
+		registerPos = 0;
+		
+		extClockSample = 1.0;
+		prevExtClockSample = 1.0;
+		firstRegSync = true;
+
+		pulseSample = 0;
+		registerWidth = smoothTable[ppqn][smooth];
+		*/
+		
+	}
+
+	/*
+	void changeSmoothSetting() {
+		smoothChange = false;
+		smooth = tempSmooth;
+		registerSum = 0;
+		registerPos = 0;
+		pulseNr = 0;
+		pulseSample = 0;
+		extClockSample = 1.0;
+		prevExtClockSample = 1.0;
+		firstRegSync = true;
+		extSync = false;
+
+		registerWidth = smoothTable[ppqn][smooth];
+	}
+	*/
+
 	void process(const ProcessArgs &args) override {
 		
 		clickOutput = 0.f;
@@ -571,12 +738,32 @@ struct Clocker : Module {
 		lights[DIVSWING_LIGHT+2].setBrightness(divSwing[2]);
 		lights[DIVSWING_LIGHT+3].setBrightness(divSwing[3]);
 
+		// ********* ppqn and smoth changes
+		
+		if (ppqnChange)
+			changePpqnSetting();
+
+		/*
+		if (smoothChange)
+			changeSmoothSetting();
+		*/
+
 		// ********* EXTERNAL CONNECTION
 
 		extConn = inputs[EXTCLOCK_INPUT].isConnected();
 		if (extConn && !prevExtConn) {
 			extSync = false;
 			bpm = 0.0;
+			pulseNr = 0;
+			/*
+			firstRegSync = true;
+			registerSum = 0;
+			registerPos = 0;
+			
+			pulseSample = 0;
+			extClockSample = 1.0;
+			prevExtClockSample = 1.0;
+			*/
 		}
 		prevExtConn = extConn;
 
@@ -624,6 +811,8 @@ struct Clocker : Module {
 				resetStart = true;
 				if (!extConn)
 					clockSample = 1.0;
+				else
+					extSync = false;
 				outputs[CLOCK_OUTPUT].setVoltage(0.f);
 				for (int d = 0; d < 4; d++) {
 					divPulse[d] = false;
@@ -643,40 +832,42 @@ struct Clocker : Module {
 
 		prevRunSetting = runSetting;
 
+		// ---------------------------------------------------------------------------------
+
+		// **********  RESET
+
+		resetBut = params[RESET_BUT_PARAM].getValue();
+		if (resetBut)
+			resetValue = 1;
+		else
+			resetValue = inputs[RESET_INPUT].getVoltage();
+
+		lights[RESET_BUT_LIGHT].setBrightness(resetValue);
+
+		if (resetValue >= 1 && prevResetValue < 1) {
+
+			outputs[CLOCK_OUTPUT].setVoltage(0.f);
+			for (int d = 0; d < 4; d++) {
+				divPulse[d] = false;
+				divClockSample[d] = 1.0;
+				divMaxSample[d][0] = 0.0;
+				divMaxSample[d][1] = 0.0;
+				outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+			}
+			midBeatPlayed = false;
+			
+			//beatCounter = 1;
+			beatCounter = 20;
+
+			resetPulse = true;
+			resetPulseTime = oneMsTime;
+		}
+		prevResetValue = resetValue;
+
+
 		// ************************* INTERNAL CLOCK
 
 		if (!extConn) {
-
-			// **********  RESET
-
-			resetBut = params[RESET_BUT_PARAM].getValue();
-			if (resetBut)
-				resetValue = 1;
-			else
-				resetValue = inputs[RESET_INPUT].getVoltage();
-
-			lights[RESET_BUT_LIGHT].setBrightness(resetValue);
-
-			if (resetValue >= 1 && prevResetValue < 1) {
-				resetStart = true;
-				clockSample = 1.0;
-				outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				for (int d = 0; d < 4; d++) {
-					divPulse[d] = false;
-					divPulseTime[d] = 0;
-					divClockSample[d] = 1.0;
-					divMaxSample[d][0] = 0.0;
-					divMaxSample[d][1] = 0.0;
-					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-				}
-				midBeatPlayed = false;
-
-				beatCounter = 20; // this ensure beat has reached maximum
-
-				resetPulse = true;
-				resetPulseTime = oneMsTime;
-			}
-			prevResetValue = resetValue;
 
 			// *********** BPM CALC
 			
@@ -698,7 +889,7 @@ struct Clocker : Module {
 
 					if (!divSwing[d]) {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][0]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
 							// ***** CLOCK MULTIPLIER *****
 							divClockSample[d] = 1.0;
 							divPulse[d] = true;
@@ -713,7 +904,7 @@ struct Clocker : Module {
 						
 					} else {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
 							// ***** CLOCK MULTIPLIER *****
 							divPulse[d] = true;
 							divPulseTime[d] = oneMsTime;
@@ -778,7 +969,7 @@ struct Clocker : Module {
 						
 						if (!divSwing[d]) {
 
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
 								// ***** CLOCK MULTIPLIER *****
 								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 								divMaxSample[d][1] = divMaxSample[d][0];
@@ -799,7 +990,7 @@ struct Clocker : Module {
 							}
 						} else {
 							
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
 								// ***** CLOCK MULTIPLIER *****
 								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 								divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
@@ -860,66 +1051,67 @@ struct Clocker : Module {
 
 			// ************************************************ EXTERNAL CLOCK
 
-			// **********  RESET
-
-			resetBut = params[RESET_BUT_PARAM].getValue();
-			if (resetBut)
-				resetValue = 1;
-			else
-				resetValue = inputs[RESET_INPUT].getVoltage();
-
-			lights[RESET_BUT_LIGHT].setBrightness(resetValue);
-
-			if (resetValue >= 1 && prevResetValue < 1) {
-
-				outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				for (int d = 0; d < 4; d++) {
-					divPulse[d] = false;
-					divClockSample[d] = 1.0;
-					divMaxSample[d][0] = 0.0;
-					divMaxSample[d][1] = 0.0;
-					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-				}
-				midBeatPlayed = false;
-				
-				//beatCounter = 1;
-				beatCounter = 20;
-
-				resetPulse = true;
-				resetPulseTime = oneMsTime;
-			}
-			prevResetValue = resetValue;
-
 			// ********** EXTERNAL SYNC
-
+			
 			extTrigValue = inputs[EXTCLOCK_INPUT].getVoltage();
 				
 			if (extTrigValue >= 1 && prevExtTrigValue < 1) {
 
+				pulseNr++;
 				if (extSync) {
-					clockMaxSample = clockSample;
-					midBeatMaxSample = clockMaxSample / 2;
-					clockSample = 1.0;
 
-					// calculate bpms
-					bpm = round(sampleRateCoeff / clockMaxSample);
-					if (bpm > 999)
-						bpm = 999;
+					/*
+					if (pulseNr > ppqnComparison) {
+						pulseNr = 0;
+						clockMaxSample = clockSample;
+						midBeatMaxSample = clockMaxSample / 2;
+						clockSample = 0.0;
+						
+						if (runSetting)
+							extBeat = true;
+
+						// calculate bpms
+						bpm = round(sampleRateCoeff / clockMaxSample);
+						if (bpm > 999)
+							bpm = 999;
+					}
+					*/
+
+					//clockMaxSample = clockSample * (ppqnValue2 - pulseNr);
+					//midBeatMaxSample = clockMaxSample / 2;
+
+					if (pulseNr > ppqnComparison) {
+						pulseNr = 0;
+						clockMaxSample = clockSample;
+						midBeatMaxSample = clockMaxSample / 2;
+						clockSample = 0.0;
+						
+						if (runSetting)
+							extBeat = true;
+
+						// calculate bpms
+						bpm = round(sampleRateCoeff / clockMaxSample);
+						if (bpm > 999)
+							bpm = 999;
+					}
 
 				} else {
 					bpm = 0.0;
 					extSync = true;
 					clockSample = 1.0;
+					pulseNr = 0;
 
+					if (runSetting)
+						extBeat = true;
 				}
-
-				if (runSetting)
-					extBeat = true;
 
 			} else {
 				extBeat = false;
 			}
 			prevExtTrigValue = extTrigValue;
+
+			//extClockSample++;
+		
 
 			// **************   RUN PROCESS   ***************
 
@@ -937,7 +1129,7 @@ struct Clocker : Module {
 
 					if(!divSwing[d]) {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][0]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
 							// ***** CLOCK MULTIPLIER *****
 							divClockSample[d] = 1.0;
 							divPulse[d] = true;
@@ -951,7 +1143,7 @@ struct Clocker : Module {
 						}
 
 					} else {
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
 							// ***** CLOCK MULTIPLIER *****
 							divPulse[d] = true;
 							divPulseTime[d] = oneMsTime;
@@ -1011,7 +1203,7 @@ struct Clocker : Module {
 						for (int d = 0; d < 4; d++) {
 
 							if (!divSwing[d]) {
-								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
 									// ***** CLOCK MULTIPLIER *****
 									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 									divMaxSample[d][1] = divMaxSample[d][0];
@@ -1031,7 +1223,7 @@ struct Clocker : Module {
 									}
 								}
 							} else {
-								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 20) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
 									// ***** CLOCK MULTIPLIER *****
 									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 									divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
@@ -1309,7 +1501,7 @@ struct ClockerDisplayDiv1 : TransparentWidget {
 				if (tempValue > 11 && tempValue < 29)
 					tempXpos = 12.8;
 
-				if (tempValue < 20)
+				if (tempValue < 21)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1335,9 +1527,9 @@ struct ClockerDisplayDiv1 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 41; i++) {
+			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+			for (int i = 0; i < 43; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue()) == i);
 				thisItem->module = module;
@@ -1377,7 +1569,7 @@ struct ClockerDisplayDiv2 : TransparentWidget {
 				if (tempValue > 11 && tempValue < 29)
 					tempXpos = 12.8;
 
-				if (tempValue < 20)
+				if (tempValue < 21)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1403,9 +1595,9 @@ struct ClockerDisplayDiv2 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 41; i++) {
+			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+			for (int i = 0; i < 43; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue()) == i);
 				thisItem->module = module;
@@ -1445,7 +1637,7 @@ struct ClockerDisplayDiv3 : TransparentWidget {
 				if (tempValue > 11 && tempValue < 29)
 					tempXpos = 12.8;
 
-				if (tempValue < 20)
+				if (tempValue < 21)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1471,9 +1663,9 @@ struct ClockerDisplayDiv3 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 41; i++) {
+			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+			for (int i = 0; i < 43; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue()) == i);
 				thisItem->module = module;
@@ -1513,7 +1705,7 @@ struct ClockerDisplayDiv4 : TransparentWidget {
 				if (tempValue > 11 && tempValue < 29)
 					tempXpos = 12.8;
 
-				if (tempValue < 20)
+				if (tempValue < 21)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1539,9 +1731,9 @@ struct ClockerDisplayDiv4 : TransparentWidget {
 				}
 			};
 
-			std::string menuNames[41] = {"/256", "/128", "/64", "/32", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 41; i++) {
+			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+			for (int i = 0; i < 43; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue()) == i);
 				thisItem->module = module;
@@ -1745,10 +1937,10 @@ struct ClockerWidget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker::DIVPW_KNOB_PARAM+2));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker::DIVPW_KNOB_PARAM+3));
 
-		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg1)), module, Clocker::DIVSWING_LIGHT+0));
-		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg2)), module, Clocker::DIVSWING_LIGHT+1));
-		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg3)), module, Clocker::DIVSWING_LIGHT+2));
-		addChild(createLightCentered<TinyLight<BlueLight>>(mm2px(Vec(xDivLg, yDivLg4)), module, Clocker::DIVSWING_LIGHT+3));
+		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg1)), module, Clocker::DIVSWING_LIGHT+0));
+		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg2)), module, Clocker::DIVSWING_LIGHT+1));
+		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg3)), module, Clocker::DIVSWING_LIGHT+2));
+		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg4)), module, Clocker::DIVSWING_LIGHT+3));
 		
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yClockOut)), module, Clocker::CLOCK_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yResetOut)), module, Clocker::RESET_OUTPUT));
@@ -1770,6 +1962,75 @@ struct ClockerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #2", "", &module->divSwing[1]));
 		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #3", "", &module->divSwing[2]));
 		menu->addChild(createBoolPtrMenuItem("Trig/Swing on Div #4", "", &module->divSwing[3]));
+
+		menu->addChild(new MenuSeparator());
+
+		struct PpqnItem : MenuItem {
+			Clocker* module;
+			int ppqn;
+			void onAction(const event::Action& e) override {
+				module->tempPpqn = ppqn;
+				module->ppqnChange = true;
+			}
+		};
+
+		menu->addChild(createMenuLabel("External Clock"));
+		std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
+		menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
+			for (int i = 0; i < 7; i++) {
+				PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
+				ppqnItem->rightText = CHECKMARK(module->ppqn == i);
+				ppqnItem->module = module;
+				ppqnItem->ppqn = i;
+				menu->addChild(ppqnItem);
+			}
+		}));
+
+		/*
+		// experimental: EXTERNAL CLOCK AUTO STOP
+		struct SmoothItem : MenuItem {
+			Clocker* module;
+			int smooth;
+			void onAction(const event::Action& e) override {
+				module->tempSmooth = smooth;
+				module->smoothChange = true;
+			}
+		};
+
+		std::string smoothNames[4] = {"None", "Low", "Medium", "High"};
+		menu->addChild(createSubmenuItem("Smoothing", smoothNames[module->smooth], [=](Menu * menu) {
+			for (int i = 0; i < 4; i++) {
+				SmoothItem* smoothItem = createMenuItem<SmoothItem>(smoothNames[i]);
+				smoothItem->rightText = CHECKMARK(module->smooth == i);
+				smoothItem->module = module;
+				smoothItem->smooth = i;
+				menu->addChild(smoothItem);
+			}
+		}));
+		*/
+
+		/*
+		// experimental: EXTERNAL CLOCK AUTO STOP
+		struct ExtStopItem : MenuItem {
+			Clocker* module;
+			int extStop;
+			void onAction(const event::Action& e) override {
+				module->extStop = extStop;
+				module->extStopValue = module->extStopTable[extStop];
+			}
+		};
+
+		std::string extStopNames[4] = {"Off", "Low", "Medium", "High"};
+		menu->addChild(createSubmenuItem("Auto Stop sensitivity", extStopNames[module->extStop], [=](Menu * menu) {
+			for (int i = 0; i < 4; i++) {
+				ExtStopItem* extStopItem = createMenuItem<ExtStopItem>(extStopNames[i]);
+				extStopItem->rightText = CHECKMARK(module->extStop == i);
+				extStopItem->module = module;
+				extStopItem->extStop = i;
+				menu->addChild(extStopItem);
+			}
+		}));
+		*/
 
 		menu->addChild(new MenuSeparator());
 

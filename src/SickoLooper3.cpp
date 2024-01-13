@@ -369,6 +369,7 @@ struct SickoLooper3 : Module {
 	bool resetStart = true;
 
 	int runSetting = 0;
+	bool internalClockAlwaysOn = false;
 
 	double clockSample = 1.0;
 	double clockMaxSample = 0.0;
@@ -551,6 +552,7 @@ struct SickoLooper3 : Module {
 		json_object_set_new(rootJ, "fadeInOnPlay0", json_boolean(fadeInOnPlay[0]));
 		json_object_set_new(rootJ, "fadeInOnPlay1", json_boolean(fadeInOnPlay[1]));
 		json_object_set_new(rootJ, "fadeInOnPlay2", json_boolean(fadeInOnPlay[2]));
+		json_object_set_new(rootJ, "internalClockAlwaysOn", json_boolean(internalClockAlwaysOn));
 		json_object_set_new(rootJ, "ClickSlot1", json_string(clickStoredPath[0].c_str()));
 		json_object_set_new(rootJ, "ClickSlot2", json_string(clickStoredPath[1].c_str()));
 		return rootJ;
@@ -610,6 +612,10 @@ struct SickoLooper3 : Module {
 		if (fadeInOnPlay2J)
 			fadeInOnPlay[2] = json_boolean_value(fadeInOnPlay2J);
 
+		json_t* internalClockAlwaysOnJ = json_object_get(rootJ, "internalClockAlwaysOn");
+		if (internalClockAlwaysOnJ)
+			internalClockAlwaysOn = json_boolean_value(internalClockAlwaysOnJ);
+
 		json_t *clickSlot1J = json_object_get(rootJ, "ClickSlot1");
 		if (clickSlot1J) {
 			clickStoredPath[0] = json_string_value(clickSlot1J);
@@ -651,6 +657,7 @@ struct SickoLooper3 : Module {
 		currentSoloTrack = -1;
 		nextSoloTrack = -1;
 		startNewSolo = false;
+		internalClockAlwaysOn = false;
 
 		Module::onReset(e);
 	}
@@ -1126,6 +1133,7 @@ struct SickoLooper3 : Module {
 		json_object_set_new(rootJ, "eolPulseOnStop", json_boolean(eolPulseOnStop));
 		json_object_set_new(rootJ, "playSequence", json_integer(playSequence));
 		json_object_set_new(rootJ, "instantStop", json_boolean(instantStop));
+		json_object_set_new(rootJ, "internalClockAlwaysOn", json_boolean(internalClockAlwaysOn));
 		json_object_set_new(rootJ, "clickSlot1", json_string(clickStoredPath[0].c_str()));
 		json_object_set_new(rootJ, "clickSlot2", json_string(clickStoredPath[1].c_str()));
 		json_object_set_new(rootJ, "click", json_integer(int(params[CLICK_BUT_PARAM].getValue())));
@@ -1188,6 +1196,9 @@ struct SickoLooper3 : Module {
 		if (instantStopJ) {
 			instantStop = json_boolean(instantStopJ);
 		}
+		json_t *internalClockAlwaysOnJ = json_object_get(rootJ, "internalClockAlwaysOn");
+		if (internalClockAlwaysOnJ)
+			internalClockAlwaysOn = json_boolean_value(internalClockAlwaysOnJ);
 		json_t *clickSlot1J = json_object_get(rootJ, "clickSlot1");
 		if (clickSlot1J) {
 			clickStoredPath[0] = json_string_value(clickSlot1J);
@@ -1831,6 +1842,30 @@ struct SickoLooper3 : Module {
 			params[BPM_KNOB_PARAM].setValue(int(300 * (double)sampleRate * beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())] / totalSampleC[track]) * params[MEAS_KNOB_PARAM+track].getValue());
 	}
 
+	bool isInternalClockAlwaysOn() {
+		return internalClockAlwaysOn;
+	}
+
+	void setInternalClock(bool internalClock) {
+		if (internalClock) {
+			internalClockAlwaysOn = true;
+			runSetting = 1;
+		} else {
+			internalClockAlwaysOn = false;
+			if (busyTracks == 0) {
+				globalStatus = IDLE;
+				
+				//if (!extConn) {
+				if (!extConn && !internalClockAlwaysOn) {
+					runSetting = 0;
+					clockSample = 1.0;
+					resetStart = true;
+					beatCounter = 20;	// this hack makes the click be audible on next runSetting=1
+				}
+			}
+		}
+	}
+
 	void inline cancelNextStatus(int track) {
 		if (trackStatus[track] == PLAYING)
 			setPlayLed(track);
@@ -1917,13 +1952,15 @@ struct SickoLooper3 : Module {
 			}
 
 			if (inputs[LEFT_INPUT+track].isConnected()) {
-				inputValue[track][LEFT] = inputs[LEFT_INPUT+track].getVoltage() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
+				//inputValue[track][LEFT] = inputs[LEFT_INPUT+track].getVoltage() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
+				inputValue[track][LEFT] = inputs[LEFT_INPUT+track].getVoltageSum() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
 				if (inputValue[track][LEFT] > 10.f)
 					inputValue[track][LEFT] = 10.f;
 				else if (inputValue[track][LEFT] < -10.f)
 					inputValue[track][LEFT] = -10.f;
 				if (inputs[RIGHT_INPUT+track].isConnected()) {
-					inputValue[track][RIGHT] = inputs[RIGHT_INPUT+track].getVoltage() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
+					//inputValue[track][RIGHT] = inputs[RIGHT_INPUT+track].getVoltage() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
+					inputValue[track][RIGHT] = inputs[RIGHT_INPUT+track].getVoltageSum() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
 					if (inputValue[track][RIGHT] > 10.f)
 						inputValue[track][RIGHT] = 10.f;
 					else if (inputValue[track][RIGHT] < -10.f)
@@ -1932,7 +1969,8 @@ struct SickoLooper3 : Module {
 					inputValue[track][RIGHT] = inputValue[track][LEFT];
 			} else {
 				if (inputs[RIGHT_INPUT+track].isConnected()) {
-					inputValue[track][RIGHT] = inputs[RIGHT_INPUT+track].getVoltage() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
+					//inputValue[track][RIGHT] = inputs[RIGHT_INPUT+track].getVoltage() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
+					inputValue[track][RIGHT] = inputs[RIGHT_INPUT+track].getVoltageSum() * params[SOURCELVL_KNOB_PARAM+track].getValue() * muteValue[track];
 					if (inputValue[track][RIGHT] > 10.f)
 						inputValue[track][RIGHT] = 10.f;
 					else if (inputValue[track][RIGHT] < -10.f)
@@ -2022,6 +2060,8 @@ struct SickoLooper3 : Module {
 
 						case RECORDING:
 							setFastRecLed(track);
+							if (!loopSync_setting[track])
+								stopNow[track] = true;
 						break;
 
 						case OVERDUBBING:
@@ -2060,6 +2100,8 @@ struct SickoLooper3 : Module {
 
 					case RECORDING:
 						setFastRecLed(track);
+						if (!loopSync_setting[track])
+							stopNow[track] = true;
 					break;
 
 					case OVERDUBBING:
@@ -4233,12 +4275,8 @@ struct SickoLooper3 : Module {
 		if (busyTracks == 0) {
 			globalStatus = IDLE;
 			
-			/*runSetting = 0;
-			clockSample = 1.0;
-			resetStart = true;
-			beatCounter = 20;	// this hack makes the click be audible on next runSetting=1
-			*/
-			if (!extConn) {
+			//if (!extConn) {
+			if (!extConn && !internalClockAlwaysOn) {
 				runSetting = 0;
 				clockSample = 1.0;
 				resetStart = true;
@@ -5318,6 +5356,11 @@ struct SickoLooper3Widget : ModuleWidget {
 		menu->addChild(createMenuItem("Save preset + loops", "", [=]() {module->menuSavePreset(true);}));
 
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolMenuItem("Internal Clock Always ON", "", [=]() {
+				return module->isInternalClockAlwaysOn();
+			}, [=](bool internalClockAlwaysOn) {
+				module->setInternalClock(internalClockAlwaysOn);
+		}));
 		menu->addChild(createSubmenuItem("Click Settings", "", [=](Menu * menu) {
 			menu->addChild(createSubmenuItem("Click Presets", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("Standard", "", [=]() {module->setClick(0);}));
