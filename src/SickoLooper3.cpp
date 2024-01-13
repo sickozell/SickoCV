@@ -302,7 +302,7 @@ struct SickoLooper3 : Module {
 	bool overdubAfterRec = false;
 	bool fadeInOnPlay[5] = {false, false, false, false, false};
 	bool extraSamples[5] = {true, true, true, true, true};
-	bool playFullTail[5] = {true, true, true, true, true};
+	bool playFullTail[5] = {false, false, false, false, false};
 
 	// ***************************************************************************************************
 	// exponential time knkobs
@@ -643,7 +643,7 @@ struct SickoLooper3 : Module {
 		for (int track = 0; track < MAX_TRACKS; track++) {
 			extraSamples[track] = true;
 			playTail[track] = false;
-			playFullTail[track] = true;
+			playFullTail[track] = false;
 			fadeTail[track] = false;
 			fadeInOnPlay[track] = false;
 			trackBuffer[track][LEFT].clear();
@@ -3595,7 +3595,13 @@ struct SickoLooper3 : Module {
 									if (solo_setting[track]) {
 										startNewSolo = true;
 										currentSoloTrack = -1;
+										/*
 										if (nextSoloTrack < 0) {
+											playTail[track] = true;
+											tailEnd[track] = samplePos[track] + tailSamples;
+										}
+										*/
+										if (nextSoloTrack < 0 && playFullTail[track]) {
 											playTail[track] = true;
 											tailEnd[track] = samplePos[track] + tailSamples;
 										}
@@ -3619,7 +3625,13 @@ struct SickoLooper3 : Module {
 										if (solo_setting[track]) {
 											startNewSolo = true;
 											currentSoloTrack = -1;
+											/*
 											if (nextSoloTrack < 0) {
+												playTail[track] = true;
+												tailEnd[track] = samplePos[track] + tailSamples;
+											}
+											*/
+											if (nextSoloTrack < 0 && playFullTail[track]) {
 												playTail[track] = true;
 												tailEnd[track] = samplePos[track] + tailSamples;
 											}
@@ -3816,7 +3828,13 @@ struct SickoLooper3 : Module {
 									if (solo_setting[track]) {
 										startNewSolo = true;
 										currentSoloTrack = -1;
+										/*
 										if (nextSoloTrack < 0) {
+											playTail[track] = true;
+											tailEnd[track] = samplePos[track] + tailSamples;
+										}
+										*/
+										if (nextSoloTrack < 0 && playFullTail[track]) {
 											playTail[track] = true;
 											tailEnd[track] = samplePos[track] + tailSamples;
 										}
@@ -3837,7 +3855,13 @@ struct SickoLooper3 : Module {
 										if (solo_setting[track]) {
 											startNewSolo = true;
 											currentSoloTrack = -1;
+											/*
 											if (nextSoloTrack < 0) {
+												playTail[track] = true;
+												tailEnd[track] = samplePos[track] + tailSamples;
+											}
+											*/
+											if (nextSoloTrack < 0 && playFullTail[track]) {
 												playTail[track] = true;
 												tailEnd[track] = samplePos[track] + tailSamples;
 											}
@@ -4510,6 +4534,7 @@ struct SickoLooper3DisplayLoop1 : TransparentWidget {
 
 			menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
 			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
+			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
 			if (module->trackStatus[track] != EMPTY)
@@ -4523,7 +4548,6 @@ struct SickoLooper3DisplayLoop1 : TransparentWidget {
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(track, xtraSamples);
 			}));
-			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			if (module->trackStatus[track] != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 			else
@@ -4672,6 +4696,7 @@ struct SickoLooper3DisplayLoop2 : TransparentWidget {
 
 			menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
 			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
+			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
 			if (module->trackStatus[track] != EMPTY)
@@ -4685,7 +4710,6 @@ struct SickoLooper3DisplayLoop2 : TransparentWidget {
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(track, xtraSamples);
 			}));
-			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 
 			if (module->trackStatus[track] != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
@@ -4834,6 +4858,7 @@ struct SickoLooper3DisplayLoop3 : TransparentWidget {
 
 			menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
 			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
+			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
 			if (module->trackStatus[track] != EMPTY)
@@ -4847,8 +4872,7 @@ struct SickoLooper3DisplayLoop3 : TransparentWidget {
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(track, xtraSamples);
 			}));
-			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
-
+			
 			if (module->trackStatus[track] != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 			else
@@ -5327,6 +5351,7 @@ struct SickoLooper3Widget : ModuleWidget {
 					menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
 					
 					menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
+					menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 					menu->addChild(new MenuSeparator());
 					menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
 					if (module->trackStatus[track] != EMPTY)
@@ -5340,7 +5365,6 @@ struct SickoLooper3Widget : ModuleWidget {
 						}, [=](bool xtraSamples) {
 							module->setExtraSamples(track, xtraSamples);
 					}));
-					menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
 
 					if (module->trackStatus[track] != EMPTY)
 						menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));

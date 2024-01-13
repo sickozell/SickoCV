@@ -12,19 +12,20 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- sickoLooper3
-- sickoLooper5
-- clocker
+- none
 
 ## **to do list:** 
 - nothing in queue
 
 ## **changelog**  
-- beta6: clocker: added external clock ppqn option in context menu and fixed reset bar bug when using external clock. Changed trig/swing led to color red.
+- beta6: clocker: added external clock ppqn option in context menu and fixed reset bar bug when using external clock.  
+Changed trig/swing led to color red.
+sickolooper: Set default 'Play Full Tail On Stop' to off.  
+fixed a bug on 'play full tail on stop' when looping solo tracks.  
 - beta5: sickoLooper: fixed a bug with PLAY/STOP ALL button that doesn't stop recording when recording a non-synced track.
 - beta4: sickoLooper: allowed poly cable sources, and 'Internal Clock Always ON' option in the right-click menu.
 
-# SickoCV v2.6.3
+# SickoCV v2.6.4
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 2](https://github.com/sickozell/SickoCV/assets/80784296/752c5b87-5991-43a6-94fa-47f05531cb17)
@@ -322,7 +323,7 @@ Connect the clock output of the external master device to one audio input of you
 
 - **Trig/Swing on Div**  
 With this option enabled the selected divider/multiplier outputs a 1ms trigger instead of gate.  
-A little blue led is turned on near the PW knob. This knob will control the swing amount instead of pulse width, but only for clock multiplications.  
+A little red led is turned on near the PW knob. This knob will control the swing amount instead of pulse width, but only for clock multiplications.  
 Swing control at 0% means no swing, so every pulse has equal timing. Increasing swing ratio it delays the even pulses by its percentage until 100% that means the even pulses fall on the next odd ones.  
 Please note that every clock timing (beat detection) resets the odd pulses, so every pulse that is a beat will be an odd one.
 This is beacause it has to match metronome and don't mess when odd clock divisions are selected.
