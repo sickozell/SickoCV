@@ -26,7 +26,7 @@ fixed a bug that doesn't restore 'Internal Clock Always ON' on startup
 # SickoCV v2.6.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 2](https://github.com/sickozell/SickoCV/assets/80784296/752c5b87-5991-43a6-94fa-47f05531cb17)
+![SickoCV modules 2 6 4](https://github.com/sickozell/SickoCV/assets/80784296/7c6a6fbb-0e2c-4349-902c-6a8946ffbd91)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -575,12 +575,13 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 
 [back to index](#table-of-contents)
 
-## sickoLooper3 / sickoLooper5
-### 3/5 track loopers with builtin clock generator, click and meter.
+## sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5
+### 1/3/5 track loopers with builtin clock generator, click and meter.
 #### - DESCRIPTION
 sickoLooper is inspired by hardware looper devices with most of their features implemented.
 
-![sickolooper35](https://github.com/sickozell/SickoCV/assets/80784296/974c1793-9f4b-41ea-bf57-f7db84136ea7)
+![sickolooper1x3](https://github.com/sickozell/SickoCV/assets/80784296/112f0265-90a0-48f4-80f7-182071e5ede6)  
+![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/34c0d771-edeb-499a-92b9-e4de995549c3)
 
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
