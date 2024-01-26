@@ -1,4 +1,4 @@
-# SickoCV v2.6.3-beta6
+# SickoCV v2.6.4-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,18 +12,16 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- none
+- sickoLooper1
+- sickoLooperX
 
 ## **to do list:** 
-- nothing in queue
+- modules testing
 
 ## **changelog**  
-- beta6: clocker: added external clock ppqn option in context menu and fixed reset bar bug when using external clock.  
-Changed trig/swing led to color red.
-sickolooper: Set default 'Play Full Tail On Stop' to off.  
-fixed a bug on 'play full tail on stop' when looping solo tracks.  
-- beta5: sickoLooper: fixed a bug with PLAY/STOP ALL button that doesn't stop recording when recording a non-synced track.
-- beta4: sickoLooper: allowed poly cable sources, and 'Internal Clock Always ON' option in the right-click menu.
+- added sickoLooper1 and sickoLooperX modules
+- sickoLooper3, sickoLooper5: added missing 'OVERDUB after REC' setting in preset storing  
+fixed a bug that doesn't restore 'Internal Clock Always ON' on startup
 
 # SickoCV v2.6.4
 VCV Rack plugin modules
