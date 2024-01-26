@@ -4762,10 +4762,12 @@ struct SickoLooper1Widget : ModuleWidget {
 			//}
 		//}));
 
+		/*
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Load preset (+loops)", "", [=]() {module->menuLoadPreset();}));
 		menu->addChild(createMenuItem("Save preset", "", [=]() {module->menuSavePreset(false);}));
 		menu->addChild(createMenuItem("Save preset + loops", "", [=]() {module->menuSavePreset(true);}));
+		*/
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolMenuItem("Internal Clock Always ON", "", [=]() {
