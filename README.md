@@ -16,7 +16,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - sickoLooperX
 
 ## **to do list:** 
-- modules testing
+- modules testing  
 
 ## **changelog**  
 - added sickoLooper1 and sickoLooperX modules
