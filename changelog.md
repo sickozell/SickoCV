@@ -1,4 +1,4 @@
-### 2.6.4 (2024-01-xx)
+### 2.6.4 (2024-01-27)
 - added sickoLooper1 and sickoLooperX modules.  
 - sickoLooper3, sickoLooper5: added missing 'OVERDUB after REC' setting in preset storing.  
 fixed a bug that doesn't restore 'Internal Clock Always ON' on startup.  
