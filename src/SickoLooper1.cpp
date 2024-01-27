@@ -1709,9 +1709,9 @@ struct SickoLooper1 : Module {
 
 	void detectTempo() {
 		if (beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())] < 6)
-			params[BPM_KNOB_PARAM].setValue(int(600 * (double)sampleRate * beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())] / totalSampleC) * params[MEAS_KNOB_PARAM].getValue());
+			params[BPM_KNOB_PARAM].setValue(int(600 * (double)sampleRate * beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())] / totalSampleC * 2) * params[MEAS_KNOB_PARAM].getValue());
 		else
-			params[BPM_KNOB_PARAM].setValue(int(300 * (double)sampleRate * beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())] / totalSampleC) * params[MEAS_KNOB_PARAM].getValue());
+			params[BPM_KNOB_PARAM].setValue(int(300 * (double)sampleRate * beatMaxPerBar[int(params[SIGNATURE_KNOB_PARAM].getValue())] / totalSampleC * 2) * params[MEAS_KNOB_PARAM].getValue());
 	}
 
 	bool isInternalClockAlwaysOn() {
