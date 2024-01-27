@@ -1,7 +1,7 @@
-# SickoCV v2.6.3
+# SickoCV v2.6.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 2](https://github.com/sickozell/SickoCV/assets/80784296/752c5b87-5991-43a6-94fa-47f05531cb17)
+![SickoCV modules 2 6 4](https://github.com/sickozell/SickoCV/assets/80784296/7c6a6fbb-0e2c-4349-902c-6a8946ffbd91)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -21,7 +21,7 @@ VCV Rack plugin modules
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
-- [sickoLooper3 / sickoLooper5](#sickolooper3--sickolooper5)
+- [sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5](#sickolooper1--sickolooperx--sickolooper3--sickolooper5)
 - [sickoPlayer](#sickoplayer)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
@@ -29,7 +29,12 @@ VCV Rack plugin modules
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
-  
+
+## **Please donate**  
+The work necessary to develop these modules required many hours of work and many sleepless nights.  
+Sickozell plugin is and will always remain free, but if you find it useful, consider donating even just a coffee by following this [payPal](https://paypal.me/sickozell) link.  
+Thanks.
+
 ## Common modules behavior
 - Triggers and gates threshold is +1v
 - Every time-related knob set full anticlockwise and displaying 1ms on the tooltip is actually considered 0ms
@@ -56,7 +61,7 @@ if it's used as a fixed pitch adder (without input CV connection) maybe it's use
 otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
 - **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## bGates
 ### 8 buffered gates and triggers
@@ -82,7 +87,7 @@ Pressing RSTALL button or triggering RESETALL input will immediately set all the
 - Initialize On Start: discards previous module state on VCV restart
 - Disable Unarm: this disables unarm feature
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## blender
 ### Polyphonic stereo crossfade mixer with double modulation
@@ -111,7 +116,7 @@ Modulation is added to the MIX knob.
 **MOD2 section**  
 MOD2 can be used to add modulation to the MOD attenuverter knob in MOD section, the rules are the same.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## blender8
 ### 8 single crossfade mixers with modulation
@@ -128,7 +133,7 @@ Audio rate modulations are allowed.
 Only the IN2 input signal can be phase inverted.  
 If a CV input is connected for modulation, CV sets the mix percentage and the MIX knob becomes the CV attenuverter.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## bToggler / bToggler Compact
 ### Buffered stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
@@ -163,7 +168,7 @@ Polyphony on L/(R) inputs is replicated on outs.
 - Disable Unarm: this disables unarm feature
 - Trigger on Gate Out: this option substitutes Gate Output with a 1ms trigger whenever a clock is detected when armed
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## bToggler8
 ### 8 buffered toggle switch signal router
@@ -208,7 +213,7 @@ Here below is one example of bToggler8 usage. When buttons are pressed on PULSES
 ![bToggler8 example](https://user-images.githubusercontent.com/80784296/204083532-db145211-1f61-45cd-9c4d-572fc243d7d3.JPG)  
 [Download example](./examples/bToggler8%20example.vcvs?raw=true) (right-click -> save link as)
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## bToggler8+
 ### 8 buffered toggle switch router, plus warnings to use with led midi controllers
@@ -245,7 +250,7 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 ![bToggler8plus example](https://user-images.githubusercontent.com/80784296/204083544-34ecf3b0-0d12-4965-bd72-f3bb85339551.JPG)  
 [Download example](./examples/bToggler8plus%20example.vcvs?raw=true) (right-click -> save link as)
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
@@ -257,7 +262,7 @@ A, B and C are the inputs. The output tables provide simple math calculations an
 
 U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## clocker
 ### Clock generator with 4 dividers/multipliers and audio metronome
@@ -321,7 +326,7 @@ When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 This submenu is the same as the previous one, but when the Run Button is switched off.  
 Please note that "On Stop/Reset bar" option sets the clock gate output to low if clocker is currently sending a high gate.  
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## CvRouter / CvSwitcher
 ### 1>2 and 2>1 voltage controlled switch  
@@ -336,7 +341,7 @@ The FADE knob with its added CV input, will crossfade up to 10s the INs or OUTs.
 
 The default value of the "THR" knob is +1v.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## drummer / drummer4 / drummer4+
 ### Accent and choke utility for drum modules lacking these features
@@ -375,7 +380,7 @@ Example of Drummer4 module usage:
 - **Drummer4+ note:**  
 Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to parameter knobs.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## drumPlayer / drumPlayer+ / drumPlayerXtra
 ### 4 channel Drum Sample Player with accent and choke functionality
@@ -452,7 +457,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 - Light Box color (if Light Boxes option is enabled in the general right-click menu, a predefined color or a custom one can be set here)
 - Light Box Fade (Fade time of Light Boxes is set here: Slow (0.5s), Normal (0.25s), Fast (0.1s)
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## holder / holder Compact / holder8
 ### Sample & Hold or Track & Hold with noise generator, probability and range
@@ -497,7 +502,7 @@ Comparison:
 **Noise Generator preset**  
 This function sets the module to Track & Hold mode, sample on HIGH gate, scale on 100% and offset to 0v, just to output white noise if trig/gate input is not connected or not triggered.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## parking
 ### Set of unconnected inputs and outputs just to park unused cables
@@ -508,7 +513,7 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 This module doesn't do anything. It's just a place to connect temporarily unused cables to not forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## shifter
 ### 64 selectable stages shift register
@@ -531,7 +536,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ![shifter example](https://user-images.githubusercontent.com/80784296/212531455-776e3110-78ef-4bec-a3f8-64180fe4ca53.JPG)  
 [Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## sickoAmp
 ### Polyphonic stereo VCA up to 200% with limiter
@@ -548,14 +553,15 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### Right-click Menu
 - Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
-## sickoLooper3 / sickoLooper5
-### 3/5 track loopers with builtin clock generator, click and meter.
+## sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5
+### 1/3/5 track loopers with builtin clock generator, click and meter.
 #### - DESCRIPTION
 sickoLooper is inspired by hardware looper devices with most of their features implemented.
 
-![sickolooper35](https://github.com/sickozell/SickoCV/assets/80784296/974c1793-9f4b-41ea-bf57-f7db84136ea7)
+![sickolooper1x3](https://github.com/sickozell/SickoCV/assets/80784296/112f0265-90a0-48f4-80f7-182071e5ede6)  
+![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/34c0d771-edeb-499a-92b9-e4de995549c3)
 
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
@@ -564,7 +570,7 @@ Download [ENGLISH user manual](./docs/sickoLooper%20user%20manual%20%5BEN%5D.pdf
 
 Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20%5BIT%5D.pdf?raw=true)
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## sickoPlayer
 ### wav sample player
@@ -674,7 +680,7 @@ There are some factory presets stored in the right-click menu for common using s
 One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
 Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100% and enable loop button.  
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## sickoSampler
 ### wav sample player and recorder
@@ -742,7 +748,7 @@ Please refer to sickoPlayer for the right-click menu, in sickoSampler following 
 - UCE/ULE updates also Start: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor).
 - Crossfade while Rec Fading: If overdub is not activated this option crossfades between previous and current recording only during fading in/out recording time, accordingly to the FD knob.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## sickoSampler2
 ### wav sample player and recorder
@@ -782,7 +788,7 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 **Right-click Menu**  
 'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## switcher / switcherSt
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
@@ -845,7 +851,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones
 - Polyphony on signal inputs is replicated on outs
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## toggler / toggler Compact
 ### Stereo signal toggle switch router, with VCA and ASR envelope generator, in regular and compact form factor
@@ -888,7 +894,7 @@ These behaviors are more understandable connecting a scope on the output.
 #### Right-click Menu
 - Initialize On Start: discards previous module state on VCV restart
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## wavetabler
 ### wavetable sample player
@@ -918,7 +924,7 @@ Master knob, with its attenuverted CVinput, sets the output volume from 0 to 200
 #### Right-Click Menu
 Please refer to sickoPlayer documentation.
 
-[back to index](#table-of-contents)
+[back to top](#table-of-contents)
 
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
@@ -927,4 +933,9 @@ Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https:/
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
 Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  
 
-[back to index](#table-of-contents)
+**Please donate**  
+The work necessary to develop these modules required many hours of work and many sleepless nights.  
+Sickozell plugin is and will always remain free, but if you find it useful, consider donating even just a coffee by following this [payPal](https://paypal.me/sickozell) link.  
+Thanks.
+
+[back to top](#table-of-contents)

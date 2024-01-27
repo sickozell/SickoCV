@@ -35,6 +35,8 @@ extern Model* modelHolder8;
 extern Model* modelParking;
 extern Model* modelShifter;
 extern Model* modelSickoAmp;
+extern Model* modelSickoLooper1;
+extern Model* modelSickoLooper1Exp;
 extern Model* modelSickoLooper3;
 extern Model* modelSickoLooper5;
 extern Model* modelSickoPlayer;
