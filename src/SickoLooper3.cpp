@@ -400,9 +400,6 @@ struct SickoLooper3 : Module {
 	int recButtonPulse[5] = {NO_PULSE, NO_PULSE, NO_PULSE, NO_PULSE, NO_PULSE};
 	float recButtonPulseTime[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
 
-	bool stopButtonPulse[5] = {false, false, false, false};
-	float stopButtonPulseTime[5] = {0.f, 0.f, 0.f, 0.f, 0.f};
-
 	bool clockPulse = false;
 	float clockPulseTime = 0.f;
 
@@ -4543,12 +4540,6 @@ struct SickoLooper3DisplayLoop1 : TransparentWidget {
 			menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
 			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
 			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
-			if (module->trackStatus[track] != EMPTY)
-				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
-			else
-				menu->addChild(createMenuLabel("Export Wav"));
 			
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
@@ -4560,6 +4551,13 @@ struct SickoLooper3DisplayLoop1 : TransparentWidget {
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 			else
 				menu->addChild(createMenuLabel("Detect tempo and set bpm"));
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
+			if (module->trackStatus[track] != EMPTY)
+				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
+			else
+				menu->addChild(createMenuLabel("Export Wav"));
 		}
 	}
 };
@@ -4705,13 +4703,7 @@ struct SickoLooper3DisplayLoop2 : TransparentWidget {
 			menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
 			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
 			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
-			if (module->trackStatus[track] != EMPTY)
-				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
-			else
-				menu->addChild(createMenuLabel("Export Wav"));
-			
+						
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
 					return module->isExtraSamples(track);
@@ -4723,6 +4715,13 @@ struct SickoLooper3DisplayLoop2 : TransparentWidget {
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 			else
 				menu->addChild(createMenuLabel("Detect tempo and set bpm"));
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
+			if (module->trackStatus[track] != EMPTY)
+				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
+			else
+				menu->addChild(createMenuLabel("Export Wav"));
 		}
 	}
 };
@@ -4867,12 +4866,6 @@ struct SickoLooper3DisplayLoop3 : TransparentWidget {
 			menu->addChild(createMenuLabel(("TRACK "+to_string(track+1)).c_str()));
 			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
 			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
-			if (module->trackStatus[track] != EMPTY)
-				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
-			else
-				menu->addChild(createMenuLabel("Export Wav"));
 			
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
@@ -4885,6 +4878,13 @@ struct SickoLooper3DisplayLoop3 : TransparentWidget {
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 			else
 				menu->addChild(createMenuLabel("Detect tempo and set bpm"));
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
+			if (module->trackStatus[track] != EMPTY)
+				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
+			else
+				menu->addChild(createMenuLabel("Export Wav"));
 		}
 	}
 };
@@ -5360,12 +5360,6 @@ struct SickoLooper3Widget : ModuleWidget {
 					
 					menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay[track]));
 					menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail[track]));
-					menu->addChild(new MenuSeparator());
-					menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
-					if (module->trackStatus[track] != EMPTY)
-						menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
-					else
-						menu->addChild(createMenuLabel("Export Wav"));
 
 					menu->addChild(new MenuSeparator());
 					menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
@@ -5378,6 +5372,13 @@ struct SickoLooper3Widget : ModuleWidget {
 						menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo(track);}));
 					else
 						menu->addChild(createMenuLabel("Detect tempo and set bpm"));
+
+					menu->addChild(new MenuSeparator());
+					menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample(track);}));
+					if (module->trackStatus[track] != EMPTY)
+						menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample(track);}));
+					else
+						menu->addChild(createMenuLabel("Export Wav"));
 				}));
 			}
 		}));

@@ -393,6 +393,7 @@ struct SickoLooper1Exp : Module {
 	int recButtonPulse = NO_PULSE;
 	float recButtonPulseTime = 0.f;
 
+	/*
 	bool stopButtonPulse = false;
 	float stopButtonPulseTime = 0.f;
 
@@ -403,6 +404,7 @@ struct SickoLooper1Exp : Module {
 	bool extConn = false;
 	bool prevExtConn = true;
 	bool extBeat = false;
+	*/
 	
 	// ***************************************************************************************************
 	// ***************************************************************************************************
@@ -490,7 +492,6 @@ struct SickoLooper1Exp : Module {
 		json_object_set_new(rootJ, "extraSamples", json_boolean(extraSamples));
 		json_object_set_new(rootJ, "playFullTail", json_boolean(playFullTail));
 		json_object_set_new(rootJ, "fadeInOnPlay", json_boolean(fadeInOnPlay));
-		//json_object_set_new(rootJ, "internalClockAlwaysOn", json_boolean(internalClockAlwaysOn));
 		return rootJ;
 	}
 
@@ -530,11 +531,7 @@ struct SickoLooper1Exp : Module {
 		json_t* fadeInOnPlayJ = json_object_get(rootJ, "fadeInOnPlay");
 		if (fadeInOnPlayJ)
 			fadeInOnPlay = json_boolean_value(fadeInOnPlayJ);
-		/*
-		json_t* internalClockAlwaysOnJ = json_object_get(rootJ, "internalClockAlwaysOn");
-		if (internalClockAlwaysOnJ)
-			internalClockAlwaysOn = json_boolean_value(internalClockAlwaysOnJ);
-		*/
+
 	}
 
 	void onReset(const ResetEvent &e) override {
@@ -567,7 +564,6 @@ struct SickoLooper1Exp : Module {
 
 		busyTracks = 0;
 		busyTrack = false;
-		//internalClockAlwaysOn = false;
 		ledLight = false;
 		expConnected = 0;
 
@@ -1043,6 +1039,7 @@ struct SickoLooper1Exp : Module {
 //																							██║░░░░░██║░░██║███████╗██████╔╝███████╗░░░██║░░░
 //																							╚═╝░░░░░╚═╝░░╚═╝╚══════╝╚═════╝░╚══════╝░░░╚═╝░░░
 
+/*
 	json_t *presetToJson() {
 		json_t *rootJ = json_object();
 
@@ -1236,6 +1233,7 @@ struct SickoLooper1Exp : Module {
 			}
 		}
 	}
+*/
 
 	void calcBiquadLpf(double frequency, double samplerate, double Q) {
 	    z1 = z2 = 0.0;
@@ -3444,12 +3442,6 @@ struct SickoLooper1ExpDisplayLoop1 : TransparentWidget {
 			menu->addChild(createMenuLabel("TRACK"));
 			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay));
 			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample();}));
-			if (module->trackStatus != EMPTY)
-				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample();}));
-			else
-				menu->addChild(createMenuLabel("Export Wav"));
 			
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
@@ -3457,12 +3449,20 @@ struct SickoLooper1ExpDisplayLoop1 : TransparentWidget {
 				}, [=](bool xtraSamples) {
 					module->setExtraSamples(xtraSamples);
 			}));
+
 			/*
 			if (module->trackStatus != EMPTY)
 				menu->addChild(createMenuItem("Detect tempo and set bpm", "", [=]() {module->detectTempo();}));
 			else
 				menu->addChild(createMenuLabel("Detect tempo and set bpm"));
 			*/
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample();}));
+			if (module->trackStatus != EMPTY)
+				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample();}));
+			else
+				menu->addChild(createMenuLabel("Export Wav"));
 		}
 	}
 };
@@ -3638,10 +3638,6 @@ struct SickoLooper1ExpWidget : ModuleWidget {
 			assert(module);
 
 		menu->addChild(new MenuSeparator());
-		
-		menu->addChild(createBoolPtrMenuItem("EOL pulse on stop", "", &module->eolPulseOnStop));
-		
-		menu->addChild(new MenuSeparator());
 
 		struct ModeItem : MenuItem {
 			SickoLooper1Exp* module;
@@ -3664,6 +3660,7 @@ struct SickoLooper1ExpWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Instant STOP button", "", &module->instantStop));
 		menu->addChild(createBoolPtrMenuItem("OVERDUB after REC", "", &module->overdubAfterRec));
+		menu->addChild(createBoolPtrMenuItem("EOL pulse on stop", "", &module->eolPulseOnStop));
 
 		menu->addChild(new MenuSeparator());
 
@@ -3676,7 +3673,7 @@ struct SickoLooper1ExpWidget : ModuleWidget {
 		};
 
 		menu->addChild(createMenuLabel("PAN CV range"));
-		std::string panNames[3] = {"0/10v", "-5/+5v", "-10/+10v"};
+		std::string panNames[3] = {"0/10v", "+/-5v", "+/-10v"};
 		for (int i = 0; i < 3; i++) {
 			PanItem* panItem = createMenuItem<PanItem>(panNames[i]);
 			panItem->rightText = CHECKMARK(module->panRange == i);
@@ -3691,12 +3688,7 @@ struct SickoLooper1ExpWidget : ModuleWidget {
 			
 			menu->addChild(createBoolPtrMenuItem("Fade IN on playback", "", &module->fadeInOnPlay));
 			menu->addChild(createBoolPtrMenuItem("Play Full Tail on Stop", "", &module->playFullTail));
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample();}));
-			if (module->trackStatus != EMPTY)
-				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample();}));
-			else
-				menu->addChild(createMenuLabel("Export Wav"));
+			
 
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createBoolMenuItem("Extra samples Tail (1sec)", "", [=]() {
@@ -3711,6 +3703,13 @@ struct SickoLooper1ExpWidget : ModuleWidget {
 			else
 				menu->addChild(createMenuLabel("Detect tempo and set bpm"));
 			*/
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Import Wav", "", [=]() {module->menuLoadSample();}));
+			if (module->trackStatus != EMPTY)
+				menu->addChild(createMenuItem("Export Wav", "", [=]() {module->menuSaveSample();}));
+			else
+				menu->addChild(createMenuLabel("Export Wav"));
 		}));
 
 		/*
