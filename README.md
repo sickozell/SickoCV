@@ -55,7 +55,7 @@ VCV Rack plugin modules
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
 
-##**Please donate**  
+## **Please donate**  
 The work necessary to develop these modules required many hours of work and many sleepless nights.  
 Sickozell plugin is and will always remain free, but if you find it useful, consider donating even just a coffee by following this [payPal](https://paypal.me/sickozell) link.  
 Thanks.
