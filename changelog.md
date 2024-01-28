@@ -1,3 +1,7 @@
+### 2.6.5 (2024-01-28)
+- sickoLooper1/sickoLooperX: fixed a bug when reverse overdubbing.  
+- sickoSampler/sickoSampler2: Allowed poly cable sources.
+
 ### 2.6.4 (2024-01-27)
 - added sickoLooper1 and sickoLooperX modules.  
 - sickoLooper3, sickoLooper5: added missing 'OVERDUB after REC' setting in preset storing.  

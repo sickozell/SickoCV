@@ -2748,8 +2748,10 @@ struct SickoSampler2 : Module {
 						recFadeValue = 1;
 					}
 
-					currRecValue[LEFT] = inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
-					currRecValue[RIGHT] = inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
+					//currRecValue[LEFT] = inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
+					//currRecValue[RIGHT] = inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * recFadeValue;
+					currRecValue[LEFT] = inputs[IN_INPUT].getVoltageSum() * params[GAIN_PARAM].getValue() * recFadeValue;
+					currRecValue[RIGHT] = inputs[IN_INPUT+1].getVoltageSum() * params[GAIN_PARAM].getValue() * recFadeValue;
 					prevRecValue[LEFT] = currRecValue[LEFT];
 					prevRecValue[RIGHT] = currRecValue[RIGHT];
 
@@ -2925,9 +2927,11 @@ struct SickoSampler2 : Module {
 				if (monitorFade) {
 					switch (polyOuts) {
 						case MONOPHONIC:										// monophonic CABLES
-							sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
+							//sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
+							sumOutput += inputs[IN_INPUT].getVoltageSum() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
 							if (channels == 2)
-								sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
+								//sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
+								sumOutputR += inputs[IN_INPUT+1].getVoltageSum() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0];
 							
 							// *** HARD CLIP ***
 
@@ -2957,8 +2961,10 @@ struct SickoSampler2 : Module {
 						break;
 
 						case POLYPHONIC:
-							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
-							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
+							//currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
+							//currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
+							currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltageSum() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
+							currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltageSum() * params[GAIN_PARAM].getValue() * (1-monitorFadeValue) * masterLevel[0]);
 							
 							// *** HARD CLIP ***
 
@@ -2993,9 +2999,11 @@ struct SickoSampler2 : Module {
 			case 1:								// *** ALWAYS MONITORING ***
 				switch (polyOuts) {
 					case MONOPHONIC:										// monophonic CABLES
-						sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
+						//sumOutput += inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
+						sumOutput += inputs[IN_INPUT].getVoltageSum() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 						if (channels == 2)
-							sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
+							//sumOutputR += inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
+							sumOutputR += inputs[IN_INPUT+1].getVoltageSum() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0];
 						
 						// *** HARD CLIP ***
 						if (sumOutput > 10)
@@ -3024,8 +3032,10 @@ struct SickoSampler2 : Module {
 					break;
 
 					case POLYPHONIC:
-						currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
-						currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
+						//currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
+						//currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltage() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
+						currentOutput = outputs[OUT_OUTPUT].getVoltage(recOutChan) + (inputs[IN_INPUT].getVoltageSum() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
+						currentOutputR = outputs[OUT_OUTPUT+1].getVoltage(recOutChan) + (inputs[IN_INPUT+1].getVoltageSum() * params[GAIN_PARAM].getValue() * monitorFadeValue * masterLevel[0]);
 						
 						// *** HARD CLIP ***
 						if (currentOutput > 10)

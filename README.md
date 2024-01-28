@@ -1,4 +1,4 @@
-# SickoCV v2.6.4-beta2
+# SickoCV v2.6.5-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -19,9 +19,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
-- added sickoLooper1 and sickoLooperX modules
-- sickoLooper3, sickoLooper5: added missing 'OVERDUB after REC' setting in preset storing  
-fixed a bug that doesn't restore 'Internal Clock Always ON' on startup
+- sickoLooper1/sickoLooperX: fixed a bug when reverse overdubbing.  
+- sickoSampler/sickoSampler2: Allowed poly cable sources.
 
 # SickoCV v2.6.4
 VCV Rack plugin modules
