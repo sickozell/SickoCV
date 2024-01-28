@@ -30,7 +30,7 @@ VCV Rack plugin modules
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
 
-## **Please donate**  
+## **Consider donating**  
 The work necessary to develop these modules required many hours of work and many sleepless nights.  
 Sickozell plugin is and will always remain free, but if you find it useful, consider donating even just a coffee by following this [payPal](https://paypal.me/sickozell) link.  
 Thanks.
@@ -933,7 +933,7 @@ Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https:/
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
 Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  
 
-**Please donate**  
+**Consider donating**  
 The work necessary to develop these modules required many hours of work and many sleepless nights.  
 Sickozell plugin is and will always remain free, but if you find it useful, consider donating even just a coffee by following this [payPal](https://paypal.me/sickozell) link.  
 Thanks.
