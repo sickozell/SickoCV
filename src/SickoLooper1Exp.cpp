@@ -2908,6 +2908,7 @@ struct SickoLooper1Exp : Module {
 					trackBuffer[LEFT][samplePos] += inputValue[LEFT] * recFadeValue;
 					trackBuffer[RIGHT][samplePos] += inputValue[RIGHT] * recFadeValue;
 
+					/*
 					if (samplePos > 0) {
 						trackBuffer[LEFT][samplePos-1] = (trackBuffer[LEFT][samplePos-2] + trackBuffer[LEFT][samplePos]) / 2;
 						trackBuffer[RIGHT][samplePos-1] = (trackBuffer[RIGHT][samplePos-2] + trackBuffer[RIGHT][samplePos]) / 2;
@@ -2917,6 +2918,20 @@ struct SickoLooper1Exp : Module {
 						samplePos += sampleCoeff;
 					else
 						samplePos -= sampleCoeff;
+					*/
+					if (playingDirection == FORWARD) {
+						if (samplePos != 0) {
+							trackBuffer[LEFT][samplePos-1] = (trackBuffer[LEFT][samplePos-2] + trackBuffer[LEFT][samplePos]) / 2;
+							trackBuffer[RIGHT][samplePos-1] = (trackBuffer[RIGHT][samplePos-2] + trackBuffer[RIGHT][samplePos]) / 2;
+						}
+						samplePos += sampleCoeff;
+					} else {
+						if (samplePos != 0) {
+							trackBuffer[LEFT][samplePos+1] = (trackBuffer[LEFT][samplePos+2] + trackBuffer[LEFT][samplePos]) / 2;
+							trackBuffer[RIGHT][samplePos+1] = (trackBuffer[RIGHT][samplePos+2] + trackBuffer[RIGHT][samplePos]) / 2;
+						}
+						samplePos -= sampleCoeff;
+					}
 				}
 
 			break;
@@ -2929,7 +2944,7 @@ struct SickoLooper1Exp : Module {
 				if (xFadeValue < 0) {
 					extraPlaying = false;
 				} else {
-					if (extraPlayPos < trackBuffer[LEFT].size()) {
+					if (extraPlayPos >= 0 && extraPlayPos < trackBuffer[LEFT].size()) {
 						currentOutput[LEFT] *= 1-xFadeValue;
 						currentOutput[RIGHT] *= 1-xFadeValue;
 						
@@ -3040,7 +3055,7 @@ struct SickoLooper1Exp : Module {
 					trackBuffer[LEFT][extraRecPos] += inputValue[LEFT] * recFadeValue;
 					trackBuffer[RIGHT][extraRecPos] += inputValue[RIGHT] * recFadeValue;
 				//}
-
+				/*
 				if (samplePos > 0) {
 					trackBuffer[LEFT][extraRecPos-1] = (trackBuffer[LEFT][extraRecPos-2] + trackBuffer[LEFT][extraRecPos]) / 2;
 					trackBuffer[RIGHT][extraRecPos-1] = (trackBuffer[RIGHT][extraRecPos-2] + trackBuffer[RIGHT][extraRecPos]) / 2;
@@ -3050,6 +3065,18 @@ struct SickoLooper1Exp : Module {
 					extraRecPos += sampleCoeff;
 				else
 					extraRecPos -= sampleCoeff;
+				*/
+				if (extraRecDirection == FORWARD) {
+					if (samplePos > 0) {
+						trackBuffer[LEFT][extraRecPos-1] = (trackBuffer[LEFT][extraRecPos-2] + trackBuffer[LEFT][extraRecPos]) / 2;
+						trackBuffer[RIGHT][extraRecPos-1] = (trackBuffer[RIGHT][extraRecPos-2] + trackBuffer[RIGHT][extraRecPos]) / 2;
+					}
+					extraRecPos += sampleCoeff;
+				} else {
+					trackBuffer[LEFT][extraRecPos+1] = (trackBuffer[LEFT][extraRecPos+2] + trackBuffer[LEFT][extraRecPos]) / 2;
+					trackBuffer[RIGHT][extraRecPos+1] = (trackBuffer[RIGHT][extraRecPos+2] + trackBuffer[RIGHT][extraRecPos]) / 2;
+					extraRecPos -= sampleCoeff;
+				}
 			}
 		}
 		
