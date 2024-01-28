@@ -22,7 +22,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - sickoLooper1/sickoLooperX: fixed a bug when reverse overdubbing.  
 - sickoSampler/sickoSampler2: Allowed poly cable sources.
 
-# SickoCV v2.6.4
+# SickoCV v2.6.5
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 4](https://github.com/sickozell/SickoCV/assets/80784296/7c6a6fbb-0e2c-4349-902c-6a8946ffbd91)
@@ -54,7 +54,7 @@ VCV Rack plugin modules
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
 
-## **Please donate**  
+## **Consider donating**  
 The work necessary to develop these modules required many hours of work and many sleepless nights.  
 Sickozell plugin is and will always remain free, but if you find it useful, consider donating even just a coffee by following this [payPal](https://paypal.me/sickozell) link.  
 Thanks.
@@ -957,7 +957,7 @@ Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https:/
 Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
 Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  
 
-**Please donate**  
+**Consider donating**  
 The work necessary to develop these modules required many hours of work and many sleepless nights.  
 Sickozell plugin is and will always remain free, but if you find it useful, consider donating even just a coffee by following this [payPal](https://paypal.me/sickozell) link.  
 Thanks.
