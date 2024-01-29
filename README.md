@@ -47,7 +47,7 @@ VCV Rack plugin modules
 - [sickoPlayer](#sickoplayer)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
-- [switcher / switcherSt](#switcher--switcherst--switcher8)
+- [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
