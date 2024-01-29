@@ -1,3 +1,6 @@
+### 2.6.6 (2024-02-xx)
+- added switcher8 module.  
+
 ### 2.6.5 (2024-01-28)
 - sickoLooper1/sickoLooperX: fixed a bug when reverse overdubbing.  
 - sickoSampler/sickoSampler2: Allowed poly cable sources.

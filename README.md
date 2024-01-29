@@ -1,4 +1,4 @@
-# SickoCV v2.6.5-beta1
+# SickoCV v2.6.6-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,17 +12,15 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- sickoLooper1
-- sickoLooperX
+- 
 
 ## **to do list:** 
 - modules testing  
 
 ## **changelog**  
-- sickoLooper1/sickoLooperX: fixed a bug when reverse overdubbing.  
-- sickoSampler/sickoSampler2: Allowed poly cable sources.
+- 
 
-# SickoCV v2.6.5
+# SickoCV v2.6.6
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 4](https://github.com/sickozell/SickoCV/assets/80784296/7c6a6fbb-0e2c-4349-902c-6a8946ffbd91)
@@ -814,7 +812,7 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 [back to top](#table-of-contents)
 
-## switcher / switcherSt
+## switcher / switcherSt / switcher8
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - DESCRIPTION
 - Signal switch (2 inputs, 1 output)
@@ -874,6 +872,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
 - On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones
 - Polyphony on signal inputs is replicated on outs
+- switcher8 is eight switcher modules in one, without fade CV input
 
 [back to top](#table-of-contents)
 

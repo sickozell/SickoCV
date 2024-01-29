@@ -44,6 +44,7 @@ extern Model* modelSickoSampler;
 extern Model* modelSickoSampler2;
 extern Model* modelSwitcher;
 extern Model* modelSwitcherSt;
+extern Model* modelSwitcher8;
 extern Model* modelToggler;
 extern Model* modelTogglerCompact;
 extern Model* modelWavetabler;
