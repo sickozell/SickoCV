@@ -18,12 +18,12 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
-- 
+- added switcher8 module
 
 # SickoCV v2.6.6
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 4](https://github.com/sickozell/SickoCV/assets/80784296/7c6a6fbb-0e2c-4349-902c-6a8946ffbd91)
+![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/2878a02d-09b4-484d-bd83-a6f9473708b6)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -824,7 +824,7 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 - Function type autodetection (switch, route, swap, mute, flipflop, toggle gate)
 - Adjustable time crossfade between switched/routed/swapped signals
 
-![switcher](https://user-images.githubusercontent.com/80784296/201516861-d3d2ab1b-7036-4355-b2ef-e4c5681fb432.JPG)
+![switcher](https://github.com/sickozell/SickoCV/assets/80784296/24e6e8d5-3bd2-4f58-ab3d-da6e9094cf2b)
 
 #### - INSTRUCTIONS
 Switcher or SwitcherSt (used for stereo signals) are multifunction modules that can be used as follows. The versatility of the module is offered thanks to the automatic detection of the function type.
