@@ -44,6 +44,9 @@ struct Switcher8 : Module {
 	float trigValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	float prevTrigValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
+	float fadeParam[8] =  {0, 0, 0, 0, 0, 0, 0, 0};
+	float prevFadeParam[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+
 	float fadeValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	float maxFadeSample[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -155,6 +158,28 @@ struct Switcher8 : Module {
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}*/
 
+	void inline checkFadeParam(int track) {
+		fadeParam[track] = params[FADE_PARAM+track].getValue();
+		if (fadeParam[track] != prevFadeParam[track]) {
+			fadeValue[track] = (std::pow(10000.f, fadeParam[track]) / 1000);
+			prevFadeParam[track] = fadeParam[track];
+		}
+	}
+
+	/*
+	void inline checkFadeValue(int track) {
+		if (fadeValue[track] > 10)
+			fadeValue[track] = 10;
+		else if (fadeValue[track] < 0)
+			fadeValue[track] = 0;
+	}
+
+	void inline initFadeValue(int track) {
+		maxFadeSample[track] = args.sampleRate * fadeValue[track];
+		lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
+	}
+	*/
+
 	void process(const ProcessArgs& args) override {
 
 		for (int track = 0; track < 8; track++) {
@@ -239,7 +264,9 @@ struct Switcher8 : Module {
 						if (trigState[track]) {
 							//fadeValue = convertCVToSeconds(params[FADE_PARAM].getValue()) + inputs[FADECV_INPUT].getVoltage();
 							//fadeValue = (std::pow(10000.f, params[FADE_PARAM].getValue()) / 1000) + inputs[FADECV_INPUT].getVoltage();
-							fadeValue[track] = (std::pow(10000.f, params[FADE_PARAM+track].getValue()) / 1000);
+							//fadeValue[track] = (std::pow(10000.f, params[FADE_PARAM+track].getValue()) / 1000);
+							checkFadeParam(track);
+
 							if (fadeValue[track] > noEnvTime) {
 								if (fading[track]) {
 									startFade[track] = 1-lastFade[track];
@@ -266,7 +293,9 @@ struct Switcher8 : Module {
 							connectionChange[track] = true;
 							//fadeValue = convertCVToSeconds(params[FADE_PARAM].getValue()) + inputs[FADECV_INPUT].getVoltage();
 							//fadeValue = (std::pow(10000.f, params[FADE_PARAM].getValue()) / 1000) + inputs[FADECV_INPUT].getVoltage();
-							fadeValue[track] = (std::pow(10000.f, params[FADE_PARAM+track].getValue()) / 1000);
+							//fadeValue[track] = (std::pow(10000.f, params[FADE_PARAM+track].getValue()) / 1000);
+							checkFadeParam(track);
+
 							if (fadeValue[track] > noEnvTime) {
 								if (fading[track]) {
 									startFade[track] = 1-lastFade[track];
@@ -303,10 +332,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -385,10 +410,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -467,10 +488,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -561,10 +578,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -649,10 +662,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -737,10 +746,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -825,10 +830,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -913,10 +914,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -1001,10 +998,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -1089,10 +1082,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -1191,10 +1180,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -1293,10 +1278,6 @@ struct Switcher8 : Module {
 						}
 
 						if (fading[track]) {
-							if (fadeValue[track] > 10)
-								fadeValue[track] = 10;
-							else if (fadeValue[track] < 0)
-								fadeValue[track] = 0;
 
 							maxFadeSample[track] = args.sampleRate * fadeValue[track];
 							lastFade[track] = (currentFadeSample[track] / maxFadeSample[track]) + startFade[track];
@@ -1420,7 +1401,6 @@ struct Switcher8Widget : ModuleWidget {
 		constexpr float yLight = 3.5f;
 
 		for (int track = 0; track < 8; track++) {
-			
 
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xTrg, yStart+(track*yDelta))), module, Switcher8::TRIG_INPUT+track));
 
