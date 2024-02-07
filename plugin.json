@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.6.6-beta1",
+  "version": "2.6.6-beta2",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -210,6 +210,14 @@
         "Noise",
         "Quad",
         "Polyphonic"
+      ]
+    },
+    {
+      "slug": "Modulator7",
+      "name": "modulator7",
+      "description": "7 triangle/ramp LFOs with sync feature",
+      "tags": [
+        "Low-frequency oscillator"
       ]
     },
     {

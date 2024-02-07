@@ -1,4 +1,4 @@
-# SickoCV v2.6.6-beta1
+# SickoCV v2.6.6-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
+- added modulator7 module
 - added switcher8 module
 
 # SickoCV v2.6.6
