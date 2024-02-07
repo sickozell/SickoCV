@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.6
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/2878a02d-09b4-484d-bd83-a6f9473708b6)
+![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/553e5c2f-eb0c-41d0-861e-5a51b2590afa)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -41,6 +41,7 @@ VCV Rack plugin modules
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
+- [modulator7](#modulator7)
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
@@ -524,6 +525,24 @@ Comparison:
 
 **Noise Generator preset**  
 This function sets the module to Track & Hold mode, sample on HIGH gate, scale on 100% and offset to 0v, just to output white noise if trig/gate input is not connected or not triggered.
+
+[back to top](#table-of-contents)
+
+## modulator7
+### 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a trig pulse.
+
+![modulator7](https://github.com/sickozell/SickoCV/assets/80784296/6f492dd5-efc2-4880-b9de-932114f00fc5)
+
+#### - INSTRUCTIONS
+Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
+The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
+SYNC input accepts triggers, like clock or other pulses, used to calculate the main rate.  
+PPC (Pulses Per Cycles) knob sets the number of triggers (from 1 to 24) on the SYNC input needed to achieve 1 cycle of the main rate.  
+The “X” knobs set each oscillator's rate calculated on the main rate.  
+The default waveshape of each oscillator is triangle, the RAMP buttons switch to sawtooth waveshape.  
+The default starting cycle value of each oscillator is 0v, the “down arrow” buttons set it to the maximum, and if ramp waveshape is selected, it will result in an inverted sawtooth (ramp down)  
+Default output range of oscillators is unipolar 0-10v, the “b” buttons modify the range to bipolar +5/-5v.  
+A trigger on RST input, resets all oscillators cycle, restarting waveforms from 0v or from maximum if "down arrow" button is on.  
 
 [back to top](#table-of-contents)
 
