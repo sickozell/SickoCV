@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.6
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/553e5c2f-eb0c-41d0-861e-5a51b2590afa)
+![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/5a151034-d62d-4a66-91f2-5a6ff563f189)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -531,7 +531,7 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 ## modulator7
 ### 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a trig pulse.
 
-![modulator7](https://github.com/sickozell/SickoCV/assets/80784296/6f492dd5-efc2-4880-b9de-932114f00fc5)
+![modulator7](https://github.com/sickozell/SickoCV/assets/80784296/6ad438f0-24ec-44dc-b28a-878a245d6fdc)
 
 #### - INSTRUCTIONS
 Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
@@ -543,9 +543,10 @@ The default waveshape of each oscillator is triangle, the RAMP buttons switch to
 The default starting cycle value of each oscillator is 0v, the “down arrow” buttons set it to the maximum, and if ramp waveshape is selected, it will result in an inverted sawtooth (ramp down)  
 Default output range of oscillators is unipolar 0-10v, the “b” buttons modify the range to bipolar +5/-5v.  
 A trigger on RST input, resets all oscillators cycle, restarting waveforms from 0v or from maximum if "down arrow" button is on.  
+PLY out is the polyphonic output of oscillators. PLY knob sets the number of channels of polyphony, corresponding of the first n oscillators.
 
 #### Right-click Menu
-There are some "X" knob presets selectable on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
+There are some selectable "X" knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
 
 [back to top](#table-of-contents)
 
