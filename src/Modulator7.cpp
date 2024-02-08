@@ -8,6 +8,7 @@ struct Modulator7 : Module {
 		RATE_ATTENUV_PARAM,
 		SYNCSW_PARAM,
 		PPC_PARAM,
+		POLY_PARAM,
 		ENUMS(WAVE_PARAM, 7),
 		ENUMS(WTYPE_PARAM, 7),
 		ENUMS(XRATE_PARAM, 7),
@@ -24,6 +25,7 @@ struct Modulator7 : Module {
 	};
 	enum OutputId {
 		ENUMS(OUT_OUTPUT, 7),
+		POLY_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -94,13 +96,16 @@ struct Modulator7 : Module {
 		configParam(PPC_PARAM, 1, 24.f, 1.f, "Pulses per Cycle");
 		paramQuantities[PPC_PARAM]->snapEnabled = true;
 		configInput(RST_INPUT, "Reset");
+		configParam(POLY_PARAM, 2.f, 7.f, 7.f, "Poly Chans");
+		paramQuantities[POLY_PARAM]->snapEnabled = true;
+		configOutput(POLY_OUTPUT, "Poly");
 		for (int i = 0; i < 7; i++) {
 			configSwitch(WAVE_PARAM+i, 0.f, 1.f, 0.f, "Wave", {"Triangle", "Ramp"});
 			configSwitch(WTYPE_PARAM+i, 0.f, 1.f, 0.f, "Type", {"Up", "Down"});
 			configParam(XRATE_PARAM+i, 0.f, 1.f, 0.5f, "xRate", "x", maxXrate / minXrate, minXrate);
 			configSwitch(BIPOLAR_PARAM+i, 0.f, 1.f, 0.f, "Bipolar", {"Off", "On"});
 			configParam(SCALE_PARAM+i, 0.f, 1.f, 1.f, "Scale", "%", 0, 100);
-			configOutput(OUT_OUTPUT+i, "OUT");
+			configOutput(OUT_OUTPUT+i, "");
 		}
 	}
 
@@ -382,8 +387,10 @@ struct Modulator7 : Module {
 				out = waveValue[i] * 10.f * params[SCALE_PARAM+i].getValue();
 				
 			outputs[OUT_OUTPUT+i].setVoltage(out);
+			outputs[POLY_OUTPUT].setVoltage(out, i);
 		}
 
+		outputs[POLY_OUTPUT].setChannels(int(params[POLY_PARAM].getValue()));
 		//debugDisplay = to_string(params[XRATE_PARAM].getValue());
 	}
 };
@@ -436,31 +443,37 @@ struct Modulator7Widget : ModuleWidget {
 		}
 		*/
 
-		const float xRtKnob = 12;
+		const float xRtKnob = 10;
 		const float yRtKnob = 21;
 
-		const float xRateAtnv = 18.8;
+		const float xRateAtnv = 16.8;
 		const float yRateAtnv = 32;
 
-		const float xRateIn = 11;
+		const float xRateIn = 9;
 		const float yRateIn = 38;
 
-		const float xSync = 37.5;
+		const float xSync = 31.5;
 		const float ySync = 20;
 
-		const float xSyncSw = 30;
+		const float xSyncSw = 26;
 		const float ySyncSw = 28;
 
-		const float xSyncIn = 34;
+		const float xSyncIn = 30;
 		const float ySyncIn = 38;
 
-		const float xPpc = 48;
+		const float xPpc = 42;
 		const float yPpc = 24;
 
-		const float xRst = 50;
-		const float yRst = 38;
+		const float xRst = 53.7;
+		const float yRst = 18.2;
 
-		const float yStart = 56;
+		const float xPolyKnob = 53.7;
+		const float yPolyKnob = 28.5;
+
+		const float xPoly = 53.7;
+		const float yPoly = 40;
+
+		const float yStart = 57;
 		constexpr float yStartShift = 10;
 
 		const float xWave = 7;
@@ -468,7 +481,8 @@ struct Modulator7Widget : ModuleWidget {
 		const float xRt = 24.4;
 		const float xBi = 33.5;
 		const float xScl = 42.6;
-		const float xOut = 53.9;
+		//const float xOut = 53.9;
+		const float xOut = 53.7;
 
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, Modulator7::RATE_PARAM));
@@ -480,6 +494,8 @@ struct Modulator7Widget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSync, ySync)), module, Modulator7::SYNC_INPUT));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPpc, yPpc)), module, Modulator7::PPC_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRst, yRst)), module, Modulator7::RST_INPUT));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPolyKnob, yPolyKnob)), module, Modulator7::POLY_PARAM));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xPoly, yPoly)), module, Modulator7::POLY_OUTPUT));
 		
 		for (int i = 0; i < 7; i++) {
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xWave, yStart + (yStartShift * i))), module, Modulator7::WAVE_PARAM+i, Modulator7::WAVE_LIGHT+i));
@@ -507,7 +523,6 @@ struct Modulator7Widget : ModuleWidget {
 		menu->addChild(createMenuItem("Prime /", "", [=]() {module->setPreset(7);}));
 		menu->addChild(createMenuItem("Fibonacci *", "", [=]() {module->setPreset(8);}));
 		menu->addChild(createMenuItem("Fibonacci /", "", [=]() {module->setPreset(9);}));
-		
 
 	}
 };
