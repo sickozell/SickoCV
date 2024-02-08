@@ -543,7 +543,7 @@ The default waveshape of each oscillator is triangle, the RAMP buttons switch to
 The default starting cycle value of each oscillator is 0v, the “down arrow” buttons set it to the maximum, and if ramp waveshape is selected, it will result in an inverted sawtooth (ramp down)  
 Default output range of oscillators is unipolar 0-10v, the “b” buttons modify the range to bipolar +5/-5v.  
 A trigger on RST input, resets all oscillators cycle, restarting waveforms from 0v or from maximum if "down arrow" button is on.  
-PLY out is the polyphonic output of oscillators. PLY knob sets the number of channels of polyphony, corresponding of the first n oscillators.
+PLY out is the polyphonic output of oscillators. PLY knob sets the number of channels of polyphony, corresponding to the first 'n' oscillators.
 
 #### Right-click Menu
 There are some selectable "X" knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
