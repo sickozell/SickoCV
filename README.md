@@ -1,4 +1,4 @@
-# SickoCV v2.6.6-beta3
+# SickoCV v2.6.6-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -538,15 +538,15 @@ Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted w
 The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
 SYNC input accepts triggers, like clock or other pulses, used to calculate the main rate.  
 PPC (Pulses Per Cycles) knob sets the number of triggers (from 1 to 24) on the SYNC input needed to achieve 1 cycle of the main rate.  
-The “X” knobs set each oscillator's rate calculated on the main rate from 1/21x to 21x, center position is 1x and it equals to main rate.  
+The 'X' knobs set each oscillator's rate calculated on the main rate from 1/21x to 21x, center position is 1x and it equals to main rate.  
 The default waveshape of each oscillator is triangle, the RAMP buttons switch to sawtooth waveshape.  
-The default starting cycle value of each oscillator is 0v, the “down arrow” buttons set it to the maximum, and if ramp waveshape is selected, it will result in an inverted sawtooth (ramp down)  
-Default output range of oscillators is unipolar 0-10v, the “b” buttons modify the range to bipolar +5/-5v.  
-A trigger on RST input, resets all oscillators cycle, restarting waveforms from 0v or from maximum if "down arrow" button is on.  
-PLY out is the polyphonic output of oscillators. PLY knob sets the number of channels of polyphony, corresponding to the first 'n' oscillators.
+The default starting cycle value of each oscillator is 0v, the 'down arrow' buttons set it to the maximum, and if ramp waveshape is selected, it will result in an inverted sawtooth (ramp down)  
+Default output range of oscillators is unipolar 0-10v, the 'b' buttons modify the range to bipolar +5/-5v.  
+A trigger on RST input, resets all oscillators cycle, restarting waveforms from 0v or from maximum if 'down arrow' button is on.  
+PLY out is the polyphonic output of oscillators. PLY knob sets the number of channels of polyphony, corresponding to the first 'n' oscillators. When PLY knob is set to 'c' position (1 poly chan), a 1ms pulse is given to PLY output.
 
 #### Right-click Menu
-There are some selectable "X" knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
+There are some selectable 'X' knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
 
 [back to top](#table-of-contents)
 

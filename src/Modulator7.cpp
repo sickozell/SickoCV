@@ -47,8 +47,17 @@ struct Modulator7 : Module {
 	float syncTrig = 0.f;
 	float prevSyncTrig = 0.f;
 
-	double sampleCount = APP->engine->getSampleRate();
-	float sampleRateCoeff = sampleCount / 2.f;
+	double sampleRate = APP->engine->getSampleRate();
+	double sampleCount = sampleRate;
+	float sampleRateCoeff = sampleRate / 2.f;
+
+	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
+	bool clockPulse = false;
+	float clockPulseTime = 0.f;
+
+	int polyKnob = 1;
+	double clockSampleCount = 0;
+	double clockMaxSample = sampleRate;
 
 	float rateProvv = 1.f;
 	float rate = 1.f;
@@ -67,8 +76,6 @@ struct Modulator7 : Module {
 
 	static constexpr float minRate = 0.01f;  // in milliseconds
 	static constexpr float maxRate = 100.f;  // in milliseconds
-	//static constexpr float minXrate = 0.1f;  // in milliseconds
-	//static constexpr float maxXrate = 10.f;  // in milliseconds
 
 	static constexpr float minXrate = 0.047619f;  // in milliseconds
 	static constexpr float maxXrate = 21.f;  // in milliseconds
@@ -96,7 +103,7 @@ struct Modulator7 : Module {
 		configParam(PPC_PARAM, 1, 24.f, 1.f, "Pulses per Cycle");
 		paramQuantities[PPC_PARAM]->snapEnabled = true;
 		configInput(RST_INPUT, "Reset");
-		configParam(POLY_PARAM, 2.f, 7.f, 7.f, "Poly Chans");
+		configParam(POLY_PARAM, 1.f, 7.f, 7.f, "Poly Chans");
 		paramQuantities[POLY_PARAM]->snapEnabled = true;
 		configOutput(POLY_OUTPUT, "Poly");
 		for (int i = 0; i < 7; i++) {
@@ -118,16 +125,22 @@ struct Modulator7 : Module {
 			xRateKnob[i] = 1;
 			prevXrateKnob[i] = 0;
 		}
-
+		clockSampleCount = 0;
+		clockMaxSample = sampleRate;
+		clockPulse = false;
+		clockPulseTime = 0;
 		rst = 0;
 		prevRst = 0;
 	    Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {
-		sampleCount = APP->engine->getSampleRate();
-		sampleRateCoeff = sampleCount / 2;
+		sampleRate = APP->engine->getSampleRate();
+		sampleCount = sampleRate;
+		sampleRateCoeff = sampleRate / 2;
 		waveCoeff = rate / sampleRateCoeff;
+		oneMsTime = (APP->engine->getSampleRate()) / 1000;
+
 	}
 
 	void setPreset(int preset) {
@@ -266,10 +279,13 @@ struct Modulator7 : Module {
 				}
 			}
 
+			clockPulse = true;
+			clockPulseTime = oneMsTime;
+			clockSampleCount = 0;	
+
 		}
 		prevRst = rst;
 
-		
 		trigSyncSwitch = inputs[SYNCSW_INPUT].getVoltage();
 
 		if (trigSyncSwitch >= 1.f && prevTrigSyncSwitch < 1) {
@@ -306,25 +322,38 @@ struct Modulator7 : Module {
 
 			waveCoeff = rate / sampleRateCoeff;
 
+			clockMaxSample = int(sampleRate / rate);
+
+			if (clockSampleCount >= clockMaxSample) {
+				clockPulse = true;
+				clockPulseTime = oneMsTime;
+				clockSampleCount = 0;		
+			}
+
 		} else {
 
 			if (inputs[SYNC_INPUT].isConnected()) {
 			
-			syncTrig = inputs[SYNC_INPUT].getVoltage();
+				syncTrig = inputs[SYNC_INPUT].getVoltage();
 
-			if (syncTrig >= 1 && prevSyncTrig < 1) {
+				if (syncTrig >= 1 && prevSyncTrig < 1) {
 
-				waveCoeff = 2 / sampleCount / params[PPC_PARAM].getValue();
+					waveCoeff = 2 / sampleCount / params[PPC_PARAM].getValue();
 
-				sampleCount = 0;
-				
+					sampleCount = 0;
+
+					clockPulse = true;
+					clockPulseTime = oneMsTime;
+					clockSampleCount = 0;
+					
+				}
+				prevSyncTrig = syncTrig;
+
+				sampleCount++;
 			}
-			prevSyncTrig = syncTrig;
-
-			sampleCount++;
 		}
 
-		}
+		clockSampleCount++;
 
 		for (int i = 0; i < 7; i++) {
 
@@ -390,7 +419,26 @@ struct Modulator7 : Module {
 			outputs[POLY_OUTPUT].setVoltage(out, i);
 		}
 
-		outputs[POLY_OUTPUT].setChannels(int(params[POLY_PARAM].getValue()));
+		polyKnob = int(params[POLY_PARAM].getValue());
+
+		if (polyKnob != 1) {
+			outputs[POLY_OUTPUT].setChannels(polyKnob);
+		} else {
+
+			if (clockPulse) {
+				clockPulseTime--;
+				if (clockPulseTime < 0) {
+					clockPulse = false;
+					outputs[POLY_OUTPUT].setVoltage(0.f);
+				} else
+					outputs[POLY_OUTPUT].setVoltage(10.f);
+			} else {
+				outputs[POLY_OUTPUT].setVoltage(0.f);	
+			}
+			
+			outputs[POLY_OUTPUT].setChannels(1);
+		}
+		
 		//debugDisplay = to_string(params[XRATE_PARAM].getValue());
 	}
 };
@@ -443,14 +491,14 @@ struct Modulator7Widget : ModuleWidget {
 		}
 		*/
 
-		const float xRtKnob = 10;
+		const float xRtKnob = 12;
 		const float yRtKnob = 21;
 
 		const float xRateAtnv = 16.8;
 		const float yRateAtnv = 32;
 
-		const float xRateIn = 9;
-		const float yRateIn = 38;
+		const float xRateIn = 10;
+		const float yRateIn = 39;
 
 		const float xSync = 31.5;
 		const float ySync = 20;
@@ -459,7 +507,7 @@ struct Modulator7Widget : ModuleWidget {
 		const float ySyncSw = 28;
 
 		const float xSyncIn = 30;
-		const float ySyncIn = 38;
+		const float ySyncIn = 39;
 
 		const float xPpc = 42;
 		const float yPpc = 24;
@@ -467,8 +515,8 @@ struct Modulator7Widget : ModuleWidget {
 		const float xRst = 53.7;
 		const float yRst = 18.2;
 
-		const float xPolyKnob = 53.7;
-		const float yPolyKnob = 28.5;
+		const float xPolyKnob = 53.5;
+		const float yPolyKnob = 32.2;
 
 		const float xPoly = 53.7;
 		const float yPoly = 40;
