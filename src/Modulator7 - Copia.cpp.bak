@@ -12,8 +12,8 @@ struct Modulator7 : Module {
 		RATE_ATTENUV_PARAM,
 		SYNCSW_PARAM,
 		PPC_PARAM,
+		PHASERST_PARAM,
 		POLY_PARAM,
-		ENUMS(PHASERST_PARAM, 7),
 		ENUMS(WAVEFORM_PARAM, 7),
 		ENUMS(XRATE_PARAM, 7),
 		ENUMS(BIPOLAR_PARAM, 7),
@@ -118,13 +118,12 @@ struct Modulator7 : Module {
 		configInput(SYNC_INPUT, "Sync");
 		configParam(PPC_PARAM, 1, 24.f, 1.f, "Pulses per Cycle");
 		paramQuantities[PPC_PARAM]->snapEnabled = true;
-		//configParam(PHASERST_PARAM, 0.f, 1.f, 0.f, "Phase Rst", "°", 0, 360);
+		configParam(PHASERST_PARAM, 0.f, 1.f, 0.f, "Phase Rst", "°", 0, 360);
 		configInput(RST_INPUT, "Reset");
 		configParam(POLY_PARAM, 1.f, 7.f, 7.f, "Poly Chans");
 		paramQuantities[POLY_PARAM]->snapEnabled = true;
 		configOutput(POLY_OUTPUT, "Poly");
 		for (int i = 0; i < 7; i++) {
-			configParam(PHASERST_PARAM+i, 0.f, 1.f, 0.f, "Phase Rst", "°", 0, 360);
 			configSwitch(WAVEFORM_PARAM+i, 0.f, 2.f, 1.f, "Type", {"Ramp Up", "Triangle", "Ramp Down"});
 			configParam(XRATE_PARAM+i, 0.f, 1.f, 0.5f, "xRate", "x", maxXrate / minXrate, minXrate);
 			configSwitch(BIPOLAR_PARAM+i, 0.f, 1.f, 0.f, "Bipolar", {"Off", "On"});
@@ -279,14 +278,11 @@ struct Modulator7 : Module {
 		rst = inputs[RST_INPUT].getVoltage();
 		if (rst >= 1 && prevRst < 1) {
 
-			//phaseResetValue = params[PHASERST_PARAM].getValue();
-
 			for (int i = 0; i < 7; i++) {
-
-				phaseResetValue = params[PHASERST_PARAM+i].getValue();
+				phaseResetValue = params[PHASERST_PARAM].getValue();
 
 				switch (waveForm[i]) {
-					
+
 					case TRIANGLE:
 						if (phaseResetValue < 0.25) {
 							waveSlope[i] = 1;
@@ -529,45 +525,47 @@ struct Modulator7Widget : ModuleWidget {
 		}
 		*/
 
-		const float xRtKnob = 14;
+		const float xRtKnob = 12;
 		const float yRtKnob = 21;
 
-		const float xRateAtnv = 20.8;
+		const float xRateAtnv = 16.8;
 		const float yRateAtnv = 32;
 
-		const float xRateIn = 13;
+		const float xRateIn = 10;
 		const float yRateIn = 39;
 
-		const float xSync = 38.5;
+		const float xSync = 31.5;
 		const float ySync = 20;
 
-		const float xSyncSw = 31;
+		const float xSyncSw = 26;
 		const float ySyncSw = 28;
 
-		const float xSyncIn = 37;
+		const float xSyncIn = 30;
 		const float ySyncIn = 39;
 
-		const float xPpc = 49;
-		const float yPpc = 30;
+		const float xPpc = 42;
+		const float yPpc = 31;
 
-		const float xRst = 63.7;
+		const float xPhR = 44;
+		const float yPhR = 18.2;
+
+		const float xRst = 53.7;
 		const float yRst = 18.2;
 
-		const float xPolyKnob = 63.5;
+		const float xPolyKnob = 53.5;
 		const float yPolyKnob = 32.2;
 
-		const float xPoly = 63.7;
+		const float xPoly = 53.7;
 		const float yPoly = 40;
 
 		const float yStart = 57;
 		constexpr float yStartShift = 10;
 
-		const float xPhR = 7.3;
-		const float xType = 20;
-		const float xRt = 32.6;
-		const float xBi = 42.0;
-		const float xScl = 51.6;
-		const float xOut = 63.7;
+		const float xType = 10;
+		const float xRt = 22.6;
+		const float xBi = 32.0;
+		const float xScl = 41.6;
+		const float xOut = 53.7;
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, Modulator7::RATE_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, Modulator7::RATE_ATTENUV_PARAM));
@@ -577,13 +575,12 @@ struct Modulator7Widget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSyncIn, ySyncIn)), module, Modulator7::SYNCSW_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSync, ySync)), module, Modulator7::SYNC_INPUT));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPpc, yPpc)), module, Modulator7::PPC_PARAM));
-		//addParam(createParamCentered<Trimpot>(mm2px(Vec(xPhR, yPhR)), module, Modulator7::PHASERST_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPhR, yPhR)), module, Modulator7::PHASERST_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRst, yRst)), module, Modulator7::RST_INPUT));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPolyKnob, yPolyKnob)), module, Modulator7::POLY_PARAM));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xPoly, yPoly)), module, Modulator7::POLY_OUTPUT));
 		
 		for (int i = 0; i < 7; i++) {
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xPhR, yStart + (yStartShift * i))), module, Modulator7::PHASERST_PARAM+i));
 			addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xType, yStart + (yStartShift * i))), module, Modulator7::WAVEFORM_PARAM+i));
 			addParam(createParamCentered<Trimpot>(mm2px(Vec(xRt, yStart + (yStartShift * i))), module, Modulator7::XRATE_PARAM+i));
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xBi, yStart + (yStartShift * i))), module, Modulator7::BIPOLAR_PARAM+i, Modulator7::BIPOLAR_LIGHT+i));
