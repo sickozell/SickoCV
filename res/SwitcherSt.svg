@@ -24,15 +24,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="5.6568544"
-     inkscape:cx="43.929008"
-     inkscape:cy="36.946328"
+     inkscape:zoom="4.0000001"
+     inkscape:cx="-56.624998"
+     inkscape:cy="403.49999"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="1272"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g23274"
+     inkscape:current-layer="layer1"
      showguides="true" />
   <defs
      id="defs2">
@@ -105,6 +105,53 @@
        x="2.7204449"
        y="0.65833217"
        transform="translate(0.29955559,0.400001)"
+       inkscape:label="rosso" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g46452"
+     inkscape:label="stripes copy"
+     transform="matrix(0.08333333,0,0,1,5.1083332,0.24166683)"
+     style="display:inline;fill:#000000">
+    <rect
+       style="display:inline;fill:#0088ff;fill-opacity:1;stroke:none;stroke-width:0.273161"
+       id="rect7854"
+       width="35.754627"
+       height="0.30911431"
+       x="77.768005"
+       y="127.24923"
+       inkscape:label="azzurro" />
+    <rect
+       style="display:inline;fill:#00cc55;fill-opacity:1;stroke:none;stroke-width:0.273161"
+       id="rect7856"
+       width="35.754627"
+       height="0.30911431"
+       x="77.768005"
+       y="126.47643"
+       inkscape:label="verde" />
+    <rect
+       style="display:inline;fill:#eeee77;fill-opacity:1;stroke:none;stroke-width:0.273161"
+       id="rect7858"
+       width="35.754627"
+       height="0.30911431"
+       x="77.768005"
+       y="125.70364"
+       inkscape:label="giallo" />
+    <rect
+       style="display:inline;fill:#ff7777;fill-opacity:1;stroke:none;stroke-width:0.273161"
+       id="rect7860"
+       width="35.754627"
+       height="0.30911431"
+       x="77.768005"
+       y="124.93086"
+       inkscape:label="rosa" />
+    <rect
+       style="display:inline;fill:#bd0000;fill-opacity:1;stroke:none;stroke-width:0.273161"
+       id="rect7862"
+       width="35.754627"
+       height="0.30911431"
+       x="77.768005"
+       y="124.15833"
        inkscape:label="rosso" />
   </g>
   <g
@@ -585,14 +632,14 @@
      id="layer1"
      style="display:inline">
     <rect
-       style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.388963;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect1447-8-5"
-       width="13.695065"
-       height="3.7641292"
-       x="1.4273803"
-       y="124.28948"
+       style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.381932;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1447-8-1"
+       width="11.118068"
+       height="3.8235898"
+       x="1.4238648"
+       y="124.25975"
        inkscape:label="footer rect"
-       ry="1.2035291" />
+       ry="1.2056972" />
     <rect
        style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect2138-3"
@@ -602,18 +649,25 @@
        y="1.1594706"
        ry="1.5"
        inkscape:label="header rect" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:none;fill:#cccccc;fill-opacity:1;stroke-width:0.264583"
-       x="8.0303516"
-       y="127.22987"
-       id="text183"
-       inkscape:label="sickozell"><tspan
-         sodipodi:role="line"
-         id="tspan181"
-         style="font-size:2.82222px;text-align:center;text-anchor:middle;fill:#cccccc;fill-opacity:1;stroke-width:0.264583"
-         x="8.0303516"
-         y="127.22987">skzll</tspan></text>
+    <g
+       aria-label="skz"
+       id="text3096"
+       style="display:inline;font-size:3.175px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-orientation:upright;text-anchor:middle;fill:#cccccc;stroke-width:0.4"
+       inkscape:label="skz"
+       transform="translate(-10.797102,0.07196014)">
+      <path
+         d="m 16.1925,125.30583 v 0.39688 H 14.605 v 0.39687 h 1.190625 v 0.39688 H 16.1925 v 0.39687 h -0.396875 v 0.39688 H 13.81125 v -0.39688 h 1.5875 v -0.39687 h -1.190625 v -0.39688 H 13.81125 v -0.39687 h 0.396875 v -0.39688 z"
+         style="font-family:'C64 User';-inkscape-font-specification:'C64 User'"
+         id="path3100" />
+      <path
+         d="m 16.589375,127.29021 v -2.38125 h 0.79375 v 1.19062 H 17.78 v -0.39687 h 0.79375 v 0.39687 h -0.396875 v 0.39688 h 0.396875 v 0.39687 h 0.396875 v 0.39688 h -0.79375 v -0.39688 H 17.78 v -0.39687 h -0.396875 v 0.79375 z"
+         style="font-family:'C64 User';-inkscape-font-specification:'C64 User'"
+         id="path3102" />
+      <path
+         d="m 19.3675,127.29021 v -0.39688 h 0.396875 v -0.39687 h 0.396875 v -0.39688 h 0.396875 v -0.39687 H 19.3675 v -0.39688 h 2.38125 v 0.39688 h -0.396875 v 0.39687 H 20.955 v 0.39688 h -0.396875 v 0.39687 h 1.190625 v 0.39688 z"
+         style="font-family:'C64 User';-inkscape-font-specification:'C64 User'"
+         id="path3104" />
+    </g>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:none;fill:#e5e5e5;fill-opacity:1;stroke-width:0.258083"
@@ -627,33 +681,6 @@
          style="font-size:2.82222px;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke-width:0.258083"
          x="13.048279"
          y="4.4515109">swst</tspan></text>
-    <g
-       aria-label="skzll"
-       id="text24862"
-       style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#cccccc;fill-opacity:1;stroke-width:0.264583"
-       inkscape:label="sickozell"
-       transform="translate(0.4209495)">
-      <path
-         d="m 4.6789653,125.46599 v 0.35277 H 3.2678552 v 0.35278 h 1.0583326 v 0.35278 h 0.3527775 v 0.35278 H 4.3261878 v 0.35277 H 2.5623002 v -0.35277 h 1.4111101 v -0.35278 H 2.9150777 v -0.35278 H 2.5623002 v -0.35278 h 0.3527775 v -0.35277 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path24877" />
-      <path
-         d="m 5.0317428,127.22987 v -2.11666 h 0.705555 v 1.05833 h 0.3527776 v -0.35278 h 0.705555 v 0.35278 H 6.4428529 v 0.35278 h 0.3527775 v 0.35278 h 0.3527775 v 0.35277 H 6.4428529 V 126.8771 H 6.0900754 v -0.35278 H 5.7372978 v 0.70555 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path24879" />
-      <path
-         d="m 7.5011854,127.22987 v -0.35277 h 0.3527775 v -0.35278 h 0.3527776 v -0.35278 H 8.559518 v -0.35278 H 7.5011854 v -0.35277 h 2.1166651 v 0.35277 H 9.265073 v 0.35278 H 8.9122955 v 0.35278 H 8.559518 v 0.35278 h 1.0583325 v 0.35277 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path24881" />
-      <path
-         d="m 11.028961,125.11321 v 1.76389 h 0.352777 v 0.35277 H 9.9706283 v -0.35277 h 0.3527777 v -1.41111 H 9.9706283 v -0.35278 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path24883" />
-      <path
-         d="m 12.792848,125.11321 v 1.76389 h 0.352778 v 0.35277 h -1.41111 v -0.35277 h 0.352777 v -1.41111 h -0.352777 v -0.35278 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path24885" />
-    </g>
     <g
        aria-label="swst"
        transform="matrix(0.97543485,0,0,1.0251838,0.60803818,2.1498712e-8)"
