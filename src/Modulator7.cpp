@@ -1,3 +1,7 @@
+#define RAMPUP 0
+#define TRIANGLE 1
+#define RAMPDOWN 2
+
 #include "plugin.hpp"
 
 //using namespace std;
@@ -8,9 +12,9 @@ struct Modulator7 : Module {
 		RATE_ATTENUV_PARAM,
 		SYNCSW_PARAM,
 		PPC_PARAM,
+		PHASERST_PARAM,
 		POLY_PARAM,
-		ENUMS(WAVE_PARAM, 7),
-		ENUMS(WTYPE_PARAM, 7),
+		ENUMS(WAVEFORM_PARAM, 7),
 		ENUMS(XRATE_PARAM, 7),
 		ENUMS(BIPOLAR_PARAM, 7),
 		ENUMS(SCALE_PARAM, 7),
@@ -30,14 +34,13 @@ struct Modulator7 : Module {
 	};
 	enum LightId {
 		SYNCSW_LIGHT,
-		ENUMS(WAVE_LIGHT, 7),
-		ENUMS(WTYPE_LIGHT, 7),
 		ENUMS(BIPOLAR_LIGHT, 7),
 		LIGHTS_LEN
 	};
 
 	float rst = 0.f;
 	float prevRst = 0.f;
+	float phaseResetValue = 0.f;
 
 	bool syncEnabled = false;
 
@@ -49,8 +52,7 @@ struct Modulator7 : Module {
 
 	double sampleRate = APP->engine->getSampleRate();
 	double sampleCount = sampleRate;
-	float sampleRateCoeff = sampleRate / 2.f;
-
+	
 	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
 	bool clockPulse = false;
 	float clockPulseTime = 0.f;
@@ -59,6 +61,8 @@ struct Modulator7 : Module {
 	double clockSampleCount = 0;
 	double clockMaxSample = sampleRate;
 
+	/*
+	float sampleRateCoeff = sampleRate / 2.f;
 	float rateProvv = 1.f;
 	float rate = 1.f;
 	float rateKnob = 0.5f;
@@ -67,10 +71,22 @@ struct Modulator7 : Module {
 	float xRateKnob[7] = {1, 1, 1, 1, 1, 1, 1};
 	float prevXrateKnob[7] = {0, 0, 0, 0, 0, 0, 0};
 	float waveCoeff = rate / sampleRateCoeff;
-	int wavePhase[7] = {1, 1, 1, 1, 1, 1, 1};
 	float waveValue[7] = {0, 0, 0, 0, 0, 0, 0};
-	bool sawWave[7] = {false, false, false, false, false, false, false};
-	bool waveType[7] = {false, false, false, false, false, false, false};
+	*/
+
+	double sampleRateCoeff = sampleRate / 2;
+	double rateProvv = 1.f;
+	double rate = 1.f;
+	double rateKnob = 0.5f;
+	double prevRateKnob = 1.f;
+	double xRate[7] = {1, 1, 1, 1, 1, 1, 1};
+	double xRateKnob[7] = {1, 1, 1, 1, 1, 1, 1};
+	double prevXrateKnob[7] = {0, 0, 0, 0, 0, 0, 0};
+	double waveCoeff = rate / sampleRateCoeff;
+	double waveValue[7] = {0, 0, 0, 0, 0, 0, 0};
+
+	int waveSlope[7] = {1, 1, 1, 1, 1, 1, 1};
+	int waveForm[7] = {TRIANGLE, TRIANGLE, TRIANGLE, TRIANGLE, TRIANGLE, TRIANGLE, TRIANGLE};
 	bool bipolar[7] = {true, true, true, true, true, true, true};
 	float out = 0.f;
 
@@ -102,13 +118,13 @@ struct Modulator7 : Module {
 		configInput(SYNC_INPUT, "Sync");
 		configParam(PPC_PARAM, 1, 24.f, 1.f, "Pulses per Cycle");
 		paramQuantities[PPC_PARAM]->snapEnabled = true;
+		configParam(PHASERST_PARAM, 0.f, 1.f, 0.f, "Phase Rst", "°", 0, 360);
 		configInput(RST_INPUT, "Reset");
 		configParam(POLY_PARAM, 1.f, 7.f, 7.f, "Poly Chans");
 		paramQuantities[POLY_PARAM]->snapEnabled = true;
 		configOutput(POLY_OUTPUT, "Poly");
 		for (int i = 0; i < 7; i++) {
-			configSwitch(WAVE_PARAM+i, 0.f, 1.f, 0.f, "Wave", {"Triangle", "Ramp"});
-			configSwitch(WTYPE_PARAM+i, 0.f, 1.f, 0.f, "Type", {"Up", "Down"});
+			configSwitch(WAVEFORM_PARAM+i, 0.f, 2.f, 1.f, "Type", {"Ramp Up", "Triangle", "Ramp Down"});
 			configParam(XRATE_PARAM+i, 0.f, 1.f, 0.5f, "xRate", "x", maxXrate / minXrate, minXrate);
 			configSwitch(BIPOLAR_PARAM+i, 0.f, 1.f, 0.f, "Bipolar", {"Off", "On"});
 			configParam(SCALE_PARAM+i, 0.f, 1.f, 1.f, "Scale", "%", 0, 100);
@@ -120,7 +136,7 @@ struct Modulator7 : Module {
 		rateKnob = 0.5;
 		prevRateKnob = 1;
 		for (int i = 0; i < 7; i++) {
-			wavePhase[i] = 1;
+			waveSlope[i] = 1;
 			waveValue[i] = 0;
 			xRateKnob[i] = 1;
 			prevXrateKnob[i] = 0;
@@ -263,19 +279,32 @@ struct Modulator7 : Module {
 		if (rst >= 1 && prevRst < 1) {
 
 			for (int i = 0; i < 7; i++) {
-				if (!waveType[i]) {
-					wavePhase[i] = 1;
-					waveValue[i] = 0;
-					if (bipolar[i])
-						waveValue[i] = 0.5f;
-					else
-						waveValue[i] = 0.f;
-				} else {
-					wavePhase[i] = -1;
-					if (bipolar[i])
-						waveValue[i] = 0.5f;
-					else
-						waveValue[i] = 1.f;
+				phaseResetValue = params[PHASERST_PARAM].getValue();
+
+				switch (waveForm[i]) {
+
+					case TRIANGLE:
+						if (phaseResetValue < 0.25) {
+							waveSlope[i] = 1;
+							waveValue[i] = 0.5 + phaseResetValue * 2;
+						} else if (phaseResetValue < 0.75) {
+							waveSlope[i] = -1;
+							waveValue[i] = 1 - ((phaseResetValue - 0.25) * 2);
+						} else {
+							waveSlope[i] = 1;
+							waveValue[i] = (phaseResetValue - 0.75) * 2;
+						}
+					break;
+
+					case RAMPUP:
+						waveSlope[i] = 1;
+						waveValue[i] = phaseResetValue;
+					break;
+
+					case RAMPDOWN:
+						waveSlope[i] = -1;
+						waveValue[i] = 1 - phaseResetValue;
+					break;
 				}
 			}
 
@@ -301,6 +330,8 @@ struct Modulator7 : Module {
 		}
 		prevTrigSyncSwitch = trigSyncSwitch;
 
+		
+
 		syncEnabled = params[SYNCSW_PARAM].getValue();
 		lights[SYNCSW_LIGHT].setBrightness(syncEnabled);
 
@@ -315,10 +346,10 @@ struct Modulator7 : Module {
 
 			rate = rateProvv + (inputs[RATE_INPUT].getVoltage() * params[RATE_ATTENUV_PARAM].getValue() * 10);
 
-			if (rate > 100.f)
-				rate = 100.f;
-			else if (rate < 0.01f)
-				rate = 0.01f;
+			if (rate > 100)
+				rate = 100;
+			else if (rate < 0.01)
+				rate = 0.01;
 
 			waveCoeff = rate / sampleRateCoeff;
 
@@ -351,17 +382,14 @@ struct Modulator7 : Module {
 
 				sampleCount++;
 			}
+
 		}
 
 		clockSampleCount++;
 
 		for (int i = 0; i < 7; i++) {
 
-			sawWave[i] = params[WAVE_PARAM+i].getValue();
-			lights[WAVE_LIGHT+i].setBrightness(sawWave[i]);
-
-			waveType[i] = params[WTYPE_PARAM+i].getValue();
-			lights[WTYPE_LIGHT+i].setBrightness(waveType[i]);
+			waveForm[i] = int(params[WAVEFORM_PARAM+i].getValue());
 
 			xRateKnob[i] = params[XRATE_PARAM+i].getValue();
 
@@ -369,42 +397,48 @@ struct Modulator7 : Module {
 				xRate[i] = convertXrateToSeconds(xRateKnob[i]);
 				prevXrateKnob[i] = xRateKnob[i];
 			}
-			
-			if (!sawWave[i]) {
 
-				waveValue[i] += xRate[i] * waveCoeff * wavePhase[i];
-				
-				if (waveValue[i] > 1.f) {
-					wavePhase[i] = -1;
-					waveValue[i] = 2 - waveValue[i];
-				} else if (waveValue[i] < 0.f) {
-					wavePhase[i] = 1;
-					waveValue[i] = -waveValue[i];
-				}
 
-			} else {
+			switch (waveForm[i]) {
+				case TRIANGLE:
 
-				waveValue[i] += xRate[i] * waveCoeff * wavePhase[i] / 2;
-
-				if (!waveType[i]) {	
-
-					if (waveValue[i] > 1.f) {
-						wavePhase[i] = 1;
-						waveValue[i] = 1 - waveValue[i];
-					} else if (wavePhase[i] < 0) {
-						wavePhase[i] = 1;
+					waveValue[i] += xRate[i] * waveCoeff * waveSlope[i];
+					
+					if (waveValue[i] > 1) {
+						waveSlope[i] = -1;
+						waveValue[i] = 2 - waveValue[i];
+					} else if (waveValue[i] < 0) {
+						waveSlope[i] = 1;
+						waveValue[i] = -waveValue[i];
 					}
 
-				} else {
+				break;
 
-					if (waveValue[i] < 0.f) {
-						wavePhase[i] = -1;
+				case RAMPUP:
+
+					waveValue[i] += xRate[i] * waveCoeff * waveSlope[i] / 2;
+
+					if (waveValue[i] > 1) {
+						waveSlope[i] = 1;
 						waveValue[i] = 1 - waveValue[i];
-					} else if (wavePhase[i] > 0) {
-						wavePhase[i] = -1;
+					} else if (waveSlope[i] < 0) {
+						waveSlope[i] = 1;
 					}
 
-				}
+				break;
+
+				case RAMPDOWN:
+
+					waveValue[i] += xRate[i] * waveCoeff * waveSlope[i] / 2;
+
+					if (waveValue[i] < 0) {
+						waveSlope[i] = -1;
+						waveValue[i] = 1 - waveValue[i];
+					} else if (waveSlope[i] > 0) {
+						waveSlope[i] = -1;
+					}
+
+				break;
 			}
 
 			bipolar[i] = params[BIPOLAR_PARAM+i].getValue();
@@ -510,7 +544,10 @@ struct Modulator7Widget : ModuleWidget {
 		const float ySyncIn = 39;
 
 		const float xPpc = 42;
-		const float yPpc = 24;
+		const float yPpc = 31;
+
+		const float xPhR = 44;
+		const float yPhR = 18.2;
 
 		const float xRst = 53.7;
 		const float yRst = 18.2;
@@ -524,14 +561,11 @@ struct Modulator7Widget : ModuleWidget {
 		const float yStart = 57;
 		constexpr float yStartShift = 10;
 
-		const float xWave = 7;
-		const float xType = 15;
-		const float xRt = 24.4;
-		const float xBi = 33.5;
-		const float xScl = 42.6;
-		//const float xOut = 53.9;
+		const float xType = 10;
+		const float xRt = 22.6;
+		const float xBi = 32.0;
+		const float xScl = 41.6;
 		const float xOut = 53.7;
-
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, Modulator7::RATE_PARAM));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, Modulator7::RATE_ATTENUV_PARAM));
@@ -541,13 +575,13 @@ struct Modulator7Widget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSyncIn, ySyncIn)), module, Modulator7::SYNCSW_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSync, ySync)), module, Modulator7::SYNC_INPUT));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPpc, yPpc)), module, Modulator7::PPC_PARAM));
+		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPhR, yPhR)), module, Modulator7::PHASERST_PARAM));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRst, yRst)), module, Modulator7::RST_INPUT));
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPolyKnob, yPolyKnob)), module, Modulator7::POLY_PARAM));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xPoly, yPoly)), module, Modulator7::POLY_OUTPUT));
 		
 		for (int i = 0; i < 7; i++) {
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xWave, yStart + (yStartShift * i))), module, Modulator7::WAVE_PARAM+i, Modulator7::WAVE_LIGHT+i));
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xType, yStart + (yStartShift * i))), module, Modulator7::WTYPE_PARAM+i, Modulator7::WTYPE_LIGHT+i));
+			addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xType, yStart + (yStartShift * i))), module, Modulator7::WAVEFORM_PARAM+i));
 			addParam(createParamCentered<Trimpot>(mm2px(Vec(xRt, yStart + (yStartShift * i))), module, Modulator7::XRATE_PARAM+i));
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xBi, yStart + (yStartShift * i))), module, Modulator7::BIPOLAR_PARAM+i, Modulator7::BIPOLAR_LIGHT+i));
 			addParam(createParamCentered<Trimpot>(mm2px(Vec(xScl, yStart + (yStartShift * i))), module, Modulator7::SCALE_PARAM+i));

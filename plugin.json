@@ -213,11 +213,20 @@
       ]
     },
     {
+      "slug": "Modulator",
+      "name": "modulator",
+      "description": "triangle/ramp LFOs with sync feature",
+      "tags": [
+        "Low-frequency oscillator"
+      ]
+    },
+    {
       "slug": "Modulator7",
       "name": "modulator7",
       "description": "7 triangle/ramp LFOs with sync feature",
       "tags": [
-        "Low-frequency oscillator"
+        "Low-frequency oscillator",
+        "Polyphonic"
       ]
     },
     {

@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
+- added modulator module
 - added modulator7 module
 - added switcher8 module
 
