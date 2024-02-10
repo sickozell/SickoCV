@@ -1,4 +1,4 @@
-# SickoCV v2.6.6-beta4
+# SickoCV v2.6.6-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.6
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/5a151034-d62d-4a66-91f2-5a6ff563f189)
+![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/728b6959-b57d-4480-864d-634934e24ce6)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -41,7 +41,7 @@ VCV Rack plugin modules
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
-- [modulator7](#modulator7)
+- [modulator / modulator7](#modulator--modulator7)
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
@@ -528,12 +528,13 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 
 [back to top](#table-of-contents)
 
-## modulator7
-### 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a trig pulse.
+## modulator / modulator7
+### single or 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a clock.
 
-![modulator7](https://github.com/sickozell/SickoCV/assets/80784296/6ad438f0-24ec-44dc-b28a-878a245d6fdc)
+![modulator](https://github.com/sickozell/SickoCV/assets/80784296/d5afa20c-966d-4215-b5bd-de1cd630ebe9)
 
 #### - INSTRUCTIONS
+Following instructions refer to modulator7, but can be applied also to modulator module.  
 Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
 The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
 SYNC input accepts triggers, like clock or other pulses, used to calculate the main rate.  
