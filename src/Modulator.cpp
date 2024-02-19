@@ -83,9 +83,14 @@ struct Modulator : Module {
 	double prevXrateKnob = 0;
 
 	double waveCoeff = rate / sampleRateCoeff;
-	double syncWaveCoeff = waveCoeff;
+	double syncWaveCoeff = 0;
 	double waveValue = 0;
 	
+	bool firstRun = true;
+	bool wait2ndClock = false;
+
+	int waitingClock = -1;
+	int waitingClockCount = 1;
 
 	int waveSlope = 1;
 
@@ -140,6 +145,21 @@ struct Modulator : Module {
 
 	}
 
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "wait2ndClock", json_boolean(wait2ndClock));
+
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+
+		json_t* wait2ndClockJ = json_object_get(rootJ, "wait2ndClock");
+		if (wait2ndClockJ)
+			wait2ndClock = json_boolean_value(wait2ndClockJ);
+		
+	}
+
 	void onReset(const ResetEvent &e) override {
 		sampleCount = 0;
 		clockSampleCount = 0;
@@ -155,6 +175,13 @@ struct Modulator : Module {
 
 		rst = 0;
 		prevRst = 0;
+
+		firstRun = true;
+		wait2ndClock = false;
+
+		waitingClock = -1;
+		waitingClockCount = 1;
+
 	    Module::onReset(e);
 	}
 
@@ -178,36 +205,61 @@ struct Modulator : Module {
 
 		waveForm = int(params[WAVEFORM_PARAM].getValue());
 
-		
+		bipolar = params[BIPOLAR_PARAM].getValue();
+		lights[BIPOLAR_LIGHT].setBrightness(bipolar);
 
 		rst = inputs[RST_INPUT].getVoltage();
 		if (rst >= 1 && prevRst < 1) {
+
+			if (wait2ndClock) {
+
+				waitingClock = -1;
+				syncWaveCoeff = 0;
+
+			} else {
+
+				if (!firstRun) {
+					waitingClock = 1;
+					//sampleCount = prevSampleCount;
+				} else {
+					syncWaveCoeff = 0;
+				}
+
+			}
+
+			firstRun = false;
 
 			phaseResetValue = params[PHASERST_PARAM].getValue();
 
 			switch (waveForm) {
 
 				case TRIANGLE:
-					if (phaseResetValue < 0.25) {
+					if (phaseResetValue < 0.5) {
 						waveSlope = 1;
-						waveValue = 0.5 + phaseResetValue * 2;
-					} else if (phaseResetValue < 0.75) {
-						waveSlope = -1;
-						waveValue = 1 - ((phaseResetValue - 0.25) * 2);
+						waveValue = phaseResetValue * 2;
+						if (bipolar)
+							waveValue += 0.5;
+
 					} else {
-						waveSlope = 1;
-						waveValue = (phaseResetValue - 0.75) * 2;
+						waveSlope = -1;
+						waveValue = 1 - ((phaseResetValue - 0.5) * 2);
+						if (bipolar)
+							waveValue -= 0.5;
 					}
 				break;
 
 				case RAMPUP:
 					waveSlope = 1;
 					waveValue = phaseResetValue;
+					if (bipolar)
+						waveValue += 0.5;
 				break;
 
 				case RAMPDOWN:
 					waveSlope = -1;
 					waveValue = 1 - phaseResetValue;
+					if (bipolar)
+						waveValue -= 0.5;
 				break;
 			}
 
@@ -241,16 +293,56 @@ struct Modulator : Module {
 				xRate = convertXrateToSeconds(xRateKnob);
 				prevXrateKnob = xRateKnob;
 			}
-			
+
 			syncTrig = inputs[SYNC_INPUT].getVoltage();
 
 			if (syncTrig >= 1 && prevSyncTrig < 1) {
-				syncWaveCoeff = 2 / sampleCount / params[PPC_PARAM].getValue();
+
+				if (waitingClock == 0) {
+
+					syncWaveCoeff = 2 / sampleCount / params[PPC_PARAM].getValue();
+
+					waitingClockCount++;
+
+					if (syncEnabled && waitingClockCount > params[PPC_PARAM].getValue())
+						waitingClockCount = 1;
+
+				} else if (waitingClock < 0) {
+
+					waitingClock = 1;
+
+					waitingClockCount = 1;
+
+					syncWaveCoeff = 0;
+
+				} else {	// waitingClock = 1
+
+					waitingClockCount++;
+
+					if (waitingClockCount > params[PPC_PARAM].getValue()) {
+
+						waitingClock = 0;
+
+						waitingClockCount = 1;
+
+						syncWaveCoeff = 2 / sampleCount / params[PPC_PARAM].getValue();
+
+					}
+
+				}
+				
 				sampleCount = 0;
 			}
+			
 			prevSyncTrig = syncTrig;
 
 			sampleCount++;
+		
+		} else {
+
+			waitingClock = -1;
+
+			syncWaveCoeff = 0;
 		}
 
 
@@ -299,7 +391,7 @@ struct Modulator : Module {
 
 				if (waveValue > 1) {
 					waveSlope = 1;
-					waveValue = 1 - waveValue;
+					waveValue = waveValue - 1;
 				} else if (waveSlope < 0) {
 					waveSlope = 1;
 				}
@@ -312,16 +404,13 @@ struct Modulator : Module {
 
 				if (waveValue < 0) {
 					waveSlope = -1;
-					waveValue = 1 - waveValue;
+					waveValue = 1 + waveValue;
 				} else if (waveSlope > 0) {
 					waveSlope = -1;
 				}
 
 			break;
 		}
-
-		bipolar = params[BIPOLAR_PARAM].getValue();
-		lights[BIPOLAR_LIGHT].setBrightness(bipolar);
 
 		scaleValue = params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * .1f);
 
@@ -457,6 +546,15 @@ struct ModulatorWidget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPhR, yPhR)), module, Modulator::PHASERST_PARAM));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut, yOut)), module, Modulator::OUT_OUTPUT));
+
+	}
+
+	void appendContextMenu(Menu* menu) override {
+		Modulator* module = dynamic_cast<Modulator*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Sync settings"));
+		menu->addChild(createBoolPtrMenuItem("Wait full clock after reset", "", &module->wait2ndClock));
 
 	}
 
