@@ -25,7 +25,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.6
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/4ae4850c-ef2f-4de7-a35e-af6845737c63)
+![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/a648c11d-d7f6-4c65-b8c2-7bd462538677)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -532,7 +532,7 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 ## modulator / modulator7
 ### single or 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a clock.
 
-![modulator](https://github.com/sickozell/SickoCV/assets/80784296/0da3f6cd-ad23-4de8-9559-86648c64bf53)
+![modulator](https://github.com/sickozell/SickoCV/assets/80784296/93e1c653-0535-4a4c-ae8c-6d57e1e8e9d4)
 
 #### - INSTRUCTIONS
 Following instructions refer to modulator7, but can be applied also to modulator module.  
@@ -542,10 +542,11 @@ SYNC input accepts triggers, like clock or other pulses, used to calculate the m
 PPC (Pulses Per Cycles) knob sets the number of triggers (from 1 to 24) on the SYNC input needed to achieve 1 cycle of the main rate. 
 The 'X' knobs set each oscillator's rate calculated on the main rate from 1/21x to 21x, center position is 1x and it equals to main rate.  
 The default waveshape of each oscillator is triangle, the RAMP buttons switch to sawtooth waveshape.  
-The default starting cycle value of each oscillator is 0v, the 'down arrow' buttons set it to the maximum, and if ramp waveshape is selected, it will result in an inverted sawtooth (ramp down)  
+The default starting cycle value of each oscillator is 0v, the 'down arrow' buttons set it to the maximum, and if ramp waveshape is selected, it will result in an inverted sawtooth (ramp down).  
 Default output range of oscillators is unipolar 0-10v, the 'b' buttons modify the range to bipolar +5/-5v.  
 A trigger on RST input, resets all oscillators cycle, restarting waveforms according to each oscillator's 'Ph' reset phase knob.  
-PLY out is the polyphonic output of oscillators. PLY knob sets the number of channels of polyphony, corresponding to the first 'n' oscillators. When PLY knob is set to 'c' position (1 poly chan), a 1ms pulse is given to PLY output.
+PLY out is the polyphonic output of oscillators. PLY knob sets the number of channels of polyphony, corresponding to the first 'n' oscillators. When PLY knob is set to 'c' position (1 poly chan), a 1ms pulse is given to PLY output when internal clock occurs.  
+If no sync cable is connected, pressing the SYNC button will act as a sample&hold, holding the last oscillators values. Another sync button press will restart the normal oscillators curves.
 
 #### Right-click Menu
 There are some selectable 'X' knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
