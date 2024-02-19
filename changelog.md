@@ -1,4 +1,4 @@
-### 2.6.6 (2024-02-xx)
+### 2.6.6 (2024-02-19)
 - added modulator module.
 - added modulator7 module.
 - added switcher8 module.  
