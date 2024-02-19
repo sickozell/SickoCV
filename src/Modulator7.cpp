@@ -672,7 +672,7 @@ struct Modulator7Widget : ModuleWidget {
 		const float xSyncIn = 37;
 		const float ySyncIn = 39;
 
-		const float xPpc = 47;
+		const float xPpc = 48;
 		const float yPpc = 32;
 
 		const float xRstBut = 41.7;
