@@ -1,7 +1,7 @@
-# SickoCV v2.6.5
+# SickoCV v2.6.6
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 4](https://github.com/sickozell/SickoCV/assets/80784296/7c6a6fbb-0e2c-4349-902c-6a8946ffbd91)
+![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/a648c11d-d7f6-4c65-b8c2-7bd462538677)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -18,6 +18,7 @@ VCV Rack plugin modules
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
+- [modulator / modulator7](#modulator--modulator7)
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
@@ -25,7 +26,7 @@ VCV Rack plugin modules
 - [sickoPlayer](#sickoplayer)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
-- [switcher / switcherSt](#switcher--switcherst)
+- [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
@@ -504,6 +505,35 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 
 [back to top](#table-of-contents)
 
+## modulator / modulator7
+### single or 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a clock.
+
+![modulator](https://github.com/sickozell/SickoCV/assets/80784296/93e1c653-0535-4a4c-ae8c-6d57e1e8e9d4)
+
+#### - INSTRUCTIONS
+Following instructions refer to modulator7, but can be applied also to modulator module.  
+
+Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
+The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
+SYNC input accepts triggers, like clock or other pulses, used to calculate the main rate.  
+PPC (Pulses Per Cycles) knob sets the number of triggers (from 1 to 24) on the SYNC input needed to achieve 1 cycle of the main rate. 
+
+The 'X' knobs set each oscillator's rate calculated on the main rate from 1/21x to 21x, center position is 1x and it equals to main rate.  
+The default waveshape of each oscillator is triangle, the RAMP buttons switch to sawtooth waveshape.  
+The default starting cycle value of each oscillator is 0v, the 'down arrow' buttons set it to the maximum, and if ramp waveshape is selected, it will result in an inverted sawtooth (ramp down).  
+Default output range of oscillators is unipolar 0-10v, the 'b' buttons modify the range to bipolar +5/-5v.  
+
+A trigger on RST input, resets all oscillators cycle, restarting waveforms according to each oscillator's 'Ph' reset phase knob.  
+PLY out is the polyphonic output of oscillators. PLY knob sets the number of channels of polyphony, corresponding to the first 'n' oscillators. When PLY knob is set to 'c' position (1 poly chan), a 1ms pulse is given to PLY output when internal clock occurs.  
+
+If no sync cable is connected, pressing the SYNC button will act as a sample&hold, holding the last oscillators values. Another sync button press will restart the normal oscillators curves.
+
+#### Right-click Menu
+- **Wait full clock after reset**. When this option is enabled and sync is on, when a reset is detected it will reset the cycle of oscillators but will wait a full clock before restarting oscillators cycle. It can be mostly used in combination of PPC greater than 1, just to restart oscillators correctly.  
+- There are some selectable 'X' knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
+
+[back to top](#table-of-contents)
+
 ## parking
 ### Set of unconnected inputs and outputs just to park unused cables
 
@@ -790,7 +820,7 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 [back to top](#table-of-contents)
 
-## switcher / switcherSt
+## switcher / switcherSt / switcher8
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - DESCRIPTION
 - Signal switch (2 inputs, 1 output)
@@ -802,7 +832,7 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 - Function type autodetection (switch, route, swap, mute, flipflop, toggle gate)
 - Adjustable time crossfade between switched/routed/swapped signals
 
-![switcher](https://user-images.githubusercontent.com/80784296/201516861-d3d2ab1b-7036-4355-b2ef-e4c5681fb432.JPG)
+![switcher](https://github.com/sickozell/SickoCV/assets/80784296/24e6e8d5-3bd2-4f58-ab3d-da6e9094cf2b)
 
 #### - INSTRUCTIONS
 Switcher or SwitcherSt (used for stereo signals) are multifunction modules that can be used as follows. The versatility of the module is offered thanks to the automatic detection of the function type.
@@ -850,6 +880,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - When a fade time is set, the module will act as an envelope generator, so if a function activation is detected during a fade, the function will restart immediately (not like a function generator)
 - On SwitcherSt module the function type is detected on Left channel sockets, so don't use Right channels without Left ones
 - Polyphony on signal inputs is replicated on outs
+- switcher8 is eight switcher modules in one, without fade CV input
 
 [back to top](#table-of-contents)
 

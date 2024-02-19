@@ -33,6 +33,8 @@ void init(Plugin* p) {
 	p->addModel(modelHolder);
 	p->addModel(modelHolderCompact);
 	p->addModel(modelHolder8);
+	p->addModel(modelModulator);
+	p->addModel(modelModulator7);
 	p->addModel(modelParking);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
@@ -45,6 +47,7 @@ void init(Plugin* p) {
 	p->addModel(modelSickoSampler2);
 	p->addModel(modelSwitcher);
 	p->addModel(modelSwitcherSt);
+	p->addModel(modelSwitcher8);
 	p->addModel(modelToggler);
 	p->addModel(modelTogglerCompact);
 	p->addModel(modelWavetabler);

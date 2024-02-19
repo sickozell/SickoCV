@@ -24,15 +24,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="2.8284271"
-     inkscape:cx="10.783379"
-     inkscape:cy="329.15821"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="21.124815"
+     inkscape:cy="440.52753"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="1272"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g15193"
+     inkscape:current-layer="g10098"
      showguides="true" />
   <defs
      id="defs2">
@@ -105,6 +105,53 @@
        x="2.7204449"
        y="0.65833217"
        transform="translate(0.29955559,0.400001)"
+       inkscape:label="rosso" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g10098"
+     inkscape:label="stripes copy"
+     transform="matrix(0.10469936,0,0,1,4.0748189,0.24166683)"
+     style="display:inline;fill:#000000">
+    <rect
+       style="display:inline;fill:#0088ff;fill-opacity:1;stroke:none;stroke-width:0.2437"
+       id="rect7854"
+       width="28.45817"
+       height="0.30911431"
+       x="71.773476"
+       y="127.24922"
+       inkscape:label="azzurro" />
+    <rect
+       style="display:inline;fill:#00cc55;fill-opacity:1;stroke:none;stroke-width:0.2437"
+       id="rect7856"
+       width="28.45817"
+       height="0.30911431"
+       x="71.773476"
+       y="126.47643"
+       inkscape:label="verde" />
+    <rect
+       style="display:inline;fill:#eeee77;fill-opacity:1;stroke:none;stroke-width:0.2437"
+       id="rect7858"
+       width="28.45817"
+       height="0.30911431"
+       x="71.773476"
+       y="125.70364"
+       inkscape:label="giallo" />
+    <rect
+       style="display:inline;fill:#ff7777;fill-opacity:1;stroke:none;stroke-width:0.2437"
+       id="rect7860"
+       width="28.45817"
+       height="0.30911431"
+       x="71.773476"
+       y="124.93086"
+       inkscape:label="rosa" />
+    <rect
+       style="display:inline;fill:#bd0000;fill-opacity:1;stroke:none;stroke-width:0.2437"
+       id="rect7862"
+       width="28.45817"
+       height="0.30911431"
+       x="71.773476"
+       y="124.15833"
        inkscape:label="rosso" />
   </g>
   <g
@@ -750,15 +797,6 @@
      style="display:inline">
     <rect
        style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect1447-8"
-       width="13.325233"
-       height="3.7684746"
-       x="1.5518775"
-       y="124.25703"
-       inkscape:label="footer rect"
-       ry="1.2" />
-    <rect
-       style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect2138"
        width="11.283327"
        height="4.6397166"
@@ -766,18 +804,34 @@
        y="1.1585186"
        ry="1.5"
        inkscape:label="header rect" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';display:none;fill:#cccccc;fill-opacity:1;stroke-width:0.264583"
-       x="2.4083335"
-       y="127.19959"
-       id="text183"
-       inkscape:label="sickozell"><tspan
-         sodipodi:role="line"
-         id="tspan181"
-         style="font-size:2.82222px;fill:#cccccc;fill-opacity:1;stroke-width:0.264583"
-         x="2.4083335"
-         y="127.19959">skzll</tspan></text>
+    <rect
+       style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.381932;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1447-8-1"
+       width="11.118068"
+       height="3.8235898"
+       x="1.5428435"
+       y="124.22947"
+       inkscape:label="footer rect"
+       ry="1.2056972" />
+    <g
+       aria-label="skz"
+       id="text3096"
+       style="display:inline;font-size:3.175px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-orientation:upright;text-anchor:middle;fill:#cccccc;stroke-width:0.4"
+       inkscape:label="skz"
+       transform="translate(-10.678124,0.04168156)">
+      <path
+         d="m 16.1925,125.30583 v 0.39688 H 14.605 v 0.39687 h 1.190625 v 0.39688 H 16.1925 v 0.39687 h -0.396875 v 0.39688 H 13.81125 v -0.39688 h 1.5875 v -0.39687 h -1.190625 v -0.39688 H 13.81125 v -0.39687 h 0.396875 v -0.39688 z"
+         style="font-family:'C64 User';-inkscape-font-specification:'C64 User'"
+         id="path3100" />
+      <path
+         d="m 16.589375,127.29021 v -2.38125 h 0.79375 v 1.19062 H 17.78 v -0.39687 h 0.79375 v 0.39687 h -0.396875 v 0.39688 h 0.396875 v 0.39687 h 0.396875 v 0.39688 h -0.79375 v -0.39688 H 17.78 v -0.39687 h -0.396875 v 0.79375 z"
+         style="font-family:'C64 User';-inkscape-font-specification:'C64 User'"
+         id="path3102" />
+      <path
+         d="m 19.3675,127.29021 v -0.39688 h 0.396875 v -0.39687 h 0.396875 v -0.39688 h 0.396875 v -0.39687 H 19.3675 v -0.39688 h 2.38125 v 0.39688 h -0.396875 v 0.39687 H 20.955 v 0.39688 h -0.396875 v 0.39687 h 1.190625 v 0.39688 z"
+         style="font-family:'C64 User';-inkscape-font-specification:'C64 User'"
+         id="path3104" />
+    </g>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';display:none;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
@@ -790,33 +844,6 @@
          style="font-size:2.82222px;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
          x="9.0522432"
          y="4.4666653">btgl</tspan></text>
-    <g
-       aria-label="skzll"
-       id="text22329"
-       style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';display:inline;fill:#cccccc;fill-opacity:1;stroke-width:0.264583"
-       inkscape:label="sickozell"
-       transform="translate(0.51449798)">
-      <path
-         d="m 4.5249986,125.43571 v 0.35277 h -1.41111 v 0.35278 h 1.0583325 v 0.35278 h 0.3527775 v 0.35278 H 4.1722211 v 0.35277 H 2.4083335 v -0.35277 h 1.4111101 v -0.35278 H 2.7611111 v -0.35278 H 2.4083335 v -0.35278 h 0.3527776 v -0.35277 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path22331" />
-      <path
-         d="m 4.8777761,127.19959 v -2.11666 h 0.7055551 v 1.05833 h 0.3527775 v -0.35278 h 0.705555 v 0.35278 H 6.2888862 v 0.35278 h 0.3527775 v 0.35278 h 0.3527775 v 0.35277 h -0.705555 v -0.35277 H 5.9361087 v -0.35278 H 5.5833312 v 0.70555 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path22333" />
-      <path
-         d="m 7.3472188,127.19959 v -0.35277 h 0.3527775 v -0.35278 h 0.3527775 v -0.35278 h 0.3527775 v -0.35278 H 7.3472188 v -0.35277 h 2.116665 v 0.35277 H 9.1111063 v 0.35278 H 8.7583288 v 0.35278 H 8.4055513 v 0.35278 h 1.0583325 v 0.35277 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path22335" />
-      <path
-         d="m 10.874994,125.08293 v 1.76389 h 0.352778 v 0.35277 H 9.8166616 v -0.35277 h 0.3527774 v -1.41111 H 9.8166616 v -0.35278 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path22337" />
-      <path
-         d="m 12.638882,125.08293 v 1.76389 h 0.352777 v 0.35277 h -1.41111 v -0.35277 h 0.352778 v -1.41111 h -0.352778 v -0.35278 z"
-         style="fill:#cccccc;fill-opacity:1"
-         id="path22339" />
-    </g>
     <g
        aria-label="btgl"
        id="text23731"
