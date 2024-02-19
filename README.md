@@ -553,7 +553,7 @@ PLY out is the polyphonic output of oscillators. PLY knob sets the number of cha
 If no sync cable is connected, pressing the SYNC button will act as a sample&hold, holding the last oscillators values. Another sync button press will restart the normal oscillators curves.
 
 #### Right-click Menu
-- **Wait full clock after reset**: When this options is enabled and sync is on, when a reset is detected it will reset the cycle of oscillators but it will wait a full clock before restarting oscillators cycle. It can be mostly used in combination of PPC greater than 1, just to restart oscillators correctly.  
+- **Wait full clock after reset**. When this option is enabled and sync is on, when a reset is detected it will reset the cycle of oscillators but will wait a full clock before restarting oscillators cycle. It can be mostly used in combination of PPC greater than 1, just to restart oscillators correctly.  
 - There are some selectable 'X' knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
 
 [back to top](#table-of-contents)
