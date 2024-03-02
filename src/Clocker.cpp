@@ -1909,48 +1909,48 @@ struct ClockerWidget : ModuleWidget {
 		// input/output --- 4.5
 		// three horizontal switch ---- x 5.5 --- y 2.8
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xExtClock, yExtClock)), module, Clocker::EXTCLOCK_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xExtClock, yExtClock)), module, Clocker::EXTCLOCK_INPUT));
 		
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xResetIn, yRstIn)), module, Clocker::RESET_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xResetIn, yRstIn)), module, Clocker::RESET_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(xResetBut, yRstBut)), module, Clocker::RESET_BUT_PARAM, Clocker::RESET_BUT_LIGHT));
 		
 
 		addParam(createLightParamCentered<VCVLightBezelLatch<BlueLight>>(mm2px(Vec(xRun, yRunBut)), module, Clocker::RUN_BUT_PARAM, Clocker::RUN_BUT_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRun, yRunIn)), module, Clocker::RUN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRun, yRunIn)), module, Clocker::RUN_INPUT));
 
-		addParam(createParamCentered<RoundBigBlackKnob>(mm2px(Vec(xBpmKnob, yBpmKob)), module, Clocker::BPM_KNOB_PARAM));
+		addParam(createParamCentered<SickoBigKnob>(mm2px(Vec(xBpmKnob, yBpmKob)), module, Clocker::BPM_KNOB_PARAM));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yPwClOut)), module, Clocker::PW_KNOB_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yPwClOut)), module, Clocker::PW_KNOB_PARAM));
 		
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xBeatKnob, yClick1 + .9f)), module, Clocker::SIGNATURE_KNOB_PARAM));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xBeatKnob, yClick1 + .9f)), module, Clocker::SIGNATURE_KNOB_PARAM));
 		
 		addParam(createLightParamCentered<VCVLightBezelLatch<YellowLight>>(mm2px(Vec(xCLickBut, yClick2)), module, Clocker::CLICK_BUT_PARAM, Clocker::CLICK_BUT_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xClickVolKnob, yClick2 + .3f)), module, Clocker::CLICKVOL_KNOB_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xClickVolKnob, yClick2 + .3f)), module, Clocker::CLICKVOL_KNOB_PARAM));
 		
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xDivKnob, yDivKn1)), module, Clocker::DIVMULT_KNOB_PARAM+0));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xDivKnob, yDivKn2)), module, Clocker::DIVMULT_KNOB_PARAM+1));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xDivKnob, yDivKn3)), module, Clocker::DIVMULT_KNOB_PARAM+2));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xDivKnob, yDivKn4)), module, Clocker::DIVMULT_KNOB_PARAM+3));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn1)), module, Clocker::DIVMULT_KNOB_PARAM+0));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn2)), module, Clocker::DIVMULT_KNOB_PARAM+1));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn3)), module, Clocker::DIVMULT_KNOB_PARAM+2));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn4)), module, Clocker::DIVMULT_KNOB_PARAM+3));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn1)), module, Clocker::DIVPW_KNOB_PARAM+0));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn2)), module, Clocker::DIVPW_KNOB_PARAM+1));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker::DIVPW_KNOB_PARAM+2));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker::DIVPW_KNOB_PARAM+3));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn1)), module, Clocker::DIVPW_KNOB_PARAM+0));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn2)), module, Clocker::DIVPW_KNOB_PARAM+1));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker::DIVPW_KNOB_PARAM+2));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker::DIVPW_KNOB_PARAM+3));
 
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg1)), module, Clocker::DIVSWING_LIGHT+0));
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg2)), module, Clocker::DIVSWING_LIGHT+1));
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg3)), module, Clocker::DIVSWING_LIGHT+2));
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg4)), module, Clocker::DIVSWING_LIGHT+3));
 		
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yClockOut)), module, Clocker::CLOCK_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yResetOut)), module, Clocker::RESET_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yBeatOut)), module, Clocker::BEATPULSE_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yBarOut)), module, Clocker::BARPULSE_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yClickOut)), module, Clocker::MASTER_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yDiv1)), module, Clocker::DIVMULT_OUTPUT+0));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yDiv2)), module, Clocker::DIVMULT_OUTPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yDiv3)), module, Clocker::DIVMULT_OUTPUT+2));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xDivOut, yDiv4)), module, Clocker::DIVMULT_OUTPUT+3));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yClockOut)), module, Clocker::CLOCK_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yResetOut)), module, Clocker::RESET_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yBeatOut)), module, Clocker::BEATPULSE_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yBarOut)), module, Clocker::BARPULSE_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yClickOut)), module, Clocker::MASTER_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yDiv1)), module, Clocker::DIVMULT_OUTPUT+0));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yDiv2)), module, Clocker::DIVMULT_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yDiv3)), module, Clocker::DIVMULT_OUTPUT+2));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yDiv4)), module, Clocker::DIVMULT_OUTPUT+3));
 	}
 
 	void appendContextMenu(Menu *menu) override {

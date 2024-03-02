@@ -3479,10 +3479,10 @@ struct SickoSampler2Widget : ModuleWidget {
 
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInL, yInputs)), module, SickoSampler2::IN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInR, yInputs)), module, SickoSampler2::IN_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xInL, yInputs)), module, SickoSampler2::IN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xInR, yInputs)), module, SickoSampler2::IN_INPUT+1));
 		
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xGain, yGain)), module, SickoSampler2::GAIN_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xGain, yGain)), module, SickoSampler2::GAIN_PARAM));
 
 		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xRecBut, yInputs)), module, SickoSampler2::REC_PARAM, SickoSampler2::REC_LIGHT));
 
@@ -3493,48 +3493,48 @@ struct SickoSampler2Widget : ModuleWidget {
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xTrigGate, yTrigGate)), module, SickoSampler2::TRIGGATEMODE_SWITCH));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xTrigMode, yTrigMode)), module, SickoSampler2::TRIGMODE_SWITCH, SickoSampler2::TRIGMODE_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xTrigIn, yTrigIn)), module, SickoSampler2::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xTrigIn, yTrigIn)), module, SickoSampler2::TRIG_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xTrigBut, yTrigBut)), module, SickoSampler2::TRIGBUT_PARAM, SickoSampler2::TRIGBUT_LIGHT));
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xScan, yScan)), module, SickoSampler2::PHASESCAN_SWITCH, SickoSampler2::PHASESCAN_LIGHT));
 
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart, yCue)), module, SickoSampler2::CUESTART_PARAM));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEnd, yCue)), module, SickoSampler2::CUEEND_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xStart, yCue)), module, SickoSampler2::CUESTART_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xEnd, yCue)), module, SickoSampler2::CUEEND_PARAM));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart, yLoop)), module, SickoSampler2::LOOPSTART_PARAM));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEnd, yLoop)), module, SickoSampler2::LOOPEND_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xStart, yLoop)), module, SickoSampler2::LOOPSTART_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xEnd, yLoop)), module, SickoSampler2::LOOPEND_PARAM));
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xRev, yRev)), module, SickoSampler2::REV_PARAM, SickoSampler2::REV_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xXfade, yXfade)), module, SickoSampler2::XFADE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xXfade, yXfade)), module, SickoSampler2::XFADE_PARAM));
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xLp, yLp)), module, SickoSampler2::LOOP_PARAM, SickoSampler2::LOOP_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xPng, yPng)), module, SickoSampler2::PINGPONG_PARAM, SickoSampler2::PINGPONG_LIGHT));
 		
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv1, yEnv1)), module, SickoSampler2::ATTACK_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv1+xEnv1Add, yEnv1)), module, SickoSampler2::DECAY_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv1+xEnv1Add*2, yEnv1)), module, SickoSampler2::SUSTAIN_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv1+xEnv1Add*3, yEnv1)), module, SickoSampler2::RELEASE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xEnv1, yEnv1)), module, SickoSampler2::ATTACK_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xEnv1+xEnv1Add, yEnv1)), module, SickoSampler2::DECAY_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xEnv1+xEnv1Add*2, yEnv1)), module, SickoSampler2::SUSTAIN_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xEnv1+xEnv1Add*3, yEnv1)), module, SickoSampler2::RELEASE_PARAM));
 
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStretch, yStretch)), module, SickoSampler2::STRETCH_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xStretchSiz, yStretchSiz)), module, SickoSampler2::STR_SIZE_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xStretch, yStretch)), module, SickoSampler2::STRETCH_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStretchSiz, yStretchSiz)), module, SickoSampler2::STR_SIZE_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xVoct, yVoct)), module, SickoSampler2::VO_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xVoct, yVoct)), module, SickoSampler2::VO_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xVol, yVol)), module, SickoSampler2::VOL_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInVol, yInVol)), module, SickoSampler2::VOL_INPUT));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xVol, yVol)), module, SickoSampler2::VOL_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xInVol, yInVol)), module, SickoSampler2::VOL_INPUT));
 
 		//----------------------------------------------------------------------------------------------------------------------------
 		
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut1, yOut1)), module, SickoSampler2::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut2, yOut1)), module, SickoSampler2::OUT_OUTPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut1, yOut2)), module, SickoSampler2::EOC_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut2, yOut2)), module, SickoSampler2::EOR_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut1, yOut1)), module, SickoSampler2::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut2, yOut1)), module, SickoSampler2::OUT_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut1, yOut2)), module, SickoSampler2::EOC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut2, yOut2)), module, SickoSampler2::EOR_OUTPUT));
 
 	}
 

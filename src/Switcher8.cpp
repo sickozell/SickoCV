@@ -1402,22 +1402,22 @@ struct Switcher8Widget : ModuleWidget {
 
 		for (int track = 0; track < 8; track++) {
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xTrg, yStart+(track*yDelta))), module, Switcher8::TRIG_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xTrg, yStart+(track*yDelta))), module, Switcher8::TRIG_INPUT+track));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRst, yStart+(track*yDelta))), module, Switcher8::RST_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRst, yStart+(track*yDelta))), module, Switcher8::RST_INPUT+track));
 
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xMode, yStart+(track*yDelta))), module, Switcher8::MODE_SWITCH+track, Switcher8::MODE_LIGHT+track));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xIn1, yStart+(track*yDelta))), module, Switcher8::IN1_INPUT+track));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xIn2, yStart+(track*yDelta))), module, Switcher8::IN2_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xIn1, yStart+(track*yDelta))), module, Switcher8::IN1_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xIn2, yStart+(track*yDelta))), module, Switcher8::IN2_INPUT+track));
 
 			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xIn1 + xLight, yStart+(track*yDelta)-yLight)), module, Switcher8::IN1_LIGHT+track));
 			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xIn2 + xLight, yStart+(track*yDelta)-yLight)), module, Switcher8::IN2_LIGHT+track));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xFade, yStart+(track*yDelta))), module, Switcher8::FADE_PARAM+track));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xFade, yStart+(track*yDelta))), module, Switcher8::FADE_PARAM+track));
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut1, yStart+(track*yDelta))), module, Switcher8::OUT1_OUTPUT+track));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut2, yStart+(track*yDelta))), module, Switcher8::OUT2_OUTPUT+track));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut1, yStart+(track*yDelta))), module, Switcher8::OUT1_OUTPUT+track));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut2, yStart+(track*yDelta))), module, Switcher8::OUT2_OUTPUT+track));
 
 			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xOut1 + xLight, yStart+(track*yDelta)-yLight)), module, Switcher8::OUT1_LIGHT+track));
 			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xOut2 + xLight, yStart+(track*yDelta)-yLight)), module, Switcher8::OUT2_LIGHT+track));

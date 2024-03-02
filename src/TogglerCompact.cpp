@@ -287,23 +287,23 @@ struct TogglerCompactWidget : ModuleWidget {
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(4, 11.35)), module, TogglerCompact::MODE_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 24.5)), module, TogglerCompact::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 36.2)), module, TogglerCompact::RST_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.2, 52.8)), module, TogglerCompact::IN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.5, 52.8)), module, TogglerCompact::IN_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 24.5)), module, TogglerCompact::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 36.2)), module, TogglerCompact::RST_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(6.2, 52.8)), module, TogglerCompact::IN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(14.5, 52.8)), module, TogglerCompact::IN_INPUT+1));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.32, 62)), module, TogglerCompact::ATTACK_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.32, 69)), module, TogglerCompact::ATTACK_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(6.32, 62)), module, TogglerCompact::ATTACK_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(6.32, 69)), module, TogglerCompact::ATTACK_INPUT));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(14.32, 73)), module, TogglerCompact::SUSTAIN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.32, 80)), module, TogglerCompact::SUSTAIN_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(14.32, 73)), module, TogglerCompact::SUSTAIN_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(14.32, 80)), module, TogglerCompact::SUSTAIN_INPUT));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(6.32, 84)), module, TogglerCompact::RELEASE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.32, 91)), module, TogglerCompact::RELEASE_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(6.32, 84)), module, TogglerCompact::RELEASE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(6.32, 91)), module, TogglerCompact::RELEASE_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.2, 107.5)), module, TogglerCompact::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.5, 107.5)), module, TogglerCompact::OUT_OUTPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.16, 119)), module, TogglerCompact::GATE_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(6.2, 107.5)), module, TogglerCompact::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(14.5, 107.5)), module, TogglerCompact::OUT_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(10.16, 119)), module, TogglerCompact::GATE_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(16.5, 121)), module, TogglerCompact::OUT_LIGHT));
 	}

@@ -1,4 +1,4 @@
-# SickoCV v2.6.6-beta7
+# SickoCV v2.6.7-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,11 +18,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
-- added modulator module
-- added modulator7 module
-- added switcher8 module
+- switcher: added 'Route & Hold' feature.
+- changed ports and knobs design.
 
-# SickoCV v2.6.6
+# SickoCV v2.6.7
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/a648c11d-d7f6-4c65-b8c2-7bd462538677)
@@ -897,6 +896,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 
 #### Right-click Menu
 - Initialize On Start: discards previous module state on VCV restart
+- Route & Hold (switcher module only): when using the module in Toggle mode and Router function, the last achieved input is held (instead of going to 0v) to the unrouted output.
 
 **NOTES**  
 - If Fader knob is set to 1ms it won't do any fade

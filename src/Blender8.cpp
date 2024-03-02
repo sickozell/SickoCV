@@ -132,16 +132,16 @@ struct Blender8Widget : ModuleWidget {
 		const float y = 13;
 		const float ys = 22;
 		for (int i=0; i<8; i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.7, ys+(i*y))), module, Blender8::IN1_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(6.7, ys+(i*y))), module, Blender8::IN1_INPUT+i));
 			
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.1, ys+(i*y))), module, Blender8::IN2_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(16.1, ys+(i*y))), module, Blender8::IN2_INPUT+i));
 			addParam(createParamCentered<CKSS>(mm2px(Vec(23.4, ys+(i*y))), module, Blender8::PHASE_SWITCH+i));
 			
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(33, ys+(i*y))), module, Blender8::MIX_PARAMS+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42, ys+(i*y))), module, Blender8::MODMIXCV_INPUT+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(33, ys+(i*y))), module, Blender8::MIX_PARAMS+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(42, ys+(i*y))), module, Blender8::MODMIXCV_INPUT+i));
 			addParam(createParamCentered<CKSS>(mm2px(Vec(50, ys+(i*y))), module, Blender8::RANGEMODMIX_SWITCH+i));
 			
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(59.3, ys+(i*y))), module, Blender8::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(59.3, ys+(i*y))), module, Blender8::OUT_OUTPUT+i));
 		}
 	}
 };

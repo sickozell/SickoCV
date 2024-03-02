@@ -5247,55 +5247,55 @@ struct SickoLooper3Widget : ModuleWidget {
 		// roundBlackKnob --- x 5.7 --- y 6.4
 		// input/output --- 4.5
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xBpm, yBpm)), module, SickoLooper3::BPM_KNOB_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xBeat, yBeat)), module, SickoLooper3::SIGNATURE_KNOB_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xBpm, yBpm)), module, SickoLooper3::BPM_KNOB_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xBeat, yBeat)), module, SickoLooper3::SIGNATURE_KNOB_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xExtClock, yExtClock)), module, SickoLooper3::EXTCLOCK_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xExtClock, yExtClock)), module, SickoLooper3::EXTCLOCK_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(xClockRst, yClockRst)), module, SickoLooper3::CLOCK_RST_SWITCH, SickoLooper3::CLOCK_RST_LIGHT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xClockOut, yClockOut)), module, SickoLooper3::CLOCK_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xClockOut, yClockOut)), module, SickoLooper3::CLOCK_OUTPUT));
 
 		addParam(createLightParamCentered<VCVLightBezelLatch<YellowLight>>(mm2px(Vec(xClick, yClick)), module, SickoLooper3::CLICK_BUT_PARAM, SickoLooper3::CLICK_BUT_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xClickVol, yClickVol)), module, SickoLooper3::CLICKVOL_KNOB_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xClickVol, yClickVol)), module, SickoLooper3::CLICKVOL_KNOB_PARAM));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xClickMst, yClickVol)), module, SickoLooper3::CLICKTOMASTER_SWITCH, SickoLooper3::CLICKTOMASTER_LIGHT));
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xPrerollBut, yPreroll)), module, SickoLooper3::PREROLL_BUT_PARAM, SickoLooper3::PREROLL_BUT_LIGHT));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xPrerollSwitch, yPreroll)), module, SickoLooper3::PREROLL_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xAllStartTrig, yAll)), module, SickoLooper3::ALLSTARTSTOP_TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xAllStartTrig, yAll)), module, SickoLooper3::ALLSTARTSTOP_TRIG_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xAllStartBut, yAll)), module, SickoLooper3::ALLSTARTSTOP_BUT_PARAM, SickoLooper3::ALLSTARTSTOP_BUT_LIGHT));
 
 		//addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xAllStop, yAll)), module, SickoLooper3::UNDOREDO_BUT_PARAM, SickoLooper3::UNDOREDO_BUT_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xAllStop, yAll)), module, SickoLooper3::ALLSTOP_TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xAllStop, yAll)), module, SickoLooper3::ALLSTOP_TRIG_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEarVol, yEarVol)), module, SickoLooper3::EARVOL_KNOB_PARAM));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEarL, yEar)), module, SickoLooper3::EAR_LEFT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEarR, yEar)), module, SickoLooper3::EAR_RIGHT_OUTPUT));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xEarVol, yEarVol)), module, SickoLooper3::EARVOL_KNOB_PARAM));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xEarL, yEar)), module, SickoLooper3::EAR_LEFT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xEarR, yEar)), module, SickoLooper3::EAR_RIGHT_OUTPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xMastVol, yMastVol)), module, SickoLooper3::MASTERVOL_KNOB_PARAM));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xMastL, yMast)), module, SickoLooper3::MASTER_LEFT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xMastR, yMast)), module, SickoLooper3::MASTER_RIGHT_OUTPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xMastVol, yMastVol)), module, SickoLooper3::MASTERVOL_KNOB_PARAM));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xMastL, yMast)), module, SickoLooper3::MASTER_LEFT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xMastR, yMast)), module, SickoLooper3::MASTER_RIGHT_OUTPUT));
 
 		for (int i = 0; i < MAX_TRACKS; i++) {
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInL+(xTrackShift*i), yIn)), module, SickoLooper3::LEFT_INPUT+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xInR+(xTrackShift*i), yIn)), module, SickoLooper3::RIGHT_INPUT+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xInLvl+(xTrackShift*i), yIn)), module, SickoLooper3::SOURCELVL_KNOB_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xInL+(xTrackShift*i), yIn)), module, SickoLooper3::LEFT_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xInR+(xTrackShift*i), yIn)), module, SickoLooper3::RIGHT_INPUT+i));
+			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xInLvl+(xTrackShift*i), yIn)), module, SickoLooper3::SOURCELVL_KNOB_PARAM+i));
 			addParam(createLightParamCentered<VCVLightLatch<LargeSimpleLight<RedLight>>>(mm2px(Vec(xMute+(xTrackShift*i), yIn)), module, SickoLooper3::MUTE_SWITCH+i, SickoLooper3::MUTE_LIGHT+i));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xSrc+(xTrackShift*i), ySrc)), module, SickoLooper3::SOURCE_KNOB_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xSrc+(xTrackShift*i), ySrc)), module, SickoLooper3::SOURCE_KNOB_PARAM+i));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xMeasKnob+(xTrackShift*i), yMeasKnob)), module, SickoLooper3::MEAS_KNOB_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xMeasKnob+(xTrackShift*i), yMeasKnob)), module, SickoLooper3::MEAS_KNOB_PARAM+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yPlay)), module, SickoLooper3::PLAY_TRIG_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yPlay)), module, SickoLooper3::PLAY_TRIG_INPUT+i));
 			addParam(createLightParamCentered<VCVLightBezel<GreenLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yPlay)), module, SickoLooper3::PLAY_BUT_PARAM+i, SickoLooper3::PLAY_BUT_LIGHT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yRec)), module, SickoLooper3::REC_TRIG_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yRec)), module, SickoLooper3::REC_TRIG_INPUT+i));
 			addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yRec)), module, SickoLooper3::REC_BUT_PARAM+i, SickoLooper3::REC_BUT_LIGHT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yStop)), module, SickoLooper3::STOP_TRIG_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yStop)), module, SickoLooper3::STOP_TRIG_INPUT+i));
 			addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yStop)), module, SickoLooper3::STOP_BUT_PARAM+i, SickoLooper3::STOP_BUT_LIGHT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yErase)), module, SickoLooper3::ERASE_TRIG_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xPlayTrig+(xTrackShift*i), yErase)), module, SickoLooper3::ERASE_TRIG_INPUT+i));
 			addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xPlayBut+(xTrackShift*i), yErase)), module, SickoLooper3::ERASE_BUT_PARAM+i, SickoLooper3::ERASE_BUT_LIGHT+i));
 
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xStartImm+(xTrackShift*i), yStartImm)), module, SickoLooper3::STARTIMM_SWITCH+i, SickoLooper3::STARTIMM_LIGHT+i));
@@ -5307,14 +5307,14 @@ struct SickoLooper3Widget : ModuleWidget {
 
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xSoloBut+(xTrackShift*i), ySoloBut)), module, SickoLooper3::SOLO_SWITCH+i, SickoLooper3::SOLO_LIGHT+i));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xXFade+(xTrackShift*i), yXFade)), module, SickoLooper3::XFADE_KNOB_PARAM+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xPan+(xTrackShift*i), yPan)), module, SickoLooper3::PAN_KNOB_PARAM+i));
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xVol+(xTrackShift*i), yVol)), module, SickoLooper3::VOLTRACK_KNOB_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xXFade+(xTrackShift*i), yXFade)), module, SickoLooper3::XFADE_KNOB_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPan+(xTrackShift*i), yPan)), module, SickoLooper3::PAN_KNOB_PARAM+i));
+			addParam(createParamCentered<SickoKnob>(mm2px(Vec(xVol+(xTrackShift*i), yVol)), module, SickoLooper3::VOLTRACK_KNOB_PARAM+i));
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xEol+(xTrackShift*i), yOutput)), module, SickoLooper3::EOL_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xEol+(xTrackShift*i), yOutput)), module, SickoLooper3::EOL_OUTPUT+i));
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xSrcToTrack+(xTrackShift*i), yOutput)), module, SickoLooper3::SRC_TO_TRACK_SWITCH+i, SickoLooper3::SRC_TO_TRACK_LIGHT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOutL+(xTrackShift*i), yOutput)), module, SickoLooper3::TRACK_LEFT_OUTPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOutR+(xTrackShift*i), yOutput)), module, SickoLooper3::TRACK_RIGHT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOutL+(xTrackShift*i), yOutput)), module, SickoLooper3::TRACK_LEFT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOutR+(xTrackShift*i), yOutput)), module, SickoLooper3::TRACK_RIGHT_OUTPUT+i));
 		}
 	}
 

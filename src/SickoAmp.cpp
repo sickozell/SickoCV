@@ -210,18 +210,18 @@ struct SickoAmpWidget : ModuleWidget {
 		const float yOut1 = 108.5;
 		const float yOut2 = 117.5f;
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x, yIn1)), module, SickoAmp::IN_INPUT+LEFT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x, yIn2)), module, SickoAmp::IN_INPUT+RIGHT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(x, yIn1)), module, SickoAmp::IN_INPUT+LEFT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(x, yIn2)), module, SickoAmp::IN_INPUT+RIGHT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x, yVca)), module, SickoAmp::VCA_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(x, yVcaAtnv)), module, SickoAmp::CV_ATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x, yVcaIn)), module, SickoAmp::CV_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(x, yVca)), module, SickoAmp::VCA_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(x, yVcaAtnv)), module, SickoAmp::CV_ATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(x, yVcaIn)), module, SickoAmp::CV_INPUT));
 	
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(x, yLimSw)), module, SickoAmp::LIMIT_SWITCH, SickoAmp::LIMIT_LIGHT));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(x, yLimKnob)), module, SickoAmp::LIMIT_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(x, yLimKnob)), module, SickoAmp::LIMIT_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x, yOut1)), module, SickoAmp::OUT_OUTPUT+LEFT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x, yOut2)), module, SickoAmp::OUT_OUTPUT+RIGHT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(x, yOut1)), module, SickoAmp::OUT_OUTPUT+LEFT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(x, yOut2)), module, SickoAmp::OUT_OUTPUT+RIGHT));
 
 	}
 

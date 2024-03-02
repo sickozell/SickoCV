@@ -568,19 +568,19 @@ struct CVrouterWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 17)), module, CVrouter::CV_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 17)), module, CVrouter::CV_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 32)), module, CVrouter::THRESHOLD_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(7.62, 41.8)), module, CVrouter::THRESHOLD_ATTENUV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 49.5)), module, CVrouter::THRESHOLD_CV_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(7.62, 32)), module, CVrouter::THRESHOLD_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(7.62, 41.8)), module, CVrouter::THRESHOLD_ATTENUV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 49.5)), module, CVrouter::THRESHOLD_CV_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 65)), module, CVrouter::IN1_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 65)), module, CVrouter::IN1_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 82.9)), module, CVrouter::FADE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 92.5)), module, CVrouter::FADECV_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(7.62, 82.9)), module, CVrouter::FADE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 92.5)), module, CVrouter::FADECV_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 109)), module, CVrouter::OUT1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 117.5)), module, CVrouter::OUT2_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(7.62, 109)), module, CVrouter::OUT1_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(7.62, 117.5)), module, CVrouter::OUT2_OUTPUT));
 
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(12, 105.5)), module, CVrouter::OUT1_LIGHT));
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(12, 114)), module, CVrouter::OUT2_LIGHT));

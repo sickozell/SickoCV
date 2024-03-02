@@ -327,15 +327,15 @@ struct Drummer4Widget : ModuleWidget {
 		const float xs = 7.75;
 
 		for (int i=0; i<4; i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), 20)), module, Drummer4::TRIG_INPUT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xs+(x*i), 32)), module, Drummer4::NOACCENT_PARAMS+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), 49)), module, Drummer4::ACCENT_INPUT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xs+(x*i), 61)), module, Drummer4::ACCENT_PARAMS+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), 77)), module, Drummer4::IN_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xs+(x*i), 20)), module, Drummer4::TRIG_INPUT+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xs+(x*i), 32)), module, Drummer4::NOACCENT_PARAMS+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xs+(x*i), 49)), module, Drummer4::ACCENT_INPUT+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xs+(x*i), 61)), module, Drummer4::ACCENT_PARAMS+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xs+(x*i), 77)), module, Drummer4::IN_INPUT+i));
 			if (i < 3)
 				addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xs+(x*i), 90.5)), module, Drummer4::CHOKE_PARAMS+i, Drummer4::CHOKE_LIGHT+i));
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xs+(x*i), 101.5)), module, Drummer4::LIMIT_PARAMS+i, Drummer4::LIMIT_LIGHT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), 115.5)), module, Drummer4::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xs+(x*i), 115.5)), module, Drummer4::OUT_OUTPUT+i));
 		}
 	}
 };

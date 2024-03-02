@@ -203,18 +203,18 @@ struct ShifterWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 18)), module, Shifter::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 18)), module, Shifter::TRIG_INPUT));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(7.62, 36.1)), module, Shifter::DELAY_PARAMS));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(7.62, 36.1)), module, Shifter::DELAY_PARAMS));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 63.3)), module, Shifter::STAGE_PARAMS));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(7.62, 76)), module, Shifter::ATNV_PARAMS));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 84.5)), module, Shifter::STAGE_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(7.62, 63.3)), module, Shifter::STAGE_PARAMS));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(7.62, 76)), module, Shifter::ATNV_PARAMS));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 84.5)), module, Shifter::STAGE_INPUT));
 		
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 100.8)), module, Shifter::IN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 100.8)), module, Shifter::IN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 117.4)), module, Shifter::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(7.62, 117.4)), module, Shifter::OUT_OUTPUT));
 
 		TextDisplayWidget *display = new TextDisplayWidget();
 		display->box.pos = Vec(12,164);

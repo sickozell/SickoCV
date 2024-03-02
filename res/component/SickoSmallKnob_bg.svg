@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 25.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.0"
+   id="svg111794"
+   x="0px"
+   y="0px"
+   width="22.67578px"
+   height="22.67581px"
+   viewBox="0 0 22.67578 22.67581"
+   enable-background="new 0 0 22.67578 22.67581"
+   xml:space="preserve"
+   sodipodi:docname="SickoSmallKnob_bg.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs8875"><linearGradient
+     id="SVGID_1_-9"
+     gradientUnits="userSpaceOnUse"
+     x1="-2317.6343"
+     y1="-3827.8528"
+     x2="-2301.4397"
+     y2="-3827.8528"
+     gradientTransform="matrix(0,1.2700325,-1.2700325,0,-4850.1594,2944.5249)">
+	<stop
+   offset="0"
+   style="stop-color:#FFFBFD"
+   id="stop5050" />
+	<stop
+   offset="1"
+   style="stop-color:#000000"
+   id="stop5052" />
+</linearGradient><linearGradient
+     id="SVGID_2_-1"
+     gradientUnits="userSpaceOnUse"
+     x1="183.81821"
+     y1="5065.8359"
+     x2="200.01283"
+     y2="5065.8359"
+     gradientTransform="matrix(4.6839279e-8,1.2700325,1.2700325,-4.6839281e-8,-6422.4383,-232.40081)">
+	<stop
+   offset="0"
+   style="stop-color:#FFFBFD"
+   id="stop5057" />
+	<stop
+   offset="1"
+   style="stop-color:#2E2E2E"
+   id="stop5059" />
+</linearGradient><linearGradient
+     id="SVGID_1_-9-9"
+     gradientUnits="userSpaceOnUse"
+     x1="-2317.6343"
+     y1="-3827.8528"
+     x2="-2301.4397"
+     y2="-3827.8528"
+     gradientTransform="matrix(0,1.2700325,-1.2700325,0,-4850.1594,2944.5249)">
+	<stop
+   offset="0"
+   style="stop-color:#FFFBFD"
+   id="stop5050-1" />
+	<stop
+   offset="1"
+   style="stop-color:#000000"
+   id="stop5052-6" />
+</linearGradient><linearGradient
+     id="SVGID_2_-1-1"
+     gradientUnits="userSpaceOnUse"
+     x1="183.81821"
+     y1="5065.8359"
+     x2="200.01283"
+     y2="5065.8359"
+     gradientTransform="matrix(4.8796694e-8,1.3218582,1.3231071,-4.8750636e-8,-6691.3058,-242.34579)">
+	<stop
+   offset="0"
+   style="stop-color:#FFFBFD"
+   id="stop5057-3" />
+	<stop
+   offset="1"
+   style="stop-color:#2E2E2E"
+   id="stop5059-2" />
+</linearGradient></defs>
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   fit-margin-bottom="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-top="0"
+   id="base"
+   inkscape:current-layer="svg111794"
+   inkscape:cx="3.5671012"
+   inkscape:cy="10.480333"
+   inkscape:document-units="mm"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="1041"
+   inkscape:window-maximized="0"
+   inkscape:window-width="1920"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:zoom="15.839192"
+   pagecolor="#ffffff"
+   showgrid="false"
+   inkscape:showpageshadow="2"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1">
+	</sodipodi:namedview>
+
+<circle
+   fill="#0a0a0a"
+   cx="11.33789"
+   cy="11.337905"
+   id="circle5048"
+   style="stroke-width:1.27004"
+   inkscape:label="c5"
+   r="11.338583" /><ellipse
+   fill="url(#SVGID_1_)"
+   cx="11.33789"
+   cy="11.337905"
+   id="circle5055"
+   style="fill:url(#SVGID_1_-9-9);stroke-width:1.27004"
+   rx="10.283859"
+   ry="10.283858"
+   inkscape:label="c4" /><ellipse
+   fill="url(#SVGID_2_)"
+   cx="11.33789"
+   cy="11.339094"
+   id="circle5062"
+   style="fill:url(#SVGID_2_-1-1);stroke-width:1.32249"
+   inkscape:label="c3"
+   rx="10.713621"
+   ry="10.703507" /><ellipse
+   opacity="0.4"
+   enable-background="new    "
+   cx="11.33789"
+   cy="11.339094"
+   id="circle5064"
+   style="stroke-width:1.37845"
+   inkscape:label="c2"
+   rx="9.5232191"
+   ry="9.5142298" /><ellipse
+   opacity="0.43"
+   enable-background="new    "
+   cx="11.33789"
+   cy="11.339094"
+   id="circle5066"
+   style="stroke-width:1.37845"
+   inkscape:label="c1"
+   rx="9.5232191"
+   ry="9.5142298" /></svg>

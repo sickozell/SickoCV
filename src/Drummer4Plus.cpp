@@ -360,19 +360,19 @@ struct Drummer4PlusWidget : ModuleWidget {
 		const float xDelta = 23.5;
 
 		for (int i = 0; i < 4; i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 15)), module, Drummer4Plus::TRIG_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(17.9+(xDelta*i), 15)), module, Drummer4Plus::TRIG_INPUT+i));
 
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(9.9+(xDelta*i), 25.5)), module, Drummer4Plus::NOACCENTVOL_PARAMS+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(18.4+(xDelta*i), 35.5)), module, Drummer4Plus::NOACCENTVOLATNV_PARAMS+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.9+(xDelta*i), 40)), module, Drummer4Plus::NOACCENTVOL_INPUT+i));
+			addParam(createParamCentered<SickoKnob>(mm2px(Vec(9.9+(xDelta*i), 25.5)), module, Drummer4Plus::NOACCENTVOL_PARAMS+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(18.4+(xDelta*i), 35.5)), module, Drummer4Plus::NOACCENTVOLATNV_PARAMS+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(9.9+(xDelta*i), 40)), module, Drummer4Plus::NOACCENTVOL_INPUT+i));
 			
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 51.5)), module, Drummer4Plus::ACCENT_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(17.9+(xDelta*i), 51.5)), module, Drummer4Plus::ACCENT_INPUT+i));
 
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(9.9+(xDelta*i), 62)), module, Drummer4Plus::ACCENTVOL_PARAMS+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(18.4+(xDelta*i), 72)), module, Drummer4Plus::ACCENTVOLATNV_PARAMS+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.9+(xDelta*i), 76.5)), module, Drummer4Plus::ACCENTVOL_INPUT+i));
+			addParam(createParamCentered<SickoKnob>(mm2px(Vec(9.9+(xDelta*i), 62)), module, Drummer4Plus::ACCENTVOL_PARAMS+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(18.4+(xDelta*i), 72)), module, Drummer4Plus::ACCENTVOLATNV_PARAMS+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(9.9+(xDelta*i), 76.5)), module, Drummer4Plus::ACCENTVOL_INPUT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 87)), module, Drummer4Plus::IN_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(17.9+(xDelta*i), 87)), module, Drummer4Plus::IN_INPUT+i));
 
 			if (i<3) {
 				addParam(createParamCentered<CKSS>(mm2px(Vec(7.9+(xDelta*i), 103.9)), module, Drummer4Plus::LIMIT_SWITCH+i));
@@ -381,7 +381,7 @@ struct Drummer4PlusWidget : ModuleWidget {
 				addParam(createParamCentered<CKSS>(mm2px(Vec(5+7.9+(xDelta*i), 103.9)), module, Drummer4Plus::LIMIT_SWITCH+i));
 			}
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(17.9+(xDelta*i), 117)), module, Drummer4Plus::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(17.9+(xDelta*i), 117)), module, Drummer4Plus::OUT_OUTPUT+i));
 		}
 	}
 };

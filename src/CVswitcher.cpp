@@ -434,23 +434,23 @@ struct CVswitcherWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 17)), module, CVswitcher::CV_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 17)), module, CVswitcher::CV_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 32)), module, CVswitcher::THRESHOLD_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(7.62, 41.8)), module, CVswitcher::THRESHOLD_ATTENUV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 49.5)), module, CVswitcher::THRESHOLD_CV_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(7.62, 32)), module, CVswitcher::THRESHOLD_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(7.62, 41.8)), module, CVswitcher::THRESHOLD_ATTENUV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 49.5)), module, CVswitcher::THRESHOLD_CV_INPUT));
 
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 65)), module, CVswitcher::IN1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 74)), module, CVswitcher::IN2_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 65)), module, CVswitcher::IN1_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 74)), module, CVswitcher::IN2_INPUT));
 
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(12, 61.5)), module, CVswitcher::IN1_LIGHT));
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(12, 70.5)), module, CVswitcher::IN2_LIGHT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 91.9)), module, CVswitcher::FADE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 101.5)), module, CVswitcher::FADECV_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(7.62, 91.9)), module, CVswitcher::FADE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 101.5)), module, CVswitcher::FADECV_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 117.5)), module, CVswitcher::OUT1_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(7.62, 117.5)), module, CVswitcher::OUT1_OUTPUT));
 
 	}
 };

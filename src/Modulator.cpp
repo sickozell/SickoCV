@@ -524,28 +524,28 @@ struct ModulatorWidget : ModuleWidget {
 		const float xOut = 18.5;
 		const float yOut = 117.4;
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, Modulator::RATE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, Modulator::RATE_ATTENUV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRateIn, yRateIn)), module, Modulator::RATE_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, Modulator::RATE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, Modulator::RATE_ATTENUV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRateIn, yRateIn)), module, Modulator::RATE_INPUT));
 
 		addParam(createLightParamCentered<VCVLightBezelLatch<GreenLight>>(mm2px(Vec(xSyncSw, ySyncSw)), module, Modulator::SYNCSW_PARAM, Modulator::SYNCSW_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSyncSwIn, ySyncSwIn)), module, Modulator::SYNCSW_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSync, ySync)), module, Modulator::SYNC_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPpc, yPpc)), module, Modulator::PPC_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xSyncSwIn, ySyncSwIn)), module, Modulator::SYNCSW_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xSync, ySync)), module, Modulator::SYNC_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPpc, yPpc)), module, Modulator::PPC_PARAM));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xRt, yRt)), module, Modulator::XRATE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRt, yRt)), module, Modulator::XRATE_PARAM));
 	
 		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xType, yType)), module, Modulator::WAVEFORM_PARAM));		
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xBi, yBi)), module, Modulator::BIPOLAR_PARAM, Modulator::BIPOLAR_LIGHT));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xScl, yScl)), module, Modulator::SCALE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSclIn, ySclIn)), module, Modulator::SCALE_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xScl, yScl)), module, Modulator::SCALE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xSclIn, ySclIn)), module, Modulator::SCALE_INPUT));
 		
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRst, yRst)), module, Modulator::RST_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPhR, yPhR)), module, Modulator::PHASERST_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRst, yRst)), module, Modulator::RST_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPhR, yPhR)), module, Modulator::PHASERST_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut, yOut)), module, Modulator::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yOut)), module, Modulator::OUT_OUTPUT));
 
 	}
 

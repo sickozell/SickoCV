@@ -2548,63 +2548,63 @@ struct SickoPlayerWidget : ModuleWidget {
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xTrig1, yTrig1)), module, SickoPlayer::TRIGGATEMODE_SWITCH));
 		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xTrig2, yTrig1+1)), module, SickoPlayer::TRIGMODE_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xTrig1-5, yTrig2)), module, SickoPlayer::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xTrig1-5, yTrig2)), module, SickoPlayer::TRIG_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xTrig1+4.6, yTrig2)), module, SickoPlayer::TRIGBUT_PARAM, SickoPlayer::TRIGBUT_LIGHT));
 		
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xTrig2-4.5, yTrig2)), module, SickoPlayer::STOP_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xTrig2-4.5, yTrig2)), module, SickoPlayer::STOP_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xTrig2+5.1, yTrig2)), module, SickoPlayer::STOPBUT_PARAM, SickoPlayer::STOPBUT_LIGHT));
 
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart1, yStart1)), module, SickoPlayer::CUESTART_PARAM));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart2, yStart1)), module, SickoPlayer::CUEEND_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xStart1, yStart1)), module, SickoPlayer::CUESTART_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xStart2, yStart1)), module, SickoPlayer::CUEEND_PARAM));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart1, yStart2)), module, SickoPlayer::LOOPSTART_PARAM));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xStart2, yStart2)), module, SickoPlayer::LOOPEND_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xStart1, yStart2)), module, SickoPlayer::LOOPSTART_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xStart2, yStart2)), module, SickoPlayer::LOOPEND_PARAM));
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xStart2+9.8, yStart1-1.5)), module, SickoPlayer::REV_PARAM, SickoPlayer::REV_LIGHT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xStart2 + 18, yStart1-1)), module, SickoPlayer::XFADE_PARAM));;
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStart2 + 18, yStart1-1)), module, SickoPlayer::XFADE_PARAM));;
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xStart2+10, yStart2-2)), module, SickoPlayer::LOOP_PARAM, SickoPlayer::LOOP_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xStart2+18, yStart2+0.5)), module, SickoPlayer::PINGPONG_PARAM, SickoPlayer::PINGPONG_LIGHT));
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEnv1, yEnv1)), module, SickoPlayer::ATTACK_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xEnv2, yEnv2)), module, SickoPlayer::ATTACK_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv2+xEnv2Add, yEnv2)), module, SickoPlayer::ATTACKATNV_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xEnv1, yEnv1)), module, SickoPlayer::ATTACK_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xEnv2, yEnv2)), module, SickoPlayer::ATTACK_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xEnv2+xEnv2Add, yEnv2)), module, SickoPlayer::ATTACKATNV_PARAM));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEnv1+xEnv1Add, yEnv1)), module, SickoPlayer::DECAY_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xEnv2+xEnv2Skip, yEnv2)), module, SickoPlayer::DECAY_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv2+xEnv2Add+xEnv2Skip, yEnv2)), module, SickoPlayer::DECAYATNV_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xEnv1+xEnv1Add, yEnv1)), module, SickoPlayer::DECAY_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xEnv2+xEnv2Skip, yEnv2)), module, SickoPlayer::DECAY_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xEnv2+xEnv2Add+xEnv2Skip, yEnv2)), module, SickoPlayer::DECAYATNV_PARAM));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEnv1+xEnv1Add*2, yEnv1)), module, SickoPlayer::SUSTAIN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xEnv2+xEnv2Skip*2, yEnv2)), module, SickoPlayer::SUSTAIN_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv2+xEnv2Add+xEnv2Skip*2, yEnv2)), module, SickoPlayer::SUSTAINATNV_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xEnv1+xEnv1Add*2, yEnv1)), module, SickoPlayer::SUSTAIN_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xEnv2+xEnv2Skip*2, yEnv2)), module, SickoPlayer::SUSTAIN_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xEnv2+xEnv2Add+xEnv2Skip*2, yEnv2)), module, SickoPlayer::SUSTAINATNV_PARAM));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xEnv1+xEnv1Add*3, yEnv1)), module, SickoPlayer::RELEASE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xEnv2+xEnv2Skip*3, yEnv2)), module, SickoPlayer::RELEASE_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xEnv2+xEnv2Add+xEnv2Skip*3, yEnv2)), module, SickoPlayer::RELEASEATNV_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xEnv1+xEnv1Add*3, yEnv1)), module, SickoPlayer::RELEASE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xEnv2+xEnv2Skip*3, yEnv2)), module, SickoPlayer::RELEASE_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xEnv2+xEnv2Add+xEnv2Skip*3, yEnv2)), module, SickoPlayer::RELEASEATNV_PARAM));
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, yTunVol+2.5)), module, SickoPlayer::VO_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(9, yTunVol+2.5)), module, SickoPlayer::VO_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23, yTunVol)), module, SickoPlayer::TUNE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18, yTunVol2)), module, SickoPlayer::TUNE_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(28, yTunVol2)), module, SickoPlayer::TUNEATNV_PARAM));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(23, yTunVol)), module, SickoPlayer::TUNE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(18, yTunVol2)), module, SickoPlayer::TUNE_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(28, yTunVol2)), module, SickoPlayer::TUNEATNV_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(45.5, yTunVol)), module, SickoPlayer::VOL_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(40.5, yTunVol2)), module, SickoPlayer::VOL_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(50.5, yTunVol2)), module, SickoPlayer::VOLATNV_PARAM));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(45.5, yTunVol)), module, SickoPlayer::VOL_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(40.5, yTunVol2)), module, SickoPlayer::VOL_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(50.5, yTunVol2)), module, SickoPlayer::VOLATNV_PARAM));
 
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(53, yTunVol-4.5)), module, SickoPlayer::CLIPPING_LIGHT));
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(59.3, 113)), module, SickoPlayer::LIMIT_SWITCH));
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(70.2, 105.3)), module, SickoPlayer::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(80.2, 105.3)), module, SickoPlayer::OUT_OUTPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(70.2, 117.5)), module, SickoPlayer::EOC_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(80.2, 117.5)), module, SickoPlayer::EOR_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(70.2, 105.3)), module, SickoPlayer::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(80.2, 105.3)), module, SickoPlayer::OUT_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(70.2, 117.5)), module, SickoPlayer::EOC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(80.2, 117.5)), module, SickoPlayer::EOR_OUTPUT));
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {

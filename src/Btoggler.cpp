@@ -459,18 +459,18 @@ struct BtogglerWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8, 21.6)), module, Btoggler::CLOCK_INPUT));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(23, 21.6)), module, Btoggler::FADE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(37.7, 21.6)), module, Btoggler::RSTALL_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(8, 21.6)), module, Btoggler::CLOCK_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(23, 21.6)), module, Btoggler::FADE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(37.7, 21.6)), module, Btoggler::RSTALL_INPUT));
 		
 		const float x = 8.9;
 		const float y = 10.8;
 		for (int i=0; i<8; i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.1, 41+(i*y))), module, Btoggler::ARM_INPUT+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.1+x, 41+(i*y))), module, Btoggler::IN_INPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(5.1+(2*x), 41+(i*y))), module, Btoggler::OUT_OUTPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(5.1+(3*x), 41+(i*y))), module, Btoggler::GATE_OUTPUT+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.1+(4*x), 41+(i*y))), module, Btoggler::RST_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.1, 41+(i*y))), module, Btoggler::ARM_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.1+x, 41+(i*y))), module, Btoggler::IN_INPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(5.1+(2*x), 41+(i*y))), module, Btoggler::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(5.1+(3*x), 41+(i*y))), module, Btoggler::GATE_OUTPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.1+(4*x), 41+(i*y))), module, Btoggler::RST_INPUT+i));
 			addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(18.45, 37.7+(i*y))), module, Btoggler::WRN_LIGHT+i));
 			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(27.3, 37.7+(i*y))), module, Btoggler::OUT_LIGHT+i));
 		}

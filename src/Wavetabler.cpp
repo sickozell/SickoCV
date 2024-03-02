@@ -1195,41 +1195,41 @@ struct WavetablerWidget : ModuleWidget {
 		const float adsrAtnvY = 65.9;
 		const float adsrInputY = 75;
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(adsrXstart, adsrCtrlY)), module, Wavetabler::ATTACK_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(adsrXstart, adsrAtnvY)), module, Wavetabler::ATTACKATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(adsrXstart, adsrInputY)), module, Wavetabler::ATTACK_INPUT));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(adsrXstart, adsrCtrlY)), module, Wavetabler::ATTACK_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart, adsrAtnvY)), module, Wavetabler::ATTACKATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart, adsrInputY)), module, Wavetabler::ATTACK_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(adsrXstart+(adsrXdelta), adsrCtrlY)), module, Wavetabler::DECAY_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(adsrXstart+(adsrXdelta), adsrAtnvY)), module, Wavetabler::DECAYATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(adsrXstart+(adsrXdelta), adsrInputY)), module, Wavetabler::DECAY_INPUT));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(adsrXstart+(adsrXdelta), adsrCtrlY)), module, Wavetabler::DECAY_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart+(adsrXdelta), adsrAtnvY)), module, Wavetabler::DECAYATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart+(adsrXdelta), adsrInputY)), module, Wavetabler::DECAY_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(adsrXstart+(adsrXdelta*2), adsrCtrlY)), module, Wavetabler::SUSTAIN_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(adsrXstart+(adsrXdelta*2), adsrAtnvY)), module, Wavetabler::SUSTAINATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(adsrXstart+(adsrXdelta*2), adsrInputY)), module, Wavetabler::SUSTAIN_INPUT));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(adsrXstart+(adsrXdelta*2), adsrCtrlY)), module, Wavetabler::SUSTAIN_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart+(adsrXdelta*2), adsrAtnvY)), module, Wavetabler::SUSTAINATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart+(adsrXdelta*2), adsrInputY)), module, Wavetabler::SUSTAIN_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(adsrXstart+(adsrXdelta*3), adsrCtrlY)), module, Wavetabler::RELEASE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(adsrXstart+(adsrXdelta*3), adsrAtnvY)), module, Wavetabler::RELEASEATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(adsrXstart+(adsrXdelta*3), adsrInputY)), module, Wavetabler::RELEASE_INPUT));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(adsrXstart+(adsrXdelta*3), adsrCtrlY)), module, Wavetabler::RELEASE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart+(adsrXdelta*3), adsrAtnvY)), module, Wavetabler::RELEASEATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart+(adsrXdelta*3), adsrInputY)), module, Wavetabler::RELEASE_INPUT));
 
 		//----------------------------------------------------------------------------------------------------------------------------
 		const float tuneYdelta = 41.691;
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, adsrCtrlY+tuneYdelta)), module, Wavetabler::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, 113)), module, Wavetabler::VO_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(9, adsrCtrlY+tuneYdelta)), module, Wavetabler::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(9, 113)), module, Wavetabler::VO_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(22, adsrCtrlY+tuneYdelta)), module, Wavetabler::TUNE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(22, adsrAtnvY+tuneYdelta)), module, Wavetabler::TUNEATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(22, adsrInputY+tuneYdelta)), module, Wavetabler::TUNE_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(22, adsrCtrlY+tuneYdelta)), module, Wavetabler::TUNE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(22, adsrAtnvY+tuneYdelta)), module, Wavetabler::TUNEATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(22, adsrInputY+tuneYdelta)), module, Wavetabler::TUNE_INPUT));
 		
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(38.5, adsrCtrlY+tuneYdelta)), module, Wavetabler::VOL_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(38.5, adsrAtnvY+tuneYdelta)), module, Wavetabler::VOLATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.5, adsrInputY+tuneYdelta)), module, Wavetabler::VOL_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(38.5, adsrCtrlY+tuneYdelta)), module, Wavetabler::VOL_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(38.5, adsrAtnvY+tuneYdelta)), module, Wavetabler::VOLATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(38.5, adsrInputY+tuneYdelta)), module, Wavetabler::VOL_INPUT));
 		
 
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(46, yTunVol-16.5)), module, Wavetabler::CLIPPING_LIGHT));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(53, 98.5)), module, Wavetabler::LIMIT_SWITCH));
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(53.6, adsrInputY+tuneYdelta)), module, Wavetabler::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(53.6, adsrInputY+tuneYdelta)), module, Wavetabler::OUT_OUTPUT));
 
 	}
 

@@ -493,19 +493,19 @@ struct Holder8Widget : ModuleWidget {
 
 		for (int track = 0; track < MAX_TRACKS; track++) {
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xTrg, yStart+(track*yDelta))), module, Holder8::TRIG_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xTrg, yStart+(track*yDelta))), module, Holder8::TRIG_INPUT+track));
 
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xMode, yStart+(track*yDelta))), module, Holder8::MODE_SWITCH+track, Holder8::MODE_LIGHT+track));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xIn, yStart+(track*yDelta))), module, Holder8::IN_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xIn, yStart+(track*yDelta))), module, Holder8::IN_INPUT+track));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xProb, yStart+(track*yDelta))), module, Holder8::PROB_PARAM+track));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xProb, yStart+(track*yDelta))), module, Holder8::PROB_PARAM+track));
 
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xScale, yStart+(track*yDelta))), module, Holder8::SCALE_PARAM+track));
+			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xScale, yStart+(track*yDelta))), module, Holder8::SCALE_PARAM+track));
 
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xOffset, yStart+(track*yDelta))), module, Holder8::OFFSET_PARAM+track));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xOffset, yStart+(track*yDelta))), module, Holder8::OFFSET_PARAM+track));
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut, yStart+(track*yDelta))), module, Holder8::OUT_OUTPUT+track));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart+(track*yDelta))), module, Holder8::OUT_OUTPUT+track));
 		}
 	}
 
