@@ -296,27 +296,27 @@ struct TogglerWidget : ModuleWidget {
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(21.458, 15.75)), module, Toggler::MODE_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.5, 38.5)), module, Toggler::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33, 38.5)), module, Toggler::RST_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(12.5, 38.5)), module, Toggler::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(33, 38.5)), module, Toggler::RST_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.48, 60)), module, Toggler::ATTACK_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(8.48, 71.5)), module, Toggler::ATTACKATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.48, 80.5)), module, Toggler::ATTACK_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(8.48, 60)), module, Toggler::ATTACK_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(8.48, 71.5)), module, Toggler::ATTACKATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(8.48, 80.5)), module, Toggler::ATTACK_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(22.8, 60)), module, Toggler::SUSTAIN_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(22.8, 71.5)), module, Toggler::SUSTAINATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(22.8, 80.5)), module, Toggler::SUSTAIN_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(22.8, 60)), module, Toggler::SUSTAIN_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(22.8, 71.5)), module, Toggler::SUSTAINATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(22.8, 80.5)), module, Toggler::SUSTAIN_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(37.32, 60)), module, Toggler::RELEASE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(37.32, 71.5)), module, Toggler::RELEASEATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(37.32, 80.5)), module, Toggler::RELEASE_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(37.32, 60)), module, Toggler::RELEASE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(37.32, 71.5)), module, Toggler::RELEASEATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(37.32, 80.5)), module, Toggler::RELEASE_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7, 108.8)), module, Toggler::IN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.5, 108.8)), module, Toggler::IN_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7, 108.8)), module, Toggler::IN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(16.5, 108.8)), module, Toggler::IN_INPUT+1));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(29, 103.2)), module, Toggler::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.2, 103.2)), module, Toggler::OUT_OUTPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(34, 116.5)), module, Toggler::GATE_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(29, 103.2)), module, Toggler::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(39.2, 103.2)), module, Toggler::OUT_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(34, 116.5)), module, Toggler::GATE_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(41.2, 118.7)), module, Toggler::OUT_LIGHT));
 	}

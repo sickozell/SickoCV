@@ -374,7 +374,7 @@ struct BgatesWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(23, 14.2)), module, Bgates::RSTBUT_PARAM, Bgates::RSTBUT_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32, 14.2)), module, Bgates::RSTALL_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(32, 14.2)), module, Bgates::RSTALL_INPUT));
 		
 		const float x = 8.9;
 		const float y = 12;
@@ -382,11 +382,11 @@ struct BgatesWidget : ModuleWidget {
 		const float startYled = 27.7;
 
 		for (int i=0; i<8; i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.1, startY+(i*y))), module, Bgates::CLOCK_INPUT+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.1+x, startY+(i*y))), module, Bgates::ARM_INPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(5.1+(2*x), startY+(i*y))), module, Bgates::TRIG_OUTPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(5.1+(3*x), startY+(i*y))), module, Bgates::GATE_OUTPUT+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.1+(4*x), startY+(i*y))), module, Bgates::RST_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.1, startY+(i*y))), module, Bgates::CLOCK_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.1+x, startY+(i*y))), module, Bgates::ARM_INPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(5.1+(2*x), startY+(i*y))), module, Bgates::TRIG_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(5.1+(3*x), startY+(i*y))), module, Bgates::GATE_OUTPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.1+(4*x), startY+(i*y))), module, Bgates::RST_INPUT+i));
 			addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(18.45, startYled+(i*y))), module, Bgates::WRN_LIGHT+i));
 			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(27.3, startYled+(i*y))), module, Bgates::OUT_LIGHT+i));
 		}

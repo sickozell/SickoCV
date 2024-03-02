@@ -196,26 +196,26 @@ struct DrummerWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));		
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 17.8)), module, Drummer::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 31.3)), module, Drummer::ACCENT_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(11.5, 17.8)), module, Drummer::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(11.5, 31.3)), module, Drummer::ACCENT_INPUT));
 		
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 17.8)), module, Drummer::NOACCENT_PARAMS));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 31.3)), module, Drummer::ACCENT_PARAMS));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(25, 17.8)), module, Drummer::NOACCENT_PARAMS));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(25, 31.3)), module, Drummer::ACCENT_PARAMS));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.5, 50)), module, Drummer::IN_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(26.5, 50)), module, Drummer::OUT_OUTPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(9.5, 50)), module, Drummer::IN_INPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(26.5, 50)), module, Drummer::OUT_OUTPUT));
 		
 		addParam(createParamCentered<CKSS>(mm2px(Vec(5.35, 67.45)), module, Drummer::CHOKE_SWITCH));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(22.25, 67.45)), module, Drummer::LIMIT_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 84.4)), module, Drummer::TRIG_INPUT+1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.5, 97.8)), module, Drummer::ACCENT_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(11.5, 84.4)), module, Drummer::TRIG_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(11.5, 97.8)), module, Drummer::ACCENT_INPUT+1));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 84.4)), module, Drummer::NOACCENT_PARAMS+1));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(25, 97.8)), module, Drummer::ACCENT_PARAMS+1));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(25, 84.4)), module, Drummer::NOACCENT_PARAMS+1));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(25, 97.8)), module, Drummer::ACCENT_PARAMS+1));
 		
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.5, 117)), module, Drummer::IN_INPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(26.5, 117)), module, Drummer::OUT_OUTPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(9.5, 117)), module, Drummer::IN_INPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(26.5, 117)), module, Drummer::OUT_OUTPUT+1));
 	}
 };
 

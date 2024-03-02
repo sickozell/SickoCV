@@ -205,15 +205,15 @@ struct Adder8Widget : ModuleWidget {
 
 		for (int i=0; i<8; i++) {
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.1, ys+(i*y))), module, Adder8::CV_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(6.1, ys+(i*y))), module, Adder8::CV_INPUT+i));
 			
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(15.4, ys+(i*y))), module, Adder8::VOLT_PARAMS+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(15.4, ys+(i*y))), module, Adder8::VOLT_PARAMS+i));
 
 			addParam(createParamCentered<Adder8::Add8modeSwitch>(mm2px(Vec(25.9, ys+(i*y) - 0.5f)), module, Adder8::ADDSUB_SWITCH+i));
 
 			addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(37.2, ys+(i*y))), module, Adder8::MODE_SWITCH+i));
 			
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.7, ys+(i*y))), module, Adder8::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(49.7, ys+(i*y))), module, Adder8::OUT_OUTPUT+i));
 
 		}
 	}

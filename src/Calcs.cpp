@@ -187,53 +187,53 @@ struct CalcsWidget : ModuleWidget {
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(27.5, 11)), module, Calcs::RANGE_SWITCH));
 		
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::A_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xb, yStart)), module, Calcs::B_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xc, yStart)), module, Calcs::C_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xa, yStart)), module, Calcs::A_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xb, yStart)), module, Calcs::B_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xc, yStart)), module, Calcs::C_INPUT));
 
 		xa = 8.2;
 		xb = 16.3;
 		xc = 24.4;
 		yStart = 23.9;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xb, yStart)), module, Calcs::BPLUSA_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xc, yStart)), module, Calcs::CPLUSA_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BPLUSA_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CPLUSA_OUTPUT));
 		yStart += yIncrement;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xc, yStart)), module, Calcs::CPLUSB_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::ATIMESB_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CPLUSB_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::ATIMESB_OUTPUT));
 		yStart += yIncrement;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::ATIMESC_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xb, yStart)), module, Calcs::BTIMESC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::ATIMESC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BTIMESC_OUTPUT));
 
 		yStart = 51.3;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xb, yStart)), module, Calcs::BMINUSA_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xc, yStart)), module, Calcs::CMINUSA_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BMINUSA_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CMINUSA_OUTPUT));
 		yStart += yIncrement;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::AMINUSB_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xc, yStart)), module, Calcs::CMINUSB_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::AMINUSB_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CMINUSB_OUTPUT));
 		yStart += yIncrement;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::AMINUSC_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xb, yStart)), module, Calcs::BMINUSC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::AMINUSC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BMINUSC_OUTPUT));
 
 		yStart = 79.1;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xb, yStart)), module, Calcs::BDIVA_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xc, yStart)), module, Calcs::CDIVA_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BDIVA_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CDIVA_OUTPUT));
 		yStart += yIncrement;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::ADIVB_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xc, yStart)), module, Calcs::CDIVB_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::ADIVB_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CDIVB_OUTPUT));
 		yStart += yIncrement;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::ADIVC_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xb, yStart)), module, Calcs::BDIVC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::ADIVC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BDIVC_OUTPUT));
 		
 		xa = 6;
 		xb = 15.24;
 		xc = 24.5;
 		yStart = 109.8;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::AAVGB_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xb, yStart)), module, Calcs::BAVGC_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xc, yStart)), module, Calcs::AAVGC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::AAVGB_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BAVGC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::AAVGC_OUTPUT));
 		xa = 6;
 		yStart = 119;
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xa, yStart)), module, Calcs::AVGABC_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::AVGABC_OUTPUT));
 	}
 };
 

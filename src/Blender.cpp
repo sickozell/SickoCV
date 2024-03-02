@@ -271,31 +271,31 @@ struct BlenderWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7, 25)), module, Blender::IN1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.5, 25)), module, Blender::IN1_INPUT+1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(29.55, 25)), module, Blender::IN2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.95, 25)), module, Blender::IN2_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7, 25)), module, Blender::IN1_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(16.5, 25)), module, Blender::IN1_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(29.55, 25)), module, Blender::IN2_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(38.95, 25)), module, Blender::IN2_INPUT+1));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(11.75, 34.6)), module, Blender::PHASE_SWITCH));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(34.1, 34.6)), module, Blender::PHASE_SWITCH+1));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(11, 47.9)), module, Blender::VOL1_PARAMS));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(34.92, 47.9)), module, Blender::VOL2_PARAMS));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(11, 47.9)), module, Blender::VOL1_PARAMS));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(34.92, 47.9)), module, Blender::VOL2_PARAMS));
 
-		addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(22.86, 54)), module, Blender::MIX_PARAMS));
+		addParam(createParamCentered<SickoLargeKnob>(mm2px(Vec(22.86, 54)), module, Blender::MIX_PARAMS));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8, 77.7)), module, Blender::MOD1_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(8, 77.7)), module, Blender::MOD1_INPUT));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(18.4, 77.7)), module, Blender::MOD1_RANGE_SWITCH));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(31.4, 77.7)), module, Blender::MOD1_ATNV_PARAMS));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(31.4, 77.7)), module, Blender::MOD1_ATNV_PARAMS));
 		
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(11.75, 115.7)), module, Blender::MOD2_INPUT));
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(11.75, 94)), module, Blender::MOD2_ATNV_PARAMS));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(11.75, 115.7)), module, Blender::MOD2_INPUT));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(11.75, 94)), module, Blender::MOD2_ATNV_PARAMS));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(11.75, 105)), module, Blender::MOD2_RANGE_SWITCH));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(31.1, 93.4)), module, Blender::VOL_PARAMS));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(31.1, 93.4)), module, Blender::VOL_PARAMS));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(39.75, 93.4)), module, Blender::LIMIT_PARAMS, Blender::LIMIT_LIGHT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(27.8, 115.2)), module, Blender::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.4, 115.2)), module, Blender::OUT_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(27.8, 115.2)), module, Blender::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(38.4, 115.2)), module, Blender::OUT_OUTPUT+1));
 	}
 
 	void appendContextMenu(Menu *menu) override {

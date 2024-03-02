@@ -1234,18 +1234,18 @@ struct DrumPlayerWidget : ModuleWidget {
 		for (int i = 0; i < 4; i++) {
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(9+(xDelta*i), 9)), module, DrumPlayer::SLOT_LIGHT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9+(xDelta*i), 20.2)), module, DrumPlayer::TRIG_INPUT+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(9+(xDelta*i), 31.5)), module, DrumPlayer::TRIGVOL_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(9+(xDelta*i), 20.2)), module, DrumPlayer::TRIG_INPUT+i));
+			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(9+(xDelta*i), 31.5)), module, DrumPlayer::TRIGVOL_PARAM+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9+(xDelta*i), 49.7)), module, DrumPlayer::ACC_INPUT+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(9+(xDelta*i), 61)), module, DrumPlayer::ACCVOL_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(9+(xDelta*i), 49.7)), module, DrumPlayer::ACC_INPUT+i));
+			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(9+(xDelta*i), 61)), module, DrumPlayer::ACCVOL_PARAM+i));
 
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(9+(xDelta*i), 80.5)), module, DrumPlayer::SPEED_PARAM+i));
+			addParam(createParamCentered<SickoKnob>(mm2px(Vec(9+(xDelta*i), 80.5)), module, DrumPlayer::SPEED_PARAM+i));
 
 			if (i<3)
 				addParam(createParamCentered<CKSS>(mm2px(Vec(9+(xDelta*i), 98.4)), module, DrumPlayer::CHOKE_SWITCH+i));
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(9+(xDelta*i), 117)), module, DrumPlayer::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(9+(xDelta*i), 117)), module, DrumPlayer::OUT_OUTPUT+i));
 		}
 	}
 

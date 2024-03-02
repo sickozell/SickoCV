@@ -55,6 +55,10 @@ struct Switcher : Module {
 
 	int chan;
 
+	bool routeAndHold = false;
+	float holdValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float prevHoldValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 	/*static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	const float maxAdsrTime = 10.f;*/
@@ -76,6 +80,9 @@ struct Switcher : Module {
 
 	void onReset(const ResetEvent &e) override {
 		initStart = false;
+		routeAndHold = false;
+		for (int i = 0; i < 16; i++)
+			holdValue[i] = 0;
 		mode = 1;
 		prevMode = 0;
 		trigConnection = false;
@@ -99,6 +106,23 @@ struct Switcher : Module {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "InitStart", json_boolean(initStart));
+		json_object_set_new(rootJ, "routeAndHold", json_boolean(routeAndHold));
+		json_object_set_new(rootJ, "holdValue0", json_real(holdValue[0]));
+		json_object_set_new(rootJ, "holdValue1", json_real(holdValue[1]));
+		json_object_set_new(rootJ, "holdValue2", json_real(holdValue[2]));
+		json_object_set_new(rootJ, "holdValue3", json_real(holdValue[3]));
+		json_object_set_new(rootJ, "holdValue4", json_real(holdValue[4]));
+		json_object_set_new(rootJ, "holdValue5", json_real(holdValue[5]));
+		json_object_set_new(rootJ, "holdValue6", json_real(holdValue[6]));
+		json_object_set_new(rootJ, "holdValue7", json_real(holdValue[7]));
+		json_object_set_new(rootJ, "holdValue8", json_real(holdValue[8]));
+		json_object_set_new(rootJ, "holdValue9", json_real(holdValue[9]));
+		json_object_set_new(rootJ, "holdValue10", json_real(holdValue[10]));
+		json_object_set_new(rootJ, "holdValue11", json_real(holdValue[11]));
+		json_object_set_new(rootJ, "holdValue12", json_real(holdValue[12]));
+		json_object_set_new(rootJ, "holdValue13", json_real(holdValue[13]));
+		json_object_set_new(rootJ, "holdValue14", json_real(holdValue[14]));
+		json_object_set_new(rootJ, "holdValue15", json_real(holdValue[15]));
 		json_object_set_new(rootJ, "State", json_boolean(currentSwitch));
 		return rootJ;
 	}
@@ -109,6 +133,63 @@ struct Switcher : Module {
 			initStart = json_boolean_value(initStartJ);
 
 		if (!initStart) {
+			json_t* routeAndHoldJ = json_object_get(rootJ, "routeAndHold");
+			if (routeAndHoldJ)
+				routeAndHold = json_boolean_value(routeAndHoldJ);
+
+			json_t* holdValue0J = json_object_get(rootJ, "holdValue0");
+			if (holdValue0J) {
+				holdValue[0] = json_real_value(holdValue0J);
+				prevHoldValue[0] = holdValue[0];
+				outputs[OUT1_OUTPUT].setChannels(1);
+				outputs[OUT2_OUTPUT].setChannels(1);
+			}
+			json_t* holdValue1J = json_object_get(rootJ, "holdValue1");
+			if (holdValue1J)
+				holdValue[1] = json_real_value(holdValue1J);
+			json_t* holdValue2J = json_object_get(rootJ, "holdValue2");
+			if (holdValue2J)
+				holdValue[2] = json_real_value(holdValue2J);
+			json_t* holdValue3J = json_object_get(rootJ, "holdValue3");
+			if (holdValue3J)
+				holdValue[3] = json_real_value(holdValue3J);
+			json_t* holdValue4J = json_object_get(rootJ, "holdValue4");
+			if (holdValue4J)
+				holdValue[4] = json_real_value(holdValue4J);
+			json_t* holdValue5J = json_object_get(rootJ, "holdValue5");
+			if (holdValue5J)
+				holdValue[5] = json_real_value(holdValue5J);
+			json_t* holdValue6J = json_object_get(rootJ, "holdValue6");
+			if (holdValue6J)
+				holdValue[6] = json_real_value(holdValue6J);
+			json_t* holdValue7J = json_object_get(rootJ, "holdValue7");
+			if (holdValue7J)
+				holdValue[7] = json_real_value(holdValue7J);
+			json_t* holdValue8J = json_object_get(rootJ, "holdValue8");
+			if (holdValue8J)
+				holdValue[8] = json_real_value(holdValue8J);
+			json_t* holdValue9J = json_object_get(rootJ, "holdValue9");
+			if (holdValue9J)
+				holdValue[9] = json_real_value(holdValue9J);
+			json_t* holdValue10J = json_object_get(rootJ, "holdValue10");
+			if (holdValue10J)
+				holdValue[10] = json_real_value(holdValue10J);
+			json_t* holdValue11J = json_object_get(rootJ, "holdValue11");
+			if (holdValue11J)
+				holdValue[11] = json_real_value(holdValue11J);
+			json_t* holdValue12J = json_object_get(rootJ, "holdValue12");
+			if (holdValue12J)
+				holdValue[12] = json_real_value(holdValue12J);
+			json_t* holdValue13J = json_object_get(rootJ, "holdValue13");
+			if (holdValue13J)
+				holdValue[13] = json_real_value(holdValue13J);
+			json_t* holdValue14J = json_object_get(rootJ, "holdValue14");
+			if (holdValue14J)
+				holdValue[14] = json_real_value(holdValue14J);
+			json_t* holdValue15J = json_object_get(rootJ, "holdValue15");
+			if (holdValue15J)
+				holdValue[15] = json_real_value(holdValue15J);
+			
 			json_t* jsonState = json_object_get(rootJ, "State");
 			if (jsonState)
 				currentSwitch = json_boolean_value(jsonState);
@@ -160,10 +241,10 @@ struct Switcher : Module {
 			// IN1 + OUT2 = 9
 			// IN2 + OUT1 = 6
 			// IN2 + OUT2 = 10
-			// IN1 + IN2 + OUT1 = 7
-			// IN1 + IN2 + OUT2 = 11
-			// IN1 + OUT1 + OUT2 = 13
-			// IN2 + OUT1 + OUT2 = 14
+			// IN1 + IN2 + OUT1 = 7		Switch 1/2 to out 1
+			// IN1 + IN2 + OUT2 = 11	Switch 2/1 to out 2
+			// IN1 + OUT1 + OUT2 = 13	Route 1 to 1/2
+			// IN2 + OUT1 + OUT2 = 14	Route 2 to 2/1
 			// IN1 + IN2 + OUT1 + OUT2 = 15
 			//
 
@@ -229,6 +310,21 @@ struct Switcher : Module {
 							}
 							currentFadeSample = 0;
 						}
+
+						if (connection == 13 && routeAndHold) {
+							chan = std::max(1, inputs[IN1_INPUT].getChannels());
+							for (int c = 0; c < chan; c++) {
+								prevHoldValue[c] = holdValue[c];
+								holdValue[c] = inputs[IN1_INPUT].getVoltage(c);
+							}
+						} else if (connection == 14 && routeAndHold) {
+							chan = std::max(1, inputs[IN2_INPUT].getChannels());
+							for (int c = 0; c < chan; c++) {
+								prevHoldValue[c] = holdValue[c];
+								holdValue[c] = inputs[IN2_INPUT].getVoltage(c);
+							}
+						}
+
 					}
 				break;
 			}
@@ -1020,7 +1116,7 @@ struct Switcher : Module {
 					}
 				break;
 
-				case 13:											// IN1 + OUT1 + OUT2 = 13
+				case 13:											// IN1 + OUT1 + OUT2 = 13	Route 1 to 1/2
 					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
@@ -1058,9 +1154,16 @@ struct Switcher : Module {
 						} else {
 							chan = std::max(1, inputs[IN1_INPUT].getChannels());
 							if (currentSwitch) {
-								for (int c = 0; c < chan; c++) {
-									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
-									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
+								if (routeAndHold && mode == 1) {
+									for (int c = 0; c < chan; c++) {
+										outputs[OUT2_OUTPUT].setVoltage((inputs[IN1_INPUT].getVoltage(c) * lastFade) + (prevHoldValue[c] * (1-lastFade)), c);
+										outputs[OUT1_OUTPUT].setVoltage(holdValue[c], c);
+									}
+								} else {
+									for (int c = 0; c < chan; c++) {
+										outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
+										outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
+									}
 								}
 								outputs[OUT2_OUTPUT].setChannels(chan);
 								outputs[OUT1_OUTPUT].setChannels(chan);
@@ -1070,9 +1173,16 @@ struct Switcher : Module {
 								lights[OUT1_LIGHT].setBrightness(1-lastFade);
 								lights[OUT2_LIGHT].setBrightness(lastFade);
 							} else {
-								for (int c = 0; c < chan; c++) {
-									outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
-									outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);
+								if (routeAndHold && mode == 1) {
+									for (int c = 0; c < chan; c++) {
+										outputs[OUT2_OUTPUT].setVoltage(holdValue[c], c);
+										outputs[OUT1_OUTPUT].setVoltage((inputs[IN1_INPUT].getVoltage(c) * lastFade) + (prevHoldValue[c] * (1-lastFade)), c);
+									}
+								} else {
+									for (int c = 0; c < chan; c++) {
+										outputs[OUT2_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * (1-lastFade), c);
+										outputs[OUT1_OUTPUT].setVoltage(inputs[IN1_INPUT].getVoltage(c) * lastFade, c);										
+									}
 								}
 								outputs[OUT2_OUTPUT].setChannels(chan);
 								outputs[OUT1_OUTPUT].setChannels(chan);
@@ -1093,8 +1203,13 @@ struct Switcher : Module {
 
 							if (connectionChange) {
 								connectionChange = false;
-								for (int c = 0; c < chan; c++)
-									outputs[OUT1_OUTPUT].setVoltage(0.f, c);
+								if (routeAndHold && mode == 1) {
+									for (int c = 0; c < chan; c++)
+										outputs[OUT1_OUTPUT].setVoltage(holdValue[c], c);
+								} else {
+									for (int c = 0; c < chan; c++)
+										outputs[OUT1_OUTPUT].setVoltage(0.f, c);
+								}
 								outputs[OUT1_OUTPUT].setChannels(chan);
 
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -1109,8 +1224,13 @@ struct Switcher : Module {
 
 							if (connectionChange) {
 								connectionChange = false;
-								for (int c = 0; c < chan; c++)
-									outputs[OUT2_OUTPUT].setVoltage(0.f, c);
+								if (routeAndHold && mode == 1) {
+									for (int c = 0; c < chan; c++)
+										outputs[OUT2_OUTPUT].setVoltage(holdValue[c], c);
+								} else {
+									for (int c = 0; c < chan; c++)
+										outputs[OUT2_OUTPUT].setVoltage(0.f, c);
+								}
 								outputs[OUT2_OUTPUT].setChannels(chan);
 
 								lights[IN1_LIGHT].setBrightness(1.f);
@@ -1122,7 +1242,7 @@ struct Switcher : Module {
 					}
 				break;
 
-				case 14:										// IN2 + OUT1 + OUT2 = 14
+				case 14:										// IN2 + OUT1 + OUT2 = 14	Route 2 to 2/1
 					if (inputs[RST_INPUT].isConnected()) {
 						rst = inputs[RST_INPUT].getVoltage();
 						if (rst >= 1 && prevRst < 1) {
@@ -1160,9 +1280,16 @@ struct Switcher : Module {
 						} else {
 							chan = std::max(inputs[IN1_INPUT].getChannels(), inputs[IN2_INPUT].getChannels());
 							if (currentSwitch) {
-								for (int c = 0; c < chan; c++) {
-									outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * (1-lastFade), c);
-									outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * lastFade, c);
+								if (routeAndHold && mode == 1) {
+									for (int c = 0; c < chan; c++) {
+										outputs[OUT1_OUTPUT].setVoltage((inputs[IN2_INPUT].getVoltage(c) * (lastFade)) + (prevHoldValue[c] * (1-lastFade)), c);
+										outputs[OUT2_OUTPUT].setVoltage(holdValue[c], c);
+									}
+								} else {
+									for (int c = 0; c < chan; c++) {
+										outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * (1-lastFade), c);
+										outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * lastFade, c);
+									}
 								}
 								outputs[OUT2_OUTPUT].setChannels(chan);
 								outputs[OUT1_OUTPUT].setChannels(chan);
@@ -1172,9 +1299,16 @@ struct Switcher : Module {
 								lights[OUT1_LIGHT].setBrightness(lastFade);
 								lights[OUT2_LIGHT].setBrightness(1-lastFade);
 							} else {
-								for (int c = 0; c < chan; c++) {
-									outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * lastFade, c);
-									outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * (1-lastFade), c);
+								if (routeAndHold && mode == 1) {
+									for (int c = 0; c < chan; c++) {
+										outputs[OUT2_OUTPUT].setVoltage((inputs[IN2_INPUT].getVoltage(c) * lastFade) + (prevHoldValue[c] * (1-lastFade)), c);
+										outputs[OUT1_OUTPUT].setVoltage(holdValue[c], c);
+									}
+								} else {
+									for (int c = 0; c < chan; c++) {
+										outputs[OUT2_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * lastFade, c);
+										outputs[OUT1_OUTPUT].setVoltage(inputs[IN2_INPUT].getVoltage(c) * (1-lastFade), c);
+									}
 								}
 								outputs[OUT2_OUTPUT].setChannels(chan);
 								outputs[OUT1_OUTPUT].setChannels(chan);
@@ -1195,8 +1329,13 @@ struct Switcher : Module {
 
 							if (connectionChange) {
 								connectionChange = false;
-								for (int c = 0; c < chan; c++)
-									outputs[OUT2_OUTPUT].setVoltage(0.f, c);
+								if (routeAndHold && mode == 1) {
+									for (int c = 0; c < chan; c++)
+										outputs[OUT2_OUTPUT].setVoltage(holdValue[c], c);
+								} else {
+									for (int c = 0; c < chan; c++)
+										outputs[OUT2_OUTPUT].setVoltage(0.f, c);
+								}
 								outputs[OUT2_OUTPUT].setChannels(chan);
 
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -1211,8 +1350,13 @@ struct Switcher : Module {
 
 							if (connectionChange) {
 								connectionChange = false;
-								for (int c = 0; c < chan; c++)
-									outputs[OUT1_OUTPUT].setVoltage(0.f, c);
+								if (routeAndHold && mode == 1) {
+									for (int c = 0; c < chan; c++)
+										outputs[OUT1_OUTPUT].setVoltage(holdValue[c], c);
+								} else {
+									for (int c = 0; c < chan; c++)
+										outputs[OUT1_OUTPUT].setVoltage(0.f, c);
+								}
 								outputs[OUT1_OUTPUT].setChannels(chan);
 
 								lights[IN1_LIGHT].setBrightness(0.f);
@@ -1352,20 +1496,20 @@ struct SwitcherWidget : ModuleWidget {
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(4, 11.35)), module, Switcher::MODE_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 26)), module, Switcher::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 39)), module, Switcher::RST_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 26)), module, Switcher::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 39)), module, Switcher::RST_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 55.5)), module, Switcher::IN1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 64.5)), module, Switcher::IN2_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 55.5)), module, Switcher::IN1_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 64.5)), module, Switcher::IN2_INPUT));
 
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(12, 52)), module, Switcher::IN1_LIGHT));
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(12, 61)), module, Switcher::IN2_LIGHT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(7.62, 82.9)), module, Switcher::FADE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.62, 92.5)), module, Switcher::FADECV_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(7.62, 82.9)), module, Switcher::FADE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.62, 92.5)), module, Switcher::FADECV_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 109)), module, Switcher::OUT1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.62, 118)), module, Switcher::OUT2_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(7.62, 109)), module, Switcher::OUT1_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(7.62, 118)), module, Switcher::OUT2_OUTPUT));
 
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(12, 105.5)), module, Switcher::OUT1_LIGHT));
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(12, 114.5)), module, Switcher::OUT2_LIGHT));
@@ -1374,6 +1518,8 @@ struct SwitcherWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		Switcher* module = dynamic_cast<Switcher*>(this->module);
 
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Route & Hold (Toggle)", "", &module->routeAndHold));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 	}

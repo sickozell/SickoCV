@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 25.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.0"
+   id="svg111794"
+   x="0px"
+   y="0px"
+   width="35.99997px"
+   height="36px"
+   viewBox="0 0 35.99997 36"
+   enable-background="new 0 0 35.99997 36"
+   xml:space="preserve"
+   sodipodi:docname="SickoLargeKnob_bg.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs4566"><linearGradient
+     id="SVGID_1_-9"
+     gradientUnits="userSpaceOnUse"
+     x1="-2317.6343"
+     y1="-3827.8528"
+     x2="-2301.4397"
+     y2="-3827.8528"
+     gradientTransform="matrix(0,2.0180816,-2.0161765,0,-7699.6268,4678.8322)">
+	<stop
+   offset="0"
+   style="stop-color:#FFFBFD"
+   id="stop5050" />
+	<stop
+   offset="1"
+   style="stop-color:#000000"
+   id="stop5052" />
+</linearGradient><linearGradient
+     id="SVGID_2_-1"
+     gradientUnits="userSpaceOnUse"
+     x1="183.81821"
+     y1="5065.8359"
+     x2="200.01283"
+     y2="5065.8359"
+     gradientTransform="matrix(7.746475e-8,2.1004327,2.1004325,-7.7464759e-8,-10622.447,-385.10527)">
+	<stop
+   offset="0"
+   style="stop-color:#FFFBFD"
+   id="stop5057" />
+	<stop
+   offset="1"
+   style="stop-color:#2E2E2E"
+   id="stop5059" />
+</linearGradient></defs>
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   fit-margin-bottom="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-top="0"
+   id="base"
+   inkscape:current-layer="svg111794"
+   inkscape:cx="27.1875"
+   inkscape:cy="17.321429"
+   inkscape:document-units="mm"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="1041"
+   inkscape:window-maximized="0"
+   inkscape:window-width="1920"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:zoom="11.2"
+   pagecolor="#ffffff"
+   showgrid="false"
+   inkscape:showpageshadow="2"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1">
+	</sodipodi:namedview>
+<ellipse
+   fill="#0a0a0a"
+   cx="17.999985"
+   cy="17.99811"
+   id="circle5048"
+   rx="18"
+   ry="18.017008"
+   style="stroke-width:2.01713"
+   inkscape:label="c5" /><ellipse
+   fill="url(#SVGID_1_)"
+   cx="17.999985"
+   cy="17.99811"
+   id="circle5055"
+   style="fill:url(#SVGID_1_-9);stroke-width:2.01713"
+   rx="16.325626"
+   ry="16.341051"
+   inkscape:label="c4" /><circle
+   fill="url(#SVGID_2_)"
+   cx="17.999985"
+   cy="18"
+   id="circle5062"
+   style="fill:url(#SVGID_2_-1);stroke-width:2.10044"
+   inkscape:label="c3"
+   r="17.007874" /><circle
+   opacity="0.4"
+   enable-background="new    "
+   cx="17.999985"
+   cy="18"
+   id="circle5064"
+   style="stroke-width:2.18932"
+   inkscape:label="c2"
+   r="15.118111" /><circle
+   opacity="0.43"
+   enable-background="new    "
+   cx="17.999985"
+   cy="18"
+   id="circle5066"
+   style="stroke-width:2.18932"
+   inkscape:label="c1"
+   r="15.118111" />
+</svg>

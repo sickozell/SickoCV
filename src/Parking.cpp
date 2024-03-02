@@ -74,8 +74,8 @@ struct ParkingWidget : ModuleWidget {
 
 		for (int j=0;j<4;j++) {
 			for (int i=0;i<4;i++) {
-				addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), ys+(y*j))), module, Parking::IN_INPUT+(i+(j*4))));
-				addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xs+(x*i), ys+((y*j)+y/2))), module, Parking::OUT_OUTPUT+(i+(j*4))));
+				addInput(createInputCentered<SickoInPort>(mm2px(Vec(xs+(x*i), ys+(y*j))), module, Parking::IN_INPUT+(i+(j*4))));
+				addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xs+(x*i), ys+((y*j)+y/2))), module, Parking::OUT_OUTPUT+(i+(j*4))));
 			}
 		}
 	}

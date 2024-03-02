@@ -643,24 +643,24 @@ struct HolderWidget : ModuleWidget {
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(9.958, 18.65)), module, Holder::MODE_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.5, 18.65)), module, Holder::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(25.5, 18.65)), module, Holder::TRIG_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(8, 42.7)), module, Holder::PROB_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(18.4, 42.7)), module, Holder::PROBATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(28.1, 42.7)), module, Holder::PROB_INPUT));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(8, 42.7)), module, Holder::PROB_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(18.4, 42.7)), module, Holder::PROBATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(28.1, 42.7)), module, Holder::PROB_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.48, 64.9)), module, Holder::SCALE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(10.48, 76.5)), module, Holder::SCALEATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.48, 85.2)), module, Holder::SCALE_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(10.48, 64.9)), module, Holder::SCALE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(10.48, 76.5)), module, Holder::SCALEATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.48, 85.2)), module, Holder::SCALE_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(25.1, 64.9)), module, Holder::OFFSET_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(25.1, 76.5)), module, Holder::OFFSETATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25.1, 85.5)), module, Holder::OFFSET_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(25.1, 64.9)), module, Holder::OFFSET_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(25.1, 76.5)), module, Holder::OFFSETATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(25.1, 85.5)), module, Holder::OFFSET_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.5, 108.8)), module, Holder::IN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(9.5, 108.8)), module, Holder::IN_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(26.3, 103)), module, Holder::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(26.3, 116.5)), module, Holder::TRIG_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(26.3, 103)), module, Holder::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(26.3, 116.5)), module, Holder::TRIG_OUTPUT));
 
 	}
 

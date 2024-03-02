@@ -1,7 +1,7 @@
-# SickoCV v2.6.6
+# SickoCV v2.6.7
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 6](https://github.com/sickozell/SickoCV/assets/80784296/a648c11d-d7f6-4c65-b8c2-7bd462538677)
+![SickoCV modules 2 6 7](https://github.com/sickozell/SickoCV/assets/80784296/ca99e925-119b-4f8a-ac1a-bf1dcdd11b7e)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -45,7 +45,7 @@ Thanks.
 #### - DESCRIPTION
 'adder8' is inspired by hardware precision adder modules. It adds, ignore or subtracts fixed voltages or CVS to outputs. 
 
-![adder8](https://github.com/sickozell/SickoCV/assets/80784296/b3d1e618-fcc4-49c1-8662-7ddf119e7304)
+![adder8](https://github.com/sickozell/SickoCV/assets/80784296/d79eddde-fa02-470c-bb26-6571553ef1c9)
 
 #### - INSTRUCTIONS
 On the first row a fixed voltage set by VLT/ATNV knob is added, ignored or subtracted, depending on the -0+ switch, to the corresponding output.  
@@ -69,7 +69,7 @@ otherwise, if the knob is used as attenuverter with a CV input connected, it can
 #### - DESCRIPTION
 'bGates' provides 8 buffered gates or triggers on 8 individual clock inputs.  
 
-![bgates](https://github.com/sickozell/SickoCV/assets/80784296/e49921ca-39c9-4684-b014-58021face2f8)
+![bgates](https://github.com/sickozell/SickoCV/assets/80784296/48b78c5b-c5cf-4673-8cc6-6a705cd179a7)
 
 #### - INSTRUCTIONS
 Connect a clock source. Clock inputs are normalled to previous ones.
@@ -99,7 +99,7 @@ Mix can be modulated by uni/bipolar signals.
 Modulation can be further modulated by another signal.  
 Audio rate modulations are allowed.
 
-![blender](https://user-images.githubusercontent.com/80784296/211660967-ce9aa25d-cc8f-45a9-beae-3381a13cf0af.JPG)
+![blender](https://github.com/sickozell/SickoCV/assets/80784296/414dac6a-32f4-490b-ad70-8e867d4a8b41)
 
 #### - INSTRUCTIONS
 Connect CVs or audio sources to IN1 and IN2, mono or stereo signals can be independently used. Polyphonic inputs are allowed and are left/right independent, but accordingly to number of channels of IN1 input.  
@@ -127,7 +127,7 @@ As the previous one it can be used either with cv signals or audio sources.
 Mix can be modulated by uni/bipolar signals.  
 Audio rate modulations are allowed.
 
-![blender8](https://user-images.githubusercontent.com/80784296/201516772-12dac17b-f8a0-4f82-946a-da8b7d254b09.JPG)
+![blender8](https://github.com/sickozell/SickoCV/assets/80784296/ef3726db-b087-4f00-ad9e-b8b43c6620f0)
 
 #### - INSTRUCTIONS
 'blender8' provides 8 mono crossfade mixers and differs from 'blender' module in the following things.  
@@ -143,7 +143,7 @@ If a CV input is connected for modulation, CV sets the mix percentage and the MI
 - Buffered Toggled ASR envelope generator
 - Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 
-![btoggler](https://user-images.githubusercontent.com/80784296/211221913-2ac04d94-b80b-4222-a02b-2719e0fb4d38.JPG)
+![btoggler](https://github.com/sickozell/SickoCV/assets/80784296/8464aaa5-f524-4fda-ae66-cca2251db96d)
 
 #### - INSTRUCTIONS
 Connect a clock source.
@@ -873,6 +873,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 
 #### Right-click Menu
 - Initialize On Start: discards previous module state on VCV restart
+- Route & Hold (switcher module only): when using the module in Toggle mode and Router function, the last achieved input is held (instead of going to 0v) to the unrouted output.
 
 **NOTES**  
 - If Fader knob is set to 1ms it won't do any fade

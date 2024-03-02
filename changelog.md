@@ -1,3 +1,7 @@
+### 2.6.7 (2024-03-02)
+- switcher: added 'Route & Hold' feature.
+- changed ports and knobs design.
+
 ### 2.6.6 (2024-02-19)
 - added modulator module.
 - added modulator7 module.

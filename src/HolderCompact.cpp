@@ -599,18 +599,18 @@ struct HolderCompactWidget : ModuleWidget {
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xCenter, 16.4)), module, HolderCompact::MODE_SWITCH, HolderCompact::MODE_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xCenter, 28.8)), module, HolderCompact::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, 28.8)), module, HolderCompact::TRIG_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xCenter, 45.5)), module, HolderCompact::IN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, 45.5)), module, HolderCompact::IN_INPUT));
 
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xCenter, 61)), module, HolderCompact::PROB_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, 61)), module, HolderCompact::PROB_PARAM));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xCenter, 74.5)), module, HolderCompact::SCALE_PARAM));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xCenter, 74.5)), module, HolderCompact::SCALE_PARAM));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xCenter, 88.7)), module, HolderCompact::OFFSET_PARAM));
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xCenter, 88.7)), module, HolderCompact::OFFSET_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xCenter, 104.1)), module, HolderCompact::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xCenter, 117.5)), module, HolderCompact::TRIG_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, 104.1)), module, HolderCompact::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, 117.5)), module, HolderCompact::TRIG_OUTPUT));
 
 	}
 

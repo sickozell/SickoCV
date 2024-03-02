@@ -551,21 +551,21 @@ struct BtogglerPlusWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.7, 21.3)), module, BtogglerPlus::CLOCK_INPUT));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(20.8, 21.3)), module, BtogglerPlus::FADE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(38.2, 17.3)), module, BtogglerPlus::WARNIN_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(38.2, 25.3)), module, BtogglerPlus::WARNOUT_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(48.2, 21.3)), module, BtogglerPlus::RSTALL_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7.7, 21.3)), module, BtogglerPlus::CLOCK_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(20.8, 21.3)), module, BtogglerPlus::FADE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(38.2, 17.3)), module, BtogglerPlus::WARNIN_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(38.2, 25.3)), module, BtogglerPlus::WARNOUT_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(48.2, 21.3)), module, BtogglerPlus::RSTALL_INPUT));
 
 		const float x = 8.9f;
 		const float y = 10.8f;
 		for (int i=0;i<8;i++) {
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.7, 41+(i*y))), module, BtogglerPlus::ARM_INPUT+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.7+x, 41+(i*y))), module, BtogglerPlus::IN_INPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(5.7+(2*x), 41+(i*y))), module, BtogglerPlus::OUT_OUTPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(5.7+(3*x), 41+(i*y))), module, BtogglerPlus::GATE_OUTPUT+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(5.7+(4*x), 41+(i*y))), module, BtogglerPlus::WARN_OUTPUT+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(5.7+(5*x), 41+(i*y))), module, BtogglerPlus::RST_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.7, 41+(i*y))), module, BtogglerPlus::ARM_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.7+x, 41+(i*y))), module, BtogglerPlus::IN_INPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(5.7+(2*x), 41+(i*y))), module, BtogglerPlus::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(5.7+(3*x), 41+(i*y))), module, BtogglerPlus::GATE_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(5.7+(4*x), 41+(i*y))), module, BtogglerPlus::WARN_OUTPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(5.7+(5*x), 41+(i*y))), module, BtogglerPlus::RST_INPUT+i));
 			addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(19.05, 37.7+(i*y))), module, BtogglerPlus::WRN_LIGHT+i));
 			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(27.9, 37.7+(i*y))), module, BtogglerPlus::OUT_LIGHT+i));
 		}

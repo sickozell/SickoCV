@@ -411,29 +411,29 @@ struct BtogglerStWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(30, 15.68)), module, BtogglerSt::CLOCK_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(30, 15.68)), module, BtogglerSt::CLOCK_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.5, 37.5)), module, BtogglerSt::ARM_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(33, 37.5)), module, BtogglerSt::RST_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(12.5, 37.5)), module, BtogglerSt::ARM_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(33, 37.5)), module, BtogglerSt::RST_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(8.48, 60)), module, BtogglerSt::ATTACK_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(8.48, 71.5)), module, BtogglerSt::ATTACKATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.48, 80.5)), module, BtogglerSt::ATTACK_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(8.48, 60)), module, BtogglerSt::ATTACK_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(8.48, 71.5)), module, BtogglerSt::ATTACKATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(8.48, 80.5)), module, BtogglerSt::ATTACK_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(22.8, 60)), module, BtogglerSt::SUSTAIN_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(22.8, 71.5)), module, BtogglerSt::SUSTAINATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(22.8, 80.5)), module, BtogglerSt::SUSTAIN_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(22.8, 60)), module, BtogglerSt::SUSTAIN_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(22.8, 71.5)), module, BtogglerSt::SUSTAINATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(22.8, 80.5)), module, BtogglerSt::SUSTAIN_INPUT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(37.32, 60)), module, BtogglerSt::RELEASE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(37.32, 71.5)), module, BtogglerSt::RELEASEATNV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(37.32, 80.5)), module, BtogglerSt::RELEASE_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(37.32, 60)), module, BtogglerSt::RELEASE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(37.32, 71.5)), module, BtogglerSt::RELEASEATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(37.32, 80.5)), module, BtogglerSt::RELEASE_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7, 108.8)), module, BtogglerSt::IN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(16.5, 108.8)), module, BtogglerSt::IN_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(7, 108.8)), module, BtogglerSt::IN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(16.5, 108.8)), module, BtogglerSt::IN_INPUT+1));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(29, 103.2)), module, BtogglerSt::OUT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.2, 103.2)), module, BtogglerSt::OUT_OUTPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(34, 116.5)), module, BtogglerSt::GATE_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(29, 103.2)), module, BtogglerSt::OUT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(39.2, 103.2)), module, BtogglerSt::OUT_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(34, 116.5)), module, BtogglerSt::GATE_OUTPUT));
 
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(41.2, 114.5)), module, BtogglerSt::WRN_LIGHT));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(41.2, 118.7)), module, BtogglerSt::OUT_LIGHT));

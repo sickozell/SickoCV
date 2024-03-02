@@ -697,28 +697,28 @@ struct Modulator7Widget : ModuleWidget {
 		const float xScl = 51.6;
 		const float xOut = 63.7;
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, Modulator7::RATE_PARAM));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, Modulator7::RATE_ATTENUV_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRateIn, yRateIn)), module, Modulator7::RATE_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, Modulator7::RATE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, Modulator7::RATE_ATTENUV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRateIn, yRateIn)), module, Modulator7::RATE_INPUT));
 
 		addParam(createLightParamCentered<VCVLightBezelLatch<BlueLight>>(mm2px(Vec(xSyncSw, ySyncSw)), module, Modulator7::SYNCSW_PARAM, Modulator7::SYNCSW_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSyncIn, ySyncIn)), module, Modulator7::SYNCSW_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xSync, ySync)), module, Modulator7::SYNC_INPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPpc, yPpc)), module, Modulator7::PPC_PARAM));
-		//addParam(createParamCentered<Trimpot>(mm2px(Vec(xPhR, yPhR)), module, Modulator7::PHASERST_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xSyncIn, ySyncIn)), module, Modulator7::SYNCSW_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xSync, ySync)), module, Modulator7::SYNC_INPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPpc, yPpc)), module, Modulator7::PPC_PARAM));
+		//addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPhR, yPhR)), module, Modulator7::PHASERST_PARAM));
 		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xRstBut, yRst)), module, Modulator7::RST_PARAM, Modulator7::RST_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRstIn, yRst)), module, Modulator7::RST_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xRstOut, yRstOut)), module, Modulator7::RST_OUTPUT));
-		addParam(createParamCentered<Trimpot>(mm2px(Vec(xPolyKnob, yPolyKnob)), module, Modulator7::POLY_PARAM));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xPoly, yPoly)), module, Modulator7::POLY_OUTPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRstIn, yRst)), module, Modulator7::RST_INPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xRstOut, yRstOut)), module, Modulator7::RST_OUTPUT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPolyKnob, yPolyKnob)), module, Modulator7::POLY_PARAM));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xPoly, yPoly)), module, Modulator7::POLY_OUTPUT));
 		
 		for (int i = 0; i < 7; i++) {
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xPhR, yStart + (yStartShift * i))), module, Modulator7::PHASERST_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPhR, yStart + (yStartShift * i))), module, Modulator7::PHASERST_PARAM+i));
 			addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xType, yStart + (yStartShift * i))), module, Modulator7::WAVEFORM_PARAM+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xRt, yStart + (yStartShift * i))), module, Modulator7::XRATE_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRt, yStart + (yStartShift * i))), module, Modulator7::XRATE_PARAM+i));
 			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xBi, yStart + (yStartShift * i))), module, Modulator7::BIPOLAR_PARAM+i, Modulator7::BIPOLAR_LIGHT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(xScl, yStart + (yStartShift * i))), module, Modulator7::SCALE_PARAM+i));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xOut, yStart + (yStartShift * i))), module, Modulator7::OUT_OUTPUT+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xScl, yStart + (yStartShift * i))), module, Modulator7::SCALE_PARAM+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart + (yStartShift * i))), module, Modulator7::OUT_OUTPUT+i));
 		}
 	}
 

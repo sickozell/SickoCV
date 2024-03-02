@@ -1527,24 +1527,24 @@ struct SwitcherStWidget : ModuleWidget {
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(4, 11.35)), module, SwitcherSt::MODE_SWITCH));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 26)), module, SwitcherSt::TRIG_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 39)), module, SwitcherSt::RST_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 26)), module, SwitcherSt::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 39)), module, SwitcherSt::RST_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6, 55.5)), module, SwitcherSt::IN1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.3, 55.5)), module, SwitcherSt::IN1_INPUT+1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6, 64.5)), module, SwitcherSt::IN2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(14.3, 64.5)), module, SwitcherSt::IN2_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(6, 55.5)), module, SwitcherSt::IN1_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(14.3, 55.5)), module, SwitcherSt::IN1_INPUT+1));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(6, 64.5)), module, SwitcherSt::IN2_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(14.3, 64.5)), module, SwitcherSt::IN2_INPUT+1));
 
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(10.16, 52)), module, SwitcherSt::IN1_LIGHT));
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(10.16, 61)), module, SwitcherSt::IN2_LIGHT));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16, 82.9)), module, SwitcherSt::FADE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(10.16, 92.5)), module, SwitcherSt::FADECV_INPUT));
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(10.16, 82.9)), module, SwitcherSt::FADE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 92.5)), module, SwitcherSt::FADECV_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6, 109)), module, SwitcherSt::OUT1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.3, 109)), module, SwitcherSt::OUT1_OUTPUT+1));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6, 118)), module, SwitcherSt::OUT2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(14.3, 118)), module, SwitcherSt::OUT2_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(6, 109)), module, SwitcherSt::OUT1_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(14.3, 109)), module, SwitcherSt::OUT1_OUTPUT+1));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(6, 118)), module, SwitcherSt::OUT2_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(14.3, 118)), module, SwitcherSt::OUT2_OUTPUT+1));
 
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(10.16, 105.5)), module, SwitcherSt::OUT1_LIGHT));
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(10.16, 114.5)), module, SwitcherSt::OUT2_LIGHT));

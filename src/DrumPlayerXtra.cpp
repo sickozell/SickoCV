@@ -2681,19 +2681,19 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 		for (int i = 0; i < 4; i++) {
 			addParam(createParamCentered<VCVButton>(mm2px(Vec(9.8+(xDelta*i), 28.4)), module, DrumPlayerXtra::PREVSAMPLE_PARAM+i));
 			addParam(createParamCentered<VCVButton>(mm2px(Vec(20+(xDelta*i), 28.4)), module, DrumPlayerXtra::NEXTSAMPLE_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(trigPos+(xDelta*i), trigInputPos)), module, DrumPlayerXtra::TRIG_INPUT+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(trigPos+(xDelta*i), trigVolPos)), module, DrumPlayerXtra::TRIGVOL_PARAM+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(trigPos+(xDelta*i), trigVolAtnvPos)), module, DrumPlayerXtra::TRIGVOLATNV_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(trigPos+(xDelta*i), trigVolInputPos)), module, DrumPlayerXtra::TRIGVOL_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(trigPos+(xDelta*i), trigInputPos)), module, DrumPlayerXtra::TRIG_INPUT+i));
+			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(trigPos+(xDelta*i), trigVolPos)), module, DrumPlayerXtra::TRIGVOL_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(trigPos+(xDelta*i), trigVolAtnvPos)), module, DrumPlayerXtra::TRIGVOLATNV_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(trigPos+(xDelta*i), trigVolInputPos)), module, DrumPlayerXtra::TRIGVOL_INPUT+i));
 
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(accPos+(xDelta*i), trigInputPos)), module, DrumPlayerXtra::ACC_INPUT+i));
-			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(accPos+(xDelta*i), trigVolPos)), module, DrumPlayerXtra::ACCVOL_PARAM+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(accPos+(xDelta*i), trigVolAtnvPos)), module, DrumPlayerXtra::ACCVOLATNV_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(accPos+(xDelta*i), trigVolInputPos)), module, DrumPlayerXtra::ACCVOL_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(accPos+(xDelta*i), trigInputPos)), module, DrumPlayerXtra::ACC_INPUT+i));
+			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(accPos+(xDelta*i), trigVolPos)), module, DrumPlayerXtra::ACCVOL_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(accPos+(xDelta*i), trigVolAtnvPos)), module, DrumPlayerXtra::ACCVOLATNV_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(accPos+(xDelta*i), trigVolInputPos)), module, DrumPlayerXtra::ACCVOL_INPUT+i));
 
-			addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(14.9+(xDelta*i), 86)), module, DrumPlayerXtra::SPEED_PARAM+i));
-			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.9+(xDelta*i), 95.5)), module, DrumPlayerXtra::SPEED_INPUT+i));
-			addParam(createParamCentered<Trimpot>(mm2px(Vec(19.9+(xDelta*i), 95.5)), module, DrumPlayerXtra::SPEEDATNV_PARAM+i));
+			addParam(createParamCentered<SickoKnob>(mm2px(Vec(14.9+(xDelta*i), 86)), module, DrumPlayerXtra::SPEED_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(9.9+(xDelta*i), 95.5)), module, DrumPlayerXtra::SPEED_INPUT+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(19.9+(xDelta*i), 95.5)), module, DrumPlayerXtra::SPEEDATNV_PARAM+i));
 
 			if (i<3) {
 				addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(9.9+(xDelta*i), buttonsYpos)), module, DrumPlayerXtra::LIMIT_PARAMS+i, DrumPlayerXtra::LIMIT_LIGHT+i));
@@ -2702,7 +2702,7 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 				addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(5+9.9+(xDelta*i), buttonsYpos)), module, DrumPlayerXtra::LIMIT_PARAMS+i, DrumPlayerXtra::LIMIT_LIGHT+i));
 			}
 
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.9+(xDelta*i), 117.5)), module, DrumPlayerXtra::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(18.9+(xDelta*i), 117.5)), module, DrumPlayerXtra::OUT_OUTPUT+i));
 		}
 	}
 
