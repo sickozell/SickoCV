@@ -166,7 +166,7 @@ If a CV input is connected for modulation, CV sets the mix percentage and the MI
 - Buffered Toggled ASR envelope generator
 - Buffer mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by Toggle Triggers
 
-![btoggler](https://user-images.githubusercontent.com/80784296/211221913-2ac04d94-b80b-4222-a02b-2719e0fb4d38.JPG)
+![btoggler](https://github.com/sickozell/SickoCV/assets/80784296/8464aaa5-f524-4fda-ae66-cca2251db96d)
 
 #### - INSTRUCTIONS
 Connect a clock source.
