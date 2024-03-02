@@ -187,7 +187,7 @@ Otherwise bToggler OUTs can be connected to envelope generators. In that case th
 
 'bToggler8' can also be used to route audio signals. Connect IN to the audio source and OUT to the mixer: the FADE knob will avoid clicks.
 
-![btoggler8](https://user-images.githubusercontent.com/80784296/233732638-2cee94ff-f323-43d9-9e04-b99dbe833daf.JPG)
+![btoggler8](https://github.com/sickozell/SickoCV/assets/80784296/afab0b47-fc81-4e51-a6b3-4982eb4bc1bc)
 
 #### - INSTRUCTIONS
 Connect a clock source.
@@ -225,7 +225,7 @@ Some midi controllers can light up or turn off their button leds by receiving th
 Taking advantage of this functionality, connect the WRN outs to a "GATE>MIDI" module connected to the same controller of the ARM inputs.  
 So when pressing buttons on controller, 'bToggler8+' will actually play/stop the sequencers or audio, and simultaneously give a visual feedback on the controller.
 
-![btoggler8plus](https://user-images.githubusercontent.com/80784296/233729070-514762a0-d978-4d03-9ac5-62dab9ef1078.JPG)
+![btoggler8plus](https://github.com/sickozell/SickoCV/assets/80784296/6f2d7c77-c8d1-40b4-ac0e-8e5dc9296532)
 
 #### - INSTRUCTIONS
 The same of the previous one, plus following features.
@@ -256,7 +256,7 @@ Here below is one example of bToggler+ usage. The MIDI>GATE module is connected 
 ## calcs
 ### Calculates sums, differences, multiplications, divisions and averages of 3 CV inputs
 
-![calcs](https://user-images.githubusercontent.com/80784296/233733100-719eb0c9-e6c1-467c-a2c6-cfe8b02012fb.JPG)
+![calcs](https://github.com/sickozell/SickoCV/assets/80784296/10721cad-2ecc-4d2f-be7e-de84832d4eae)
 
 #### - INSTRUCTIONS
 A, B and C are the inputs. The output tables provide simple math calculations and averages between two inputs or the average of all of them.
@@ -271,7 +271,7 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 #### - DESCRIPTION
 Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature, time signatures and integrated audio click.
 
-![clocker](https://github.com/sickozell/SickoCV/assets/80784296/297e57cc-7338-4dc5-a817-2f4215387c7e)
+![clocker](https://github.com/sickozell/SickoCV/assets/80784296/03b7fd56-4f36-4761-bf59-0357aa182865)
 
 #### - INSTRUCTIONS
 The BPM knob sets the clock speed from 30 to 300 bpm.  
@@ -332,7 +332,7 @@ Please note that "On Stop/Reset bar" option sets the clock gate output to low if
 ## CvRouter / CvSwitcher
 ### 1>2 and 2>1 voltage controlled switch  
 
-![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/d82e6cda-d973-4476-8d3a-28640a4bbe41)
+![cvRouter cvSwitcher](https://github.com/sickozell/SickoCV/assets/80784296/2edd2ce2-fe79-4533-90d6-1e4775348ac0)
 
 #### - INSTRUCTIONS
 With the cvRouter the IN signal will be routed to OUT1 or OUT2 if the CV input voltage is lower or higher than the voltage set by the "THR" threshold knob.  
@@ -347,7 +347,7 @@ The default value of the "THR" knob is +1v.
 ## drummer / drummer4 / drummer4+
 ### Accent and choke utility for drum modules lacking these features
 
-![drummer](https://user-images.githubusercontent.com/80784296/212536993-c8ac8011-b324-4dae-99f6-8f8b548557eb.JPG)
+![drummer](https://github.com/sickozell/SickoCV/assets/80784296/1fdfb704-f5e0-400f-8095-e20a8c51a7d3)
 
 #### - INSTRUCTIONS
 Drummer and Drummer4/Drummer4+ module can handle 2 or 4 drum sounds with separate standard and accent volume levels set by respective knobs.  
@@ -386,7 +386,7 @@ Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to para
 ## drumPlayer / drumPlayer+ / drumPlayerXtra
 ### 4 channel Drum Sample Player with accent and choke functionality
 
-![drumplayer](https://user-images.githubusercontent.com/80784296/221338110-d550144f-4e34-475d-9b00-00872910f331.JPG)
+![drumplayer](https://github.com/sickozell/SickoCV/assets/80784296/f7691957-dd29-48f3-b26d-7f280feb806b)
 
 #### INSTRUCTIONS  
 Load wav samples in the slots using general or slot right-click menu.  
@@ -463,7 +463,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ## holder / holder Compact / holder8
 ### Sample & Hold or Track & Hold with noise generator, probability and range
 
-![holder](https://github.com/sickozell/SickoCV/assets/80784296/cbcc05b1-f874-429b-8856-f191381aa2d0)
+![holder](https://github.com/sickozell/SickoCV/assets/80784296/eba30e61-6e09-4c4d-b5dc-083362feaac1)
 
 #### - INSTRUCTIONS
 S&H / T&H switch changes the mode between Sample & Hold and Track & Hold
@@ -491,7 +491,7 @@ There are two types of white noise generator.
 - CENTERED generates random ±5v voltages but the weight is more centered, and occasionally may exceed the range.
 
 Comparison:  
-![Holder_b](https://github.com/sickozell/SickoCV/assets/80784296/72ed6cb8-7372-4c4d-9670-c5d4de5d1c5b)
+![holder_b](https://github.com/sickozell/SickoCV/assets/80784296/234aea77-12d9-44af-a8af-c9c37ac871a2)
 
 **Track & Hold options**
 
@@ -508,7 +508,7 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 ## modulator / modulator7
 ### single or 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a clock.
 
-![modulator](https://github.com/sickozell/SickoCV/assets/80784296/93e1c653-0535-4a4c-ae8c-6d57e1e8e9d4)
+![modulator](https://github.com/sickozell/SickoCV/assets/80784296/a275769b-fddf-43e1-b9a6-874284b50043)
 
 #### - INSTRUCTIONS
 Following instructions refer to modulator7, but can be applied also to modulator module.  
@@ -537,7 +537,7 @@ If no sync cable is connected, pressing the SYNC button will act as a sample&hol
 ## parking
 ### Set of unconnected inputs and outputs just to park unused cables
 
-![parking](https://user-images.githubusercontent.com/80784296/233734644-cc9eed31-a959-4ba3-b544-48ed16a6285b.JPG)
+![parking](https://github.com/sickozell/SickoCV/assets/80784296/da6e1635-60cc-455a-8fe0-73b388f60224)
 
 #### - INSTRUCTIONS
 This module doesn't do anything. It's just a place to connect temporarily unused cables to not forget to where they were wired.  
@@ -551,7 +551,7 @@ It can also be used to connect other modules sockets when they need to be wired 
 - 64 stages shift register that outputs only the selected stage controlled by knob/CV with attenuverter
 - Trigger delay to adjust the 1-sample latency of VCV cables
 
-![shifter](https://user-images.githubusercontent.com/80784296/212537155-aceff24b-4dc8-4c04-9063-fad4543c9cd6.JPG)
+![shifter](https://github.com/sickozell/SickoCV/assets/80784296/19c42dd1-524a-4d21-97ca-02e235c776c6)
 
 #### - INSTRUCTIONS
 Shifter module can be useful to shift back and fotrth a sequencer output on the fly, thanks to the 64 stages register.  
@@ -571,7 +571,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ## sickoAmp
 ### Polyphonic stereo VCA up to 200% with limiter
 
-![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/ba7314f8-eee5-4d8f-b5b6-3240a1c95b01)
+![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/3aa3017d-13a1-4fa4-b169-6040c4b07492)
 
 #### - INSTRUCTIONS
 Level knob can be set up to 200% and its CV input is added to its value.  
@@ -590,8 +590,8 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### - DESCRIPTION
 sickoLooper is inspired by hardware looper devices with most of their features implemented.
 
-![sickolooper1x3](https://github.com/sickozell/SickoCV/assets/80784296/112f0265-90a0-48f4-80f7-182071e5ede6)  
-![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/34c0d771-edeb-499a-92b9-e4de995549c3)
+![sickolooper1x3](https://github.com/sickozell/SickoCV/assets/80784296/3a6d28ae-1882-46a7-ba56-772fdc679d40)  
+![sickolooper5](https://github.com/sickozell/SickoCV/assets/80784296/d7b2110a-4ffd-4171-96c2-b724a360875e)
 
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
@@ -611,7 +611,7 @@ Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20%5BIT
 - envelope generator, loop, reverse, pingpong
 - different interpolation modes, anti-aliasing filter, phase-scan feature
 
-![sickoplayer](https://github.com/sickozell/SickoCV/assets/80784296/4dc300e9-a2e4-4ed0-93f1-466d41f128d8)
+![sickoplayer](https://github.com/sickozell/SickoCV/assets/80784296/3e11b1a7-fc15-4335-a43e-361960e4d000)
 
 #### - INSTRUCTIONS
 Load sample using the right-click menu or right-click in the waveform display area to access quick load menu.  
@@ -722,7 +722,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler](https://github.com/sickozell/SickoCV/assets/80784296/33f276f9-e9ef-410a-946f-990dad0677de)
+![sickosampler](https://github.com/sickozell/SickoCV/assets/80784296/9950ed5c-c454-4cb6-9806-ad81844502b6)
 
 #### - INSTRUCTIONS
 
@@ -791,7 +791,7 @@ Please refer to sickoPlayer for the right-click menu, in sickoSampler following 
 - envelope generator, loop, reverse, pingpong
 - anti-aliasing filter, phase-scan feature
 
-![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/ec021062-dbbd-4afc-95c9-e7bb5c886dbf)
+![sickosampler2](https://github.com/sickozell/SickoCV/assets/80784296/8bdfcaf7-c22f-4be4-b456-5ea4a79097fe)
 
 #### - INSTRUCTIONS
 This audio sampling module simplifies the functionalities of sickoSampler by eliminating overdubbing, tuning and modulation of many parameters, but at the same time it implements a 90s style cyclic time stretch algorithm.  
@@ -832,10 +832,10 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 - Function type autodetection (switch, route, swap, mute, flipflop, toggle gate)
 - Adjustable time crossfade between switched/routed/swapped signals
 
-![switcher](https://github.com/sickozell/SickoCV/assets/80784296/24e6e8d5-3bd2-4f58-ab3d-da6e9094cf2b)
+![switcher](https://github.com/sickozell/SickoCV/assets/80784296/8ff64a26-a092-4ce1-8175-b1e02de8c8ee)
 
 #### - INSTRUCTIONS
-Switcher or SwitcherSt (used for stereo signals) are multifunction modules that can be used as follows. The versatility of the module is offered thanks to the automatic detection of the function type.
+Switcher, SwitcherSt (used for stereo signals) or Switcher8 are multifunction modules that can be used as follows. The versatility of the module is offered thanks to the automatic detection of the function type.
 
 **TOGGLE/GATE modes**  
 When the MODE switch is in 'TOGGLE' position functions are activated by triggers in a toggle style.  
@@ -892,7 +892,7 @@ CV input is added to Fade knob value and the sum will be clamped in the range of
 - Toggled ASR envelope generator
 - mute/unmute CVs or mono/stereo AUDIO signals according to an ASR envelope activated by a Gate or Toggle Triggers
 
-![toggler](https://user-images.githubusercontent.com/80784296/211222030-1a5b4e86-eccd-4e4f-ae56-65efd100e336.JPG)
+![toggler](https://github.com/sickozell/SickoCV/assets/80784296/9d7c77b4-9683-4d02-9e6b-ecb3a68a07fa)
 
 #### - INSTRUCTIONS
 **TOGGLE MODE**
@@ -937,7 +937,7 @@ These behaviors are more understandable connecting a scope on the output.
 - envelope generator, reverse, pingpong
 - anti-aliasing filter
 
-![wavetabler](https://user-images.githubusercontent.com/80784296/222272709-33ee0e06-bcfa-4f20-8428-6579940f1f0f.JPG)
+![wavetabler](https://github.com/sickozell/SickoCV/assets/80784296/187583f0-1eab-4ac7-974f-aa656e2a40f3)
 
 #### - INSTRUCTIONS
 Load sample using the right-click menu or right-click in the waveform display area to access quick load menu.  
