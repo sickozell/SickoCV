@@ -1,4 +1,4 @@
-# SickoCV v2.6.7-beta1
+# SickoCV v2.6.8-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,10 +18,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
-- switcher: added 'Route & Hold' feature.
-- changed ports and knobs design.
+- added 'modulator7 Compact' module.
+- calcs: added output range selection to context menu.
 
-# SickoCV v2.6.7
+# SickoCV v2.6.8
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 7](https://github.com/sickozell/SickoCV/assets/80784296/ca99e925-119b-4f8a-ac1a-bf1dcdd11b7e)

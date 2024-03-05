@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.6.7-beta1",
+  "version": "2.6.8-beta1",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -227,6 +227,14 @@
       "tags": [
         "Low-frequency oscillator",
         "Polyphonic"
+      ]
+    },
+    {
+      "slug": "Modulator7Compact",
+      "name": "modulator7 Compact",
+      "description": "7 unipolar triangle LFOs",
+      "tags": [
+        "Low-frequency oscillator"
       ]
     },
     {

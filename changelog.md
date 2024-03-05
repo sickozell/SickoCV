@@ -1,3 +1,7 @@
+### 2.6.8 (2024-03-xx)
+- added 'modulator7 Compact' module.
+- calcs: added output range selection to context menu.
+
 ### 2.6.7 (2024-03-02)
 - switcher: added 'Route & Hold' feature.
 - changed ports and knobs design.
