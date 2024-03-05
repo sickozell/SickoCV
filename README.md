@@ -41,7 +41,7 @@ VCV Rack plugin modules
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
-- [modulator / modulator7 / modulator7 Compact](#modulator--modulator7)
+- [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
@@ -535,7 +535,7 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 
 #### - INSTRUCTIONS
 Following instructions refer to modulator7, but can be applied also to modulator module.  
-The 'modulator7 Compact' module is just a 7 triangle only LFOs whithout sync and reset features.  
+The 'modulator7 Compact' module is just a 7 triangle only unipolar LFOs whithout sync and reset features.  
 
 Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
 The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
