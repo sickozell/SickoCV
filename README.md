@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.8
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 7](https://github.com/sickozell/SickoCV/assets/80784296/ca99e925-119b-4f8a-ac1a-bf1dcdd11b7e)
+![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/0c417481-6223-4611-aa2d-23caa7d9eb28)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -41,7 +41,7 @@ VCV Rack plugin modules
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
-- [modulator / modulator7](#modulator--modulator7)
+- [modulator / modulator7 / modulator7 Compact](#modulator--modulator7)
 - [parking](#parking)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
@@ -528,13 +528,14 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 
 [back to top](#table-of-contents)
 
-## modulator / modulator7
+## modulator / modulator7 / modulator7 Compact
 ### single or 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a clock.
 
-![modulator](https://github.com/sickozell/SickoCV/assets/80784296/a275769b-fddf-43e1-b9a6-874284b50043)
+![modulator](https://github.com/sickozell/SickoCV/assets/80784296/706a9a80-0b1e-462a-b3a4-21d8e80066e3)
 
 #### - INSTRUCTIONS
 Following instructions refer to modulator7, but can be applied also to modulator module.  
+The 'modulator7 Compact' module is just a 7 triangle only LFOs whithout sync and reset features.  
 
 Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
 The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
