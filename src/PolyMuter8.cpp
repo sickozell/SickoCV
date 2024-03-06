@@ -208,7 +208,7 @@ struct PolyMuter8 : Module {
 
 		chan = std::max(1, inputs[IN_INPUT].getChannels());
 		
-		for (int c = 0; c < chan; c++) {
+		for (int c = 0; c < 8; c++) {
 			mute[c] = params[MUTE_PARAM+c].getValue();
 			lights[MUTE_LIGHT+c].setBrightness(mute[c]);
 
