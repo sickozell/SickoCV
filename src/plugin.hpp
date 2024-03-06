@@ -35,6 +35,7 @@ extern Model* modelModulator;
 extern Model* modelModulator7;
 extern Model* modelModulator7Compact;
 extern Model* modelParking;
+extern Model* modelPolyMuter8;
 extern Model* modelShifter;
 extern Model* modelSickoAmp;
 extern Model* modelSickoLooper1;

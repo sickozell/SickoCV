@@ -1,4 +1,5 @@
 ### 2.6.8 (2024-03-xx)
+- added 'polyMuter8' module.
 - added 'modulator7 Compact' module.
 - calcs: added output range selection to context menu.
 
