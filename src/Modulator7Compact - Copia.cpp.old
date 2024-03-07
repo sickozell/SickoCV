@@ -34,9 +34,6 @@ struct Modulator7Compact : Module {
 
 	int waveSlope[7] = {1, 1, 1, 1, 1, 1, 1};
 
-	int polyChans = 1;
-	float out = 0;
-
 	static constexpr float minRate = 0.01f;  // in milliseconds
 	static constexpr float maxRate = 100.f;  // in milliseconds
 
@@ -69,7 +66,6 @@ struct Modulator7Compact : Module {
 	void onReset(const ResetEvent &e) override {
 		rateKnob = 0.5;
 		prevRateKnob = 1;
-		polyChans = 1;
 		for (int i = 0; i < 7; i++) {
 			waveSlope[i] = 1;
 			waveValue[i] = 0;
@@ -84,19 +80,6 @@ struct Modulator7Compact : Module {
 
 	void onSampleRateChange() override {
 		sampleRateCoeff = APP->engine->getSampleRate() / 2;
-	}
-
-	
-	json_t* dataToJson() override {
-		json_t* rootJ = json_object();
-		json_object_set_new(rootJ, "polyChans", json_integer(polyChans));
-		return rootJ;
-	}
-	
-	void dataFromJson(json_t* rootJ) override {
-		json_t* polyChansJ = json_object_get(rootJ, "polyChans");
-		if (polyChansJ)
-			polyChans = json_integer_value(polyChansJ);
 	}
 
 
@@ -232,7 +215,7 @@ struct Modulator7Compact : Module {
 
 		waveCoeff = rate / sampleRateCoeff;
 
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 7; i++) {
 
 			xRateKnob[i] = params[XRATE_PARAM+i].getValue();
 
@@ -251,43 +234,9 @@ struct Modulator7Compact : Module {
 				waveValue[i] = -waveValue[i];
 			}
 
-			out = waveValue[i] * 10.f;
-			if (polyChans >= i){
-				outputs[OUT_OUTPUT+6].setVoltage(out, i);	
-			}
-			outputs[OUT_OUTPUT+i].setVoltage(out);
+			outputs[OUT_OUTPUT+i].setVoltage(waveValue[i] * 10.f);
 
 		}
-
-		xRateKnob[6] = params[XRATE_PARAM+6].getValue();
-
-		if (xRateKnob[6] != prevXrateKnob[6]) {
-			xRate[6] = convertXrateToSeconds(xRateKnob[6]);
-			prevXrateKnob[6] = xRateKnob[6];
-		}
-
-		waveValue[6] += xRate[6] * waveCoeff * waveSlope[6];
-				
-		if (waveValue[6] > 1) {
-			waveSlope[6] = -1;
-			waveValue[6] = 2 - waveValue[6];
-		} else if (waveValue[6] < 0) {
-			waveSlope[6] = 1;
-			waveValue[6] = -waveValue[6];
-		}
-
-		out = waveValue[6] * 10.f;
-
-		if (polyChans == 1) {
-			outputs[OUT_OUTPUT+6].setVoltage(out);
-			outputs[OUT_OUTPUT+6].setChannels(1);
-		} else {
-			outputs[OUT_OUTPUT+6].setVoltage(out, 6);
-			outputs[OUT_OUTPUT+6].setChannels(polyChans);
-		}
-			
-		
-		
 		
 		//debugDisplay = to_string(params[XRATE_PARAM].getValue());
 	}
@@ -366,17 +315,6 @@ struct Modulator7CompactWidget : ModuleWidget {
 
 	void appendContextMenu(Menu* menu) override {
 		Modulator7Compact* module = dynamic_cast<Modulator7Compact*>(this->module);
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Polyphony on 7th out", std::to_string(module->polyChans), [=](Menu * menu) {
-			menu->addChild(createMenuItem("1", "", [=]() {module->polyChans = 1;}));
-			menu->addChild(createMenuItem("2", "", [=]() {module->polyChans = 2;}));
-			menu->addChild(createMenuItem("3", "", [=]() {module->polyChans = 3;}));
-			menu->addChild(createMenuItem("4", "", [=]() {module->polyChans = 4;}));
-			menu->addChild(createMenuItem("5", "", [=]() {module->polyChans = 5;}));
-			menu->addChild(createMenuItem("6", "", [=]() {module->polyChans = 6;}));
-			menu->addChild(createMenuItem("7", "", [=]() {module->polyChans = 7;}));
-		}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("xRate Presets"));
