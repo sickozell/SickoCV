@@ -1,4 +1,4 @@
-# SickoCV v2.6.8-beta3
+# SickoCV v2.6.8-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -19,6 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog**  
 - added 'polyMuter8' module.
+- added 'polyMuter8+' module.
 - added 'modulator7 Compact' module.
 - calcs: added output range selection to context menu.
 
