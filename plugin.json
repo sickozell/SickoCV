@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.6.8-beta3",
+  "version": "2.6.8-beta4",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -249,6 +249,14 @@
       "slug": "PolyMuter8",
       "name": "polyMuter8",
       "description": "Mutes single channels of a poly-cable",
+      "tags": [
+        "Utility"
+      ]
+    },
+    {
+      "slug": "PolyMuter8Plus",
+      "name": "polyMuter8+",
+      "description": "Mutes or Soloes single channels of a poly-cable",
       "tags": [
         "Utility"
       ]

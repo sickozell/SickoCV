@@ -7,6 +7,7 @@
 
 struct Calcs : Module {
 	enum ParamId {
+		RANGE_SWITCH,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -57,6 +58,9 @@ struct Calcs : Module {
 		configInput(A_INPUT, "a");
 		configInput(B_INPUT, "b");
 		configInput(C_INPUT, "c");
+
+		// this is maintained to not brak patched for previous version
+		configSwitch(RANGE_SWITCH, 0.f, 1.f, 1.f, "Input range", {"Bipolar", "Unipolar"});
 
 		configOutput(BPLUSA_OUTPUT, "b+a");
 		configOutput(CPLUSA_OUTPUT, "c+a");

@@ -1,6 +1,8 @@
+#define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
+
 #include "plugin.hpp"
 
-//using namespace std;	// this is for debug
+using namespace std;
 
 struct PolyMuter8 : Module {
 	enum ParamId {
@@ -36,6 +38,8 @@ struct PolyMuter8 : Module {
 	
 	bool initStart = false;
 
+	int inChans = 0;
+	int outChans = 0;
 	int chan;
 	float mute[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	float prevMute[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -207,6 +211,9 @@ struct PolyMuter8 : Module {
 		}
 
 		chan = std::max(1, inputs[IN_INPUT].getChannels());
+		inChans = chan;
+		if (inChans > 8)
+			outChans = 8;
 		
 		for (int c = 0; c < 8; c++) {
 			mute[c] = params[MUTE_PARAM+c].getValue();
@@ -244,11 +251,36 @@ struct PolyMuter8 : Module {
 			outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * ampValue[c], c);
 		}
 
-		outputs[OUT_OUTPUT].setChannels(chan);
+		//outputs[OUT_OUTPUT].setChannels(chan);
+		outputs[OUT_OUTPUT].setChannels(outChans);
 
 	}
 };
 
+struct PolyMuter8DisplayChan : TransparentWidget {
+	PolyMuter8 *module;
+	int frame = 0;
+	PolyMuter8DisplayChan() {
+	}
+
+	void drawLayer(const DrawArgs &args, int layer) override {
+		if (module) {
+			if (layer ==1) {
+				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
+				nvgFontSize(args.vg, 10);
+				nvgFontFaceId(args.vg, font->handle);
+				nvgTextLetterSpacing(args.vg, 0);
+
+				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));					
+				if (module->inChans > 9)
+					nvgTextBox(args.vg, 1.5, 17, 60, to_string(module->inChans).c_str(), NULL);
+				else
+					nvgTextBox(args.vg, 9.8, 17, 60, to_string(module->inChans).c_str(), NULL);
+			}
+		}
+		Widget::drawLayer(args, layer);
+	}
+};
 /*
 struct PolyMuter8DebugDisplay : TransparentWidget {
 	PolyMuter8 *module;
@@ -285,6 +317,14 @@ struct PolyMuter8Widget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
+		{
+			PolyMuter8DisplayChan *display = new PolyMuter8DisplayChan();
+			//display->box.pos = mm2px(Vec(13.1, 31.2));
+			display->box.pos = mm2px(Vec(10.7, 13));
+			display->box.size = mm2px(Vec(8, 8));
+			display->module = module;
+			addChild(display);
+		}
 		/*
 		{
 			PolyMuter8DebugDisplay *display = new PolyMuter8DebugDisplay();
@@ -307,7 +347,7 @@ struct PolyMuter8Widget : ModuleWidget {
 		constexpr float yStart2 = 50.5;
 		constexpr float y = 8.f;
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yIn)), module, PolyMuter8::IN_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xLeft, yIn)), module, PolyMuter8::IN_INPUT));
 
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yFade)), module, PolyMuter8::FADE_PARAM));
 

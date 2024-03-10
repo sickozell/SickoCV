@@ -36,6 +36,7 @@ void init(Plugin* p) {
 	p->addModel(modelModulator7Compact);
 	p->addModel(modelParking);
 	p->addModel(modelPolyMuter8);
+	p->addModel(modelPolyMuter8Plus);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
 	p->addModel(modelSickoLooper1);

@@ -369,7 +369,7 @@ struct Modulator7CompactWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Polyphony on 7th out", std::to_string(module->polyChans), [=](Menu * menu) {
-			menu->addChild(createMenuItem("1", "", [=]() {module->polyChans = 1;}));
+			menu->addChild(createMenuItem("Monophonic", "", [=]() {module->polyChans = 1;}));
 			menu->addChild(createMenuItem("2", "", [=]() {module->polyChans = 2;}));
 			menu->addChild(createMenuItem("3", "", [=]() {module->polyChans = 3;}));
 			menu->addChild(createMenuItem("4", "", [=]() {module->polyChans = 4;}));
