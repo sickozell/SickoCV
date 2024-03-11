@@ -578,7 +578,7 @@ It can also be used to connect other modules sockets when they need to be wired 
 ![polymuter](https://github.com/sickozell/SickoCV/assets/80784296/e7a22bf9-1a90-451c-8ca9-6ce460978134)
 
 #### - INSTRUCTIONS
-polyMuter mutes the single channels of a polyphonic cable connected to IN and outputs the same number of channels on OUT.  
+polyMuter mutes the single channels of a polyphonic cable connected to IN and outputs the same number of channels to OUT.  
 To avoid clicks the FADE knob sets the fade length in milliseconds of the mute/unmute operation.  
 Fade range is from 0 to 10 seconds and default setting is 10ms.  
 Please note that when the knob is set fully anti-clockwise the tooltip popup will shown 1ms, but it actually means no fade.  
