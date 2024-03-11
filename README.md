@@ -579,7 +579,9 @@ It can also be used to connect other modules sockets when they need to be wired 
 
 #### - INSTRUCTIONS
 polyMuter mutes the single channels of a polyphonic cable connected to IN and outputs the same number of channels on OUT.  
-To avoid clicks the FADE knob sets the fade length in milliseconds of the mute/unmute operation.  Fade range is from 0 to 10 seconds and default setting is 10ms. Please note that when the knob is set fully anti-clockwise on the tooltip will be shown 1ms, but it actually means no fade.  
+To avoid clicks the FADE knob sets the fade length in milliseconds of the mute/unmute operation.  
+Fade range is from 0 to 10 seconds and default setting is 10ms.  
+Please note that when the knob is set fully anti-clockwise the tooltip popup will shown 1ms, but it actually means no fade.  
 
 polyMuter16 is the standard version of the module, polyMuter8 will output a maximum of 8 channels. The channel display will show the number of channels of the input cable.
 
