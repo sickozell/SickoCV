@@ -580,14 +580,14 @@ It can also be used to connect other modules sockets when they need to be wired 
 #### - INSTRUCTIONS
 polyMuter mutes the single channels of a polyphonic cable connected to IN and outputs the same number of channels to OUT.  
 To avoid clicks the FADE knob sets the fade length in milliseconds of the mute/unmute operation.  
-Fade range is from 0 to 10 seconds and default setting is 10ms.  
-Please note that when the knob is set fully anti-clockwise the tooltip popup will shown 1ms, but it actually means no fade.  
+Fade range is from 0 to 10 seconds and the default setting is 10ms.  
+Please note that when the knob is set to full anti-clockwise the tooltip popup will show 1ms, but it actually means no fade.  
 
 polyMuter16 is the standard version of the module, polyMuter8 will output a maximum of 8 channels. The channel display will show the number of channels of the input cable.
 
 The plus version of each module can also 'solo' the channels by right-clicking on mute buttons, so the led button will become green. Multiple solo channels can be selected.  
-If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be be directly unmuted.  
-Unfortunately, by using the plus version the right-click menu of buttons will be no longer available (that's why there are two versions), but they will be still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function is activated by a gate in the range of +3.4v/9.9v.
+If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be directly unmuted.  
+By using the plus version of polyMuter the right-click menu of buttons is no longer available (that's why there are two versions), but the buttons are still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function by a +3.4v/9.9v gate.
 
 [back to top](#table-of-contents)
 
