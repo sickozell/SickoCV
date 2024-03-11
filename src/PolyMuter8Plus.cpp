@@ -185,7 +185,7 @@ struct PolyMuter8Plus : Module {
 	bool debugBool = false;
 	*/
 	
-	std::string db[4] = {"unm", "sol", "m-s", "mut"};
+	//std::string db[4] = {"unm", "sol", "m-s", "mut"};
 	
 	bool initStart = false;
 
