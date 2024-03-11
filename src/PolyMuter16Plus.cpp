@@ -396,7 +396,6 @@ struct PolyMuter16Plus : Module {
 				firstStatusCheck(15);
 			}
 
-			
 		}
 	}
 
@@ -450,7 +449,6 @@ struct PolyMuter16Plus : Module {
 		}
 	}
 
-
 	void process(const ProcessArgs& args) override {
 
 		fadeKnob = params[FADE_PARAM].getValue();
@@ -496,7 +494,6 @@ struct PolyMuter16Plus : Module {
 			// 1 soloed
 			// 2 soloed muted
 			// 3 muted
-
 
 			buttonValue[c] = int(params[MUTE_PARAM+c].getValue());
 
@@ -608,8 +605,6 @@ struct PolyMuter16Plus : Module {
 								status[c] = MUTED;
 							break;
 
-
-
 						}
 
 					break;
@@ -637,15 +632,7 @@ struct PolyMuter16Plus : Module {
 		debugDisplay9 = to_string(soloChans);
 		*/
 
-		//inChans = std::max(1, inputs[IN_INPUT].getChannels());
 		outChans = std::max(1, inputs[IN_INPUT].getChannels());
-		
-		/*
-		if (inChans < 9)
-			outChans = inChans;
-		else
-			outChans = 8;
-		*/
 
 		for (int c = 0; c < outChans; c++) {
 
@@ -733,7 +720,7 @@ struct PolyMuter16PlusWidget : ModuleWidget {
 
 		{
 			PolyMuter16PlusDisplayChan *display = new PolyMuter16PlusDisplayChan();
-			display->box.pos = mm2px(Vec(20.9, 25.7));
+			display->box.pos = mm2px(Vec(20.9, 8.2));
 			display->box.size = mm2px(Vec(13.2, 8.6));
 			display->module = module;
 			addChild(display);
@@ -748,14 +735,14 @@ struct PolyMuter16PlusWidget : ModuleWidget {
 		}
 		*/
 
-		const float xCenter = 10.1f;
-		const float xLeft = 12.f;
-		const float xRight = 21.f;
+		const float xCenter = 10.1;
+		const float xLeft = 12;
+		const float xRight = 21;
 
-		const float yIn = 17.5;
+		const float yIn = 17;
 		const float yFade = 30;
 		const float xOut = 27.5;
-		const float yOut = 17.5;
+		const float yOut = 28;
 
 		constexpr float yStart = 41.5;
 		constexpr float yStart2 = 46.5;

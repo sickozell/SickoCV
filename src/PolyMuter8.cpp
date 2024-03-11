@@ -210,9 +210,18 @@ struct PolyMuter8 : Module {
 			prevFadeKnob = fadeKnob;
 		}
 
+		/*
 		chan = std::max(1, inputs[IN_INPUT].getChannels());
 		inChans = chan;
 		if (inChans > 8)
+			outChans = 8;
+		*/
+
+		inChans = std::max(1, inputs[IN_INPUT].getChannels());
+
+		if (inChans < 9)
+			outChans = inChans;
+		else
 			outChans = 8;
 		
 		for (int c = 0; c < 8; c++) {

@@ -277,8 +277,6 @@ struct PolyMuter16 : Module {
 		}
 	}
 	
-
-
 	void process(const ProcessArgs& args) override {
 
 		fadeKnob = params[FADE_PARAM].getValue();
@@ -289,11 +287,6 @@ struct PolyMuter16 : Module {
 		}
 
 		inChans = std::max(1, inputs[IN_INPUT].getChannels());
-		/*
-		inChans = chan;
-		if (inChans > 8)
-			outChans = 8;
-		*/
 		
 		for (int c = 0; c < 16; c++) {
 			mute[c] = params[MUTE_PARAM+c].getValue();
@@ -331,7 +324,6 @@ struct PolyMuter16 : Module {
 			outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * ampValue[c], c);
 		}
 
-		//outputs[OUT_OUTPUT].setChannels(outChans);
 		outputs[OUT_OUTPUT].setChannels(inChans);
 
 	}
@@ -401,7 +393,7 @@ struct PolyMuter16Widget : ModuleWidget {
 
 		{
 			PolyMuter16DisplayChan *display = new PolyMuter16DisplayChan();
-			display->box.pos = mm2px(Vec(20.9, 25.7));
+			display->box.pos = mm2px(Vec(20.9, 8.2));
 			display->box.size = mm2px(Vec(13.2, 8.6));
 			display->module = module;
 			addChild(display);
@@ -416,14 +408,14 @@ struct PolyMuter16Widget : ModuleWidget {
 		}
 		*/
 
-		const float xCenter = 10.1f;
-		const float xLeft = 12.f;
-		const float xRight = 21.f;
+		const float xCenter = 10.1;
+		const float xLeft = 12;
+		const float xRight = 21;
 
-		const float yIn = 17.5;
+		const float yIn = 17;
 		const float yFade = 30;
 		const float xOut = 27.5;
-		const float yOut = 17.5;
+		const float yOut = 28;
 
 		constexpr float yStart = 41.5;
 		constexpr float yStart2 = 46.5;
@@ -436,15 +428,6 @@ struct PolyMuter16Widget : ModuleWidget {
 
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yOut)), module, PolyMuter16::OUT_OUTPUT));
 
-		/*
-		for (int i = 0; i < 16; i=i+2) {
-			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter16::MUTE_PARAM+i, PolyMuter16::MUTE_LIGHT+i));
-		}
-
-		for (int i = 1; i < 16; i=i+2) {
-			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xRight, yStart2+((i-1)*y))), module, PolyMuter16::MUTE_PARAM+i, PolyMuter16::MUTE_LIGHT+i));
-		}
-		*/
 		for (int i = 0; i < 8; i++) {
 			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter16::MUTE_PARAM+i, PolyMuter16::MUTE_LIGHT+i));
 		}

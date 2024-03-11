@@ -269,7 +269,6 @@ struct PolyMuter8Plus : Module {
 		sampleRate = APP->engine->getSampleRate();
 	}
 
-	
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
@@ -395,7 +394,6 @@ struct PolyMuter8Plus : Module {
 		}
 	}
 
-
 	void process(const ProcessArgs& args) override {
 
 		fadeKnob = params[FADE_PARAM].getValue();
@@ -441,7 +439,6 @@ struct PolyMuter8Plus : Module {
 			// 1 soloed
 			// 2 soloed muted
 			// 3 muted
-
 
 			buttonValue[c] = int(params[MUTE_PARAM+c].getValue());
 
@@ -552,8 +549,6 @@ struct PolyMuter8Plus : Module {
 								soloChans--;
 								status[c] = MUTED;
 							break;
-
-
 
 						}
 
@@ -721,15 +716,7 @@ struct PolyMuter8PlusWidget : ModuleWidget {
 			addParam(createParamCentered<PM8SoloMuteButton>(mm2px(Vec(xRight, yStart2+((i-1)*y))), module, PolyMuter8Plus::MUTE_PARAM+i));
 		}
 
-		/*
-		for (int i = 8; i < 16; i++) {
-			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xRight, yStart+((i-8)*y))), module, PolyMuter8Plus::MUTE_PARAM+i, PolyMuter8Plus::MUTE_LIGHT+i));
-		}
-		*/
-
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut)), module, PolyMuter8Plus::OUT_OUTPUT));
-
-
 
 	}
 

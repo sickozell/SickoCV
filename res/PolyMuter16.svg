@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.8284273"
-     inkscape:cx="60.987956"
-     inkscape:cy="115.9655"
+     inkscape:cx="54.270442"
+     inkscape:cy="87.681235"
      inkscape:window-width="1366"
      inkscape:window-height="705"
      inkscape:window-x="-8"
@@ -183,7 +183,7 @@
        width="13.045838"
        height="15.933232"
        x="20.99342"
-       y="8.4411116"
+       y="18.161114"
        ry="1.9985814"
        inkscape:label="input" />
     <path
@@ -206,7 +206,7 @@
        width="12.800317"
        height="8.2003174"
        x="21.099842"
-       y="25.899841"
+       y="8.4678411"
        ry="1.4906279"
        inkscape:label="slot1 rect" />
     <path
@@ -299,14 +299,14 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
        x="27.542727"
-       y="12.376056"
+       y="22.469442"
        id="text2513"
        inkscape:label="out"><tspan
          sodipodi:role="line"
          id="tspan2511"
          style="font-size:2.82222px;text-align:center;text-anchor:middle;fill:#ffffff;stroke:none;stroke-width:0.265"
          x="27.542727"
-         y="12.376056">OUT</tspan></text>
+         y="22.469442">OUT</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
@@ -535,7 +535,7 @@
        id="text18428"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#000000;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="out"
-       transform="translate(-1.9986487)">
+       transform="translate(-1.9986487,10.093387)">
       <path
          d="M 26.18999,12.376056 V 12.023278 H 25.837212 V 10.259391 H 26.18999 V 9.9066131 h 1.41111 v 0.3527779 h 0.352777 v 1.763887 H 27.6011 v 0.352778 z m 0.352777,-0.352778 h 0.705555 v -1.763887 h -0.705555 z"
          style="fill:#000000;stroke-width:0.265"
@@ -800,7 +800,7 @@
        id="g18593"
        style="font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="out"
-       transform="translate(-1.9986487)">
+       transform="translate(-1.9986487,10.093387)">
       <path
          d="M 26.18999,12.376056 V 12.023278 H 25.837212 V 10.259391 H 26.18999 V 9.9066131 h 1.41111 v 0.3527779 h 0.352777 v 1.763887 H 27.6011 v 0.352778 z m 0.352777,-0.352778 h 0.705555 v -1.763887 h -0.705555 z"
          style="stroke-width:0.265"
