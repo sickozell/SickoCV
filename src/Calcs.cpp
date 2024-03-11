@@ -1,3 +1,8 @@
+#define UNLIMITED 0
+#define LIM_0_10 1
+#define LIM_10_10 2
+#define LIM_5_5 3
+
 #include "plugin.hpp"
 
 struct Calcs : Module {
@@ -42,12 +47,19 @@ struct Calcs : Module {
 		LIGHTS_LEN
 	};
 
+	float aValue = 0;
+	float bValue = 0;
+	float cValue = 0;
+
+	int outRange = 1;
+
 	Calcs() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configInput(A_INPUT, "a");
 		configInput(B_INPUT, "b");
 		configInput(C_INPUT, "c");
 
+		// this is maintained to not brak patched for previous version
 		configSwitch(RANGE_SWITCH, 0.f, 1.f, 1.f, "Input range", {"Bipolar", "Unipolar"});
 
 		configOutput(BPLUSA_OUTPUT, "b+a");
@@ -79,94 +91,96 @@ struct Calcs : Module {
 	}
 
 
+
 	float checkRange(float checkedValue) {
-		if (params[RANGE_SWITCH].getValue() == 0) {
-			if (checkedValue > 5)
-				checkedValue = 5;
-			else if (checkedValue < -5)
-				checkedValue = -5;
-		} else {
-			if (checkedValue > 10)
-				checkedValue = 10;
-			else if (checkedValue < 0)
-				checkedValue = 0;
+
+		switch (outRange) {
+			case UNLIMITED:
+			break;
+
+			case LIM_0_10:
+				if (checkedValue > 10.f)
+					checkedValue = 10.f;
+				else if (checkedValue < 0.f)
+					checkedValue = 0.f;
+			break;
+
+			case LIM_10_10:
+				if (checkedValue > 10.f)
+					checkedValue = 10.f;
+				else if (checkedValue < -10.f)
+					checkedValue = -10.f;
+			break;
+
+			case LIM_5_5:
+				if (checkedValue > 5.f)
+					checkedValue = 5.f;
+				else if (checkedValue < -5.f)
+					checkedValue = -5.f;
+			break;
 		}
 		return checkedValue;
 	}
 
 	void process(const ProcessArgs& args) override {
-		if (inputs[A_INPUT].isConnected() && inputs[B_INPUT].isConnected()) {
-			outputs[BPLUSA_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() + inputs[B_INPUT].getVoltage()));
-			outputs[ATIMESB_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() * inputs[B_INPUT].getVoltage()));
-			outputs[BMINUSA_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() - inputs[A_INPUT].getVoltage()));
-			outputs[AMINUSB_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() - inputs[B_INPUT].getVoltage()));
-			
-			if (inputs[B_INPUT].getVoltage() != 0)
-				outputs[ADIVB_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() / inputs[B_INPUT].getVoltage()));
 
-			if (inputs[C_INPUT].getVoltage() != 0)
-				outputs[BDIVA_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() / inputs[A_INPUT].getVoltage()));
+		aValue = inputs[A_INPUT].getVoltage();
+		bValue = inputs[B_INPUT].getVoltage();
+		cValue = inputs[C_INPUT].getVoltage();
 
-			outputs[AAVGB_OUTPUT].setVoltage(checkRange((inputs[A_INPUT].getVoltage() + inputs[B_INPUT].getVoltage())/2));
-		} else {
-			outputs[BPLUSA_OUTPUT].setVoltage(0);
-			outputs[ATIMESB_OUTPUT].setVoltage(0);
-			outputs[BMINUSA_OUTPUT].setVoltage(0);
-			outputs[AMINUSB_OUTPUT].setVoltage(0);
-			outputs[ADIVB_OUTPUT].setVoltage(0);
-			outputs[BDIVA_OUTPUT].setVoltage(0);
-			outputs[AAVGB_OUTPUT].setVoltage(0);
-		}
-		if (inputs[B_INPUT].isConnected() && inputs[C_INPUT].isConnected()) {
-			outputs[CPLUSB_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() + inputs[C_INPUT].getVoltage()));
-			outputs[BTIMESC_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() * inputs[C_INPUT].getVoltage()));
-			outputs[BMINUSC_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() - inputs[C_INPUT].getVoltage()));
-			outputs[CMINUSB_OUTPUT].setVoltage(checkRange(inputs[C_INPUT].getVoltage() - inputs[B_INPUT].getVoltage()));
 
-			if (inputs[C_INPUT].getVoltage() != 0)
-				outputs[BDIVC_OUTPUT].setVoltage(checkRange(inputs[B_INPUT].getVoltage() / inputs[C_INPUT].getVoltage()));
-
-			if (inputs[B_INPUT].getVoltage() != 0)
-				outputs[CDIVB_OUTPUT].setVoltage(checkRange(inputs[C_INPUT].getVoltage() / inputs[B_INPUT].getVoltage()));
-
-			outputs[BAVGC_OUTPUT].setVoltage(checkRange((inputs[B_INPUT].getVoltage() + inputs[C_INPUT].getVoltage())/2));	
-		} else {
-			outputs[CPLUSB_OUTPUT].setVoltage(0);
-			outputs[BTIMESC_OUTPUT].setVoltage(0);
-			outputs[BMINUSC_OUTPUT].setVoltage(0);
-			outputs[CMINUSB_OUTPUT].setVoltage(0);
-			outputs[BDIVC_OUTPUT].setVoltage(0);
-			outputs[CDIVB_OUTPUT].setVoltage(0);
-			outputs[BAVGC_OUTPUT].setVoltage(0);	
-		}
-
-		if (inputs[A_INPUT].isConnected() && inputs[C_INPUT].isConnected()) {
-			outputs[CPLUSA_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() + inputs[C_INPUT].getVoltage()));
-			outputs[ATIMESC_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() * inputs[C_INPUT].getVoltage()));
-			outputs[AMINUSC_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() - inputs[C_INPUT].getVoltage()));
-			outputs[CMINUSA_OUTPUT].setVoltage(checkRange(inputs[C_INPUT].getVoltage() - inputs[A_INPUT].getVoltage()));
-
-			if (inputs[A_INPUT].getVoltage() != 0)
-				outputs[CDIVA_OUTPUT].setVoltage(checkRange(inputs[C_INPUT].getVoltage() / inputs[A_INPUT].getVoltage()));
-
-			if (inputs[C_INPUT].getVoltage() != 0)
-				outputs[ADIVC_OUTPUT].setVoltage(checkRange(inputs[A_INPUT].getVoltage() / inputs[C_INPUT].getVoltage()));
-
-			outputs[AAVGC_OUTPUT].setVoltage(checkRange((inputs[A_INPUT].getVoltage() + inputs[C_INPUT].getVoltage())/2));
-		} else {
-			outputs[CPLUSA_OUTPUT].setVoltage(0);
-			outputs[ATIMESC_OUTPUT].setVoltage(0);
-			outputs[AMINUSC_OUTPUT].setVoltage(0);
-			outputs[CMINUSA_OUTPUT].setVoltage(0);
-			outputs[CDIVA_OUTPUT].setVoltage(0);
-			outputs[ADIVC_OUTPUT].setVoltage(0);
-			outputs[AAVGC_OUTPUT].setVoltage(0);
-		}
-
-		if (inputs[A_INPUT].isConnected() && inputs[B_INPUT].isConnected() && inputs[C_INPUT].isConnected())
-			outputs[AVGABC_OUTPUT].setVoltage(checkRange((inputs[A_INPUT].getVoltage() + inputs[B_INPUT].getVoltage() + inputs[C_INPUT].getVoltage())/3));
+		outputs[BPLUSA_OUTPUT].setVoltage(checkRange(aValue + bValue));
+		outputs[ATIMESB_OUTPUT].setVoltage(checkRange(aValue * bValue));
+		outputs[BMINUSA_OUTPUT].setVoltage(checkRange(bValue - aValue));
+		outputs[AMINUSB_OUTPUT].setVoltage(checkRange(aValue - bValue));
+		
+		if (bValue != 0.f)
+			outputs[ADIVB_OUTPUT].setVoltage(checkRange(aValue / bValue));
 		else
-			outputs[AVGABC_OUTPUT].setVoltage(0);
+			outputs[ADIVB_OUTPUT].setVoltage(0.f);
+
+		if (cValue != 0.f)
+			outputs[BDIVA_OUTPUT].setVoltage(checkRange(bValue / aValue));
+		else
+			outputs[BDIVA_OUTPUT].setVoltage(0.f);
+
+		outputs[AAVGB_OUTPUT].setVoltage(checkRange((aValue + bValue)/2));		
+
+		// ---------------------------
+
+		outputs[CPLUSB_OUTPUT].setVoltage(checkRange(bValue + cValue));
+		outputs[BTIMESC_OUTPUT].setVoltage(checkRange(bValue * cValue));
+		outputs[BMINUSC_OUTPUT].setVoltage(checkRange(bValue - cValue));
+		outputs[CMINUSB_OUTPUT].setVoltage(checkRange(cValue - bValue));
+
+		if (cValue != 0.f)
+			outputs[BDIVC_OUTPUT].setVoltage(checkRange(bValue / cValue));
+		else
+			outputs[BDIVC_OUTPUT].setVoltage(0.f);
+
+		if (bValue != 0.f)
+			outputs[CDIVB_OUTPUT].setVoltage(checkRange(cValue / bValue));
+
+		outputs[BAVGC_OUTPUT].setVoltage(checkRange((bValue + cValue)/2));	
+
+		// --------------------------
+
+		outputs[CPLUSA_OUTPUT].setVoltage(checkRange(aValue + cValue));
+		outputs[ATIMESC_OUTPUT].setVoltage(checkRange(aValue * cValue));
+		outputs[AMINUSC_OUTPUT].setVoltage(checkRange(aValue - cValue));
+		outputs[CMINUSA_OUTPUT].setVoltage(checkRange(cValue - aValue));
+
+		if (aValue != 0.f)
+			outputs[CDIVA_OUTPUT].setVoltage(checkRange(cValue / aValue));
+
+		if (cValue != 0.f)
+			outputs[ADIVC_OUTPUT].setVoltage(checkRange(aValue / cValue));
+
+		outputs[AAVGC_OUTPUT].setVoltage(checkRange((aValue + cValue)/2));
+
+		// --------------------------
+
+		outputs[AVGABC_OUTPUT].setVoltage(checkRange((aValue + bValue + cValue)/3));
 	}
 };
 
@@ -178,23 +192,21 @@ struct CalcsWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		float xa = 4.4;
-		float xb = 12.6;
-		float xc = 20.7;
+		float xa = 5.7f;
+		float xb = 15.2f;
+		float xc = 24.9f;
 
-		float yStart = 12;
-		float yIncrement = 8;
+		float yStart = 12.3f;
+		float yIncrement = 8.f;
 
-		addParam(createParamCentered<CKSS>(mm2px(Vec(27.5, 11)), module, Calcs::RANGE_SWITCH));
-		
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xa, yStart)), module, Calcs::A_INPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xb, yStart)), module, Calcs::B_INPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xc, yStart)), module, Calcs::C_INPUT));
 
-		xa = 8.2;
-		xb = 16.3;
-		xc = 24.4;
-		yStart = 23.9;
+		xa = 8.2f;
+		xb = 16.3f;
+		xc = 24.4f;
+		yStart = 23.9f;
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BPLUSA_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CPLUSA_OUTPUT));
 		yStart += yIncrement;
@@ -204,7 +216,7 @@ struct CalcsWidget : ModuleWidget {
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::ATIMESC_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BTIMESC_OUTPUT));
 
-		yStart = 51.3;
+		yStart = 51.3f;
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BMINUSA_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CMINUSA_OUTPUT));
 		yStart += yIncrement;
@@ -214,7 +226,7 @@ struct CalcsWidget : ModuleWidget {
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::AMINUSC_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BMINUSC_OUTPUT));
 
-		yStart = 79.1;
+		yStart = 79.1f;
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BDIVA_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::CDIVA_OUTPUT));
 		yStart += yIncrement;
@@ -224,16 +236,40 @@ struct CalcsWidget : ModuleWidget {
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::ADIVC_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BDIVC_OUTPUT));
 		
-		xa = 6;
-		xb = 15.24;
-		xc = 24.5;
-		yStart = 109.8;
+		xa = 6.f;
+		xb = 15.24f;
+		xc = 24.5f;
+		yStart = 109.8f;
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::AAVGB_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xb, yStart)), module, Calcs::BAVGC_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xc, yStart)), module, Calcs::AAVGC_OUTPUT));
-		xa = 6;
-		yStart = 119;
+		xa = 6.f;
+		yStart = 119.f;
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xa, yStart)), module, Calcs::AVGABC_OUTPUT));
+	}
+
+	void appendContextMenu(Menu *menu) override {
+	   	Calcs *module = dynamic_cast<Calcs*>(this->module);
+			assert(module);
+		
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Output Range"));
+		struct RangeItem : MenuItem {
+			Calcs* module;
+			int outRange;
+			void onAction(const event::Action& e) override {
+				module->outRange = outRange;
+			}
+		};
+
+		std::string outRangeNames[4] = {"Unlimited", "0-10v", "± 10v", "± 5v"};
+		for (int i = 0; i < 4; i++) {
+			RangeItem* rangeItem = createMenuItem<RangeItem>(outRangeNames[i]);
+			rangeItem->rightText = CHECKMARK(module->outRange == i);
+			rangeItem->module = module;
+			rangeItem->outRange = i;
+			menu->addChild(rangeItem);
+		}
 	}
 };
 

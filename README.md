@@ -1,7 +1,7 @@
-# SickoCV v2.6.7
+# SickoCV v2.6.8
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 7](https://github.com/sickozell/SickoCV/assets/80784296/ca99e925-119b-4f8a-ac1a-bf1dcdd11b7e)
+![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/e29f6164-0446-4899-b6d9-81e22f6923ac)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -18,8 +18,9 @@ VCV Rack plugin modules
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
-- [modulator / modulator7](#modulator--modulator7)
+- [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
 - [parking](#parking)
+- [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
 - [sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5](#sickolooper1--sickolooperx--sickolooper3--sickolooper5)
@@ -505,13 +506,14 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 
 [back to top](#table-of-contents)
 
-## modulator / modulator7
+## modulator / modulator7 / modulator7 Compact
 ### single or 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a clock.
 
-![modulator](https://github.com/sickozell/SickoCV/assets/80784296/a275769b-fddf-43e1-b9a6-874284b50043)
+![modulator](https://github.com/sickozell/SickoCV/assets/80784296/706a9a80-0b1e-462a-b3a4-21d8e80066e3)
 
 #### - INSTRUCTIONS
 Following instructions refer to modulator7, but can be applied also to modulator module.  
+The 'modulator7 Compact' module is just a 7 triangle only unipolar LFOs whithout sync and reset features.  
 
 Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
 The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
@@ -542,6 +544,25 @@ If no sync cable is connected, pressing the SYNC button will act as a sample&hol
 #### - INSTRUCTIONS
 This module doesn't do anything. It's just a place to connect temporarily unused cables to not forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
+
+[back to top](#table-of-contents)
+
+## polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+
+### Mutes or soloes the single channels of a poly-cable
+
+![polymuter](https://github.com/sickozell/SickoCV/assets/80784296/dffb9dda-a74c-428e-8bf4-e7880c82b305)
+
+#### - INSTRUCTIONS
+polyMuter mutes the single channels of a polyphonic cable connected to IN and outputs the same number of channels to OUT.  
+To avoid clicks the FADE knob sets the fade length in milliseconds of the mute/unmute operation.  
+Fade range is from 0 to 10 seconds and the default setting is 10ms.  
+Please note that when the knob is set to full anti-clockwise the tooltip popup will show 1ms, but it actually means no fade.  
+
+polyMuter16 is the standard version of the module, polyMuter8 will output a maximum of 8 channels. The channel display will show the number of channels of the input cable.
+
+The plus version of each module can also 'solo' the channels by right-clicking on mute buttons, so the led button will become green. Multiple solo channels can be selected.  
+If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be directly unmuted.  
+By using the plus version of polyMuter the right-click menu of buttons is no longer available (that's why there are two versions), but the buttons are still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function by a +3.4v/9.9v gate.
 
 [back to top](#table-of-contents)
 
