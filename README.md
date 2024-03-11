@@ -26,7 +26,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.8
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/89aa1608-9fb0-4e25-b8d9-53e47293feec)
+![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/e29f6164-0446-4899-b6d9-81e22f6923ac)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -575,7 +575,7 @@ It can also be used to connect other modules sockets when they need to be wired 
 ## polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+
 ### Mutes or soloes the single channels of a poly-cable
 
-![polymuter](https://github.com/sickozell/SickoCV/assets/80784296/e7a22bf9-1a90-451c-8ca9-6ce460978134)
+![polymuter](https://github.com/sickozell/SickoCV/assets/80784296/dffb9dda-a74c-428e-8bf4-e7880c82b305)
 
 #### - INSTRUCTIONS
 polyMuter mutes the single channels of a polyphonic cable connected to IN and outputs the same number of channels to OUT.  
