@@ -26,7 +26,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.8
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/0c417481-6223-4611-aa2d-23caa7d9eb28)
+![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/89aa1608-9fb0-4e25-b8d9-53e47293feec)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -45,6 +45,7 @@ VCV Rack plugin modules
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
 - [parking](#parking)
+- [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polyMuter8--polyMuter8--polyMuter16--polyMuter16+)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
 - [sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5](#sickolooper1--sickolooperx--sickolooper3--sickolooper5)
@@ -568,6 +569,23 @@ If no sync cable is connected, pressing the SYNC button will act as a sample&hol
 #### - INSTRUCTIONS
 This module doesn't do anything. It's just a place to connect temporarily unused cables to not forget to where they were wired.  
 It can also be used to connect other modules sockets when they need to be wired to obtain some functionality.
+
+[back to top](#table-of-contents)
+
+## polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+
+### Mutes or Soloes single channels of a poly-cable
+
+![polymuter](https://github.com/sickozell/SickoCV/assets/80784296/e7a22bf9-1a90-451c-8ca9-6ce460978134)
+
+#### - INSTRUCTIONS
+polyMuter mutes the single channels of a polyphonic cable connected to IN and outputs the same number of channels on OUT.  
+FADE knob sets the fade length in milliseconds of the mutue/unmute operation.  
+
+polyMuter16 is the standard version of the module, polyMuter8 will output a maximum of 8 channels. The channel dsiplay will show the number of channels of the input cable.
+
+The plus version of each module can also 'solo' the channels by right-clicking on mute buttons. Multiple solo channels can be selected.  
+If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be be directly unmuted.  
+By using the plus version the right-click menu of knob will be no longer available, but the knobs will be still midi mappable for the mute function only.
 
 [back to top](#table-of-contents)
 
