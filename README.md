@@ -573,7 +573,7 @@ It can also be used to connect other modules sockets when they need to be wired 
 [back to top](#table-of-contents)
 
 ## polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+
-### Mutes or Soloes single channels of a poly-cable
+### Mutes or soloes the single channels of a poly-cable
 
 ![polymuter](https://github.com/sickozell/SickoCV/assets/80784296/e7a22bf9-1a90-451c-8ca9-6ce460978134)
 
