@@ -585,7 +585,7 @@ polyMuter16 is the standard version of the module, polyMuter8 will output a maxi
 
 The plus version of each module can also 'solo' the channels by right-clicking on mute buttons, so the led button will become green. Multiple solo channels can be selected.  
 If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be be directly unmuted.  
-By using the plus version the right-click menu of knob will be no longer available, but the knobs will be still midi mappable for the mute function only.
+By using the plus version the right-click menu of buttons will be no longer available, but they will be still midi mappable for the mute function only.
 
 [back to top](#table-of-contents)
 
