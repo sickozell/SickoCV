@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.8284273"
-     inkscape:cx="7.0710675"
-     inkscape:cy="328.09753"
+     inkscape:cx="1.2374368"
+     inkscape:cy="328.45108"
      inkscape:window-width="1366"
      inkscape:window-height="705"
      inkscape:window-x="-8"
@@ -254,7 +254,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Etichette Testo"
-     style="display:inline">
+     style="display:none">
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"

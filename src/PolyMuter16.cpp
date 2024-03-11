@@ -4,10 +4,10 @@
 
 using namespace std;
 
-struct PolyMuter8 : Module {
+struct PolyMuter16 : Module {
 	enum ParamId {
 		FADE_PARAM,
-		ENUMS(MUTE_PARAM, 8),
+		ENUMS(MUTE_PARAM, 16),
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -19,7 +19,7 @@ struct PolyMuter8 : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		ENUMS(MUTE_LIGHT, 8),
+		ENUMS(MUTE_LIGHT, 16),
 		LIGHTS_LEN
 	};
 
@@ -39,13 +39,13 @@ struct PolyMuter8 : Module {
 	bool initStart = false;
 
 	int inChans = 0;
-	int outChans = 0;
-	int chan;
-	float mute[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	float prevMute[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	float ampValue[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-	float ampDelta[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-	bool fading[8] = {false, false, false, false, false, false, false, false};
+	//int outChans = 0;
+	//int chan;
+	float mute[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float prevMute[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float ampValue[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+	float ampDelta[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+	bool fading[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 	float fadeKnob = 0.f;
 	float prevFadeKnob = 1.f;
@@ -54,32 +54,30 @@ struct PolyMuter8 : Module {
 
 	const float noEnvTime = 0.00101;
 
-	PolyMuter8() {
+	PolyMuter16() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configParam(FADE_PARAM, 0.f, 1.f, 0.25f, "Fade", "ms", 10000.f, 1.f);
 		configInput(IN_INPUT, "Poly");
+		configParam(FADE_PARAM, 0.f, 1.f, 0.25f, "Fade", "ms", 10000.f, 1.f);
+		configOutput(OUT_OUTPUT, "Poly");
 
 		configSwitch(MUTE_PARAM, 0.f, 1.f, 0.f, "Mute #1", {"Off", "On"});
-		configSwitch(MUTE_PARAM+1, 0.f, 1.f, 0.f, "Mute #1", {"Off", "On"});
-		configSwitch(MUTE_PARAM+2, 0.f, 1.f, 0.f, "Mute #2", {"Off", "On"});
-		configSwitch(MUTE_PARAM+3, 0.f, 1.f, 0.f, "Mute #3", {"Off", "On"});
-		configSwitch(MUTE_PARAM+4, 0.f, 1.f, 0.f, "Mute #4", {"Off", "On"});
-		configSwitch(MUTE_PARAM+5, 0.f, 1.f, 0.f, "Mute #5", {"Off", "On"});
-		configSwitch(MUTE_PARAM+6, 0.f, 1.f, 0.f, "Mute #6", {"Off", "On"});
-		configSwitch(MUTE_PARAM+7, 0.f, 1.f, 0.f, "Mute #7", {"Off", "On"});
-		/*
-		configSwitch(MUTE_PARAM+8, 0.f, 1.f, 0.f, "Mute #8", {"Off", "On"});
-		configSwitch(MUTE_PARAM+9, 0.f, 1.f, 0.f, "Mute #9", {"Off", "On"});
-		configSwitch(MUTE_PARAM+10, 0.f, 1.f, 0.f, "Mute #10", {"Off", "On"});
-		configSwitch(MUTE_PARAM+11, 0.f, 1.f, 0.f, "Mute #11", {"Off", "On"});
-		configSwitch(MUTE_PARAM+12, 0.f, 1.f, 0.f, "Mute #12", {"Off", "On"});
-		configSwitch(MUTE_PARAM+13, 0.f, 1.f, 0.f, "Mute #13", {"Off", "On"});
-		configSwitch(MUTE_PARAM+14, 0.f, 1.f, 0.f, "Mute #14", {"Off", "On"});
-		configSwitch(MUTE_PARAM+15, 0.f, 1.f, 0.f, "Mute #15", {"Off", "On"});
-		*/
+		configSwitch(MUTE_PARAM+1, 0.f, 1.f, 0.f, "Mute #2", {"Off", "On"});
+		configSwitch(MUTE_PARAM+2, 0.f, 1.f, 0.f, "Mute #3", {"Off", "On"});
+		configSwitch(MUTE_PARAM+3, 0.f, 1.f, 0.f, "Mute #4", {"Off", "On"});
+		configSwitch(MUTE_PARAM+4, 0.f, 1.f, 0.f, "Mute #5", {"Off", "On"});
+		configSwitch(MUTE_PARAM+5, 0.f, 1.f, 0.f, "Mute #+", {"Off", "On"});
+		configSwitch(MUTE_PARAM+6, 0.f, 1.f, 0.f, "Mute #7", {"Off", "On"});
+		configSwitch(MUTE_PARAM+7, 0.f, 1.f, 0.f, "Mute #8", {"Off", "On"});
+		configSwitch(MUTE_PARAM+8, 0.f, 1.f, 0.f, "Mute #9", {"Off", "On"});
+		configSwitch(MUTE_PARAM+9, 0.f, 1.f, 0.f, "Mute #10", {"Off", "On"});
+		configSwitch(MUTE_PARAM+10, 0.f, 1.f, 0.f, "Mute #11", {"Off", "On"});
+		configSwitch(MUTE_PARAM+11, 0.f, 1.f, 0.f, "Mute #12", {"Off", "On"});
+		configSwitch(MUTE_PARAM+12, 0.f, 1.f, 0.f, "Mute #13", {"Off", "On"});
+		configSwitch(MUTE_PARAM+13, 0.f, 1.f, 0.f, "Mute #14", {"Off", "On"});
+		configSwitch(MUTE_PARAM+14, 0.f, 1.f, 0.f, "Mute #15", {"Off", "On"});
+		configSwitch(MUTE_PARAM+15, 0.f, 1.f, 0.f, "Mute #16", {"Off", "On"});
 		
-		configOutput(OUT_OUTPUT, "Poly");
 	}
 
 	void onReset(const ResetEvent &e) override {
@@ -89,7 +87,7 @@ struct PolyMuter8 : Module {
 		prevFadeKnob = 1.f;
 		fadeValue = 0;
 
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 16; i++) {
 			mute[i] = 0;
 			prevMute[i] = 0;
 			ampValue[i] = 1;
@@ -112,6 +110,14 @@ struct PolyMuter8 : Module {
 		json_object_set_new(rootJ, "mute6", json_real(params[MUTE_PARAM+5].getValue()));
 		json_object_set_new(rootJ, "mute7", json_real(params[MUTE_PARAM+6].getValue()));
 		json_object_set_new(rootJ, "mute8", json_real(params[MUTE_PARAM+7].getValue()));
+		json_object_set_new(rootJ, "mute9", json_real(params[MUTE_PARAM+8].getValue()));
+		json_object_set_new(rootJ, "mute10", json_real(params[MUTE_PARAM+9].getValue()));
+		json_object_set_new(rootJ, "mute11", json_real(params[MUTE_PARAM+10].getValue()));
+		json_object_set_new(rootJ, "mute12", json_real(params[MUTE_PARAM+11].getValue()));
+		json_object_set_new(rootJ, "mute13", json_real(params[MUTE_PARAM+12].getValue()));
+		json_object_set_new(rootJ, "mute14", json_real(params[MUTE_PARAM+13].getValue()));
+		json_object_set_new(rootJ, "mute15", json_real(params[MUTE_PARAM+14].getValue()));
+		json_object_set_new(rootJ, "mute16", json_real(params[MUTE_PARAM+15].getValue()));
 		return rootJ;
 	}
 	
@@ -196,6 +202,78 @@ struct PolyMuter8 : Module {
 					ampValue[7] = 0;
 				}
 			}
+
+			json_t* mute9J = json_object_get(rootJ, "mute9");
+			if (mute9J){
+				mute[8] = json_real_value(mute9J);
+				if (mute[8] == 1.f) {
+					prevMute[8] = 1;
+					ampValue[8] = 0;
+				}
+			}
+
+			json_t* mute10J = json_object_get(rootJ, "mute10");
+			if (mute10J){
+				mute[9] = json_real_value(mute9J);
+				if (mute[9] == 1.f) {
+					prevMute[9] = 1;
+					ampValue[9] = 0;
+				}
+			}
+
+			json_t* mute11J = json_object_get(rootJ, "mute11");
+			if (mute11J){
+				mute[10] = json_real_value(mute11J);
+				if (mute[10] == 1.f) {
+					prevMute[10] = 1;
+					ampValue[10] = 0;
+				}
+			}
+
+			json_t* mute12J = json_object_get(rootJ, "mute12");
+			if (mute12J){
+				mute[11] = json_real_value(mute12J);
+				if (mute[11] == 1.f) {
+					prevMute[11] = 1;
+					ampValue[11] = 0;
+				}
+			}
+
+			json_t* mute13J = json_object_get(rootJ, "mute13");
+			if (mute13J){
+				mute[12] = json_real_value(mute13J);
+				if (mute[12] == 1.f) {
+					prevMute[12] = 1;
+					ampValue[12] = 0;
+				}
+			}
+
+			json_t* mute14J = json_object_get(rootJ, "mute14");
+			if (mute14J){
+				mute[13] = json_real_value(mute14J);
+				if (mute[13] == 1.f) {
+					prevMute[13] = 1;
+					ampValue[13] = 0;
+				}
+			}
+
+			json_t* mute15J = json_object_get(rootJ, "mute15");
+			if (mute15J){
+				mute[14] = json_real_value(mute15J);
+				if (mute[14] == 1.f) {
+					prevMute[14] = 1;
+					ampValue[14] = 0;
+				}
+			}
+
+			json_t* mute16J = json_object_get(rootJ, "mute16");
+			if (mute16J){
+				mute[15] = json_real_value(mute16J);
+				if (mute[15] == 1.f) {
+					prevMute[15] = 1;
+					ampValue[15] = 0;
+				}
+			}
 		}
 	}
 	
@@ -210,12 +288,14 @@ struct PolyMuter8 : Module {
 			prevFadeKnob = fadeKnob;
 		}
 
-		chan = std::max(1, inputs[IN_INPUT].getChannels());
+		inChans = std::max(1, inputs[IN_INPUT].getChannels());
+		/*
 		inChans = chan;
 		if (inChans > 8)
 			outChans = 8;
+		*/
 		
-		for (int c = 0; c < 8; c++) {
+		for (int c = 0; c < 16; c++) {
 			mute[c] = params[MUTE_PARAM+c].getValue();
 			lights[MUTE_LIGHT+c].setBrightness(mute[c]);
 
@@ -251,41 +331,41 @@ struct PolyMuter8 : Module {
 			outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * ampValue[c], c);
 		}
 
-		//outputs[OUT_OUTPUT].setChannels(chan);
-		outputs[OUT_OUTPUT].setChannels(outChans);
+		//outputs[OUT_OUTPUT].setChannels(outChans);
+		outputs[OUT_OUTPUT].setChannels(inChans);
 
 	}
 };
 
-struct PolyMuter8DisplayChan : TransparentWidget {
-	PolyMuter8 *module;
+struct PolyMuter16DisplayChan : TransparentWidget {
+	PolyMuter16 *module;
 	int frame = 0;
-	PolyMuter8DisplayChan() {
+	PolyMuter16DisplayChan() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
 		if (module) {
 			if (layer ==1) {
 				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 10);
+				nvgFontSize(args.vg, 16);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
 
 				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));					
 				if (module->inChans > 9)
-					nvgTextBox(args.vg, 1.5, 17, 60, to_string(module->inChans).c_str(), NULL);
+					nvgTextBox(args.vg, 4, 20.8, 60, to_string(module->inChans).c_str(), NULL);
 				else
-					nvgTextBox(args.vg, 9.8, 17, 60, to_string(module->inChans).c_str(), NULL);
+					nvgTextBox(args.vg, 17, 20.8, 60, to_string(module->inChans).c_str(), NULL);
 			}
 		}
 		Widget::drawLayer(args, layer);
 	}
 };
 /*
-struct PolyMuter8DebugDisplay : TransparentWidget {
-	PolyMuter8 *module;
+struct PolyMuter16DebugDisplay : TransparentWidget {
+	PolyMuter16 *module;
 	int frame = 0;
-	PolyMuter8DebugDisplay() {
+	PolyMuter16DebugDisplay() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -309,25 +389,26 @@ struct PolyMuter8DebugDisplay : TransparentWidget {
 };
 */
 
-struct PolyMuter8Widget : ModuleWidget {
-	PolyMuter8Widget(PolyMuter8* module) {
+struct PolyMuter16Widget : ModuleWidget {
+	PolyMuter16Widget(PolyMuter16* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/PolyMuter8.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/PolyMuter16.svg")));
 
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		{
-			PolyMuter8DisplayChan *display = new PolyMuter8DisplayChan();
-			//display->box.pos = mm2px(Vec(13.1, 31.2));
-			display->box.pos = mm2px(Vec(10.7, 13));
-			display->box.size = mm2px(Vec(8, 8));
+			PolyMuter16DisplayChan *display = new PolyMuter16DisplayChan();
+			display->box.pos = mm2px(Vec(20.9, 25.7));
+			display->box.size = mm2px(Vec(13.2, 8.6));
 			display->module = module;
 			addChild(display);
 		}
 		/*
 		{
-			PolyMuter8DebugDisplay *display = new PolyMuter8DebugDisplay();
+			PolyMuter16DebugDisplay *display = new PolyMuter16DebugDisplay();
 			display->box.pos = Vec(3, 25);
 			display->box.size = Vec(307, 100);
 			display->module = module;
@@ -336,47 +417,50 @@ struct PolyMuter8Widget : ModuleWidget {
 		*/
 
 		const float xCenter = 10.1f;
-		const float xLeft = 6.5f;
-		const float xRight = 14.f;
+		const float xLeft = 12.f;
+		const float xRight = 21.f;
 
-		const float yIn = 17;
+		const float yIn = 17.5;
 		const float yFade = 30;
-		const float yOut = 116;
+		const float xOut = 27.5;
+		const float yOut = 17.5;
 
-		constexpr float yStart = 42.5;
-		constexpr float yStart2 = 50.5;
-		constexpr float y = 8.f;
+		constexpr float yStart = 41.5;
+		constexpr float yStart2 = 46.5;
+		constexpr float y = 10.f;
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xLeft, yIn)), module, PolyMuter8::IN_INPUT));
 
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yFade)), module, PolyMuter8::FADE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yIn)), module, PolyMuter16::IN_INPUT));
 
-		for (int i = 0; i < 8; i=i+2) {
-			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter8::MUTE_PARAM+i, PolyMuter8::MUTE_LIGHT+i));
-		}
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yFade)), module, PolyMuter16::FADE_PARAM));
 
-		for (int i = 1; i < 8; i=i+2) {
-			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xRight, yStart2+((i-1)*y))), module, PolyMuter8::MUTE_PARAM+i, PolyMuter8::MUTE_LIGHT+i));
-		}
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yOut)), module, PolyMuter16::OUT_OUTPUT));
 
 		/*
-		for (int i = 8; i < 16; i++) {
-			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xRight, yStart+((i-8)*y))), module, PolyMuter8::MUTE_PARAM+i, PolyMuter8::MUTE_LIGHT+i));
+		for (int i = 0; i < 16; i=i+2) {
+			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter16::MUTE_PARAM+i, PolyMuter16::MUTE_LIGHT+i));
+		}
+
+		for (int i = 1; i < 16; i=i+2) {
+			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xRight, yStart2+((i-1)*y))), module, PolyMuter16::MUTE_PARAM+i, PolyMuter16::MUTE_LIGHT+i));
 		}
 		*/
+		for (int i = 0; i < 8; i++) {
+			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter16::MUTE_PARAM+i, PolyMuter16::MUTE_LIGHT+i));
+		}
 
-		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut)), module, PolyMuter8::OUT_OUTPUT));
-
-
+		for (int i = 0; i < 8; i++) {
+			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xRight, yStart2+(i*y))), module, PolyMuter16::MUTE_PARAM+8+i, PolyMuter16::MUTE_LIGHT+8+i));
+		}
 
 	}
 
 	void appendContextMenu(Menu* menu) override {
-		PolyMuter8* module = dynamic_cast<PolyMuter8*>(this->module);
+		PolyMuter16* module = dynamic_cast<PolyMuter16*>(this->module);
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 	}
 };
 
-Model* modelPolyMuter8 = createModel<PolyMuter8, PolyMuter8Widget>("PolyMuter8");
+Model* modelPolyMuter16 = createModel<PolyMuter16, PolyMuter16Widget>("PolyMuter16");

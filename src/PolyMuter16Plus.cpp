@@ -28,12 +28,12 @@ struct LightEmittingWidget : BASE {
 
 // ----------------------------------------------------------------------------
 
-struct PM8SoloMuteButton : LightEmittingWidget<ParamWidget> {
+struct PM16SoloMuteButton : LightEmittingWidget<ParamWidget> {
     std::vector<std::shared_ptr<Svg>> _frames;
     SvgWidget* _svgWidget;
     CircularShadow* shadow = NULL;
 
-    PM8SoloMuteButton();
+    PM16SoloMuteButton();
     void onButton(const event::Button& e) override;
     void onChange(const event::Change& e) override;
     bool isLit() override;
@@ -45,7 +45,7 @@ struct PM8SoloMuteButton : LightEmittingWidget<ParamWidget> {
 // ----------------------------------------------------------------------------
 
 
-PM8SoloMuteButton::PM8SoloMuteButton() {
+PM16SoloMuteButton::PM16SoloMuteButton() {
     shadow = new CircularShadow();
     addChild(shadow);
 
@@ -66,7 +66,7 @@ PM8SoloMuteButton::PM8SoloMuteButton() {
     shadow->box.pos = Vec(0.0, 1.0);
 }
 
-void PM8SoloMuteButton::onButton(const event::Button& e) {
+void PM16SoloMuteButton::onButton(const event::Button& e) {
     if (!getParamQuantity() || !(e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0)) {
         ParamWidget::onButton(e);
         return;
@@ -121,7 +121,7 @@ void PM8SoloMuteButton::onButton(const event::Button& e) {
     }
 }
 
-void PM8SoloMuteButton::onChange(const event::Change& e) {
+void PM16SoloMuteButton::onChange(const event::Change& e) {
     assert(_frames.size() == 4);
     if (getParamQuantity()) {
         float value = getParamQuantity()->getValue();
@@ -131,27 +131,27 @@ void PM8SoloMuteButton::onChange(const event::Change& e) {
     ParamWidget::onChange(e);
 }
 
-bool PM8SoloMuteButton::isLit() {
+bool PM16SoloMuteButton::isLit() {
     return module && !module->isBypassed() && getParamQuantity() && getParamQuantity()->getValue() > 0.0f;
 }
 
-void PM8SoloMuteButton::draw(const DrawArgs& args) {
+void PM16SoloMuteButton::draw(const DrawArgs& args) {
     if (!isLit() || !getParamQuantity() || getParamQuantity()->getValue() < 1.0f) {
         ParamWidget::draw(args);
     }
 }
 
-void PM8SoloMuteButton::drawLit(const DrawArgs& args) {
+void PM16SoloMuteButton::drawLit(const DrawArgs& args) {
     if (getParamQuantity() && getParamQuantity()->getValue() >= 1.0f) {
         ParamWidget::draw(args);
     }
 }
 // ---------------------- 
 
-struct PolyMuter8Plus : Module {
+struct PolyMuter16Plus : Module {
 	enum ParamId {
 		FADE_PARAM,
-		ENUMS(MUTE_PARAM, 8),
+		ENUMS(MUTE_PARAM, 16),
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -163,7 +163,7 @@ struct PolyMuter8Plus : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		//ENUMS(MUTE_LIGHT, 8),
+		//ENUMS(MUTE_LIGHT, 16),
 		LIGHTS_LEN
 	};
 
@@ -185,20 +185,20 @@ struct PolyMuter8Plus : Module {
 	bool debugBool = false;
 	*/
 	
-	std::string db[4] = {"unm", "sol", "m-s", "mut"};
+	//std::string db[4] = {"unm", "sol", "m-s", "mut"};
 	
 	bool initStart = false;
 
-	int inChans = 0;
+	//int inChans = 0;
 	int outChans = 0;
 	//int chan;
-	int buttonValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	int prevButtonValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	int status[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	int prevStatus[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	float ampValue[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-	float ampDelta[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-	bool fading[8] = {false, false, false, false, false, false, false, false};
+	int buttonValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int prevButtonValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int status[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int prevStatus[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float ampValue[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+	float ampDelta[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+	bool fading[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 	float fadeKnob = 0.f;
 	float prevFadeKnob = 1.f;
@@ -213,7 +213,7 @@ struct PolyMuter8Plus : Module {
 
 	const float noEnvTime = 0.00101;
 
-	PolyMuter8Plus() {
+	PolyMuter16Plus() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
 		configParam(FADE_PARAM, 0.f, 1.f, 0.25f, "Fade", "ms", 10000.f, 1.f);
@@ -227,16 +227,14 @@ struct PolyMuter8Plus : Module {
 		configSwitch(MUTE_PARAM+5, 0.0f, 3.0f, 0.0f, "Mute #6", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
 		configSwitch(MUTE_PARAM+6, 0.0f, 3.0f, 0.0f, "Mute #7", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
 		configSwitch(MUTE_PARAM+7, 0.0f, 3.0f, 0.0f, "Mute #8", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
-
-		/*
-		configSwitch(MUTE_PARAM+9, 0.f, 1.f, 0.f, "Mute #9", {"Off", "On"});
-		configSwitch(MUTE_PARAM+10, 0.f, 1.f, 0.f, "Mute #10", {"Off", "On"});
-		configSwitch(MUTE_PARAM+11, 0.f, 1.f, 0.f, "Mute #11", {"Off", "On"});
-		configSwitch(MUTE_PARAM+12, 0.f, 1.f, 0.f, "Mute #12", {"Off", "On"});
-		configSwitch(MUTE_PARAM+13, 0.f, 1.f, 0.f, "Mute #13", {"Off", "On"});
-		configSwitch(MUTE_PARAM+14, 0.f, 1.f, 0.f, "Mute #14", {"Off", "On"});
-		configSwitch(MUTE_PARAM+15, 0.f, 1.f, 0.f, "Mute #15", {"Off", "On"});
-		*/
+		configSwitch(MUTE_PARAM+8, 0.0f, 3.0f, 0.0f, "Mute #9", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
+		configSwitch(MUTE_PARAM+9, 0.0f, 3.0f, 0.0f, "Mute #10", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
+		configSwitch(MUTE_PARAM+10, 0.0f, 3.0f, 0.0f, "Mute #11", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
+		configSwitch(MUTE_PARAM+11, 0.0f, 3.0f, 0.0f, "Mute #12", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
+		configSwitch(MUTE_PARAM+12, 0.0f, 3.0f, 0.0f, "Mute #13", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
+		configSwitch(MUTE_PARAM+13, 0.0f, 3.0f, 0.0f, "Mute #14", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
+		configSwitch(MUTE_PARAM+14, 0.0f, 3.0f, 0.0f, "Mute #15", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
+		configSwitch(MUTE_PARAM+15, 0.0f, 3.0f, 0.0f, "Mute #16", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
 		
 		configOutput(OUT_OUTPUT, "Poly");
 	}
@@ -252,7 +250,7 @@ struct PolyMuter8Plus : Module {
 		globalSolo = false;
 		prevGlobalSolo = false;
 
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 16; i++) {
 			buttonValue[i] = UNMUTED;
 			prevButtonValue[i] = UNMUTED;
 			status[i] = UNMUTED;
@@ -269,7 +267,6 @@ struct PolyMuter8Plus : Module {
 		sampleRate = APP->engine->getSampleRate();
 	}
 
-	
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
@@ -281,6 +278,14 @@ struct PolyMuter8Plus : Module {
 		json_object_set_new(rootJ, "status6", json_integer(params[MUTE_PARAM+5].getValue()));
 		json_object_set_new(rootJ, "status7", json_integer(params[MUTE_PARAM+6].getValue()));
 		json_object_set_new(rootJ, "status8", json_integer(params[MUTE_PARAM+7].getValue()));
+		json_object_set_new(rootJ, "status9", json_integer(params[MUTE_PARAM+8].getValue()));
+		json_object_set_new(rootJ, "status10", json_integer(params[MUTE_PARAM+9].getValue()));
+		json_object_set_new(rootJ, "status11", json_integer(params[MUTE_PARAM+10].getValue()));
+		json_object_set_new(rootJ, "status12", json_integer(params[MUTE_PARAM+11].getValue()));
+		json_object_set_new(rootJ, "status13", json_integer(params[MUTE_PARAM+12].getValue()));
+		json_object_set_new(rootJ, "status14", json_integer(params[MUTE_PARAM+13].getValue()));
+		json_object_set_new(rootJ, "status15", json_integer(params[MUTE_PARAM+14].getValue()));
+		json_object_set_new(rootJ, "status16", json_integer(params[MUTE_PARAM+15].getValue()));
 		return rootJ;
 	}
 	
@@ -342,6 +347,56 @@ struct PolyMuter8Plus : Module {
 				buttonValue[7] = json_integer_value(status8J);
 				firstStatusCheck(7);
 			}
+
+			json_t* status9J = json_object_get(rootJ, "status9");
+			if (status9J){
+				buttonValue[8] = json_integer_value(status9J);
+				firstStatusCheck(8);
+			}
+
+			json_t* status10J = json_object_get(rootJ, "status10");
+			if (status10J){
+				buttonValue[9] = json_integer_value(status10J);
+				firstStatusCheck(9);
+			}
+
+			json_t* status11J = json_object_get(rootJ, "status11");
+			if (status11J){
+				buttonValue[10] = json_integer_value(status11J);
+				firstStatusCheck(10);
+			}
+
+			json_t* status12J = json_object_get(rootJ, "status12");
+			if (status12J){
+				buttonValue[11] = json_integer_value(status12J);
+				firstStatusCheck(11);
+			}
+
+			json_t* status13J = json_object_get(rootJ, "status13");
+			if (status13J){
+				buttonValue[12] = json_integer_value(status13J);
+				firstStatusCheck(12);
+			}
+
+			json_t* status14J = json_object_get(rootJ, "status14");
+			if (status14J){
+				buttonValue[13] = json_integer_value(status14J);
+				firstStatusCheck(13);
+			}
+
+			json_t* status15J = json_object_get(rootJ, "status15");
+			if (status15J){
+				buttonValue[14] = json_integer_value(status15J);
+				firstStatusCheck(14);
+			}
+
+			json_t* status16J = json_object_get(rootJ, "status16");
+			if (status16J){
+				buttonValue[15] = json_integer_value(status16J);
+				firstStatusCheck(15);
+			}
+
+			
 		}
 	}
 
@@ -407,7 +462,7 @@ struct PolyMuter8Plus : Module {
 
 		if (globalSolo != prevGlobalSolo) {
 			if (globalSolo) {	// solo on
-				for (int c = 0; c < 8; c++) {
+				for (int c = 0; c < 16; c++) {
 					if (status[c] == UNMUTED) {
 						fadeOut(c);
 						prevStatus[c] = status[c];
@@ -418,7 +473,7 @@ struct PolyMuter8Plus : Module {
 					}
 				}
 			} else {	// solo off
-				for (int c = 0; c < 8; c++) {
+				for (int c = 0; c < 16; c++) {
 					if (prevStatus[c] == UNMUTED) {
 						fadeIn(c);
 						
@@ -435,7 +490,7 @@ struct PolyMuter8Plus : Module {
 			prevGlobalSolo = globalSolo;
 		}
 
-		for (int c = 0; c < 8; c++) {
+		for (int c = 0; c < 16; c++) {
 
 			// 0 unmuted
 			// 1 soloed
@@ -582,13 +637,15 @@ struct PolyMuter8Plus : Module {
 		debugDisplay9 = to_string(soloChans);
 		*/
 
-		inChans = std::max(1, inputs[IN_INPUT].getChannels());
+		//inChans = std::max(1, inputs[IN_INPUT].getChannels());
+		outChans = std::max(1, inputs[IN_INPUT].getChannels());
 		
+		/*
 		if (inChans < 9)
 			outChans = inChans;
 		else
 			outChans = 8;
-		
+		*/
 
 		for (int c = 0; c < outChans; c++) {
 
@@ -611,36 +668,36 @@ struct PolyMuter8Plus : Module {
 	}
 };
 
-struct PolyMuter8PlusDisplayChan : TransparentWidget {
-	PolyMuter8Plus *module;
+struct PolyMuter16PlusDisplayChan : TransparentWidget {
+	PolyMuter16Plus *module;
 	int frame = 0;
-	PolyMuter8PlusDisplayChan() {
+	PolyMuter16PlusDisplayChan() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
 		if (module) {
 			if (layer ==1) {
 				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 10);
+				nvgFontSize(args.vg, 16);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
 
 				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));					
-				if (module->inChans > 9)
-					nvgTextBox(args.vg, 1.5, 17, 60, to_string(module->inChans).c_str(), NULL);
+				//if (module->inChans > 9)
+				if (module->outChans > 9)
+					nvgTextBox(args.vg, 4, 20.8, 60, to_string(module->outChans).c_str(), NULL);
 				else
-					nvgTextBox(args.vg, 9.8, 17, 60, to_string(module->inChans).c_str(), NULL);
+					nvgTextBox(args.vg, 17, 20.8, 60, to_string(module->outChans).c_str(), NULL);
 			}
 		}
 		Widget::drawLayer(args, layer);
 	}
 };
-
 /*
-struct PolyMuter8PlusDebugDisplay : TransparentWidget {
-	PolyMuter8Plus *module;
+struct PolyMuter16PlusDebugDisplay : TransparentWidget {
+	PolyMuter16Plus *module;
 	int frame = 0;
-	PolyMuter8PlusDebugDisplay() {
+	PolyMuter16PlusDebugDisplay() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -652,16 +709,10 @@ struct PolyMuter8PlusDebugDisplay : TransparentWidget {
 				nvgTextLetterSpacing(args.vg, 0);
 				nvgFillColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0xff)); 
 				
-				nvgTextBox(args.vg, 30, 0,120, module->debugDisplay.c_str(), NULL);
-				nvgTextBox(args.vg, 30, 10,120, module->debugDisplay2.c_str(), NULL);
-				nvgTextBox(args.vg, 30, 20,120, module->debugDisplay3.c_str(), NULL);
-				nvgTextBox(args.vg, 30, 30,120, module->debugDisplay4.c_str(), NULL);
-
-				nvgTextBox(args.vg, 60, 0,120, module->debugDisplay5.c_str(), NULL);
-				nvgTextBox(args.vg, 60, 10,120, module->debugDisplay6.c_str(), NULL);
-				nvgTextBox(args.vg, 60, 20,120, module->debugDisplay7.c_str(), NULL);
-				nvgTextBox(args.vg, 60, 30,120, module->debugDisplay8.c_str(), NULL);
-				nvgTextBox(args.vg, 60, 40,120, module->debugDisplay9.c_str(), NULL);
+				nvgTextBox(args.vg, 0, 0,120, module->debugDisplay.c_str(), NULL);
+				//nvgTextBox(args.vg, 9, 16,120, module->debugDisplay2.c_str(), NULL);
+				//nvgTextBox(args.vg, 129, 6,120, module->debugDisplay3.c_str(), NULL);
+				//nvgTextBox(args.vg, 129, 16,120, module->debugDisplay4.c_str(), NULL);
 
 			}
 		}
@@ -670,26 +721,26 @@ struct PolyMuter8PlusDebugDisplay : TransparentWidget {
 };
 */
 
-
-struct PolyMuter8PlusWidget : ModuleWidget {
-	PolyMuter8PlusWidget(PolyMuter8Plus* module) {
+struct PolyMuter16PlusWidget : ModuleWidget {
+	PolyMuter16PlusWidget(PolyMuter16Plus* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/PolyMuter8Plus.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/PolyMuter16Plus.svg")));
 
 		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		{
-			PolyMuter8PlusDisplayChan *display = new PolyMuter8PlusDisplayChan();
-			display->box.pos = mm2px(Vec(10.7, 13));
-			display->box.size = mm2px(Vec(8, 8));
+			PolyMuter16PlusDisplayChan *display = new PolyMuter16PlusDisplayChan();
+			display->box.pos = mm2px(Vec(20.9, 25.7));
+			display->box.size = mm2px(Vec(13.2, 8.6));
 			display->module = module;
 			addChild(display);
 		}
-		
 		/*
 		{
-			PolyMuter8PlusDebugDisplay *display = new PolyMuter8PlusDebugDisplay();
+			PolyMuter16DebugDisplay *display = new PolyMuter16DebugDisplay();
 			display->box.pos = Vec(3, 25);
 			display->box.size = Vec(307, 100);
 			display->module = module;
@@ -698,43 +749,37 @@ struct PolyMuter8PlusWidget : ModuleWidget {
 		*/
 
 		const float xCenter = 10.1f;
-		const float xLeft = 6.5f;
-		const float xRight = 14.f;
+		const float xLeft = 12.f;
+		const float xRight = 21.f;
 
-		const float yIn = 17;
+		const float yIn = 17.5;
 		const float yFade = 30;
-		const float yOut = 116;
+		const float xOut = 27.5;
+		const float yOut = 17.5;
 
-		constexpr float yStart = 42.5;
-		constexpr float yStart2 = 50.5;
-		constexpr float y = 8.f;
+		constexpr float yStart = 41.5;
+		constexpr float yStart2 = 46.5;
+		constexpr float y = 10.f;
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xLeft, yIn)), module, PolyMuter8Plus::IN_INPUT));
 
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yFade)), module, PolyMuter8Plus::FADE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yIn)), module, PolyMuter16Plus::IN_INPUT));
 
-		for (int i = 0; i < 8; i=i+2) {
-			addParam(createParamCentered<PM8SoloMuteButton>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter8Plus::MUTE_PARAM+i));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yFade)), module, PolyMuter16Plus::FADE_PARAM));
+
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yOut)), module, PolyMuter16Plus::OUT_OUTPUT));
+
+		for (int i = 0; i < 8; i++) {
+			addParam(createParamCentered<PM16SoloMuteButton>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter16Plus::MUTE_PARAM+i));
 		}
 
-		for (int i = 1; i < 8; i=i+2) {
-			addParam(createParamCentered<PM8SoloMuteButton>(mm2px(Vec(xRight, yStart2+((i-1)*y))), module, PolyMuter8Plus::MUTE_PARAM+i));
+		for (int i = 0; i < 8; i++) {
+			addParam(createParamCentered<PM16SoloMuteButton>(mm2px(Vec(xRight, yStart2+(i*y))), module, PolyMuter16Plus::MUTE_PARAM+8+i));
 		}
-
-		/*
-		for (int i = 8; i < 16; i++) {
-			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xRight, yStart+((i-8)*y))), module, PolyMuter8Plus::MUTE_PARAM+i, PolyMuter8Plus::MUTE_LIGHT+i));
-		}
-		*/
-
-		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut)), module, PolyMuter8Plus::OUT_OUTPUT));
-
-
 
 	}
 
 	void appendContextMenu(Menu* menu) override {
-		PolyMuter8Plus* module = dynamic_cast<PolyMuter8Plus*>(this->module);
+		PolyMuter16Plus* module = dynamic_cast<PolyMuter16Plus*>(this->module);
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Right-click on buttons"));
@@ -744,4 +789,4 @@ struct PolyMuter8PlusWidget : ModuleWidget {
 	}
 };
 
-Model* modelPolyMuter8Plus = createModel<PolyMuter8Plus, PolyMuter8PlusWidget>("PolyMuter8Plus");
+Model* modelPolyMuter16Plus = createModel<PolyMuter16Plus, PolyMuter16PlusWidget>("PolyMuter16Plus");

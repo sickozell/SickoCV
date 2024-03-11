@@ -24,15 +24,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.0000001"
-     inkscape:cx="-199.49999"
-     inkscape:cy="91.999994"
+     inkscape:zoom="2.8284274"
+     inkscape:cx="7.9549505"
+     inkscape:cy="49.143916"
      inkscape:window-width="1366"
      inkscape:window-height="705"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg5"
+     inkscape:current-layer="layer1"
      showguides="true" />
   <defs
      id="defs2">
@@ -254,7 +254,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Etichette Testo"
-     style="display:inline">
+     style="display:none">
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
@@ -755,25 +755,25 @@
          d="m 14.870968,4.8914113 v -0.396875 h -0.396875 v -0.79375 h 0.396875 v -0.396875 h -0.396875 v -0.79375 h 0.396875 v -0.396875 h 1.5875 v 0.396875 h 0.396875 v 0.79375 h -0.396875 v 0.396875 h 0.396875 v 0.79375 h -0.396875 v 0.396875 z m 0.396875,-1.5875 h 0.79375 v -0.79375 h -0.79375 z m 0,1.190625 h 0.79375 v -0.79375 h -0.79375 z"
          id="path6286" />
     </g>
-  </g>
-  <rect
-     style="display:inline;fill:#000000;stroke:#000000;stroke-width:0.187008;stroke-opacity:1"
-     id="rect1055"
-     width="1.9774246"
-     height="1.8678312"
-     x="17.300152"
-     y="1.0071292"
-     ry="0"
-     inkscape:label="black patch" />
-  <g
-     aria-label="+"
-     id="text2148"
-     style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';display:inline;fill:#e6e6e6;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
-     inkscape:label="plus"
-     transform="translate(-22.062733,-0.68375235)">
-    <path
-       d="m 40.224937,3.3668751 v -0.79375 h -0.79375 v -0.396875 h 0.79375 v -0.79375 h 0.79375 v 0.79375 h 0.79375 v 0.396875 h -0.79375 v 0.79375 z"
-       style="fill:#e6e6e6;stroke:none;stroke-width:0.265"
-       id="path2150" />
+    <rect
+       style="display:inline;fill:#000000;stroke:#000000;stroke-width:0.187008;stroke-opacity:1"
+       id="rect1055"
+       width="1.9774246"
+       height="1.8678312"
+       x="17.300152"
+       y="1.0071292"
+       ry="0"
+       inkscape:label="black patch" />
+    <g
+       aria-label="+"
+       id="text2148"
+       style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';display:inline;fill:#e6e6e6;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
+       inkscape:label="plus"
+       transform="translate(-22.062733,-0.68375236)">
+      <path
+         d="m 40.224937,3.3668751 v -0.79375 h -0.79375 v -0.396875 h 0.79375 v -0.79375 h 0.79375 v 0.79375 h 0.79375 v 0.396875 h -0.79375 v 0.79375 z"
+         style="fill:#e6e6e6;stroke:none;stroke-width:0.265"
+         id="path2150" />
+    </g>
   </g>
 </svg>
