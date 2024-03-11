@@ -1,6 +1,6 @@
 ### 2.6.8 (2024-03-xx)
-- added 'polyMuter16' and 'polyMuter16+' modules.
 - added 'polyMuter8' and 'polyMuter8+' modules.
+- added 'polyMuter16' and 'polyMuter16+' modules.
 - added 'modulator7 Compact' module.
 - calcs: added output range selection to context menu.
 

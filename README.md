@@ -18,8 +18,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
-- added 'polyMuter16' and 'polyMuter16+' modules.
 - added 'polyMuter8' and 'polyMuter8+' modules.
+- added 'polyMuter16' and 'polyMuter16+' modules.
 - added 'modulator7 Compact' module.
 - calcs: added output range selection to context menu.
 
