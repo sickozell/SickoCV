@@ -45,7 +45,7 @@ VCV Rack plugin modules
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
 - [parking](#parking)
-- [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polyMuter8--polyMuter8--polyMuter16--polyMuter16+)
+- [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
 - [sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5](#sickolooper1--sickolooperx--sickolooper3--sickolooper5)
@@ -579,11 +579,11 @@ It can also be used to connect other modules sockets when they need to be wired 
 
 #### - INSTRUCTIONS
 polyMuter mutes the single channels of a polyphonic cable connected to IN and outputs the same number of channels on OUT.  
-FADE knob sets the fade length in milliseconds of the mutue/unmute operation.  
+FADE knob sets the fade length in milliseconds of the mute/unmute operation.  
 
-polyMuter16 is the standard version of the module, polyMuter8 will output a maximum of 8 channels. The channel dsiplay will show the number of channels of the input cable.
+polyMuter16 is the standard version of the module, polyMuter8 will output a maximum of 8 channels. The channel display will show the number of channels of the input cable.
 
-The plus version of each module can also 'solo' the channels by right-clicking on mute buttons. Multiple solo channels can be selected.  
+The plus version of each module can also 'solo' the channels by right-clicking on mute buttons, so the led button will become green. Multiple solo channels can be selected.  
 If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be be directly unmuted.  
 By using the plus version the right-click menu of knob will be no longer available, but the knobs will be still midi mappable for the mute function only.
 
