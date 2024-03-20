@@ -1,5 +1,5 @@
 ### 2.6.9 (2024-03-xx)
-- sickoPlayer / sickoSampler: added 'Unlimited File Size' option in right-click menu.
+- sickoPlayer / sickoSampler: added 'Unlimited Sample Size' option in right-click menu.
 
 ### 2.6.8 (2024-03-11)
 - added 'polyMuter8' and 'polyMuter8+' modules.

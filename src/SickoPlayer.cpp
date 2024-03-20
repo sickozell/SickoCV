@@ -2768,7 +2768,7 @@ struct SickoPlayerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
-		menu->addChild(createBoolPtrMenuItem("Unlimited File Size (risky)", "", &module->unlimitedRecording));
+		menu->addChild(createBoolPtrMenuItem("Unlimited Sample Size (risky)", "", &module->unlimitedRecording));
 		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
