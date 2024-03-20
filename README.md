@@ -1,4 +1,4 @@
-# SickoCV v2.6.8-beta6
+# SickoCV v2.6.9-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,12 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
-- added 'polyMuter8' and 'polyMuter8+' modules.
-- added 'polyMuter16' and 'polyMuter16+' modules.
-- added 'modulator7 Compact' module.
-- calcs: added output range selection to context menu.
+- sickoPlayer / sickoSampler: added 'Unlimited File Size' option in right-click menu.
 
-# SickoCV v2.6.8
+# SickoCV v2.6.9
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/e29f6164-0446-4899-b6d9-81e22f6923ac)
