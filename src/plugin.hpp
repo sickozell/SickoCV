@@ -46,6 +46,7 @@ extern Model* modelSickoLooper1Exp;
 extern Model* modelSickoLooper3;
 extern Model* modelSickoLooper5;
 extern Model* modelSickoPlayer;
+extern Model* modelSickoQuant4;
 extern Model* modelSickoSampler;
 extern Model* modelSickoSampler2;
 extern Model* modelSwitcher;
