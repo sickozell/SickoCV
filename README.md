@@ -762,7 +762,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 ## sickoQuant / sickoQuant4
 ### single or 4 channles polyphonic quantazier with scales and presets.
 #### - DESCRIPTION
-sickoQuant / sickoQuant4 can quantize signals in min/Maj or custom scales, continuously or triggered.
+sickoQuant / sickoQuant4 can quantize signals in chromatic/min/Maj or custom scales, continuously or triggered.
 
  ![sickoquant](https://github.com/sickozell/SickoCV/assets/80784296/5ba80489-cd8b-403e-95f4-279900d9c3c4)
 
