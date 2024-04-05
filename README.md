@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.9
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/e29f6164-0446-4899-b6d9-81e22f6923ac)
+![SickoCV modules 2 6 9](https://github.com/sickozell/SickoCV/assets/80784296/44581571-6234-4d4e-91f6-50a329cad66b)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -48,6 +48,7 @@ VCV Rack plugin modules
 - [sickoAmp](#sickoamp)
 - [sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5](#sickolooper1--sickolooperx--sickolooper3--sickolooper5)
 - [sickoPlayer](#sickoplayer)
+- [sickoQuant / sickoQuant4](#sickoquant--sickoquant4)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
@@ -755,6 +756,18 @@ There are some factory presets stored in the right-click menu for common using s
 #### USING ONE-CYCLE WAVEFORMS
 One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
 Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100% and enable loop button.  
+
+[back to top](#table-of-contents)
+
+## sickoQuant / sickoQuant4
+### single or 4 channles polyphonic quantazier with scales and presets.
+#### - DESCRIPTION
+sickoQuant / sickoQuant4 can quantize signals in min/Maj or custom scales, continuously or triggered.
+
+ ![sickoquant](https://github.com/sickozell/SickoCV/assets/80784296/5ba80489-cd8b-403e-95f4-279900d9c3c4)
+
+#### - INSTRUCTIONS
+
 
 [back to top](#table-of-contents)
 
