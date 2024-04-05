@@ -1,5 +1,5 @@
 ### 2.6.9 (2024-03-xx)
-- added 'sickoQuant4' module.
+- added 'sickoQuant' and 'sickoQuant4' modules.
 - sickoPlayer / sickoSampler: added 'Unlimited Sample Size' option in right-click menu.
 
 ### 2.6.8 (2024-03-11)

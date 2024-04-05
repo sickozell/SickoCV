@@ -1,4 +1,4 @@
-# SickoCV v2.6.9-beta2
+# SickoCV v2.6.9-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,7 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - modules testing  
 
 ## **changelog**  
-- added 'sickoQuant4' module.
+- added 'sickoQuant' and 'sickoQuant4' modules.
 - sickoPlayer / sickoSampler: added 'Unlimited File Size' option in right-click menu.
 
 # SickoCV v2.6.9
