@@ -794,7 +794,7 @@ On the other hand, editing an actual working scale with the note buttons, it wil
 This SET button can be also used to apply pending scales or programs.  
 
 A display shows the current working scale or program in green, or both the working in green and the pending one in red.  
-Scales are shown with usual scale notation (C, C#, Dm, F#), or 'chr' for cromatic, or 'CST' for other custom scales.  
+Scales are shown with usual scale notation (C, C#, Dm, F#m, etc.), or 'chr' for cromatic, or 'CST' for other custom scales.  
 Programs are shown from P0 to p31.  
 
 All 32 programs can be saved in a preset file (.SQN) with the 'Save PROG preset' function in the right-click menu, and reloaded in other sickoQuant modules with the 'Load PROG preset' function.  
