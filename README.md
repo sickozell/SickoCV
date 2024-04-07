@@ -768,6 +768,44 @@ sickoQuant / sickoQuant4 can quantize signals in chromatic/min/Maj or custom sca
 
 #### - INSTRUCTIONS
 
+IN input is used to connect the signal to be quantized and accepts polyphonic sources.  
+OUT output provides the quantized signal.  
+
+Quantization is applied to the closest note in the current working scale.
+
+Inputs can be attenuated by ATT knob or sampled&held with a trigger via the TRG input.  
+A further voltage on the OFS input can be applied before quantization.  
+The OCT knob can shift the signal up to 2 octaves below or above the source signal.  
+
+SCL knob selects the quantizer scale and hold it in pending state. The relative SET button sets the scale in actual working state.  
+SCL knob in the middle position sets the chromatic scale, turning the knob clockwise selects Major scales, moving it anti-clockwise selects minor scales.  
+A cv input with a range of ±10v is provided and its value is added to knob selection.  
+
+PROG knob selects 32 further user scales that can be recalled via the RECL button, with a pending state as the SCL knob does.  
+A cv input with a range of ±10v is provided and its value is added to knob selection.  
+Double-clicking the STOR button stores the currently displayed notes in the program selected by the PROG knob.  
+While a program is being stored, the STOR button LED remains lit for a while.  
+
+Enabling the A (auto) button deactivaes the pending states, so the selected scales or programs are instantly set to working state.  
+
+A keyboard-like set of LED buttons is provided to show the working scale or manually modify it.  
+If a pending scale or program is manually modified it will be set as a working scale only when the SET button located below the keyboard is pressed.  
+On the other hand, editing an actual working scale with the note buttons, it will cause the change to be applied immediately.  
+This SET button can be also used to apply pending scales or programs.  
+
+A display shows the current working scale or program in green, or both the working in green and the pending one in red.  
+Scales are shown with usual scale notation (C, C#, Dm, F#), or 'chr' for cromatic, or 'CST' for other custom scales.  
+Programs are shown from P0 to p31.  
+
+All 32 programs can be saved in a preset file (.SQN) with the 'Save PROG preset' function in the right-click menu, and reloaded in other sickoQuant modules with the 'Load PROG preset' function.  
+
+##### sickoQuant4
+
+sickoQuant4 module works like sickoQuant but provides 4 normalled polyphonic channels.  
+
+In the right-click menu there is a further function to sum the first 'n' channels (rows) and output a polyphonic signal (with a 'row' correlation) to the output #1 marked with a 'S' and circled in pink.  
+In this case, if there are polyphonic sources connected, only the first polyphony channel of the sources will be summed to the polyphonic out #1, just to maintain the purpose of this 'sum' function.  
+Setting the 'sum' function will alter only the first output, but the other channels will work as usual.  
 
 [back to top](#table-of-contents)
 
