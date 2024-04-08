@@ -1,4 +1,4 @@
-# SickoCV v2.6.9-beta3
+# SickoCV v2.6.9-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -771,7 +771,7 @@ sickoQuant / sickoQuant4 can quantize signals in chromatic/min/Maj or custom sca
 IN input is used to connect the signal to be quantized and accepts polyphonic sources.  
 OUT output provides the quantized signal.  
 
-Quantization is applied to the closest note in the current working scale.
+Quantization is applied to the closest note in the current working scale. When there are no notes selected there is no quantization.
 
 Inputs can be attenuated by ATT knob or sampled&held with a trigger via the TRG input.  
 A further voltage on the OFS input can be applied before quantization.  
@@ -794,8 +794,8 @@ On the other hand, editing an actual working scale with the note buttons, it wil
 This SET button can be also used to apply pending scales or programs.  
 
 A display shows the current working scale or program in green, or both the working in green and the pending one in red.  
-Scales are shown with usual scale notation (C, C#, Dm, F#m, etc.), or 'chr' for cromatic, or 'CST' for other custom scales.  
-Programs are shown from P0 to p31.  
+Scales are shown with usual scale notation (C, C#, Dm, F#m, etc.), 'chr' for cromatic, 'CST' for other custom scales, 'N.Q' for no quantization.  
+Programs are shown from P0 to p31, even if no notes are selecte (no quantization).  
 
 All 32 programs can be saved in a preset file (.SQN) with the 'Save PROG preset' function in the right-click menu, and reloaded in other sickoQuant modules with the 'Load PROG preset' function.  
 

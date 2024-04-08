@@ -134,48 +134,48 @@ struct SickoQuant4 : Module {
 											};
 
 	int progNotes[32][12] = {
-								{1,0,0,1,0,0,0,1,0,0,0,0},
-								{0,1,0,0,1,0,0,0,1,0,0,0},
-								{0,0,1,0,0,1,0,0,0,1,0,0},
-								{0,0,0,1,0,0,1,0,0,0,1,0},
-								{0,0,0,0,1,0,0,1,0,0,0,1},
-								{1,0,0,0,0,1,0,0,1,0,0,0},
-								{0,1,0,0,0,0,1,0,0,1,0,0},
-								{0,0,1,0,0,0,0,1,0,0,1,0},
-								{0,0,0,1,0,0,0,0,1,0,0,1},
-								{1,0,0,0,1,0,0,0,0,1,0,0},
-								{0,1,0,0,0,1,0,0,0,0,1,0},
-								{0,0,1,0,0,0,1,0,0,0,0,1},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
 
-								{1,0,0,0,1,0,0,1,0,0,0,0},
-								{0,1,0,0,0,1,0,0,1,0,0,0},
-								{0,0,1,0,0,0,1,0,0,1,0,0},
-								{0,0,0,1,0,0,0,1,0,0,1,0},
-								{0,0,0,0,1,0,0,0,1,0,0,1},
-								{1,0,0,0,0,1,0,0,0,1,0,0},
-								{0,1,0,0,0,0,1,0,0,0,1,0},
-								{0,0,1,0,0,0,0,1,0,0,0,1},
-								{1,0,0,1,0,0,0,0,1,0,0,0},
-								{0,1,0,0,1,0,0,0,0,1,0,0},
-								{0,0,1,0,0,1,0,0,0,0,1,0},
-								{0,0,0,1,0,0,1,0,0,0,0,1},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
 
-								{1,0,0,0,0,0,0,0,0,0,0,0},
-								{0,1,0,0,0,0,0,0,0,0,0,0},
-								{0,0,1,0,0,0,0,0,0,0,0,0},
-								{0,0,0,1,0,0,0,0,0,0,0,0},
-								{0,0,0,0,1,0,0,0,0,0,0,0},
-								{0,0,0,0,0,1,0,0,0,0,0,0},
-								{0,0,0,0,0,0,1,0,0,0,0,0},
-								{0,0,0,0,0,0,0,1,0,0,0,0}
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0}
 							};
 
-	int note[12] = {1,1,1,1,1,1,1,1,1,1,1,1};
+	int note[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 	int pendingNote[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
-	int nextNote[12] = {1,1,1,1,1,1,1,1,1,1,1,1};
+	int nextNote[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 	float voltageScale[12] = {0, 0.08333f, 0.16667f, 0.25f, 0.33333f, 0.41667, 0.5f, 0.58333f, 0.66667f, 0.75f, 0.83333f, 0.91667f};
-	int notesInVoltageScale = 12;
-	int lastNoteInVoltageScale = 11;
+	int notesInVoltageScale = 0;
+	int lastNoteInVoltageScale = -1;
 	float noteDelta = 0.f;
 	float noteDeltaMin = 5.f;
 	int chosenNote = 0;
@@ -229,8 +229,8 @@ struct SickoQuant4 : Module {
 
 	bool pendingUpdate = false;
 
-	int displayWorking = DISPLAYSCALE;
-	int displayLastSelected = DISPLAYSCALE;
+	int displayWorking = CUSTOMSCALE;
+	int displayLastSelected = CUSTOMSCALE;
 
 	int chan = 0;
 	float atten = 0;
@@ -257,8 +257,6 @@ struct SickoQuant4 : Module {
 								{0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
 								{0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f}};
 
-	//float oneMsSamples = (APP->engine->getSampleRate()) / 1000;			// samples in 1ms
-	
 	float quantTrig[4] = {0.f, 0.f, 0.f, 0.f};
 	float prevQuantTrig[4] = {0.f, 0.f, 0.f, 0.f};
 
@@ -282,18 +280,18 @@ struct SickoQuant4 : Module {
 	SickoQuant4() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
-		configSwitch(NOTE_PARAM+0, 0.f, 1.f, 1.f, "C", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+1, 0.f, 1.f, 1.f, "C#", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+2, 0.f, 1.f, 1.f, "D", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+3, 0.f, 1.f, 1.f, "D#", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+4, 0.f, 1.f, 1.f, "E", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+5, 0.f, 1.f, 1.f, "F", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+6, 0.f, 1.f, 1.f, "F#", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+7, 0.f, 1.f, 1.f, "G", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+8, 0.f, 1.f, 1.f, "G#", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+9, 0.f, 1.f, 1.f, "A", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+10, 0.f, 1.f, 1.f, "A#", {"OFF", "ON"});
-		configSwitch(NOTE_PARAM+11, 0.f, 1.f, 1.f, "B", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+0, 0.f, 1.f, 0.f, "C", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+1, 0.f, 1.f, 0.f, "C#", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+2, 0.f, 1.f, 0.f, "D", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+3, 0.f, 1.f, 0.f, "D#", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+4, 0.f, 1.f, 0.f, "E", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+5, 0.f, 1.f, 0.f, "F", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+6, 0.f, 1.f, 0.f, "F#", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+7, 0.f, 1.f, 0.f, "G", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+8, 0.f, 1.f, 0.f, "G#", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+9, 0.f, 1.f, 0.f, "A", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+10, 0.f, 1.f, 0.f, "A#", {"OFF", "ON"});
+		configSwitch(NOTE_PARAM+11, 0.f, 1.f, 0.f, "B", {"OFF", "ON"});
 
 		configSwitch(MANUALSET_PARAM, 0, 1.f, 0.f, "Set", {"OFF", "ON"});
 
@@ -330,13 +328,13 @@ struct SickoQuant4 : Module {
 		configInput(OFFS_INPUT+2, "Offset #3");
 		configInput(OFFS_INPUT+3, "Offset #4");
 
-		configParam(OCT_PARAM, -2.f, 2.f, 0.f, "Octave #1");
+		configParam(OCT_PARAM, -3.f, 3.f, 0.f, "Octave #1");
 		paramQuantities[OCT_PARAM]->snapEnabled = true;
-		configParam(OCT_PARAM+1, -2.f, 2.f, 0.f, "Octave #2");
+		configParam(OCT_PARAM+1, -3.f, 3.f, 0.f, "Octave #2");
 		paramQuantities[OCT_PARAM+1]->snapEnabled = true;
-		configParam(OCT_PARAM+2, -2.f, 2.f, 0.f, "Octave #3");
+		configParam(OCT_PARAM+2, -3.f, 3.f, 0.f, "Octave #3");
 		paramQuantities[OCT_PARAM+2]->snapEnabled = true;
-		configParam(OCT_PARAM+3, -2.f, 2.f, 0.f, "Octave #4");
+		configParam(OCT_PARAM+3, -3.f, 3.f, 0.f, "Octave #4");
 		paramQuantities[OCT_PARAM+3]->snapEnabled = true;
 
 		configOutput(OUT_OUTPUT, "Signal #1");
@@ -354,14 +352,14 @@ struct SickoQuant4 : Module {
 
 	void onReset(const ResetEvent &e) override {
 		for (int i = 0; i < 12; i++) {
-			note[i] = 1;
+			note[i] = 0;
 			pendingNote[i] = 0;
-			nextNote[i] = 1;
+			nextNote[i] = 0;
 			voltageScale[i] = noteVtable[i];
 		}
 
-		notesInVoltageScale = 12;
-		lastNoteInVoltageScale = 11;
+		notesInVoltageScale = 0;
+		lastNoteInVoltageScale = -1;
 		notesChanged = false;
 
 		scaleKnob = 0;
@@ -385,8 +383,8 @@ struct SickoQuant4 : Module {
 
 		pendingUpdate = false;
 
-		displayWorking = DISPLAYSCALE;
-		displayLastSelected = DISPLAYSCALE;
+		displayWorking = CUSTOMSCALE;
+		displayLastSelected = CUSTOMSCALE;
 
 		outSumMode = 0;
 		outSumModePlus1 = 1;
@@ -398,7 +396,6 @@ struct SickoQuant4 : Module {
 
 		storeSamples = APP->engine->getSampleRate() / 1.5f;
 		maxStoredProgramTime = APP->engine->getSampleRate() * 1.5;
-		//oneMsSamples = APP->engine->getSampleRate() / 1000;
 
 	}
 
@@ -658,7 +655,6 @@ struct SickoQuant4 : Module {
 			progKnob = 31;
 
 		if (progKnob != prevProgKnob) {
-			//DEBUG("PROG KNOB");
 			pendingUpdate = true;
 			progChanged = true;
 			displayLastSelected = DISPLAYPROG;
@@ -912,7 +908,6 @@ struct SickoQuant4 : Module {
 		}
 
 
-
 		// -------------------------------------------------------
 		// ------------------- SIGNAL QUANTIZATION ---------------
 		// -------------------------------------------------------
@@ -1003,8 +998,7 @@ struct SickoQuant4 : Module {
 					} else {
 						outputs[OUT_OUTPUT+track].setVoltage(0, 0);	
 					}
-
-					
+		
 					outputs[OUT_OUTPUT+track].setChannels(chan);
 
 				}
@@ -1149,9 +1143,6 @@ struct SickoQuant4 : Module {
 				
 				// ------------------------------------------------------- OTHER SUMMED TRACKS
 
-				//chan = 1; // this is set on track 0;
-
-				//for (int track = 1; track < outSumMode + 1; track++) {
 				for (int track = 1; track < outSumModePlus1; track++) {
 
 					if (inputs[IN_INPUT+track].isConnected()) {
@@ -1220,23 +1211,18 @@ struct SickoQuant4 : Module {
 						outputs[OUT_OUTPUT+track].setVoltage(outSignal[track][c], c);	
 					}
 							
-
 					outputs[OUT_OUTPUT+track].setChannels(chan);
 
 					outputs[OUT_OUTPUT].setVoltage(outSignal[track][0], track);
 
 				}
 
-				//outputs[OUT_OUTPUT].setChannels(outSumMode + 1);
 				outputs[OUT_OUTPUT].setChannels(outSumModePlus1);
 
 				// ******************************************************************************
 				// ******************************************************************************
 				// ****************** RESIDUAL CHANNELS QUANTIZATION
 
-				// chan = 1; // chan is set before. It's the previous detected
-
-				//for (int track = outSumMode + 1; track < 4; track++) {
 				for (int track = outSumModePlus1; track < 4; track++) {
 					
 					if (inputs[IN_INPUT+track].isConnected()) {
@@ -1356,7 +1342,6 @@ struct SickoQuant4 : Module {
 
 				// ***********************************************************  OTHER SUMMED TRACKS
 
-				//for (int track = 1; track < outSumMode + 1; track++) {
 				for (int track = 1; track < outSumModePlus1; track++) {
 
 					if (inputs[IN_INPUT+track].isConnected()) {
@@ -1404,12 +1389,10 @@ struct SickoQuant4 : Module {
 					outputs[OUT_OUTPUT+track].setChannels(chan);
 				}
 
-				//outputs[OUT_OUTPUT].setChannels(outSumMode + 1);
 				outputs[OUT_OUTPUT].setChannels(outSumModePlus1);
 
 				// --------------------------- RESIDUAL CHANNEL NO QUANTIZATION
 
-				//for (int track = outSumMode + 1; track < 4; track++) {
 				for (int track = outSumModePlus1; track < 4; track++) {
 
 					if (inputs[IN_INPUT+track].isConnected()) {
@@ -1464,11 +1447,6 @@ struct SickoQuant4 : Module {
 
 			}
 		}
-
-
-
-		
-
 	}
 };
 
@@ -1494,6 +1472,8 @@ struct SickoQuant4DisplayScale : TransparentWidget {
 						currentDisplay +=  module->scaleDisplay[module->workingMinMaj];
 				} else if (module->displayWorking == DISPLAYPROG) {
 					currentDisplay = "P" + to_string(module->workingProg);
+				} else if (module->notesInVoltageScale == 0) {
+					currentDisplay = "N.Q";
 				} else {
 					currentDisplay = "CST";
 				}
