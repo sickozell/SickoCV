@@ -309,7 +309,15 @@ struct SickoQuant : Module {
 	}
 
 	void processBypass(const ProcessArgs &e) override {
-		outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage());
+		if (inputs[IN_INPUT].isConnected())
+			chan = inputs[IN_INPUT].getChannels();
+		else
+			chan = 1;
+
+		for (int c = 0; c < chan; c++)
+			outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c), c);
+		outputs[OUT_OUTPUT].setChannels(chan);
+
 		Module::processBypass(e);
 	}
 
@@ -589,6 +597,12 @@ struct SickoQuant : Module {
 		}
 	}
 
+	void eraseProgs() {
+		for (int i = 0; i < 12; i++)
+			for (int j = 0; j < 32; j++)
+				progNotes[j][i] = 0;
+	}
+
 	void process(const ProcessArgs& args) override {
 
 		// ----------- AUTO SWITCH
@@ -596,7 +610,9 @@ struct SickoQuant : Module {
 		instantScaleChange = int(params[AUTO_PARAM].getValue());
 		lights[AUTO_LIGHT].setBrightness(instantScaleChange);
 
+		// --------------------------------------
 		// ----------- PROGRAM MANAGEMENT
+		// --------------------------------------
 
 		progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
 		if (progKnob < 0)
@@ -621,7 +637,9 @@ struct SickoQuant : Module {
 			notesChanged = true;
 		}
 		
+		// --------------------------------------
 		// ----------- SCALE MANAGEMENT
+		// --------------------------------------
 
 		scaleKnob = int(params[SCALE_PARAM].getValue() + (inputs[SCALE_INPUT].getVoltage() * 1.2));
 		
@@ -676,7 +694,9 @@ struct SickoQuant : Module {
 			}
 		}
 
+		// --------------------------------------
 		// -------- CURRENT SCALE UPDATE
+		// --------------------------------------
 
 		butSetScale = false;
 
@@ -741,7 +761,7 @@ struct SickoQuant : Module {
 
 				}
 		
-			} else {	// if there are NOT pending scale or prog updates (only manual notes are changed)
+			} else {	// if there are NO pending scale or prog updates (only manual notes are changed)
 				notesInVoltageScale = 0;
 				for (int i = 0; i < 12; i++) {
 					note[i] = nextNote[i];
@@ -757,7 +777,9 @@ struct SickoQuant : Module {
 			}
 		}
 
+		// --------------------------------------
 		// -------------------------- RESET SCALE
+		// --------------------------------------
 
 		resetScale = params[RESETSCALE_PARAM].getValue();
 		lights[RESETSCALE_LIGHT].setBrightness(resetScale);
@@ -787,7 +809,9 @@ struct SickoQuant : Module {
 		}
 		prevResetScale = resetScale;
 
+		// --------------------------------------
 		// -------------------------- RECALL PROG
+		// --------------------------------------
 
 		recallBut = params[RECALL_PARAM].getValue();
 		lights[RECALL_LIGHT].setBrightness(recallBut);
@@ -856,7 +880,7 @@ struct SickoQuant : Module {
 		}
 
 		// ---------------------------------------
-		// ------------------- signal quantization
+		// ------------------- SIGNAL QUANTIZATION
 		// ---------------------------------------
 
 		if (notesInVoltageScale) {
@@ -933,51 +957,13 @@ struct SickoQuant : Module {
 
 			outputs[OUT_OUTPUT].setChannels(chan);
 
-		} else {	// IF THERE ARE NO NOTES DISPLAYED -> DO NOT QUANTIZE
+		} else {	// IF THERE ARE NO NOTES TO QUANTIZE -> DO NOT QUANTIZE
 
-			if (outputs[OUT_OUTPUT].isConnected() && inputs[IN_INPUT].isConnected()) {
-
-				chan = inputs[IN_INPUT].getChannels();
-				octPostValue = params[OCT_PARAM].getValue();
-
-				if (!inputs[TRIG_INPUT].isConnected()) {
-
-					for (int c = 0; c < chan; c++) {
-						outSignal[c] = (inputs[IN_INPUT].getVoltage(c) * params[ATN_PARAM].getValue()) + inputs[OFFS_INPUT].getVoltage() + octPostValue;
-						if (outSignal[c] > 5)
-							outSignal[c] = 4 + (outSignal[c] - int(outSignal[c]));
-						else if (outSignal[c] < -4)
-							outSignal[c] = -4 - (outSignal[c] - int(outSignal[c]));
-
-						outputs[OUT_OUTPUT].setVoltage(outSignal[c], c);
-					}
-
-				} else {
-
-					quantTrig = inputs[TRIG_INPUT].getVoltage();
-					if (quantTrig >= 1.f && prevQuantTrig < 1.f) {
-						for (int c = 0; c < chan; c++) {	
-							outSignal[c] = (inputs[IN_INPUT].getVoltage(c) * params[ATN_PARAM].getValue()) + inputs[OFFS_INPUT].getVoltage() + octPostValue;
-							if (outSignal[c] > 5)
-								outSignal[c] = 4 + (outSignal[c] - int(outSignal[c]));
-							else if (outSignal[c] < -4)
-								outSignal[c] = -4 - (outSignal[c] - int(outSignal[c]));
-
-							outputs[OUT_OUTPUT].setVoltage(outSignal[c], c);
-						}
-					}
-					prevQuantTrig = quantTrig;
-				}
-
-			} else {
-
-				chan = 1;
-				outputs[OUT_OUTPUT].setVoltage(0, 0);	
-
-			}
-
+			chan = inputs[IN_INPUT].getChannels();
+			for (int c = 0; c < chan; c++)
+				outputs[OUT_OUTPUT].setVoltage(0.f, c);
 			outputs[OUT_OUTPUT].setChannels(chan);
-
+			
 		}
 	}
 };
@@ -1204,6 +1190,12 @@ struct SickoQuantWidget : ModuleWidget {
 		menu->addChild(createMenuLabel("Store Programs"));
 		menu->addChild(createMenuLabel("with double-click"));
 
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
+			}));
+		}));
 	}
 
 };

@@ -345,8 +345,16 @@ struct SickoQuant4 : Module {
 	}
 
 	void processBypass(const ProcessArgs &e) override {
-		for (int track = 0; track < 4; track++)
-			outputs[OUT_OUTPUT+track].setVoltage(inputs[IN_INPUT+track].getVoltage());
+		for (int track = 0; track < 4; track++) {
+			if (inputs[IN_INPUT+track].isConnected())
+				chan = inputs[IN_INPUT+track].getChannels();
+			else if (track == 0)
+				chan = 1;
+
+			for (int c = 0; c < chan; c++)
+				outputs[OUT_OUTPUT+track].setVoltage(inputs[IN_INPUT+track].getVoltage(c), c);
+			outputs[OUT_OUTPUT+track].setChannels(chan);
+		}
 		Module::processBypass(e);
 	}
 
@@ -638,6 +646,11 @@ struct SickoQuant4 : Module {
 		}
 	}
 
+	void eraseProgs() {
+		for (int i = 0; i < 12; i++)
+			for (int j = 0; j < 32; j++)
+				progNotes[j][i] = 0;
+	}
 
 	void process(const ProcessArgs& args) override {
 
@@ -912,9 +925,9 @@ struct SickoQuant4 : Module {
 		// ------------------- SIGNAL QUANTIZATION ---------------
 		// -------------------------------------------------------
 
-		if (outSumMode == SUM_OFF) {
+		if (notesInVoltageScale) {
 
-			if (notesInVoltageScale) {
+			if (outSumMode == SUM_OFF) {
 
 				chan = 1;
 
@@ -1003,70 +1016,12 @@ struct SickoQuant4 : Module {
 
 				}
 
-			} else {	// IF THERE ARE NO NOTES DISPLAYED -> DO NOT QUANTIZE
+			} else {
 
-				chan = 1;
-
-				for (int track = 0; track < 4; track++) {
-
-					if (inputs[IN_INPUT+track].isConnected()) {
-						chan = inputs[IN_INPUT+track].getChannels();
-						for (int c = 0; c < chan; c++)
-							inSignal[track][c] = inputs[IN_INPUT+track].getVoltage(c);
-
-					} else if (track > 0) {
-						for (int c = 0; c < chan; c++)
-							inSignal[track][c] = inSignal[track-1][c];
-					} else {
-						inSignal[track][0] = 0;
-					}
-
-					if (outputs[OUT_OUTPUT+track].isConnected()) {
-						atten = params[ATN_PARAM+track].getValue();
-						octPostValue = params[OCT_PARAM+track].getValue();
-
-						if (!inputs[TRIG_INPUT+track].isConnected()) {
-							for (int c = 0; c < chan; c++) {
-								outSignal[track][c] = (inSignal[track][c] * atten) + inputs[OFFS_INPUT+track].getVoltage() + octPostValue;
-								if (outSignal[track][c] > 5)
-									outSignal[track][c] = 4 + (outSignal[track][c] - int(outSignal[track][c]));
-								else if (outSignal[track][c] < -4)
-									outSignal[track][c] = -4 - (outSignal[track][c] - int(outSignal[track][c]));
-
-								outputs[OUT_OUTPUT+track].setVoltage(outSignal[track][c], c);
-							}
-
-						} else {
-							quantTrig[track] = inputs[TRIG_INPUT+track].getVoltage();
-							if (quantTrig[track] >= 1.f && prevQuantTrig[track] < 1.f) {
-								for (int c = 0; c < chan; c++) {	
-									outSignal[track][c] = (inSignal[track][c] * atten) + inputs[OFFS_INPUT+track].getVoltage() + octPostValue;
-									if (outSignal[track][c] > 5)
-										outSignal[track][c] = 4 + (outSignal[track][c] - int(outSignal[track][c]));
-									else if (outSignal[track][c] < -4)
-										outSignal[track][c] = -4 - (outSignal[track][c] - int(outSignal[track][c]));
-
-									outputs[OUT_OUTPUT+track].setVoltage(outSignal[track][c], c);
-								}
-							}
-							prevQuantTrig[track] = quantTrig[track];
-						}
-
-					} else {
-						//chan = 1;
-						outputs[OUT_OUTPUT+track].setVoltage(0, 0);	
-					}
-
-					outputs[OUT_OUTPUT+track].setChannels(chan);
-				}
-			}
-
-		} else {	// ************************************************************  SUMMED OUTS
-					// ************************************************************  SUMMED OUTS
-					// ************************************************************  SUMMED OUTS
-					// ************************************************************  SUMMED OUTS
-
-			if (notesInVoltageScale) {
+				// ************************************************************  SUMMED OUTS
+				// ************************************************************  SUMMED OUTS
+				// ************************************************************  SUMMED OUTS
+				// ************************************************************  SUMMED OUTS
 
 				// ---------- track ZERO  : get all channels but quantize only first
 
@@ -1294,158 +1249,59 @@ struct SickoQuant4 : Module {
 					}
 					outputs[OUT_OUTPUT+track].setChannels(chan);
 				}
+			}
 
-			} else {	// IF THERE ARE NO NOTES DISPLAYED -> DO NOT QUANTIZE
+		} else {	//  **** IF THERE ARE NO NOTES TO QUANTIZE
 
-				chan = 1;
+			if (outSumMode == SUM_OFF) {
+				for (int track = 0; track < 4; track++) {
+					if (inputs[IN_INPUT+track].isConnected())
+						chan = inputs[IN_INPUT+track].getChannels();
+					else if (track == 0)
+						chan = 1;
 
-				// *****************************************************  TRACK ZERO
-
-				if (inputs[IN_INPUT].isConnected()) {
-					chan = inputs[IN_INPUT].getChannels();
 					for (int c = 0; c < chan; c++)
-						inSignal[0][c] = inputs[IN_INPUT].getVoltage(c);
-				} else {
-					inSignal[0][0] = 0;
+						outputs[OUT_OUTPUT+track].setVoltage(0.f, c);
+					outputs[OUT_OUTPUT+track].setChannels(chan);
 				}
-
-				if (outputs[OUT_OUTPUT].isConnected()) {
-					atten = params[ATN_PARAM].getValue();
-					octPostValue = params[OCT_PARAM].getValue();
-
-					if (!inputs[TRIG_INPUT].isConnected()) {
-						outSignal[0][0] = (inSignal[0][0] * atten) + inputs[OFFS_INPUT].getVoltage() + octPostValue;
-						if (outSignal[0][0] > 5)
-							outSignal[0][0] = 4 + (outSignal[0][0] - int(outSignal[0][0]));
-						else if (outSignal[0][0] < -4)
-							outSignal[0][0] = -4 - (outSignal[0][0] - int(outSignal[0][0]));
-
-						outputs[OUT_OUTPUT].setVoltage(outSignal[0][0], 0);
-
-					} else {
-						quantTrig[0] = inputs[TRIG_INPUT].getVoltage();
-						if (quantTrig[0] >= 1.f && prevQuantTrig[0] < 1.f) {
-							outSignal[0][0] = (inSignal[0][0] * atten) + inputs[OFFS_INPUT].getVoltage() + octPostValue;
-							if (outSignal[0][0] > 5)
-								outSignal[0][0] = 4 + (outSignal[0][0] - int(outSignal[0][0]));
-							else if (outSignal[0][0] < -4)
-								outSignal[0][0] = -4 - (outSignal[0][0] - int(outSignal[0][0]));
-
-							outputs[OUT_OUTPUT].setVoltage(outSignal[0][0], 0);
-						}
-						prevQuantTrig[0] = quantTrig[0];
-					}
-
-				} else {
-					outputs[OUT_OUTPUT].setVoltage(0, 0);	
-				}
-
-				// ***********************************************************  OTHER SUMMED TRACKS
+			} else {
+				
+				if (inputs[IN_INPUT].isConnected())
+					chan = inputs[IN_INPUT].getChannels();
+				else
+					chan = 1;
+				
+				outputs[OUT_OUTPUT].setVoltage(0.f, 0);
 
 				for (int track = 1; track < outSumModePlus1; track++) {
 
 					if (inputs[IN_INPUT+track].isConnected()) {
 						chan = inputs[IN_INPUT+track].getChannels();
 						for (int c = 0; c < chan; c++)
-							inSignal[track][c] = inputs[IN_INPUT+track].getVoltage(c);
+							outputs[OUT_OUTPUT+track].setVoltage(0.f, c);
 					} else {
 						for (int c = 0; c < chan; c++)
-							inSignal[track][c] = inSignal[track-1][c];
+							outputs[OUT_OUTPUT+track].setVoltage(0.f, c);
 					}
-
-
-					atten = params[ATN_PARAM+track].getValue();
-					octPostValue = params[OCT_PARAM+track].getValue();
-
-					if (!inputs[TRIG_INPUT+track].isConnected()) {
-						for (int c = 0; c < chan; c++) {
-							outSignal[track][c] = (inSignal[track][c] * atten) + inputs[OFFS_INPUT+track].getVoltage() + octPostValue;
-							if (outSignal[track][c] > 5)
-								outSignal[track][c] = 4 + (outSignal[track][c] - int(outSignal[track][c]));
-							else if (outSignal[track][c] < -4)
-								outSignal[track][c] = -4 - (outSignal[track][c] - int(outSignal[track][c]));
-
-							outputs[OUT_OUTPUT+track].setVoltage(outSignal[track][c], c);
-						}
-
-					} else {
-						quantTrig[track] = inputs[TRIG_INPUT+track].getVoltage();
-						if (quantTrig[track] >= 1.f && prevQuantTrig[track] < 1.f) {
-							for (int c = 0; c < chan; c++) {	
-								outSignal[track][c] = (inSignal[track][c] * atten) + inputs[OFFS_INPUT+track].getVoltage() + octPostValue;
-								if (outSignal[track][c] > 5)
-									outSignal[track][c] = 4 + (outSignal[track][c] - int(outSignal[track][c]));
-								else if (outSignal[track][c] < -4)
-									outSignal[track][c] = -4 - (outSignal[track][c] - int(outSignal[track][c]));
-
-								outputs[OUT_OUTPUT+track].setVoltage(outSignal[track][c], c);
-							}
-						}
-						prevQuantTrig[track] = quantTrig[track];
-					}
-
-
-					outputs[OUT_OUTPUT].setVoltage(outSignal[track][0], track);
 					outputs[OUT_OUTPUT+track].setChannels(chan);
+					outputs[OUT_OUTPUT].setVoltage(0.f, track);
 				}
-
 				outputs[OUT_OUTPUT].setChannels(outSumModePlus1);
 
-				// --------------------------- RESIDUAL CHANNEL NO QUANTIZATION
-
 				for (int track = outSumModePlus1; track < 4; track++) {
-
 					if (inputs[IN_INPUT+track].isConnected()) {
 						chan = inputs[IN_INPUT+track].getChannels();
 						for (int c = 0; c < chan; c++)
-							inSignal[track][c] = inputs[IN_INPUT+track].getVoltage(c);
-
-					} else if (track > 0) {
+							outputs[OUT_OUTPUT+track].setVoltage(0.f, c);
+					} else {
 						for (int c = 0; c < chan; c++)
-							inSignal[track][c] = inSignal[track-1][c];
-					} else {
-						inSignal[track][0] = 0;
+							outputs[OUT_OUTPUT+track].setVoltage(0.f, c);
 					}
-
-					if (outputs[OUT_OUTPUT+track].isConnected()) {
-						atten = params[ATN_PARAM+track].getValue();
-						octPostValue = params[OCT_PARAM+track].getValue();
-
-						if (!inputs[TRIG_INPUT+track].isConnected()) {
-							for (int c = 0; c < chan; c++) {
-								outSignal[track][c] = (inSignal[track][c] * atten) + inputs[OFFS_INPUT+track].getVoltage() + octPostValue;
-								if (outSignal[track][c] > 5)
-									outSignal[track][c] = 4 + (outSignal[track][c] - int(outSignal[track][c]));
-								else if (outSignal[track][c] < -4)
-									outSignal[track][c] = -4 - (outSignal[track][c] - int(outSignal[track][c]));
-
-								outputs[OUT_OUTPUT+track].setVoltage(outSignal[track][c], c);
-							}
-
-						} else {
-							quantTrig[track] = inputs[TRIG_INPUT+track].getVoltage();
-							if (quantTrig[track] >= 1.f && prevQuantTrig[track] < 1.f) {
-								for (int c = 0; c < chan; c++) {	
-									outSignal[track][c] = (inSignal[track][c] * atten) + inputs[OFFS_INPUT+track].getVoltage() + octPostValue;
-									if (outSignal[track][c] > 5)
-										outSignal[track][c] = 4 + (outSignal[track][c] - int(outSignal[track][c]));
-									else if (outSignal[track][c] < -4)
-										outSignal[track][c] = -4 - (outSignal[track][c] - int(outSignal[track][c]));
-
-									outputs[OUT_OUTPUT+track].setVoltage(outSignal[track][c], c);
-								}
-							}
-							prevQuantTrig[track] = quantTrig[track];
-						}
-
-					} else {
-						outputs[OUT_OUTPUT+track].setVoltage(0, 0);	
-					}
-
 					outputs[OUT_OUTPUT+track].setChannels(chan);
 				}
 
 			}
+
 		}
 	}
 };
@@ -1714,6 +1570,13 @@ struct SickoQuant4Widget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Store Programs"));
 		menu->addChild(createMenuLabel("with double-click"));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
+			}));
+		}));
 
 	}
 	
