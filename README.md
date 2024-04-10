@@ -775,10 +775,10 @@ Quantization is applied to the closest note in the current working scale. If the
 
 Inputs can be attenuated by ATT knob or sampled&held with a trigger via the TRG input.  
 A further voltage on the OFS input can be applied before quantization.  
-The OCT knob can shift the signal up to 2 octaves below or above the source signal.  
+The OCT knob can shift the signal up to 3 octaves below or above the source signal.  
 
 SCL knob selects the quantizer scale and hold it in pending state. The relative SET button sets the scale in actual working state.  
-SCL knob in the middle position sets the chromatic scale, turning the knob clockwise selects Major scales, moving it anti-clockwise selects minor scales.  
+SCL knob in the middle position sets the chromatic scale, turning the knob clockwise selects Major scales, moving it counterclockwise selects minor scales.  
 A cv input with a range of ±10v is provided and its value is added to knob selection.  
 
 PROG knob selects 32 further user scales that can be recalled via the RECL button, with a pending state as the SCL knob does.  
@@ -793,9 +793,9 @@ If a pending scale or program is manually modified it will be set as a working s
 On the other hand, editing an actual working scale with the note buttons, it will cause the change to be applied immediately.  
 This SET button can be also used to apply pending scales or programs.  
 
-A display shows the current working scale or program in green, or both the working in green and the pending one in red.  
-Scales are shown with usual scale notation (C, C#, Dm, F#m, etc.), 'chr' for cromatic, 'CST' for other custom scales, 'N.Q' for no quantization.  
-Programs are shown from P0 to p31, even if no notes are selecte (no quantization).  
+A display shows the current working scale or program in green, or both the working scale in green and the pending one in red.  
+Scales are shown with the usual scale notation (C, C#, Dm, F#m, etc.), 'chr' for cromatic, 'CST' for other custom scales, 'N.Q' for no quantization.  
+Programs are shown from P0 to P31, even if no notes are selected (no quantization).  
 
 All 32 programs can be saved in a preset file (.SQN) with the 'Save PROG preset' function in the right-click menu, and reloaded in other sickoQuant modules with the 'Load PROG preset' function.  
 
