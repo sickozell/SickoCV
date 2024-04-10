@@ -1120,7 +1120,7 @@ struct SickoQuantWidget : ModuleWidget {
 		const float xAuto = 28.5;
 		const float yAuto = 63.1;
 
-		const float xSet = 5.6;
+		const float xSet = 6.5;
 		const float ySet = 64;
 		
 		const float xProgKnob = 8.5;

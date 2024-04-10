@@ -1,4 +1,4 @@
-# SickoCV v2.6.9-beta5
+# SickoCV v2.6.9-beta6
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -748,7 +748,7 @@ Disables panel Sample Navigation buttons to avoid utilizing mistakes.
 This option allows to save the loaded samples in vcv patch file to use it on other machines or if the orginal sample files are missing.  
 Please note that this could make the patch filesize very large.
 
-- Unlimited File Size (risky). The maximum memory allocation for samples is set to 200Mb. For example, at 48khz Mono the maximum is about 18mins. Ticking this option this limit is removed, but there can be a crash risk if the sample file exeeds the computer abilities.
+- Unlimited File Size (risky). The maximum memory allocation for samples is set to 200Mb. For example, at 48khz Mono the maximum is about 18mins. Ticking this option this limit is removed, but there can be a crash risk if the sample file exceeds the computer abilities.
 
 **Presets**
 There are some factory presets stored in the right-click menu for common using settings.  
@@ -789,7 +789,7 @@ While a program is being stored, the STOR button LED remains lit for a while.
 Enabling the A (auto) button deactivaes the pending states, so the selected scales or programs are instantly set to working state.  
 
 A keyboard-like set of LED buttons is provided to show the working scale or manually modify it.  
-If a pending scale or program is manually modified it will be set as a working scale only when the SET button located below the keyboard is pressed.  
+If a pending scale or program is manually modified it will be set as a working scale only when the SET (marked as ^) button located below the keyboard is pressed.  
 On the other hand, editing an actual working scale with the note buttons, it will cause the change to be applied immediately.  
 This SET button can be also used to apply pending scales or programs.  
 
@@ -876,7 +876,7 @@ Please refer to sickoPlayer for the right-click menu, in sickoSampler following 
 - Save Oversampled: If this option is enabled, samples will be saved at sickoSampler working samplerate (2x VCV samplerate). This can be useful when samples are recorded at different speeds than normal for further external editing.
 - UCE/ULE updates also Start: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor).
 - Crossfade while Rec Fading: If overdub is not activated this option crossfades between previous and current recording only during fading in/out recording time, accordingly to the FD knob.
-- Unlimited REC (risky). The maximum recording memory allocation is set to 200Mb, so the maximum recording time depends on the working sample rate and if the recording is mono or stereo. At 48khz Mono the maximum recording time is about 18mins. Ticking this option the limit is removed, but there can be a crash risk if recording time exeeds the computer abilities.
+- Unlimited REC (risky). The maximum recording memory allocation is set to 200Mb, so the maximum recording time depends on the working sample rate and if the recording is mono or stereo. At 48khz Mono the maximum recording time is about 18mins. Ticking this option the limit is removed, but there can be a crash risk if recording time exceeds the computer abilities.
 
 [back to top](#table-of-contents)
 
