@@ -789,7 +789,7 @@ While a program is being stored, the STOR button LED remains lit for a while.
 Enabling the A (auto) button deactivaes the pending states, so the selected scales or programs are instantly set to working state.  
 
 A keyboard-like set of LED buttons is provided to show the working scale or manually modify it.  
-If a pending scale or program is manually modified it will be set as a working scale only when the SET (marked as ^) button located below the keyboard is pressed.  
+If a pending scale or program is manually modified it will be set as a working scale only when the SET button (marked as ^) located below the keyboard is pressed.  
 On the other hand, editing an actual working scale with the note buttons, it will cause the change to be applied immediately.  
 This SET button can be also used to apply pending scales or programs.  
 
