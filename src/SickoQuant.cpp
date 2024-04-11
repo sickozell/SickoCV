@@ -249,6 +249,11 @@ struct SickoQuant : Module {
 	int chanSum = 1;
 	float outSum = 0;
 
+	// ------- set button light
+
+	bool setButLight = false;
+	float setButLightDelta = 2 / APP->engine->getSampleRate();
+	float setButLightValue = 0.f;
 
 	//**************************************************************
 	//  DEBUG 
@@ -356,6 +361,10 @@ struct SickoQuant : Module {
 
 		displayWorking = CUSTOMSCALE;
 		displayLastSelected = CUSTOMSCALE;
+
+		setButLight = false;
+		setButLightDelta = 2 / APP->engine->getSampleRate();
+		setButLightValue = 0.f;
 		Module::onReset(e);
 	}
 
@@ -363,6 +372,7 @@ struct SickoQuant : Module {
 
 		storeSamples = APP->engine->getSampleRate() / 1.5f;
 		maxStoredProgramTime = APP->engine->getSampleRate() * 1.5;
+		setButLightDelta = 2 / APP->engine->getSampleRate();
 
 	}
 
@@ -635,6 +645,10 @@ struct SickoQuant : Module {
 				params[NOTE_PARAM+i].setValue(nextNote[i]);
 			}
 			notesChanged = true;
+			
+			setButLight = true;
+			setButLightValue = 0.f;
+
 		}
 		
 		// --------------------------------------
@@ -670,6 +684,9 @@ struct SickoQuant : Module {
 
 			displayLastSelected = DISPLAYSCALE;
 
+			setButLight = true;
+			setButLightValue = 0.f;
+
 		}
 		
 		// -------- populate next notes array and show them
@@ -701,7 +718,7 @@ struct SickoQuant : Module {
 		butSetScale = false;
 
 		scaleSetBut = params[MANUALSET_PARAM].getValue();
-		lights[MANUALSET_LIGHT].setBrightness(scaleSetBut);
+		//lights[MANUALSET_LIGHT].setBrightness(scaleSetBut);
 		if (scaleSetBut >= 1.f && prevScaleSetBut < 1.f) {
 			butSetScale = true;
 		}
@@ -732,6 +749,9 @@ struct SickoQuant : Module {
 					}
 					notesChanged = false;
 
+					setButLight = false;
+					setButLightValue = 0.f;
+
 				} else {
 					
 					if (butSetScale) {
@@ -757,6 +777,10 @@ struct SickoQuant : Module {
 							savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
 						}
 						notesChanged = false;
+
+						setButLight = false;
+						setButLightValue = 0.f;
+
 					}
 
 				}
@@ -806,6 +830,8 @@ struct SickoQuant : Module {
 			progChanged = false;
 			scaleChanged = false;
 
+			setButLight = false;
+			setButLightValue = 0.f;
 		}
 		prevResetScale = resetScale;
 
@@ -838,6 +864,9 @@ struct SickoQuant : Module {
 			pendingUpdate = false;
 			progChanged = false;
 			scaleChanged = false;
+
+			setButLight = false;
+			setButLightValue = 0.f;
 		}
 		prevRecallBut = recallBut;
 
@@ -878,6 +907,15 @@ struct SickoQuant : Module {
 			}
 
 		}
+
+		if (setButLight) {
+			if (setButLightValue > 1 || setButLightValue < 0) {
+				setButLightDelta *= -1;
+			}
+			setButLightValue += setButLightDelta;
+		}
+
+		lights[MANUALSET_LIGHT].setBrightness(setButLightValue);
 
 		// ---------------------------------------
 		// ------------------- SIGNAL QUANTIZATION
@@ -1162,12 +1200,12 @@ struct SickoQuantWidget : ModuleWidget {
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xAuto, yAuto)), module, SickoQuant::AUTO_PARAM, SickoQuant::AUTO_LIGHT));
 
-		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xSet, ySet)), module, SickoQuant::MANUALSET_PARAM, SickoQuant::MANUALSET_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<GreenLight>>(mm2px(Vec(xSet, ySet)), module, SickoQuant::MANUALSET_PARAM, SickoQuant::MANUALSET_LIGHT));
 
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xProgKnob, yProgKnob)), module, SickoQuant::PROG_PARAM));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xProgIn, yProgIn)), module, SickoQuant::PROG_INPUT));
 		
-		addParam(createLightParamCentered<VCVLightBezel<GreenLight>>(mm2px(Vec(xRecall, yRecall)), module, SickoQuant::RECALL_PARAM, SickoQuant::RECALL_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xRecall, yRecall)), module, SickoQuant::RECALL_PARAM, SickoQuant::RECALL_LIGHT));
 		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xStore, yProgIn)), module, SickoQuant::STORE_PARAM, SickoQuant::STORE_LIGHT));
 
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xTrig, yOut1)), module, SickoQuant::TRIG_INPUT));
