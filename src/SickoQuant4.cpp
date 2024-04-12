@@ -1527,7 +1527,7 @@ struct SickoQuant4Widget : ModuleWidget {
 		addParam(createLightParamCentered<VCVLightBezelLatch<YellowLight>>(mm2px(Vec(xKbdStart+(11*xKbdDelta), yKbdBlck)), module, SickoQuant4::NOTE_PARAM+10, SickoQuant4::NOTE_LIGHT+10));
 		addParam(createLightParamCentered<VCVLightBezelLatch<YellowLight>>(mm2px(Vec(xKbdStart+(12*xKbdDelta), yKbdWht)), module, SickoQuant4::NOTE_PARAM+11, SickoQuant4::NOTE_LIGHT+11));
 		
-		addParam(createLightParamCentered<VCVLightBezel<GreenLight>>(mm2px(Vec(xSet, ySet)), module, SickoQuant4::MANUALSET_PARAM, SickoQuant4::MANUALSET_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xSet, ySet)), module, SickoQuant4::MANUALSET_PARAM, SickoQuant4::MANUALSET_LIGHT));
 
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xSclIn, yScl)), module, SickoQuant4::SCALE_INPUT));
 		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xSclKnob, yScl)), module, SickoQuant4::SCALE_PARAM));

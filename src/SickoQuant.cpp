@@ -1200,7 +1200,7 @@ struct SickoQuantWidget : ModuleWidget {
 
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xAuto, yAuto)), module, SickoQuant::AUTO_PARAM, SickoQuant::AUTO_LIGHT));
 
-		addParam(createLightParamCentered<VCVLightBezel<GreenLight>>(mm2px(Vec(xSet, ySet)), module, SickoQuant::MANUALSET_PARAM, SickoQuant::MANUALSET_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xSet, ySet)), module, SickoQuant::MANUALSET_PARAM, SickoQuant::MANUALSET_LIGHT));
 
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xProgKnob, yProgKnob)), module, SickoQuant::PROG_PARAM));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xProgIn, yProgIn)), module, SickoQuant::PROG_INPUT));
