@@ -264,6 +264,11 @@ struct SickoPlayer : Module {
 	bool prevSample = false;
 	bool prevPrevSample = false;
 
+	bool unlimitedRecording = false;
+	const drwav_uint64 recordingLimit = 52428800 * 2;	// // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+	//const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+	drwav_uint64 currentRecordingLimit = recordingLimit;
+
 	static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	const float maxAdsrTime = 10.f;
@@ -432,6 +437,7 @@ struct SickoPlayer : Module {
 		json_object_set_new(rootJ, "EocFromPong", json_boolean(eocFromPong));
 		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
 		json_object_set_new(rootJ, "sampleInPatch", json_boolean(sampleInPatch));
+		json_object_set_new(rootJ, "unlimitedRecording", json_boolean(unlimitedRecording));
 		json_object_set_new(rootJ, "ResetCursorsOnLoad", json_boolean(resetCursorsOnLoad));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
@@ -484,6 +490,9 @@ struct SickoPlayer : Module {
 		json_t* sampleInPatchJ = json_object_get(rootJ, "sampleInPatch");
 		if (sampleInPatchJ)
 			sampleInPatch = json_boolean_value(sampleInPatchJ);
+		json_t* unlimitedRecordingJ = json_object_get(rootJ, "unlimitedRecording");
+		if (unlimitedRecordingJ)
+			unlimitedRecording = json_boolean_value(unlimitedRecordingJ);
 		json_t* resetCursorsOnLoadJ = json_object_get(rootJ, "ResetCursorsOnLoad");
 		if (resetCursorsOnLoadJ)
 			resetCursorsOnLoad = json_boolean_value(resetCursorsOnLoadJ);
@@ -718,8 +727,16 @@ struct SickoPlayer : Module {
 			playBuffer[RIGHT][1].clear();
 			displayBuff.clear();
 
+			/*
 			if (tsc > 52428800)
 				tsc = 52428800;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+			*/
+			if (!unlimitedRecording) {
+				if (tsc > recordingLimit / 2)
+					tsc = recordingLimit / 2;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+			}
+
+
 			for (unsigned int i=0; i < tsc; i = i + c) {
 				playBuffer[LEFT][0].push_back(pSampleData[i] * 5);
 				playBuffer[LEFT][0].push_back(0);
@@ -2751,6 +2768,7 @@ struct SickoPlayerWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
+		menu->addChild(createBoolPtrMenuItem("Unlimited Sample Size (risky)", "", &module->unlimitedRecording));
 		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {

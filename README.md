@@ -1,7 +1,7 @@
-# SickoCV v2.6.8
+# SickoCV v2.6.9
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 8](https://github.com/sickozell/SickoCV/assets/80784296/e29f6164-0446-4899-b6d9-81e22f6923ac)
+![SickoCV modules 2 6 9](https://github.com/sickozell/SickoCV/assets/80784296/48e2d08f-e71a-43fa-b333-c45519f991f0)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -25,6 +25,7 @@ VCV Rack plugin modules
 - [sickoAmp](#sickoamp)
 - [sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5](#sickolooper1--sickolooperx--sickolooper3--sickolooper5)
 - [sickoPlayer](#sickoplayer)
+- [sickoQuant / sickoQuant4](#sickoquant--sickoquant4)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
@@ -724,12 +725,66 @@ Disables panel Sample Navigation buttons to avoid utilizing mistakes.
 This option allows to save the loaded samples in vcv patch file to use it on other machines or if the orginal sample files are missing.  
 Please note that this could make the patch filesize very large.
 
+- Unlimited File Size (risky). The maximum memory allocation for samples is set to 200Mb. For example, at 48khz Mono the maximum is about 18mins. Ticking this option this limit is removed, but there can be a crash risk if the sample file exceeds the computer abilities.
+
 **Presets**
 There are some factory presets stored in the right-click menu for common using settings.  
 
 #### USING ONE-CYCLE WAVEFORMS
 One-cycle waveforms can be used in GATE mode with LOOP mode enabled.  
 Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop START to 0% and Cue/Loop END to 100% and enable loop button.  
+
+[back to top](#table-of-contents)
+
+## sickoQuant / sickoQuant4
+### single or 4 channels polyphonic quantizer with scales and presets.
+#### - DESCRIPTION
+sickoQuant / sickoQuant4 can quantize signals in chromatic/min/Maj or custom scales, continuously or triggered.
+
+ ![sickoquant](https://github.com/sickozell/SickoCV/assets/80784296/e19fa858-3eaa-45c3-afa5-7cfdac75e5d7)
+
+#### - INSTRUCTIONS
+
+IN input is used to connect the signal to be quantized and accepts polyphonic sources.  
+OUT output provides the quantized signal.  
+
+Quantization is applied to the closest note in the current working scale. If there are no notes selected there is no quantization and no signal at the out.
+
+Inputs can be attenuated by ATT knob or sampled&held with a trigger via the TRG input.  
+A further voltage on the OFS input can be applied before quantization.  
+The OCT knob can shift the signal up to 3 octaves below or above the source signal.  
+
+SCL knob selects the quantizer scale and hold it in pending state. The relative SET button sets the scale in actual working state.  
+SCL knob in the middle position sets the chromatic scale, turning the knob clockwise selects Major scales, moving it counterclockwise selects minor scales.  
+A cv input with a range of ±10v is provided and its value is added to knob selection.  
+
+PROG knob selects 32 further user scales that can be recalled via the RECL button, with a pending state as the SCL knob does.  
+A cv input with a range of ±10v is provided and its value is added to knob selection.  
+Double-clicking the STOR button stores the currently displayed notes in the program selected by the PROG knob.  
+While a program is being stored, the STOR button LED remains lit for a while.  
+
+Enabling the A (auto) button deactivaes the pending states, so the selected scales or programs are instantly set to working state.  
+
+A keyboard-like set of LED buttons is provided to show the working scale or manually modify it.  
+If a pending scale or program is manually modified it will be set as a working scale only when the SET button (marked as ^) located below the keyboard is pressed.  
+On the other hand, editing an actual working scale with the note buttons, it will cause the change to be applied immediately.  
+This SET button can be also used to apply pending scales or programs.  
+
+A display shows the current working scale or program in green, or both the working scale in green and the pending one in red.  
+Scales are shown with the usual scale notation (C, C#, Dm, F#m, etc.), 'chr' for cromatic, 'CST' for other custom scales, 'N.Q' for no quantization.  
+Programs are shown from P0 to P31, even if no notes are selected (no quantization).  
+
+All 32 programs can be saved in a preset file (.SQN) with the 'Save PROG preset' function in the right-click menu, and reloaded in other sickoQuant modules with the 'Load PROG preset' function.  
+
+To erase all programs in memory in the right-click menu there is a function 'Erase ALL progs'. For safety, it has to be clicked 'ERASE!' in the sub menu 'Are You Sure?' to proceed.
+
+##### sickoQuant4
+
+sickoQuant4 module works like sickoQuant but provides 4 normalled polyphonic channels.  
+
+In the right-click menu there is a further function to sum the first 'n' channels (rows) and output a polyphonic signal (with a 'row' correlation) to the output #1 marked with a 'S' and circled in pink.  
+In this case, if there are polyphonic sources connected, only the first polyphony channel of the sources will be summed to the polyphonic out #1, just to maintain the purpose of this 'sum' function.  
+Setting the 'sum' function will alter only the first output, but the other channels will work as usual.  
 
 [back to top](#table-of-contents)
 
@@ -798,6 +853,7 @@ Please refer to sickoPlayer for the right-click menu, in sickoSampler following 
 - Save Oversampled: If this option is enabled, samples will be saved at sickoSampler working samplerate (2x VCV samplerate). This can be useful when samples are recorded at different speeds than normal for further external editing.
 - UCE/ULE updates also Start: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor).
 - Crossfade while Rec Fading: If overdub is not activated this option crossfades between previous and current recording only during fading in/out recording time, accordingly to the FD knob.
+- Unlimited REC (risky). The maximum recording memory allocation is set to 200Mb, so the maximum recording time depends on the working sample rate and if the recording is mono or stereo. At 48khz Mono the maximum recording time is about 18mins. Ticking this option the limit is removed, but there can be a crash risk if recording time exceeds the computer abilities.
 
 [back to top](#table-of-contents)
 

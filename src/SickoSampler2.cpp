@@ -293,6 +293,11 @@ struct SickoSampler2 : Module {
 	bool prevSample = false;
 	bool prevPrevSample = false;
 
+	bool unlimitedRecording = false;
+	const drwav_uint64 recordingLimit = 52428800 * 2;
+	//const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+	drwav_uint64 currentRecordingLimit = recordingLimit;
+
 	static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	const float maxAdsrTime = 10.f;
@@ -410,6 +415,7 @@ struct SickoSampler2 : Module {
 
 		disableNav = false;
 		sampleInPatch = true;
+		unlimitedRecording = false;
 		
 		prevKnobCueStartPos = -1.f;
 		prevKnobCueEndPos = 2.f;
@@ -467,6 +473,7 @@ struct SickoSampler2 : Module {
 		json_object_set_new(rootJ, "ResetCursorsOnLoad", json_boolean(resetCursorsOnLoad));
 		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
 		json_object_set_new(rootJ, "sampleInPatch", json_boolean(sampleInPatch));
+		json_object_set_new(rootJ, "unlimitedRecording", json_boolean(unlimitedRecording));
 		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
 		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
 		return rootJ;
@@ -521,6 +528,9 @@ struct SickoSampler2 : Module {
 		json_t* sampleInPatchJ = json_object_get(rootJ, "sampleInPatch");
 		if (sampleInPatchJ)
 			sampleInPatch = json_boolean_value(sampleInPatchJ);
+		json_t* unlimitedRecordingJ = json_object_get(rootJ, "unlimitedRecording");
+		if (unlimitedRecordingJ)
+			unlimitedRecording = json_boolean_value(unlimitedRecordingJ);
 		json_t *slotJ = json_object_get(rootJ, "Slot");
 		if (slotJ) {
 			storedPath = json_string_value(slotJ);
@@ -1066,8 +1076,10 @@ struct SickoSampler2 : Module {
 			tempBuffer[RIGHT].clear();
 			displayBuff.clear();
 
-			if (tsc > 52428800)
-				tsc = 52428800;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+			if (!unlimitedRecording) {
+				if (tsc > recordingLimit / 2)
+					tsc = recordingLimit / 2;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+			}
 
 			if (sr == APP->engine->getSampleRate()) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -2715,6 +2727,9 @@ struct SickoSampler2 : Module {
 					else
 						recChannels = 1;
 
+					currentRecordingLimit = recordingLimit / recChannels;
+					//DEBUG("[SickoSampler2] %d", currentRecordingLimit);
+
 					fileChannels = recChannels;
 
 					sampleRate = args.sampleRate * 2;
@@ -2878,11 +2893,14 @@ struct SickoSampler2 : Module {
 				playBuffer[rc][1][currRecPosition] = biquadLpf2(playBuffer[rc][0][currRecPosition]); // filtered vector
 			}
 
-			if (currRecPosition * recChannels > 52428800)
-				params[REC_PARAM].setValue(0);
-
 			recSamples++;
 			currRecPosition = currRecPosition + 2;
+
+			if (!unlimitedRecording && currRecPosition > currentRecordingLimit) {
+				params[REC_PARAM].setValue(0);
+				lights[REC_LIGHT].setBrightness(0);
+				recButton = 0;
+			}
 
 		}	// end if RECORDING STATE = true
 
@@ -3687,6 +3705,7 @@ struct SickoSampler2Widget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
+		menu->addChild(createBoolPtrMenuItem("Unlimited REC (risky)", "", &module->unlimitedRecording));
 	}
 };
 

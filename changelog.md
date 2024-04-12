@@ -1,3 +1,7 @@
+### 2.6.9 (2024-03-12)
+- added 'sickoQuant' and 'sickoQuant4' modules.
+- sickoPlayer / sickoSampler / sickoSampler2: added 'Unlimited Sample Size' option in right-click menu.
+
 ### 2.6.8 (2024-03-11)
 - added 'polyMuter8' and 'polyMuter8+' modules.
 - added 'polyMuter16' and 'polyMuter16+' modules.
