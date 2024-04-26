@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.10
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 9](https://github.com/sickozell/SickoCV/assets/80784296/48e2d08f-e71a-43fa-b333-c45519f991f0)
+![SickoCV modules 2 6 10](https://github.com/sickozell/SickoCV/assets/80784296/5c665dd5-e48b-4271-b762-3f741d8f6b35)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -46,6 +46,7 @@ VCV Rack plugin modules
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
+- [sickoCrosser / sickoCrosser4](#sickocrosser--sickocrosser4)
 - [sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5](#sickolooper1--sickolooperx--sickolooper3--sickolooper5)
 - [sickoPlayer](#sickoplayer)
 - [sickoQuant / sickoQuant4](#sickoquant--sickoquant4)
@@ -627,6 +628,18 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 
 #### Right-click Menu
 - Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
+
+[back to top](#table-of-contents)
+
+## sickoCrosser / sickoCrosser4
+### single or 4 channels multi-input crossfader.
+#### - DESCRIPTION
+sickoCrosser / sickoCrosser4 can crossfade up to 4 signals by operating a single knob.
+
+![sickocrosser](https://github.com/sickozell/SickoCV/assets/80784296/b35acbd5-3c56-4056-b38a-ba5bfe56eb8a)
+
+#### - INSTRUCTIONS
+Coming soon.
 
 [back to top](#table-of-contents)
 
