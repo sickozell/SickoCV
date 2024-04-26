@@ -1,4 +1,4 @@
-# SickoCV v2.6.9-beta8
+# SickoCV v2.6.10-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,16 +12,16 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- 
+- sickoCrosser
+- sickoCrosser4
 
 ## **to do list:** 
-- modules testing  
+- sickoSampler2: to fix rack crashing when modulating stretching and v/oct at the same time.
 
 ## **changelog**  
-- added 'sickoQuant' and 'sickoQuant4' modules.
-- sickoPlayer / sickoSampler: added 'Unlimited File Size' option in right-click menu.
+- added 'sickoCrosser' and 'sickoCrosser4' modules.
 
-# SickoCV v2.6.9
+# SickoCV v2.6.10
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 9](https://github.com/sickozell/SickoCV/assets/80784296/48e2d08f-e71a-43fa-b333-c45519f991f0)

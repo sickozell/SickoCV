@@ -1,3 +1,6 @@
+### 2.6.10 (2024-04-xx)
+- added 'sickoCrosser' and 'sickoCrosser4' modules.
+
 ### 2.6.9 (2024-04-12)
 - added 'sickoQuant' and 'sickoQuant4' modules.
 - sickoPlayer / sickoSampler / sickoSampler2: added 'Unlimited Sample Size' option in right-click menu.
