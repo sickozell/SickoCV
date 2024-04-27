@@ -1,4 +1,4 @@
-# SickoCV v2.6.10-beta1
+# SickoCV v2.6.10-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -14,12 +14,14 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## Current modules in beta testing:
 - sickoCrosser
 - sickoCrosser4
+- sickoSampler2
 
 ## **to do list:** 
-- sickoSampler2: to fix rack crashing when modulating stretching and v/oct at the same time.
+- 
 
 ## **changelog**  
 - added 'sickoCrosser' and 'sickoCrosser4' modules.
+- sickoSampler2: fixed rack crash when modulating stretching and v/oct at the same time.
 
 # SickoCV v2.6.10
 VCV Rack plugin modules
