@@ -638,10 +638,14 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### - DESCRIPTION
 sickoCrosser / sickoCrosser4 can crossfade up to 4 signals by operating a single knob.
 
-![sickocrosser](https://github.com/sickozell/SickoCV/assets/80784296/b35acbd5-3c56-4056-b38a-ba5bfe56eb8a)
+![sickocrosser](https://github.com/sickozell/SickoCV/assets/80784296/ea0fc24c-1a57-4b42-9e8f-ba68942e08b9)
 
 #### - INSTRUCTIONS
-Coming soon.
+
+INs switch selects the number of input signals to be crossfaded.  
+The xFD knob together with its CV input voltage sets the crossfade between the inputs.  
+Colored marks of the xFD knob correspond to equal attenuation of adjacent input signals (50% / 50%).  
+On sickoCrosser4 the 'L' (Link) led buttons deactivate the xFD knob of the next channel and the crossfade is set by the previous channel knob. This feature is mainly used to manage stereo signals, but it can be even crossfaded all the channels by acting on the first knob if all 'L' buttons are on.
 
 [back to top](#table-of-contents)
 
