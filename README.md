@@ -26,7 +26,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.10
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 10](https://github.com/sickozell/SickoCV/assets/80784296/5c665dd5-e48b-4271-b762-3f741d8f6b35)
+![SickoCV modules 2 6 10](https://github.com/sickozell/SickoCV/assets/80784296/4487b2b4-a99f-4dc1-8655-238364c49707)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -779,7 +779,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 #### - DESCRIPTION
 sickoQuant / sickoQuant4 can quantize signals in chromatic/min/Maj or custom scales, continuously or triggered.
 
- ![sickoquant](https://github.com/sickozell/SickoCV/assets/80784296/e19fa858-3eaa-45c3-afa5-7cfdac75e5d7)
+![sickoquant](https://github.com/sickozell/SickoCV/assets/80784296/eba80507-4a65-4fd5-be07-ef81c95d5bca)
 
 #### - INSTRUCTIONS
 
