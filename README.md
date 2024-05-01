@@ -645,7 +645,13 @@ sickoCrosser / sickoCrosser4 can crossfade up to 4 signals by operating a single
 INs switch selects the number of input signals to be crossfaded.  
 The xFD knob together with its CV input voltage sets the crossfade between the inputs.  
 Colored marks of the xFD knob correspond to equal attenuation of adjacent input signals (50% / 50%).  
-On sickoCrosser4 the 'L' (Link) led buttons deactivate the xFD knob of the next channel and the crossfade is set by the previous channel knob. This feature is mainly used to manage stereo signals, but it can be even crossfaded all the channels by acting on the first knob if all 'L' buttons are on.
+
+sickoCrosser can crossfade up to 4 stereo signals. Right inputs are normalled if no cable is plugged in.  
+Polyphonic cables can be connected on the first stereo input, in this case the crossfading will be applied between the polyphony channels by selecting the number of channels with the PLY knob, then the INs switch and other inputs will be ignored.  
+
+On sickoCrosser4 the 'L' (Link) led buttons can link channels in two ways according to the right-click menu 'Link Mode' selection.
+- 'xFd + Inputs' will link channels to add inputs to be crossfaded. All the inputs of linked channels are crossfaded except the last channel that can be set via its INs switch. Only the first xFD knob and OUT of the linked channels will work.  
+- 'xFd only' will link channels only for the xFD knob. In this mode the crossfade is set by the first xFD knob of the linked channels. For example 4 stereo signals can be crossfaded connecting the left signals on the first channel and the right on the second one, leaving the other 2 channels for mono signals or another stereo crossfading. Linking all the channels is allowed.  
 
 [back to top](#table-of-contents)
 
