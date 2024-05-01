@@ -26,7 +26,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.10
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 10](https://github.com/sickozell/SickoCV/assets/80784296/4487b2b4-a99f-4dc1-8655-238364c49707)
+![SickoCV modules 2 6 10](https://github.com/sickozell/SickoCV/assets/80784296/566b4fb8-5d90-4737-9dd5-2d2090aa73a7)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -638,7 +638,7 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### - DESCRIPTION
 sickoCrosser / sickoCrosser4 can crossfade up to 4 signals by operating a single knob.
 
-![sickocrosser](https://github.com/sickozell/SickoCV/assets/80784296/ea0fc24c-1a57-4b42-9e8f-ba68942e08b9)
+![sickocrosser](https://github.com/sickozell/SickoCV/assets/80784296/0d1bede2-477e-4807-af32-897fff14477d)
 
 #### - INSTRUCTIONS
 
