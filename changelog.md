@@ -1,4 +1,4 @@
-### 2.6.10 (2024-04-xx)
+### 2.6.10 (2024-05-xx)
 - added 'sickoCrosser' and 'sickoCrosser4' modules.
 - sickoSampler2: fixed rack crash when modulating stretching and v/oct at the same time.
 
