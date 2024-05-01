@@ -11,6 +11,25 @@ struct SickoSwitch_Three_Horiz : SvgSwitch {
     }
 };
 
+struct SickoSwitch_CKSS_Three_Vert : SvgSwitch {
+    SickoSwitch_CKSS_Three_Vert() {
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/CKSSThree_V_0.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/CKSSThree_V_1.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/CKSSThree_V_2.svg")));
+        shadow->opacity = 0.0f;
+    }
+};
+
+struct SickoSwitch_CKSS_Four_Horiz : SvgSwitch {
+    SickoSwitch_CKSS_Four_Horiz() {
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/CKSSFour_H_0.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/CKSSFour_H_1.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/CKSSFour_H_2.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/CKSSFour_H_3.svg")));
+        shadow->opacity = 0.0f;
+    }
+};
+
 struct SickoSwitch_CKSS_Horiz : SvgSwitch {
     SickoSwitch_CKSS_Horiz() {
         addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/CKSS_H_0.svg")));

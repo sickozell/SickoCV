@@ -1,4 +1,4 @@
-# SickoCV v2.6.10-beta4
+# SickoCV v2.6.10-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -634,7 +634,7 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 [back to top](#table-of-contents)
 
 ## sickoCrosser / sickoCrosser4
-### single or 4 channels multi-input crossfader.
+### stereo or 4 channels multi-input crossfader.
 #### - DESCRIPTION
 sickoCrosser / sickoCrosser4 can crossfade up to 4 signals by operating a single knob.
 
