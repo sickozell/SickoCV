@@ -6,8 +6,7 @@
 #include "plugin.hpp"
 
 struct SickoCrosser4 : Module {
-	//int inSources[4] = {0, 0, 0, 0};
-	//int inSources[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 	int inSources = 0;
 
 	int chan;
@@ -16,7 +15,6 @@ struct SickoCrosser4 : Module {
 	float xFadeCoeff;
 
 	int link[4] = {0, 0, 0, 0};
-	//float xFade[4] = {0.f, 0.f, 0.f, 0.f};
 	float xFade = 0.f;
 	float out = 0.f;
 
@@ -125,7 +123,6 @@ struct SickoCrosser4 : Module {
 
 				if (i == 0) {
 
-					//xFade[i] = params[XFD_PARAM+i].getValue() + (inputs[MOD_XFD_INPUT+i].getVoltage() * .1);
 					xFade = params[XFD_PARAM+i].getValue() + (inputs[MOD_XFD_INPUT+i].getVoltage() * .1);
 
 					if (xFade < 0.f)
@@ -135,11 +132,10 @@ struct SickoCrosser4 : Module {
 
 				} else if (link[i-1]) {
 
-					//xFade[i] = xFade[i-1];
+					// do nothing
 
 				} else {
 
-					//xFade[i] = params[XFD_PARAM+i].getValue() + (inputs[MOD_XFD_INPUT+i].getVoltage() * .1);
 					xFade = params[XFD_PARAM+i].getValue() + (inputs[MOD_XFD_INPUT+i].getVoltage() * .1);
 
 					if (xFade < 0.f)
@@ -211,11 +207,6 @@ struct SickoCrosser4 : Module {
 			lights[LINK_LIGHT+1].setBrightness(link[1]);
 			link[2] = int(params[LINK_PARAM+2].getValue());
 			lights[LINK_LIGHT+2].setBrightness(link[2]);
-
-			/*exitLink = 0;
-			summedInputs = 0;
-			currentChan = 0;
-			linkedChans = 0;*/
 
 			if (link[0]) {
 				if (link[1]) {
@@ -470,7 +461,6 @@ struct SickoCrosser4Widget : ModuleWidget {
 		const float yLink = 94.4;
 
 		for (int i = 0; i < 4; i++) {
-			//addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xs+(x*i), ySw)), module, SickoCrosser4::IN_SW_SWITCH+i));
 			addParam(createParamCentered<SickoSwitch_CKSS_Four_Horiz>(mm2px(Vec(xs+(x*i), ySw)), module, SickoCrosser4::IN_SW_SWITCH+i));
 			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xs+(x*i), yIn1)), module, SickoCrosser4::IN_INPUT+(i*4)));
 			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xs+(x*i), yIn2)), module, SickoCrosser4::IN_INPUT+(i*4+1)));
