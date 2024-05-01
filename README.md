@@ -638,7 +638,7 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 #### - DESCRIPTION
 sickoCrosser / sickoCrosser4 can crossfade up to 4 signals by operating a single knob.
 
-![sickocrosser](https://github.com/sickozell/SickoCV/assets/80784296/0d1bede2-477e-4807-af32-897fff14477d)
+![sickocrosser](https://github.com/sickozell/SickoCV/assets/80784296/1193328e-7abf-4286-9ba8-2621c16712e3)
 
 #### - INSTRUCTIONS
 
