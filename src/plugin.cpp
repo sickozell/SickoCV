@@ -41,6 +41,8 @@ void init(Plugin* p) {
 	p->addModel(modelPolyMuter16Plus);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
+	p->addModel(modelSickoCrosser);
+	p->addModel(modelSickoCrosser4);
 	p->addModel(modelSickoLooper1);
 	p->addModel(modelSickoLooper1Exp);
 	p->addModel(modelSickoLooper3);

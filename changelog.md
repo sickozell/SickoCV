@@ -1,3 +1,7 @@
+### 2.6.10 (2024-05-01)
+- added 'sickoCrosser' and 'sickoCrosser4' modules.
+- sickoSampler2: fixed rack crash when modulating stretching and v/oct at the same time.
+
 ### 2.6.9 (2024-04-12)
 - added 'sickoQuant' and 'sickoQuant4' modules.
 - sickoPlayer / sickoSampler / sickoSampler2: added 'Unlimited Sample Size' option in right-click menu.

@@ -1,7 +1,7 @@
-# SickoCV v2.6.9
+# SickoCV v2.6.10
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 9](https://github.com/sickozell/SickoCV/assets/80784296/48e2d08f-e71a-43fa-b333-c45519f991f0)
+![SickoCV modules 2 6 10](https://github.com/sickozell/SickoCV/assets/80784296/566b4fb8-5d90-4737-9dd5-2d2090aa73a7)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -23,6 +23,7 @@ VCV Rack plugin modules
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
+- [sickoCrosser / sickoCrosser4](#sickocrosser--sickocrosser4)
 - [sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5](#sickolooper1--sickolooperx--sickolooper3--sickolooper5)
 - [sickoPlayer](#sickoplayer)
 - [sickoQuant / sickoQuant4](#sickoquant--sickoquant4)
@@ -607,6 +608,28 @@ If both inputs are used with polyphony, channels on the Right output replicate t
 
 [back to top](#table-of-contents)
 
+## sickoCrosser / sickoCrosser4
+### stereo or 4 channels multi-input crossfader.
+#### - DESCRIPTION
+sickoCrosser / sickoCrosser4 can crossfade up to 4 signals by operating a single knob.
+
+![sickocrosser](https://github.com/sickozell/SickoCV/assets/80784296/1193328e-7abf-4286-9ba8-2621c16712e3)
+
+#### - INSTRUCTIONS
+
+INs switch selects the number of input signals to be crossfaded.  
+The xFD knob together with its CV input voltage sets the crossfade between the inputs.  
+Colored marks of the xFD knob correspond to equal attenuation of adjacent input signals (50% / 50%).  
+
+sickoCrosser can crossfade up to 4 stereo signals. Right inputs are normalled if no cable is plugged in.  
+Polyphonic cables can be connected on the first stereo input, in this case the crossfading will be applied between the polyphony channels by selecting the number of channels with the PLY knob, then the INs switch and other inputs will be ignored.  
+
+On sickoCrosser4 the 'L' (Link) led buttons can link channels in two ways according to the right-click menu 'Link Mode' selection.
+- 'xFd + Inputs' will link channels to add inputs to be crossfaded. All the inputs of linked channels are crossfaded except the last channel that can be set via its INs switch. Only the first xFD knob and OUT of the linked channels will work.  
+- 'xFd only' will link channels only for the xFD knob. In this mode the crossfade is set by the first xFD knob of the linked channels. For example 4 stereo signals can be crossfaded connecting the left signals on the first channel and the right on the second one, leaving the other 2 channels for mono signals or another stereo crossfading. Linking all the channels is allowed.  
+
+[back to top](#table-of-contents)
+
 ## sickoLooper1 / sickoLooperX / sickoLooper3 / sickoLooper5
 ### 1/3/5 track loopers with builtin clock generator, click and meter.
 #### - DESCRIPTION
@@ -741,7 +764,7 @@ Be sure to recall relative preset or disable PhaseScan, adjust Cue and Loop STAR
 #### - DESCRIPTION
 sickoQuant / sickoQuant4 can quantize signals in chromatic/min/Maj or custom scales, continuously or triggered.
 
- ![sickoquant](https://github.com/sickozell/SickoCV/assets/80784296/e19fa858-3eaa-45c3-afa5-7cfdac75e5d7)
+![sickoquant](https://github.com/sickozell/SickoCV/assets/80784296/eba80507-4a65-4fd5-be07-ef81c95d5bca)
 
 #### - INSTRUCTIONS
 

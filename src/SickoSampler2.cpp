@@ -296,6 +296,7 @@ struct SickoSampler2 : Module {
 	bool unlimitedRecording = false;
 	const drwav_uint64 recordingLimit = 52428800 * 2;
 	//const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+	
 	drwav_uint64 currentRecordingLimit = recordingLimit;
 
 	static constexpr float minStageTime = 1.f;  // in milliseconds
@@ -307,10 +308,14 @@ struct SickoSampler2 : Module {
 	int grainCount[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double grainSampleCount[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double stretchMaxPos = 0;
-	drwav_uint64 grainPos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	//drwav_uint64 grainPos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double grainPos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float grainFadeValue[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	float grainFadeCoeff[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	bool grainFade[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+
+	float stretchKnob = 0.f;
+	float cycleKnob = 0.f;
 
 	SickoSampler2() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -1335,6 +1340,8 @@ struct SickoSampler2 : Module {
 			fileLoaded = true;
 			channels = fileChannels;
 
+			//debugDisplay2 = to_string(totalSamples);
+
 		} else {
 			fileFound = false;
 			fileLoaded = false;
@@ -1553,7 +1560,10 @@ struct SickoSampler2 : Module {
 		trigButValue = params[TRIGBUT_PARAM].getValue();
 		lights[TRIGBUT_LIGHT].setBrightness(trigButValue);
 
-		stretchMaxPos = oneMsSamples * params[STR_SIZE_PARAM].getValue();
+		stretchKnob = params[STRETCH_PARAM].getValue();
+		cycleKnob = params[STR_SIZE_PARAM].getValue();
+		//stretchMaxPos = oneMsSamples * params[STR_SIZE_PARAM].getValue();
+		stretchMaxPos = oneMsSamples * cycleKnob;
 
 		// *********************************************************************************************** PLAY SECTION *******************************		
 
@@ -2298,12 +2308,20 @@ struct SickoSampler2 : Module {
 
 					if (play[c]) {									// it's false only if end of sample has reached, see above
 
+						/*
+						// debuggrain
+						if (samplePos[c] < 0 || samplePos[c] > totalSamples) {
+							DEBUG(("samplePos " + to_string(samplePos[c]) + " / " + to_string(totalSamples)).c_str());
+						}
+						*/
+
 						// *** SICKOSAMPLER USES HERMITE INTERPOLATION ONLY ***
 						if (currSampleWeight[c] == 0) {	// if no distance between samples, it means that speed is 1 and samplerates match -> no interpolation
+							
 							currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
 							if (channels == 2)
 								currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
-
+							
 						} else {
 							if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
 								/*
@@ -2326,9 +2344,16 @@ struct SickoSampler2 : Module {
 								}
 
 							} else { // if playing sample is the first or one of the last 3 -> no interpolation
+								/*
 								currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
 								if (channels == 2)
 									currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+								*/
+								if (floor(samplePos[c]) >= 0 && floor(samplePos[c]) < totalSampleC) {
+									currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+									if (channels == 2)
+										currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];	
+								}
 							}
 						}
 
@@ -2341,7 +2366,16 @@ struct SickoSampler2 : Module {
 								grainFade[c] = false;
 							} else {
 								float tempGrainFadeOutput;
+
+								/*
+								// debuggrain
+								if (grainPos[c] < 0 || grainPos[c] > totalSamples) {
+									DEBUG(("GRAIN " + to_string(grainPos[c]) + " / " + to_string(totalSamples)).c_str());
+								}
+								*/
+								
 								if (floor(grainPos[c]) > 0 && floor(grainPos[c]) < totalSamples - 1) {
+
 									tempGrainFadeOutput = hermiteInterpol(playBuffer[LEFT][antiAlias][floor(grainPos[c])-1],
 																playBuffer[LEFT][antiAlias][floor(grainPos[c])],
 																playBuffer[LEFT][antiAlias][floor(grainPos[c])+1],
@@ -2358,13 +2392,24 @@ struct SickoSampler2 : Module {
 									}
 
 								} else { // if playing sample is the first or one of the last 3 -> no interpolation
+									/*
 									tempGrainFadeOutput = playBuffer[LEFT][antiAlias][floor(grainPos[c])];
 									currentOutput = (currentOutput * (1-grainFadeValue[c])) + (tempGrainFadeOutput * grainFadeValue[c]);
 									if (channels == 2) {
 										tempGrainFadeOutput = playBuffer[RIGHT][antiAlias][floor(grainPos[c])];
 										currentOutputR = (currentOutputR * (1-grainFadeValue[c])) + (tempGrainFadeOutput * grainFadeValue[c]);
 									}
+									*/
+									if (floor(grainPos[c]) >= 0 && floor(grainPos[c]) < totalSampleC) {
+										tempGrainFadeOutput = playBuffer[LEFT][antiAlias][floor(grainPos[c])];
+										currentOutput = (currentOutput * (1-grainFadeValue[c])) + (tempGrainFadeOutput * grainFadeValue[c]);
+										if (channels == 2) {
+											tempGrainFadeOutput = playBuffer[RIGHT][antiAlias][floor(grainPos[c])];
+											currentOutputR = (currentOutputR * (1-grainFadeValue[c])) + (tempGrainFadeOutput * grainFadeValue[c]);
+										}
+									}
 								}
+
 
 								if (!reversePlaying[c])
 									grainPos[c] += distancePos[c];
@@ -2455,6 +2500,7 @@ struct SickoSampler2 : Module {
 									fadingValue[c] -= fadeCoeff;
 									switch (reversePlaying[c]) {
 										case FORWARD:
+											
 											if (floor(fadedPosition[c]) < totalSampleC) {
 												currentOutput *= 1 - fadingValue[c];
 												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
@@ -2465,9 +2511,11 @@ struct SickoSampler2 : Module {
 											} else {
 												fadingType[c] = NO_FADE;
 											}
+											
 											fadedPosition[c] += distancePos[c];
 										break;
 										case REVERSE:
+											
 											if (floor(fadedPosition[c]) >= 0) {
 												currentOutput *= 1 - fadingValue[c];
 												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
@@ -2478,6 +2526,7 @@ struct SickoSampler2 : Module {
 											} else {
 												fadingType[c] = NO_FADE;
 											}
+											
 											fadedPosition[c] -= distancePos[c];
 											
 										break;
@@ -2502,6 +2551,7 @@ struct SickoSampler2 : Module {
 									fadingValue[c] -= fadeCoeff;
 									switch (reversePlaying[c]) {
 										case FORWARD:
+											
 											if (fadedPosition[c] >= 0) {
 												currentOutput *= 1 - fadingValue[c];
 												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
@@ -2512,9 +2562,11 @@ struct SickoSampler2 : Module {
 											} else {
 												fadingType[c] = NO_FADE;
 											}
+											
 											fadedPosition[c] -= distancePos[c];
 										break;
 										case REVERSE:
+											
 											if (fadedPosition[c] < totalSampleC) {
 												currentOutput *= 1 - fadingValue[c];
 												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
@@ -2525,6 +2577,7 @@ struct SickoSampler2 : Module {
 											} else {
 												fadingType[c] = NO_FADE;
 											}
+											
 											fadedPosition[c] += distancePos[c];
 										break;
 									}
@@ -2535,20 +2588,25 @@ struct SickoSampler2 : Module {
 
 						// ------------------------------------------------------- U P D A T E    S A M P L E   P O S I T I O N -----------------
 						
-						if (params[STRETCH_PARAM].getValue() != 1) {
+						//if (params[STRETCH_PARAM].getValue() != 1) {
+						if (stretchKnob != 1) {
 							grainSampleCount[c]++;
-							if (params[STRETCH_PARAM].getValue() > 1) {
+							//if (params[STRETCH_PARAM].getValue() > 1) {
+							if (stretchKnob > 1) {
 
 								if (grainSampleCount[c] > stretchMaxPos ) {		//
 									grainCount[c]++;
 									grainPos[c] = samplePos[c];
 									grainFadeValue[c] = 1;
 
-									grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
+									//grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
+									grainFadeCoeff[c] = 10 / (cycleKnob * oneMsSamples);
 									grainFade[c] = true;
 
-									if (grainCount[c] > (params[STRETCH_PARAM].getValue())) {
-										double tempStretch1 = params[STRETCH_PARAM].getValue()-floor(params[STRETCH_PARAM].getValue());
+									//if (grainCount[c] > (params[STRETCH_PARAM].getValue())) {
+									if (grainCount[c] > stretchKnob) {
+										//double tempStretch1 = params[STRETCH_PARAM].getValue()-floor(params[STRETCH_PARAM].getValue());
+										double tempStretch1 = stretchKnob-floor(stretchKnob);
 										if (!reversePlaying[c])
 											samplePos[c] -= stretchMaxPos * tempStretch1 * distancePos[c];
 										else
@@ -2571,13 +2629,16 @@ struct SickoSampler2 : Module {
 									grainPos[c] = samplePos[c];
 									grainFadeValue[c] = 1;
 									
-									grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
+									//grainFadeCoeff[c] = 10 / (params[STR_SIZE_PARAM].getValue() * oneMsSamples);
+									grainFadeCoeff[c] = 10 / (cycleKnob * oneMsSamples);
 									grainFade[c] = true;
 									
 									if (!reversePlaying[c])
-										samplePos[c] += ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
+										//samplePos[c] += ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
+										samplePos[c] += ((stretchMaxPos / stretchKnob) - stretchMaxPos) * distancePos[c];
 									else
-										samplePos[c] -= ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
+										//samplePos[c] -= ((stretchMaxPos / params[STRETCH_PARAM].getValue()) - stretchMaxPos) * distancePos[c];
+										samplePos[c] -= ((stretchMaxPos / stretchKnob) - stretchMaxPos) * distancePos[c];
 
 									grainSampleCount[c] = grainSampleCount[c] - stretchMaxPos;
 								}
@@ -3177,12 +3238,12 @@ struct SickoSampler2Display : TransparentWidget {
 				nvgFillColor(args.vg, nvgRGBA(0xee, 0xee, 0x22, 0xff)); 
 				nvgTextBox(args.vg, 137, 11,97, module->infoToSave.c_str(), NULL);
 
-				/*
-				nvgTextBox(args.vg, 9, 26,120, module->debugDisplay.c_str(), NULL);
-				nvgTextBox(args.vg, 9, 36,120, module->debugDisplay2.c_str(), NULL);
-				nvgTextBox(args.vg, 129, 26,120, module->debugDisplay3.c_str(), NULL);
-				nvgTextBox(args.vg, 129, 36,120, module->debugDisplay4.c_str(), NULL);
-				*/
+				
+				//nvgTextBox(args.vg, 9, 26,120, module->debugDisplay.c_str(), NULL);
+				//nvgTextBox(args.vg, 9, 36,120, module->debugDisplay2.c_str(), NULL);
+				//nvgTextBox(args.vg, 129, 26,120, module->debugDisplay3.c_str(), NULL);
+				//nvgTextBox(args.vg, 129, 36,120, module->debugDisplay4.c_str(), NULL);
+				
 
 				// Zero line
 				nvgStrokeColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
