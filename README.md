@@ -485,6 +485,8 @@ TRIG output sends a trigger when sample occurs. If Track & Hold is selected, it 
 
 Holder can be used as a simple white noise generator if in T&H mode with Sample on HIGH gate option ticked. There's a specific function in the right-click menu to achieve this setting with one click.
 
+When polyphonic signals are used, all signals are sampled at the same time if a monophonic trigger is connected. Otherwise if a polyphoic trigger cable is connected the signals will be sampled according to trigger polyphony.
+
 holder8 is composed of 8 independent holder modules without attenuators and trig output.
 
 #### RIGHT-CLICK MENU
