@@ -1,6 +1,7 @@
 ### 2.6.10 (2024-05-02)
 - added 'sickoCrosser' and 'sickoCrosser4' modules.
 - sickoSampler2: fixed rack crash when modulating stretching and v/oct at the same time.
+- holder modules: added ability to sample polyphonic signals according to polyphonic triggers.
 
 ### 2.6.9 (2024-04-12)
 - added 'sickoQuant' and 'sickoQuant4' modules.

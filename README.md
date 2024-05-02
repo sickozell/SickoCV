@@ -20,6 +20,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog**  
 - added 'sickoCrosser' and 'sickoCrosser4' modules.
 - sickoSampler2: fixed rack crash when modulating stretching and v/oct at the same time.
+- holder modules: added ability to sample polyphonic signals according to polyphonic triggers.
 
 # SickoCV v2.6.10
 VCV Rack plugin modules
@@ -507,6 +508,8 @@ OUT output is feeded with sampled or tracked signal.
 TRIG output sends a trigger when sample occurs. If Track & Hold is selected, it sends a trigger on tracking start and/or end, or a gate depending by the options ticked on the right-click menu.
 
 Holder can be used as a simple white noise generator if in T&H mode with Sample on HIGH gate option ticked. There's a specific function in the right-click menu to achieve this setting with one click.
+
+When polyphonic signals are used, all signals are sampled at the same time if a monophonic trigger is connected. Otherwise if a polyphoic trigger cable is connected the signals will be sampled according to trigger polyphony.
 
 holder8 is composed of 8 independent holder modules without attenuators and trig output.
 
