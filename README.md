@@ -12,15 +12,14 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
--
+- multiSwitcher
+- multiRouter
 
 ## **to do list:** 
 - 
 
 ## **changelog**  
-- added 'sickoCrosser' and 'sickoCrosser4' modules.
-- sickoSampler2: fixed rack crash when modulating stretching and v/oct at the same time.
-- holder modules: added ability to sample polyphonic signals according to polyphonic triggers.
+- added 'multiSwitcher' and 'multiRouter' modules.
 
 # SickoCV v2.6.10
 VCV Rack plugin modules

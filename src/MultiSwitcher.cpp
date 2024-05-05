@@ -6,8 +6,6 @@
 
 #include "plugin.hpp"
 
-//using namespace std;
-
 struct MultiSwitcher : Module {
 	
 	int mode = TRIG_MODE;
@@ -117,9 +115,15 @@ struct MultiSwitcher : Module {
 	void onReset(const ResetEvent &e) override {
 		//initStart = false;
 		
+		prevInput = currInput;
+		currInput = 0;
+		//lights[IN_LIGHT].setBrightness(1.f);
+		xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+		fading = true;
+
 		for (int i = 0; i < 8; i++) {
 			lights[IN_LIGHT+i].setBrightness(0.f);
-		}
+		}	
 
 		Module::onReset(e);
 	}
@@ -145,23 +149,17 @@ struct MultiSwitcher : Module {
 			if (lastInputUsedJ) {
 				lastInputUsed = json_integer_value(lastInputUsedJ);
 				if (lastInputUsed >= 0 && lastInputUsed < 8) {
-					lights[IN_LIGHT+lastInputUsed].setBrightness(1.f);
+					//lights[IN_LIGHT+lastInputUsed].setBrightness(1.f);
 					currInput = lastInputUsed;
 				} else {
-					lights[IN_LIGHT].setBrightness(1.f);
+					//lights[IN_LIGHT].setBrightness(1.f);
 					currInput = 0;
 				}
 			}
 		} else {
-			lights[IN_LIGHT].setBrightness(1.f);
+			//lights[IN_LIGHT].setBrightness(1.f);
 			currInput = 0;
 		}
-
-		/*
-		fading = true;
-		xFadeValue = 0;
-		xFadeCoeff = 1 / (APP->engine->getSampleRate() * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
-		*/
 
 	}
 
@@ -181,7 +179,7 @@ struct MultiSwitcher : Module {
 			prevInput = currInput;
 			lights[IN_LIGHT+prevInput].setBrightness(0.f);
 			currInput = params[RST_PARAM].getValue() - 1;
-			lights[IN_LIGHT+currInput].setBrightness(1.f);
+			//lights[IN_LIGHT+currInput].setBrightness(1.f);
 
 			xFadeKnob = params[XFD_PARAM].getValue();
 
@@ -219,7 +217,7 @@ struct MultiSwitcher : Module {
 								currInput = maxInputs- 1;
 						break;
 					}
-					lights[IN_LIGHT+currInput].setBrightness(1.f);
+					//lights[IN_LIGHT+currInput].setBrightness(1.f);
 
 					xFadeKnob = params[XFD_PARAM].getValue();
 
@@ -248,7 +246,7 @@ struct MultiSwitcher : Module {
 						prevInput = currInput;
 						lights[IN_LIGHT+prevInput].setBrightness(0.f);
 						currInput = currAddr;
-						lights[IN_LIGHT+currInput].setBrightness(1.f);
+						//lights[IN_LIGHT+currInput].setBrightness(1.f);
 						
 						prevAddr = currAddr;
 
@@ -458,7 +456,7 @@ struct MultiSwitcher : Module {
 				outputs[OUT_RIGHT_OUTPUT].setChannels(prevChanR);
 
 		}
-		
+		lights[IN_LIGHT+currInput].setBrightness(1.f);
 	}		
 };
 

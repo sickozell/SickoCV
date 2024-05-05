@@ -116,10 +116,15 @@ struct MultiRouter : Module {
 	void onReset(const ResetEvent &e) override {
 		//initStart = false;
 		
+		currOutput= 0;
+		//lights[OUT_LIGHT].setBrightness(1.f);
+		xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+		fadingIn = currOutput;
+
 		for (int i = 0; i < 8; i++) {
 			lights[OUT_LIGHT+i].setBrightness(0.f);
+			fadingOut[i] = true;
 		}
-
 		Module::onReset(e);
 	}
 
@@ -146,24 +151,24 @@ struct MultiRouter : Module {
 				if (currOutput >= 0 && currOutput < 8) {
 					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
 					fadingIn = currOutput;
-					lights[OUT_LIGHT+currOutput].setBrightness(1.f);
+					//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 				} else {
 					currOutput = params[RST_PARAM].getValue()-1;
 					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
 					fadingIn = currOutput;
-					lights[OUT_LIGHT+currOutput].setBrightness(1.f);
+					//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 				}
 			} else {
 				currOutput = params[RST_PARAM].getValue()-1;
 				xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
 				fadingIn = currOutput;
-				lights[OUT_LIGHT+currOutput].setBrightness(1.f);
+				//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 			}
 		} else {
 			currOutput = params[RST_PARAM].getValue()-1;
 			xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
 			fadingIn = currOutput;
-			lights[OUT_LIGHT+currOutput].setBrightness(1.f);
+			//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 		}
 
 	}
@@ -181,7 +186,7 @@ struct MultiRouter : Module {
 			prevOutput = currOutput;
 			lights[OUT_LIGHT+prevOutput].setBrightness(0.f);
 			currOutput = params[RST_PARAM].getValue() - 1;
-			lights[OUT_LIGHT+currOutput].setBrightness(1.f);
+			//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 
 			xFadeKnob = params[XFD_PARAM].getValue();
 
@@ -221,7 +226,7 @@ struct MultiRouter : Module {
 								currOutput = maxOutputs- 1;
 						break;
 					}
-					lights[OUT_LIGHT+currOutput].setBrightness(1.f);
+					//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 
 					xFadeKnob = params[XFD_PARAM].getValue();
 
@@ -252,7 +257,7 @@ struct MultiRouter : Module {
 						prevOutput = currOutput;
 						lights[OUT_LIGHT+prevOutput].setBrightness(0.f);
 						currOutput = currAddr;
-						lights[OUT_LIGHT+currOutput].setBrightness(1.f);
+						//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 						
 						prevAddr = currAddr;
 
@@ -373,7 +378,7 @@ struct MultiRouter : Module {
 				outputs[OUT_RIGHT_OUTPUT+out].setChannels(chanR);
 			}
 		}
-
+		lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 
 	}		
 };
