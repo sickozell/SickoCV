@@ -22,7 +22,7 @@ struct MultiRouter : Module {
 
 	int fadingIn = -1;
 	bool fadingOut[8] = {false, false, false, false, false, false, false, false};
-	float xFadeValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	float xFadeValue[8] = {1, 1, 1, 1, 1, 1, 1, 1};
 
 	int currOutput = 0;
 	int prevOutput = 0;
@@ -35,8 +35,6 @@ struct MultiRouter : Module {
 
 	int chanL;
 	int chanR;
-	//int prevChanL;
-	//int prevChanR;
 
 	float outL[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float outR[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -117,7 +115,6 @@ struct MultiRouter : Module {
 		//initStart = false;
 		
 		currOutput= 0;
-		//lights[OUT_LIGHT].setBrightness(1.f);
 		xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
 		fadingIn = currOutput;
 
@@ -150,25 +147,25 @@ struct MultiRouter : Module {
 				currOutput = json_integer_value(currOutputJ);
 				if (currOutput >= 0 && currOutput < 8) {
 					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+					xFadeValue[currOutput] = 0;
 					fadingIn = currOutput;
-					//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 				} else {
 					currOutput = params[RST_PARAM].getValue()-1;
 					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+					xFadeValue[currOutput] = 0;
 					fadingIn = currOutput;
-					//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 				}
 			} else {
 				currOutput = params[RST_PARAM].getValue()-1;
 				xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+				xFadeValue[currOutput] = 0;
 				fadingIn = currOutput;
-				//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 			}
 		} else {
 			currOutput = params[RST_PARAM].getValue()-1;
 			xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+			xFadeValue[currOutput] = 0;
 			fadingIn = currOutput;
-			//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 		}
 
 	}
@@ -186,7 +183,6 @@ struct MultiRouter : Module {
 			prevOutput = currOutput;
 			lights[OUT_LIGHT+prevOutput].setBrightness(0.f);
 			currOutput = params[RST_PARAM].getValue() - 1;
-			//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 
 			xFadeKnob = params[XFD_PARAM].getValue();
 
@@ -226,7 +222,6 @@ struct MultiRouter : Module {
 								currOutput = maxOutputs- 1;
 						break;
 					}
-					//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 
 					xFadeKnob = params[XFD_PARAM].getValue();
 
@@ -257,7 +252,6 @@ struct MultiRouter : Module {
 						prevOutput = currOutput;
 						lights[OUT_LIGHT+prevOutput].setBrightness(0.f);
 						currOutput = currAddr;
-						//lights[OUT_LIGHT+currOutput].setBrightness(1.f);
 						
 						prevAddr = currAddr;
 
@@ -360,7 +354,6 @@ struct MultiRouter : Module {
 								outputs[OUT_RIGHT_OUTPUT+out].setVoltage(outL[c] * xFadeValue[out], c);
 							}
 						}
-
 
 						xFadeValue[out] -= xFadeCoeff;
 						if (xFadeValue[out] < 0) {

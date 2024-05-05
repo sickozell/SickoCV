@@ -17,19 +17,12 @@ struct MultiSwitcher : Module {
 
 	int direction = DOWN;
 
-	/*
-	bool fading = false;
-	float xFadeKnob = 0.f;
-	float xFadeValue = 0.f;
-	float xFadeCoeff;
-	*/
-
 	float xFadeKnob = 0.f;
 	float xFadeCoeff;
 
 	int fadingIn = -1;
 	bool fadingOut[8] = {false, false, false, false, false, false, false, false};
-	float xFadeValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	float xFadeValue[8] = {1, 1, 1, 1, 1, 1, 1, 1};
 
 	int currInput = 0;
 	int prevInput = 0;
@@ -42,8 +35,6 @@ struct MultiSwitcher : Module {
 
 	int chanL;
 	int chanR;
-	//int prevChanL;
-	//int prevChanR;
 
 	int maxChanL;
 	int maxChanR;
@@ -51,13 +42,7 @@ struct MultiSwitcher : Module {
 	float inL[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float inR[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	//float outL[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	//float outR[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-	//bool firstRun = true;
-
 	bool initStart = false;
-	//int lastInputUsed = 0;
 
 	unsigned int sampleRate = APP->engine->getSampleRate();
 
@@ -132,7 +117,6 @@ struct MultiSwitcher : Module {
 		
 		prevInput = currInput;
 		currInput = 0;
-		//lights[IN_LIGHT].setBrightness(1.f);
 		xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
 		fadingIn = currInput;
 
@@ -166,20 +150,24 @@ struct MultiSwitcher : Module {
 				currInput = json_integer_value(currInputJ);
 				if (currInput >= 0 && currInput < 8) {
 					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+					xFadeValue[currInput] = 0;
 					fadingIn = currInput;
 				} else {
 					currInput = params[RST_PARAM].getValue()-1;
 					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+					xFadeValue[currInput] = 0;
 					fadingIn = currInput;
 				}
 			} else {
 				currInput = params[RST_PARAM].getValue()-1;
 				xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+				xFadeValue[currInput] = 0;
 				fadingIn = currInput;
 			}
 		} else {
 			currInput = params[RST_PARAM].getValue()-1;
 			xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+			xFadeValue[currInput] = 0;
 			fadingIn = currInput;
 		}
 
@@ -187,9 +175,6 @@ struct MultiSwitcher : Module {
 
 	void process(const ProcessArgs& args) override {
 		
-		//outL = 0.f;
-		//outR = 0.f;
-
 		maxInputs = params[INS_PARAM].getValue();
 		
 		mode = params[MODE_SWITCH].getValue();
@@ -201,7 +186,6 @@ struct MultiSwitcher : Module {
 			prevInput = currInput;
 			lights[IN_LIGHT+prevInput].setBrightness(0.f);
 			currInput = params[RST_PARAM].getValue() - 1;
-			//lights[IN_LIGHT+currInput].setBrightness(1.f);
 
 			xFadeKnob = params[XFD_PARAM].getValue();
 
@@ -241,7 +225,6 @@ struct MultiSwitcher : Module {
 								currInput = maxInputs- 1;
 						break;
 					}
-					//lights[IN_LIGHT+currInput].setBrightness(1.f);
 
 					xFadeKnob = params[XFD_PARAM].getValue();
 
@@ -272,7 +255,6 @@ struct MultiSwitcher : Module {
 						prevInput = currInput;
 						lights[IN_LIGHT+prevInput].setBrightness(0.f);
 						currInput = currAddr;
-						//lights[IN_LIGHT+currInput].setBrightness(1.f);
 						
 						prevAddr = currAddr;
 
@@ -300,8 +282,6 @@ struct MultiSwitcher : Module {
 		}
 
 		for (int in = 0; in < 8; in++) {
-
-
 
 			if (inputs[IN_LEFT_INPUT+in].isConnected() || inputs[IN_RIGHT_INPUT+in].isConnected()) {
 
@@ -340,14 +320,13 @@ struct MultiSwitcher : Module {
 
 					}
 
-				} else {	// if not the current track, check if it's fading out
+				} else {
 
 					if (fadingOut[in]) {
 
 						for (int c = 0; c < chanL; c++)
 							inL[c] += inputs[IN_LEFT_INPUT+in].getVoltage(c) * xFadeValue[in];
 					
-
 						if (inputs[IN_RIGHT_INPUT+in].isConnected()) {
 							chanR = inputs[IN_RIGHT_INPUT+in].getChannels();
 							if (chanR > maxChanR)
