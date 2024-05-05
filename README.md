@@ -21,10 +21,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog**  
 - added 'multiSwitcher' and 'multiRouter' modules.
 
-# SickoCV v2.6.10
+# SickoCV v2.6.11
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 10](https://github.com/sickozell/SickoCV/assets/80784296/566b4fb8-5d90-4737-9dd5-2d2090aa73a7)
+![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/71db3265-fc55-4c4c-a681-bada5359c349)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -42,6 +42,7 @@ VCV Rack plugin modules
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
+- [multiRouter / multiSwitcher](#multirouter--multiswitcher)
 - [parking](#parking)
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [shifter](#shifter)
@@ -560,6 +561,16 @@ If no sync cable is connected, pressing the SYNC button will act as a sample&hol
 #### Right-click Menu
 - **Wait full clock after reset**. When this option is enabled and sync is on, when a reset is detected it will reset the cycle of oscillators but will wait a full clock before restarting oscillators cycle. It can be mostly used in combination of PPC greater than 1, just to restart oscillators correctly.  
 - There are some selectable 'X' knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
+
+[back to top](#table-of-contents)
+
+## multiRouter / multiSwitcher
+### 1>8 router and 8>1 switcher for cvs and audio signals
+
+![multiRtMultiSw](https://github.com/sickozell/SickoCV/assets/80784296/3e728cfe-ac30-4e70-bc50-72cfffbc1fe6)
+
+#### - INSTRUCTIONS
+Coming soon.
 
 [back to top](#table-of-contents)
 
