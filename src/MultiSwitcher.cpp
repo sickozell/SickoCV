@@ -17,10 +17,19 @@ struct MultiSwitcher : Module {
 
 	int direction = DOWN;
 
+	/*
 	bool fading = false;
 	float xFadeKnob = 0.f;
 	float xFadeValue = 0.f;
 	float xFadeCoeff;
+	*/
+
+	float xFadeKnob = 0.f;
+	float xFadeCoeff;
+
+	int fadingIn = -1;
+	bool fadingOut[8] = {false, false, false, false, false, false, false, false};
+	float xFadeValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	int currInput = 0;
 	int prevInput = 0;
@@ -33,16 +42,22 @@ struct MultiSwitcher : Module {
 
 	int chanL;
 	int chanR;
-	int prevChanL;
-	int prevChanR;
+	//int prevChanL;
+	//int prevChanR;
 
-	float outL[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	float outR[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int maxChanL;
+	int maxChanR;
 
-	bool firstRun = true;
+	float inL[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float inR[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	//float outL[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	//float outR[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	//bool firstRun = true;
 
 	bool initStart = false;
-	int lastInputUsed = 0;
+	//int lastInputUsed = 0;
 
 	unsigned int sampleRate = APP->engine->getSampleRate();
 
@@ -119,10 +134,11 @@ struct MultiSwitcher : Module {
 		currInput = 0;
 		//lights[IN_LIGHT].setBrightness(1.f);
 		xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
-		fading = true;
+		fadingIn = currInput;
 
 		for (int i = 0; i < 8; i++) {
 			lights[IN_LIGHT+i].setBrightness(0.f);
+			fadingOut[i] = true;
 		}	
 
 		Module::onReset(e);
@@ -135,7 +151,7 @@ struct MultiSwitcher : Module {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
-		json_object_set_new(rootJ, "lastInputUsed", json_integer(currInput));
+		json_object_set_new(rootJ, "currInput", json_integer(currInput));
 		return rootJ;
 	}
 
@@ -145,20 +161,26 @@ struct MultiSwitcher : Module {
 			initStart = json_boolean_value(initStartJ);
 
 		if (!initStart) {
-			json_t* lastInputUsedJ = json_object_get(rootJ, "lastInputUsed");
-			if (lastInputUsedJ) {
-				lastInputUsed = json_integer_value(lastInputUsedJ);
-				if (lastInputUsed >= 0 && lastInputUsed < 8) {
-					//lights[IN_LIGHT+lastInputUsed].setBrightness(1.f);
-					currInput = lastInputUsed;
+			json_t* currInputJ = json_object_get(rootJ, "currInput");
+			if (currInputJ) {
+				currInput = json_integer_value(currInputJ);
+				if (currInput >= 0 && currInput < 8) {
+					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+					fadingIn = currInput;
 				} else {
-					//lights[IN_LIGHT].setBrightness(1.f);
-					currInput = 0;
+					currInput = params[RST_PARAM].getValue()-1;
+					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+					fadingIn = currInput;
 				}
+			} else {
+				currInput = params[RST_PARAM].getValue()-1;
+				xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+				fadingIn = currInput;
 			}
 		} else {
-			//lights[IN_LIGHT].setBrightness(1.f);
-			currInput = 0;
+			currInput = params[RST_PARAM].getValue()-1;
+			xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, params[XFD_PARAM].getValue()) / 1000));
+			fadingIn = currInput;
 		}
 
 	}
@@ -183,10 +205,12 @@ struct MultiSwitcher : Module {
 
 			xFadeKnob = params[XFD_PARAM].getValue();
 
-			if (xFadeKnob != 0) {
-				xFadeValue = 0;
+			if (xFadeKnob == 0) {
+				xFadeValue[currInput] = 1;
+			} else {
 				xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
-				fading = true;
+				fadingIn = currInput;
+				fadingOut[prevInput] = true;
 			}
 
 		}
@@ -221,10 +245,12 @@ struct MultiSwitcher : Module {
 
 					xFadeKnob = params[XFD_PARAM].getValue();
 
-					if (xFadeKnob != 0) {
-						xFadeValue = 0;
+					if (xFadeKnob == 0) {
+						xFadeValue[currInput] = 1;
+					} else {
 						xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
-						fading = true;
+						fadingIn = currInput;
+						fadingOut[prevInput] = true;
 					}
 				}
 				prevTrigValue = trigValue;
@@ -252,211 +278,130 @@ struct MultiSwitcher : Module {
 
 						xFadeKnob = params[XFD_PARAM].getValue();
 
-						if (xFadeKnob != 0) {
-							xFadeValue = 0;
+						if (xFadeKnob == 0) {
+							xFadeValue[currInput] = 1;
+						} else {
 							xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
-							fading = true;
+							fadingIn = currInput;
+							fadingOut[prevInput] = true;
 						}
-
 					}
 				}
 				prevTrigValue = trigValue;
 			break;
 		}
 
-		if (!fading) {
+		maxChanL = 0;
+		maxChanR = 0;
 
-			chanL = inputs[IN_LEFT_INPUT+currInput].getChannels();
+		for (int c = 0; c < 16; c++) {
+			inL[c] = 0;
+			inR[c] = 0;
+		}
 
-			for (int c = 0; c < chanL; c++) {
-				outL[c] = inputs[IN_LEFT_INPUT+currInput].getVoltage(c);
+		for (int in = 0; in < 8; in++) {
 
-				if (outL[c] > 10.f)
-					outL[c] = 10.f;
-				else if (outL[c] < -10.f)
-					outL[c] = -10.f;
-				outputs[OUT_LEFT_OUTPUT].setVoltage(outL[c], c);
-			}
-			outputs[OUT_LEFT_OUTPUT].setChannels(chanL);
 
-			if (inputs[IN_RIGHT_INPUT+currInput].isConnected()) {
 
-				chanR = inputs[IN_RIGHT_INPUT+currInput].getChannels();
+			if (inputs[IN_LEFT_INPUT+in].isConnected() || inputs[IN_RIGHT_INPUT+in].isConnected()) {
 
-				for (int c = 0; c < chanR; c++) {
-					outR[c] = inputs[IN_RIGHT_INPUT+currInput].getVoltage(c);
-					if (outR[c] > 10.f)
-						outR[c] = 10.f;
-					else if (outR[c] < -10.f)
-						outR[c] = -10.f;
-					outputs[OUT_RIGHT_OUTPUT].setVoltage(outR[c], c);
-				}
-				outputs[OUT_RIGHT_OUTPUT].setChannels(chanR);
-				
-			} else {
-				for (int c = 0; c < chanL; c++)
-					outputs[OUT_RIGHT_OUTPUT].setVoltage(outL[c], c);
-				outputs[OUT_RIGHT_OUTPUT].setChannels(chanL);
-			}
+				chanL = inputs[IN_LEFT_INPUT+in].getChannels();
+				if (chanL > maxChanL)
+					maxChanL = chanL;
 
-		} else {
+				if (in == currInput) {
 
-			xFadeValue += xFadeCoeff;
-			if (xFadeValue > 1) {
-				xFadeValue = 1;
-				fading = false;
-			}
+					if (fadingIn == in) {
+						xFadeValue[in] += xFadeCoeff;
+						if (xFadeValue[in] > 1) {
+							xFadeValue[in] = 1;
+							fadingIn = -1;
+						}
+					}
 
-			// LEFT CHANNEL
+					for (int c = 0; c < chanL; c++)
+						inL[c] += inputs[IN_LEFT_INPUT+in].getVoltage(c) * xFadeValue[in];
 
-			chanL = inputs[IN_LEFT_INPUT+currInput].getChannels();
-			prevChanL = inputs[IN_LEFT_INPUT+prevInput].getChannels();
+					if (inputs[IN_RIGHT_INPUT+in].isConnected()) {
+						chanR = inputs[IN_RIGHT_INPUT+in].getChannels();
+						if (chanR > maxChanR)
+							maxChanR = chanR;
 
-			for (int c = 0; c < prevChanL; c++)
-				outL[c] = inputs[IN_LEFT_INPUT+prevInput].getVoltage(c) * (1-xFadeValue);
+						for (int c = 0; c < chanR; c++)
+							inR[c] += inputs[IN_RIGHT_INPUT+in].getVoltage(c) * xFadeValue[in];
 
-			if (chanL > prevChanL) {
-				for (int c = prevChanL; c < chanL; c++) {
-					outL[c] = inputs[IN_LEFT_INPUT+prevInput].getVoltage(c) * (1-xFadeValue);
-					outputs[OUT_LEFT_OUTPUT].setVoltage(outL[c], c);
-				}
-			}
+					} else {
+						chanR = chanL;
+						if (chanR > maxChanR)
+							maxChanR = chanR;
 
-			for (int c = 0; c < chanL; c++) {
-				outL[c] += inputs[IN_LEFT_INPUT+currInput].getVoltage(c) * xFadeValue;
+						for (int c = 0; c < chanR; c++)
+							inR[c] += inputs[IN_LEFT_INPUT+in].getVoltage(c) * xFadeValue[in];
 
-				if (outL[c] > 10.f)
-					outL[c] = 10.f;
-				else if (outL[c] < -10.f)
-					outL[c] = -10.f;
-				
-				outputs[OUT_LEFT_OUTPUT].setVoltage(outL[c], c);
-			}
+					}
 
-			if (prevChanL > chanL) {
-				for (int c = chanL; c < prevChanL; c++) {
-					outL[c] += inputs[IN_LEFT_INPUT+currInput].getVoltage(c) * xFadeValue;
+				} else {	// if not the current track, check if it's fading out
 
-					if (outL[c] > 10.f)
-						outL[c] = 10.f;
-					else if (outL[c] < -10.f)
-						outL[c] = -10.f;
+					if (fadingOut[in]) {
+
+						for (int c = 0; c < chanL; c++)
+							inL[c] += inputs[IN_LEFT_INPUT+in].getVoltage(c) * xFadeValue[in];
 					
-					outputs[OUT_LEFT_OUTPUT].setVoltage(outL[c], c);
-				}
-			}
 
-			// set left channel
+						if (inputs[IN_RIGHT_INPUT+in].isConnected()) {
+							chanR = inputs[IN_RIGHT_INPUT+in].getChannels();
+							if (chanR > maxChanR)
+								maxChanR = chanR;
 
-			if (chanL > prevChanL)
-				outputs[OUT_LEFT_OUTPUT].setChannels(chanL);
-			else
-				outputs[OUT_LEFT_OUTPUT].setChannels(prevChanL);
+							for (int c = 0; c < chanR; c++)
+								inR[c] += inputs[IN_RIGHT_INPUT+in].getVoltage(c) * xFadeValue[in];
 
-			// RIGHT CHANNEL
+						} else {
 
-			if (inputs[IN_RIGHT_INPUT+currInput].isConnected()) 
-				chanR = inputs[IN_RIGHT_INPUT+currInput].getChannels();
-			else
-				chanR = chanL;
+							chanR = chanL;
+							if (chanR > maxChanR)
+								maxChanR = chanR;
 
-			if (inputs[IN_RIGHT_INPUT+prevInput].isConnected()) 
-				prevChanR = inputs[IN_RIGHT_INPUT+prevInput].getChannels();
-			else
-				prevChanR = prevChanR;
+							for (int c = 0; c < chanR; c++)
+								inR[c] += inputs[IN_LEFT_INPUT+in].getVoltage(c) * xFadeValue[in];
 
-			// prev right channel
+						}
 
-			if (inputs[IN_RIGHT_INPUT+prevInput].isConnected()) {
-				for (int c = 0; c < prevChanR; c++)
-					outR[c] = inputs[IN_RIGHT_INPUT+prevInput].getVoltage(c) * (1-xFadeValue);
+						xFadeValue[in] -= xFadeCoeff;
+						if (xFadeValue[in] < 0) {
+							xFadeValue[in] = 0;
+							fadingOut[in] = false;
+						}
 
-				if (chanR > prevChanR) {
-					for (int c = prevChanR; c < chanR; c++) {
-						outR[c] = inputs[IN_RIGHT_INPUT+prevInput].getVoltage(c) * (1-xFadeValue);
-						outputs[OUT_RIGHT_OUTPUT].setVoltage(outR[c], c);
 					}
-				}
-			} else {
-				prevChanR = prevChanL;
-				for (int c = 0; c < prevChanR; c++)
-					outR[c] = inputs[IN_LEFT_INPUT+prevInput].getVoltage(c) * (1-xFadeValue);
 
-				if (chanR > prevChanR) {
-					for (int c = prevChanR; c < chanR; c++) {
-						outR[c] = inputs[IN_LEFT_INPUT+prevInput].getVoltage(c) * (1-xFadeValue);
-						outputs[OUT_RIGHT_OUTPUT].setVoltage(outR[c], c);
-					}
-				}
-			}
-
-			// curr right channel
-
-			if (inputs[IN_RIGHT_INPUT+currInput].isConnected()) {
-
-				for (int c = 0; c < chanR; c++) {
-					outR[c] += inputs[IN_RIGHT_INPUT+currInput].getVoltage(c) * xFadeValue;
-
-					if (outR[c] > 10.f)
-						outR[c] = 10.f;
-					else if (outR[c] < -10.f)
-						outR[c] = -10.f;
-
-					outputs[OUT_RIGHT_OUTPUT].setVoltage(outR[c], c);
-				}
-
-				if (prevChanR > chanR) {
-					for (int c = chanR; c < prevChanR; c++) {
-						outR[c] += inputs[IN_RIGHT_INPUT+currInput].getVoltage(c) * xFadeValue;
-
-						if (outR[c] > 10.f)
-							outR[c] = 10.f;
-						else if (outR[c] < -10.f)
-							outR[c] = -10.f;
-						
-						outputs[OUT_RIGHT_OUTPUT].setVoltage(outR[c], c);
-					}
-				}
-
-			} else {
-
-				chanR = chanL;
-
-				for (int c = 0; c < chanL; c++) {
-					outR[c] += inputs[IN_LEFT_INPUT+currInput].getVoltage(c) * xFadeValue;
-
-					if (outR[c] > 10.f)
-						outR[c] = 10.f;
-					else if (outR[c] < -10.f)
-						outR[c] = -10.f;
-
-					outputs[OUT_RIGHT_OUTPUT].setVoltage(outR[c], c);
-				}
-
-				if (prevChanR > chanR) {
-					for (int c = chanR; c < prevChanR; c++) {
-						outR[c] += inputs[IN_LEFT_INPUT+currInput].getVoltage(c) * xFadeValue;
-
-						if (outR[c] > 10.f)
-							outR[c] = 10.f;
-						else if (outR[c] < -10.f)
-							outR[c] = -10.f;
-						
-						outputs[OUT_RIGHT_OUTPUT].setVoltage(outR[c], c);
-					}
 				}
 
 			}
-
-			// set right channel
-
-			if (chanR > prevChanR)
-				outputs[OUT_RIGHT_OUTPUT].setChannels(chanR);
-			else
-				outputs[OUT_RIGHT_OUTPUT].setChannels(prevChanR);
 
 		}
+
+		for (int c = 0; c < maxChanL; c++) {
+			if (inL[c] > 10.f)
+				inL[c] = 10.f;
+			else if (inL[c] < -10.f)
+				inL[c] = -10.f;
+			outputs[OUT_LEFT_OUTPUT].setVoltage(inL[c], c);
+		}
+
+		for (int c = 0; c < maxChanR; c++) {
+			if (inR[c] > 10.f)
+				inR[c] = 10.f;
+			else if (inR[c] < -10.f)
+				inR[c] = -10.f;
+			outputs[OUT_RIGHT_OUTPUT].setVoltage(inR[c], c);
+		}
+
+		outputs[OUT_LEFT_OUTPUT].setChannels(maxChanL);
+		outputs[OUT_RIGHT_OUTPUT].setChannels(maxChanR);
+
 		lights[IN_LIGHT+currInput].setBrightness(1.f);
+
 	}		
 };
 

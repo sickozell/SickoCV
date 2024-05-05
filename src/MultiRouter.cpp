@@ -35,8 +35,8 @@ struct MultiRouter : Module {
 
 	int chanL;
 	int chanR;
-	int prevChanL;
-	int prevChanR;
+	//int prevChanL;
+	//int prevChanR;
 
 	float outL[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float outR[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
