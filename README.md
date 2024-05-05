@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.11
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/71db3265-fc55-4c4c-a681-bada5359c349)
+![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/bf545094-11df-4a16-a00c-92bb44543ed4)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -567,7 +567,7 @@ If no sync cable is connected, pressing the SYNC button will act as a sample&hol
 ## multiRouter / multiSwitcher
 ### 1>8 stereo router and 8>1 stereo switcher for cvs and audio signals
 
-![multiRtMultiSw](https://github.com/sickozell/SickoCV/assets/80784296/3e728cfe-ac30-4e70-bc50-72cfffbc1fe6)
+![multiRtMultiSw](https://github.com/sickozell/SickoCV/assets/80784296/b32b2642-5d30-4a08-8f69-ab0a2dbd47a4)
 
 #### - INSTRUCTIONS
 Coming soon.
