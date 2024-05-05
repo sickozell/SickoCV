@@ -34,6 +34,8 @@ void init(Plugin* p) {
 	p->addModel(modelModulator);
 	p->addModel(modelModulator7);
 	p->addModel(modelModulator7Compact);
+	p->addModel(modelMultiSwitcher);
+	p->addModel(modelMultiRouter);
 	p->addModel(modelParking);
 	p->addModel(modelPolyMuter8);
 	p->addModel(modelPolyMuter8Plus);

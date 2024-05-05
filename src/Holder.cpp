@@ -56,7 +56,7 @@ struct Holder : Module {
 
 	float oneMsSamples = (APP->engine->getSampleRate()) / 1000;			// samples in 1ms
 	float outTrigSample[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	float outTrig[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool outTrig[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 	//**************************************************************
 	//  DEBUG 

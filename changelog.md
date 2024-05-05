@@ -1,3 +1,6 @@
+### 2.6.11 (2024-05-xx)
+- added 'multiSwitcher' and 'multiRouter' modules.
+
 ### 2.6.10 (2024-05-02)
 - added 'sickoCrosser' and 'sickoCrosser4' modules.
 - sickoSampler2: fixed rack crash when modulating stretching and v/oct at the same time.

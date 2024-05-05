@@ -34,6 +34,8 @@ extern Model* modelHolder8;
 extern Model* modelModulator;
 extern Model* modelModulator7;
 extern Model* modelModulator7Compact;
+extern Model* modelMultiSwitcher;
+extern Model* modelMultiRouter;
 extern Model* modelParking;
 extern Model* modelPolyMuter8;
 extern Model* modelPolyMuter8Plus;
