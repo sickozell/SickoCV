@@ -565,7 +565,7 @@ If no sync cable is connected, pressing the SYNC button will act as a sample&hol
 [back to top](#table-of-contents)
 
 ## multiRouter / multiSwitcher
-### 1>8 router and 8>1 switcher for cvs and audio signals
+### 1>8 stereo router and 8>1 stereo switcher for cvs and audio signals
 
 ![multiRtMultiSw](https://github.com/sickozell/SickoCV/assets/80784296/3e728cfe-ac30-4e70-bc50-72cfffbc1fe6)
 
