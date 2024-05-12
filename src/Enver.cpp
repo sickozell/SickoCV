@@ -559,9 +559,9 @@ struct Enver : Module {
 			break;
 		}
 
-		env = stageLevel[c] * 10;
+		env = stageLevel[c];
 
-		outputs[ENV_OUTPUT].setVoltage(env, c);
+		outputs[ENV_OUTPUT].setVoltage(env * 10, c);
 				
 		
 		// --------- eoA eoD eoS eoR
