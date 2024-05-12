@@ -28,6 +28,7 @@ void init(Plugin* p) {
 	p->addModel(modelDrumPlayer);
 	p->addModel(modelDrumPlayerPlus);
 	p->addModel(modelDrumPlayerXtra);
+	p->addModel(modelEnver);
 	p->addModel(modelHolder);
 	p->addModel(modelHolderCompact);
 	p->addModel(modelHolder8);

@@ -1,4 +1,4 @@
-# SickoCV v2.6.11-beta2
+# SickoCV v2.6.11-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -14,11 +14,13 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## Current modules in beta testing:
 - multiSwitcher
 - multiRouter
+- enver
 
 ## **to do list:** 
 - 
 
 ## **changelog**  
+- added 'enver' module.
 - added 'multiSwitcher' and 'multiRouter' modules.
 
 # SickoCV v2.6.11

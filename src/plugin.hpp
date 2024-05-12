@@ -28,6 +28,7 @@ extern Model* modelDrummer4Plus;
 extern Model* modelDrumPlayer;
 extern Model* modelDrumPlayerPlus;
 extern Model* modelDrumPlayerXtra;
+extern Model* modelEnver;
 extern Model* modelHolder;
 extern Model* modelHolderCompact;
 extern Model* modelHolder8;
