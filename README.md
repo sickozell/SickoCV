@@ -26,7 +26,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.11
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/bf545094-11df-4a16-a00c-92bb44543ed4)
+![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/da516ece-894c-43ce-9ed9-1175551a1623)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -42,6 +42,7 @@ VCV Rack plugin modules
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
+- [enver](#enver)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
 - [multiRouter / multiSwitcher](#multirouter--multiswitcher)
@@ -488,6 +489,14 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 - Light Box Fade (Fade time of Light Boxes is set here: Slow (0.5s), Normal (0.25s), Fast (0.1s)
 
 [back to top](#table-of-contents)
+
+## enver
+### Envelope generator with stereo VCA
+
+![enver](https://github.com/sickozell/SickoCV/assets/80784296/7657611f-b5e2-4783-95ac-798240972209)
+
+#### - INSTRUCTIONS
+Coming soon.
 
 ## holder / holder Compact / holder8
 ### Sample & Hold or Track & Hold with noise generator, probability and range
