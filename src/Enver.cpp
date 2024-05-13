@@ -22,6 +22,7 @@ struct Enver : Module {
 		TRIGBUT_PARAM,
 		MODE_SWITCH,
 		SHAPE_PARAM,
+		SHAPEATNV_PARAM,
 		ATTACK_PARAM,
 		ATTACKATNV_PARAM,
 		DECAY_PARAM,
@@ -30,16 +31,20 @@ struct Enver : Module {
 		SUSTAINATNV_PARAM,
 		RELEASE_PARAM,
 		RELEASEATNV_PARAM,
+		VOL_PARAM,
 		NUM_PARAMS 
 	};
 	enum InputIds {
 		TRIG_INPUT,
+		RETRIG_INPUT,
+		SHAPE_INPUT,
 		ATTACK_INPUT,
 		DECAY_INPUT,
 		SUSTAIN_INPUT,
 		RELEASE_INPUT,
 		LEFT_INPUT,
 		RIGHT_INPUT,
+		VOL_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -48,6 +53,7 @@ struct Enver : Module {
 		SUSTAIN_OUTPUT,
 		RELEASE_OUTPUT,
 		ENV_OUTPUT,
+		INV_OUTPUT,
 		LEFT_OUTPUT,
 		RIGHT_OUTPUT,
 		NUM_OUTPUTS
@@ -65,23 +71,27 @@ struct Enver : Module {
 
 	float shape;
 
+	float trigButton = 0;
+
 	float trigValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevTrigValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	float retrigValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float prevRetrigValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	int polyOuts = POLYPHONIC;
 	int polyMaster = POLYPHONIC;
 	
 	int stage[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	//int stageSample[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float stageSample[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	//int maxStageSample[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float maxStageSample[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float stageLevel[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 
-	int chan;
+	int chanVca = 1;
+	int chanTrig = 1;
 
-	float env = 0.f;
+	float env[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	float outSignal = 0.f;
 
 	float attackValue;
@@ -89,7 +99,7 @@ struct Enver : Module {
 	float sustainValue;
 	float releaseValue;
 
-	float refValue = 0.f;
+	float refValue[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 
 	float stageCoeff[16];
 
@@ -102,17 +112,18 @@ struct Enver : Module {
 	float releaseKnob = 0.f;
 	float prevReleaseKnob = -1.f;
 
-	float masterLevel[16];
+	float masterLevel;
+	float volLevel;
 
-	bool eoA = false;
-	bool eoD = false;
-	bool eoS = false;
-	bool eoR = false;
+	bool eoA[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool eoD[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool eoS[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool eoR[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
-	float eoAtime = 0.f;
-	float eoDtime = 0.f;
-	float eoStime = 0.f;
-	float eoRtime = 0.f;
+	float eoAtime[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+	float eoDtime[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+	float eoStime[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+	float eoRtime[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 
 
 	static constexpr float minStageTime = 1.f;  // in milliseconds
@@ -126,42 +137,52 @@ struct Enver : Module {
 		configSwitch(MODE_SWITCH, 0.f, 2.f, 0.f, "Mode", {"Envelope", "Function", "Loop"});
 		configSwitch(TRIGBUT_PARAM, 0.f, 1.f, 0.f, "Gate/Trig", {"OFF", "ON"});
 		configInput(TRIG_INPUT,"Gate/Trig");
+		configInput(RETRIG_INPUT,"Retrig");
+
 		configParam(SHAPE_PARAM, 0.f, 1.f, 0.5f, "Shape","", 0, 100);
+		configParam(SHAPEATNV_PARAM, -1.f, 1.f, 0.f, "Shape CV","%", 0, 100);
+		configInput(SHAPE_INPUT,"Shape");
 
 		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
-		configInput(ATTACK_INPUT,"Attack");
 		configParam(ATTACKATNV_PARAM, -1.f, 1.f, 0.f, "Attack CV","%", 0, 100);
+		configInput(ATTACK_INPUT,"Attack");
 
 		configParam(DECAY_PARAM, 0.f, 1.f, 0.f, "Decay", " ms", maxStageTime / minStageTime, minStageTime);
-		configInput(DECAY_INPUT,"Decay");
 		configParam(DECAYATNV_PARAM, -1.f, 1.f, 0.f, "Decay CV","%", 0, 100);
+		configInput(DECAY_INPUT,"Decay");
 
 		configParam(SUSTAIN_PARAM, 0.f, 1.f, 1.f, "Sustain","%", 0, 100);
-		configInput(SUSTAIN_INPUT,"Sustain");
 		configParam(SUSTAINATNV_PARAM, -1.f, 1.f, 0.f, "Sustain CV","%", 0, 100);
+		configInput(SUSTAIN_INPUT,"Sustain");
 
 		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
-		configInput(RELEASE_INPUT,"Release");
 		configParam(RELEASEATNV_PARAM, -1.f, 1.f, 0.f, "Release CV","%", 0, 100);
+		configInput(RELEASE_INPUT,"Release");
 		
 		configOutput(ATTACK_OUTPUT,"Attack");
 		configOutput(DECAY_OUTPUT,"Decay");
 		configOutput(SUSTAIN_OUTPUT,"Sustain");
 		configOutput(RELEASE_OUTPUT,"Release");
 		configOutput(ENV_OUTPUT,"Envelope");
+		configOutput(INV_OUTPUT,"Inv.Envelope");
 
 		configInput(LEFT_INPUT,"Left");
 		configInput(RIGHT_INPUT,"Right");
+
+		configParam(VOL_PARAM, 0.f, 1.f, 1.f, "Vol","", 0, 100);
+		configInput(VOL_INPUT,"Vol");
 
 		configOutput(LEFT_OUTPUT,"Left");
 		configOutput(RIGHT_OUTPUT,"Right");
 
 	}
 
+	/*
 	struct EnverSwitch : SickoSwitch_CKSS_Three_Vert
     {
         Enver* enver;
     };
+    */
 
 	void onReset(const ResetEvent &e) override {
 		/*
@@ -319,311 +340,417 @@ struct Enver : Module {
 		else if (sustainValue < 0)
 			sustainValue = 0;
 
-		int c = 0;
+		if (inputs[TRIG_INPUT].isConnected())
+			chanTrig = inputs[TRIG_INPUT].getChannels();
+		else
+			chanTrig = 1;
 
-		trigValue[c] = inputs[TRIG_INPUT].getVoltage() + params[TRIGBUT_PARAM].getValue();
-		lights[TRIGBUT_LIGHT].setBrightness(trigValue[c]);
+		trigButton = params[TRIGBUT_PARAM].getValue();
+		lights[TRIGBUT_LIGHT].setBrightness(trigButton);
 
-		switch (mode) {
-			case ENV_MODE:
-				if (trigValue[c] >= 1.f) {
-					if (stage[c] == STOP_STAGE) {
-						stage[c] = ATTACK_STAGE;
-						stageSample[c] = 0;
-						refValue = 0;
-					} else {
-						if (stage[c] == RELEASE_STAGE) {
+		for (int c = 0; c < chanTrig; c++) {
+
+			trigValue[c] = inputs[TRIG_INPUT].getVoltage(c) + trigButton;
+			//lights[TRIGBUT_LIGHT].setBrightness(trigValue[c]);
+
+			switch (mode) {
+				case ENV_MODE:
+					if (trigValue[c] >= 1.f) {
+						if (stage[c] == STOP_STAGE) {
 							stage[c] = ATTACK_STAGE;
 							stageSample[c] = 0;
-							refValue = stageLevel[c];
-
-							eoR = true;
-							eoRtime = oneMsSamples;
-							outputs[RELEASE_OUTPUT].setVoltage(10.f);
-						}
-					}
-				} else {
-					if (stage[c] != STOP_STAGE) {
-						if (stage[c] != RELEASE_STAGE) {
-							if (stage[c] == SUSTAIN_STAGE) {
-								eoS = true;
-								eoStime = oneMsSamples;
-								outputs[SUSTAIN_OUTPUT].setVoltage(10.f);
-								//refValue = sustainValue;
-							} else	if (stage[c] == ATTACK_STAGE) {
-								eoA = true;
-								eoAtime = oneMsSamples;
-								outputs[ATTACK_OUTPUT].setVoltage(10.f);
-								//refValue = stageLevel[c];
-							} else if (stage[c] == DECAY_STAGE) {
-								eoD = true;
-								eoDtime = oneMsSamples;
-								outputs[DECAY_OUTPUT].setVoltage(10.f);
-								//refValue = stageLevel[c];
-							}
-							refValue = stageLevel[c];
-							stage[c] = RELEASE_STAGE;
-							stageSample[c] = 0;
-						}
-					}
-				}
-			break;
-
-			case FUNC_MODE:
-				if (trigValue[c] >= 1.f && prevTrigValue[c] < 1.f) {
-					if (stage[c] == STOP_STAGE) {
-						stage[c] = ATTACK_STAGE;
-						stageSample[c] = 0;
-						refValue = 0;
-					} else {
-						if (stage[c] == RELEASE_STAGE) {
-							stage[c] = ATTACK_STAGE;
-
-							eoR = true;
-							eoRtime = oneMsSamples;
-							outputs[RELEASE_OUTPUT].setVoltage(10.f);
+							refValue[c] = 0;
 						} else {
-							if (stage[c] == SUSTAIN_STAGE) {
-								eoS = true;
-								eoStime = oneMsSamples;
-								outputs[SUSTAIN_OUTPUT].setVoltage(10.f);
-							} else	if (stage[c] == ATTACK_STAGE) {
-								eoA = true;
-								eoAtime = oneMsSamples;
-								outputs[ATTACK_OUTPUT].setVoltage(10.f);
-							} else if (stage[c] == DECAY_STAGE) {
-								eoD = true;
-								eoDtime = oneMsSamples;
-								outputs[DECAY_OUTPUT].setVoltage(10.f);
+							if (stage[c] == RELEASE_STAGE) {
+								stage[c] = ATTACK_STAGE;
+								stageSample[c] = 0;
+								refValue[c] = stageLevel[c];
+
+								eoR[c] = true;
+								eoRtime[c] = oneMsSamples;
+								outputs[RELEASE_OUTPUT].setVoltage(10.f, c);
 							}
-							stage[c] = RELEASE_STAGE;
-							stageSample[c] = 0;
-							refValue = stageLevel[c];
+						}
+					} else {
+						if (stage[c] != STOP_STAGE) {
+							if (stage[c] != RELEASE_STAGE) {
+								if (stage[c] == SUSTAIN_STAGE) {
+									eoS[c] = true;
+									eoStime[c] = oneMsSamples;
+									outputs[SUSTAIN_OUTPUT].setVoltage(10.f, c);
+								} else	if (stage[c] == ATTACK_STAGE) {
+									eoA[c] = true;
+									eoAtime[c] = oneMsSamples;
+									outputs[ATTACK_OUTPUT].setVoltage(10.f, c);
+								} else if (stage[c] == DECAY_STAGE) {
+									eoD[c] = true;
+									eoDtime[c] = oneMsSamples;
+									outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+								}
+								refValue[c] = stageLevel[c];
+								stage[c] = RELEASE_STAGE;
+								stageSample[c] = 0;
+							}
 						}
 					}
-				}
-				prevTrigValue[c] = trigValue[c];
-			break;
+				break;
 
-			case LOOP_MODE:
-				if (trigValue[c] >= 1.f && prevTrigValue[c] < 1.f) {
-					if (stage[c] == STOP_STAGE) {
-						stage[c] = ATTACK_STAGE;
-						stageSample[c] = 0;
-						refValue = 0;
-					} else {
-						if (stage[c] == RELEASE_STAGE) {
-							eoD = true;
-							eoDtime = oneMsSamples;
-							outputs[DECAY_OUTPUT].setVoltage(10.f);
+				case FUNC_MODE:
+					if (trigValue[c] >= 1.f && prevTrigValue[c] < 1.f) {
+						if (stage[c] == STOP_STAGE) {
 							stage[c] = ATTACK_STAGE;
+							stageSample[c] = 0;
+							refValue[c] = 0;
 						} else {
-							if (stage[c] == ATTACK_STAGE) {
-								eoA = true;
-								eoAtime = oneMsSamples;
-								outputs[ATTACK_OUTPUT].setVoltage(10.f);
+							if (stage[c] == RELEASE_STAGE) {
+								stage[c] = ATTACK_STAGE;
+
+								eoR[c] = true;
+								eoRtime[c] = oneMsSamples;
+								outputs[RELEASE_OUTPUT].setVoltage(10.f, c);
 							} else {
-								eoD = true;
-								eoDtime = oneMsSamples;
-								outputs[DECAY_OUTPUT].setVoltage(10.f);
+								if (stage[c] == SUSTAIN_STAGE) {
+									eoS[c] = true;
+									eoStime[c] = oneMsSamples;
+									outputs[SUSTAIN_OUTPUT].setVoltage(10.f, c);
+								} else	if (stage[c] == ATTACK_STAGE) {
+									eoA[c] = true;
+									eoAtime[c] = oneMsSamples;
+									outputs[ATTACK_OUTPUT].setVoltage(10.f, c);
+								} else if (stage[c] == DECAY_STAGE) {
+									eoD[c] = true;
+									eoDtime[c] = oneMsSamples;
+									outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+								}
+								stage[c] = RELEASE_STAGE;
+								stageSample[c] = 0;
+								refValue[c] = stageLevel[c];
 							}
-							stage[c] = RELEASE_STAGE;
 						}
-						stageSample[c] = 0;
-						refValue = stageLevel[c];
 					}
-				}
-				prevTrigValue[c] = trigValue[c];
-			break;
+					prevTrigValue[c] = trigValue[c];
+				break;
 
-		}
+				case LOOP_MODE:
+					if (trigValue[c] >= 1.f && prevTrigValue[c] < 1.f) {
+						if (stage[c] == STOP_STAGE) {
+							stage[c] = ATTACK_STAGE;
+							stageSample[c] = 0;
+							refValue[c] = 0;
+						} else {
+							if (stage[c] == RELEASE_STAGE) {
+								eoD[c] = true;
+								eoDtime[c] = oneMsSamples;
+								outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+								stage[c] = ATTACK_STAGE;
+							} else {
+								if (stage[c] == ATTACK_STAGE) {
+									eoA[c] = true;
+									eoAtime[c] = oneMsSamples;
+									outputs[ATTACK_OUTPUT].setVoltage(10.f, c);
+								} else {
+									eoD[c] = true;
+									eoDtime[c] = oneMsSamples;
+									outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+								}
+								stage[c] = RELEASE_STAGE;
+							}
+							stageSample[c] = 0;
+							refValue[c] = stageLevel[c];
+						}
+					}
+					prevTrigValue[c] = trigValue[c];
+				break;
 
-		switch (stage[c]) {
-			case ATTACK_STAGE:
+			}
 
-				stageSample[c]++;
-				attackKnob = params[ATTACK_PARAM].getValue();
-				if (attackKnob != prevAttackKnob)
-					attackValue = convertCVToMs(attackKnob);
-				prevAttackKnob = attackKnob;
+			switch (stage[c]) {
+				case ATTACK_STAGE:
 
-				if (!inputs[ATTACK_INPUT].isConnected()) {
-					maxStageSample[c] = attackValue * oneMsSamples;
-				} else {
-					maxStageSample[c] = (attackValue + (1000 * inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue())) * oneMsSamples;
-					if (maxStageSample[c] > tenSmS)
-						maxStageSample[c] = tenSmS;
-					else if (maxStageSample[c] < 0)
-						maxStageSample[c] = 0;
-				}
+					stageSample[c]++;
+					attackKnob = params[ATTACK_PARAM].getValue();
+					if (attackKnob != prevAttackKnob)
+						attackValue = convertCVToMs(attackKnob);
+					prevAttackKnob = attackKnob;
 
-				stageLevel[c] = (shapeResponse(stageSample[c] / maxStageSample[c]) * (1 - refValue)) + refValue;
+					if (!inputs[ATTACK_INPUT].isConnected()) {
+						maxStageSample[c] = attackValue * oneMsSamples;
+					} else {
+						maxStageSample[c] = (attackValue + (1000 * inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue())) * oneMsSamples;
+						if (maxStageSample[c] > tenSmS)
+							maxStageSample[c] = tenSmS;
+						else if (maxStageSample[c] < 0)
+							maxStageSample[c] = 0;
+					}
 
-				if (stageSample[c] >= maxStageSample[c]) {
-					
-					stage[c] = DECAY_STAGE;
-					stageSample[c] = 0;
-					stageLevel[c] = 1.f;
-
-					eoA = true;
-					eoAtime = oneMsSamples;
-					outputs[ATTACK_OUTPUT].setVoltage(10.f);
-				}
-
-			break;
-
-			case DECAY_STAGE:
-				stageSample[c]++;
-				decayKnob = params[DECAY_PARAM].getValue();
-				if (decayKnob != prevDecayKnob)
-					decayValue = convertCVToMs(decayKnob);
-				prevDecayKnob = decayKnob;
-
-				if (!inputs[DECAY_INPUT].isConnected()) {
-					maxStageSample[c] = decayValue * oneMsSamples;
-				} else {
-					maxStageSample[c] = (decayValue + (1000 * inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue())) * oneMsSamples;
-					if (maxStageSample[c] > tenSmS)
-						maxStageSample[c] = tenSmS;
-					else if (maxStageSample[c] < 0)
-						maxStageSample[c] = 0;
-				}
-
-				if (mode != LOOP_MODE) {
-					stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * (1 - sustainValue)) + sustainValue;
+					stageLevel[c] = (shapeResponse(stageSample[c] / maxStageSample[c]) * (1 - refValue[c])) + refValue[c];
 
 					if (stageSample[c] >= maxStageSample[c]) {
-						stage[c] = SUSTAIN_STAGE;
-
+						
+						stage[c] = DECAY_STAGE;
 						stageSample[c] = 0;
-						stageLevel[c] = sustainValue;
+						stageLevel[c] = 1.f;
 
-						eoD = true;
-						eoDtime = oneMsSamples;
-						outputs[DECAY_OUTPUT].setVoltage(10.f);
-
+						eoA[c] = true;
+						eoAtime[c] = oneMsSamples;
+						outputs[ATTACK_OUTPUT].setVoltage(10.f, c);
 					}
-				} else {	// loop mode
 
-					stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) );
+				break;
 
-					if (stageSample[c] >= maxStageSample[c]) {
+				case DECAY_STAGE:
+
+					retrigValue[c] = inputs[RETRIG_INPUT].getVoltage(c);
+					if (retrigValue[c] >= 1.f && prevRetrigValue[c] < 1) {
+
+						refValue[c] = stageLevel[c];
+
 						stage[c] = ATTACK_STAGE;
 
 						stageSample[c] = 0;
-						stageLevel[c] = 0;
+						//stageLevel[c] = 0;
 
-						eoD = true;
-						eoDtime = oneMsSamples;
-						outputs[DECAY_OUTPUT].setVoltage(10.f);
+						eoD[c] = true;
+						eoDtime[c] = oneMsSamples;
+						outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+
+					} else {
+
+						stageSample[c]++;
+						decayKnob = params[DECAY_PARAM].getValue();
+						if (decayKnob != prevDecayKnob)
+							decayValue = convertCVToMs(decayKnob);
+						prevDecayKnob = decayKnob;
+
+						if (!inputs[DECAY_INPUT].isConnected()) {
+							maxStageSample[c] = decayValue * oneMsSamples;
+						} else {
+							maxStageSample[c] = (decayValue + (1000 * inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue())) * oneMsSamples;
+							if (maxStageSample[c] > tenSmS)
+								maxStageSample[c] = tenSmS;
+							else if (maxStageSample[c] < 0)
+								maxStageSample[c] = 0;
+						}
+
+						if (mode != LOOP_MODE) {
+							stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * (1 - sustainValue)) + sustainValue;
+
+							if (stageSample[c] >= maxStageSample[c]) {
+								stage[c] = SUSTAIN_STAGE;
+
+								stageSample[c] = 0;
+								stageLevel[c] = sustainValue;
+
+								eoD[c] = true;
+								eoDtime[c] = oneMsSamples;
+								outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+
+							}
+						} else {	// loop mode
+
+							stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) );
+
+							if (stageSample[c] >= maxStageSample[c]) {
+								stage[c] = ATTACK_STAGE;
+
+								stageSample[c] = 0;
+								stageLevel[c] = 0;
+
+								eoD[c] = true;
+								eoDtime[c] = oneMsSamples;
+								outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+
+							}
+						}
+					}
+					retrigValue[c] = retrigValue[c];
+
+				break;
+
+				case SUSTAIN_STAGE:
+
+					retrigValue[c] = inputs[RETRIG_INPUT].getVoltage(c);
+					if (retrigValue[c] >= 1.f && prevRetrigValue[c] < 1) {
+
+						refValue[c] = sustainValue;
+
+						stage[c] = ATTACK_STAGE;
+
+						stageSample[c] = 0;
+						//stageLevel[c] = 0;
+
+						eoS[c] = true;
+						eoStime[c] = oneMsSamples;
+						outputs[SUSTAIN_OUTPUT].setVoltage(10.f, c);
+
+
+					} else {
+						stageLevel[c] = sustainValue;
+					}
+					retrigValue[c] = retrigValue[c];
+
+				break;
+
+				case RELEASE_STAGE:
+					stageSample[c]++;
+					releaseKnob = params[RELEASE_PARAM].getValue();
+					if (releaseKnob != prevReleaseKnob)
+						releaseValue = convertCVToMs(releaseKnob);
+					prevReleaseKnob = releaseKnob;
+
+					if (!inputs[RELEASE_INPUT].isConnected()) {
+						maxStageSample[c] = releaseValue * oneMsSamples;
+					} else {
+						maxStageSample[c] = (releaseValue + (1000 * inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue())) * oneMsSamples;
+						if (maxStageSample[c] > tenSmS)
+							maxStageSample[c] = tenSmS;
+						else if (maxStageSample[c] < 0)
+							maxStageSample[c] = 0;
+					}
+
+					stageLevel[c] = shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * refValue[c];
+
+					if (stageSample[c] >= maxStageSample[c]) {
+						
+						stageSample[c] = 0;
+						stageLevel[c] = 0.f;
+
+						stage[c] = STOP_STAGE;
+						eoR[c] = true;
+						eoRtime[c] = oneMsSamples;
+						outputs[RELEASE_OUTPUT].setVoltage(10.f, c);
 
 					}
-				}
-			break;
 
-			case SUSTAIN_STAGE:
-				stageLevel[c] = sustainValue;
-			break;
+				break;
+			}
 
-			case RELEASE_STAGE:
-				stageSample[c]++;
-				releaseKnob = params[RELEASE_PARAM].getValue();
-				if (releaseKnob != prevReleaseKnob)
-					releaseValue = convertCVToMs(releaseKnob);
-				prevReleaseKnob = releaseKnob;
+			env[c] = stageLevel[c];
 
-				if (!inputs[RELEASE_INPUT].isConnected()) {
-					maxStageSample[c] = releaseValue * oneMsSamples;
-				} else {
-					maxStageSample[c] = (releaseValue + (1000 * inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue())) * oneMsSamples;
-					if (maxStageSample[c] > tenSmS)
-						maxStageSample[c] = tenSmS;
-					else if (maxStageSample[c] < 0)
-						maxStageSample[c] = 0;
-				}
+			if (mode == LOOP_MODE)
+				env[c] *= sustainValue;
 
-				stageLevel[c] = shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * refValue;
-
-				if (stageSample[c] >= maxStageSample[c]) {
+			outputs[ENV_OUTPUT].setVoltage(env[c] * 10, c);
+			outputs[INV_OUTPUT].setVoltage((1 - env[c]) * 10, c);
 					
-					stageSample[c] = 0;
-					stageLevel[c] = 0.f;
+			
+			// --------- eoA eoD eoS eoR
 
-					stage[c] = STOP_STAGE;
-					eoR = true;
-					eoRtime = oneMsSamples;
-					outputs[RELEASE_OUTPUT].setVoltage(10.f);
-
+			if (eoA[c]) {
+				eoAtime[c]--;
+				if (eoAtime[c] < 0) {
+					eoA[c] = false;
+					outputs[ATTACK_OUTPUT].setVoltage(0.f, c);
 				}
+			}
 
-			break;
+			if (eoD[c]) {
+				eoDtime[c]--;
+				if (eoDtime[c] < 0) {
+					eoD[c] = false;
+					outputs[DECAY_OUTPUT].setVoltage(0.f, c);
+				}
+			}
+
+			if (eoS[c]) {
+				eoStime[c]--;
+				if (eoStime[c] < 0) {
+					eoS[c] = false;
+					outputs[SUSTAIN_OUTPUT].setVoltage(0.f, c);
+				}
+			}
+
+			if (eoR[c]) {
+				eoRtime[c]--;
+				if (eoRtime[c] < 0) {
+					eoR[c] = false;
+					outputs[RELEASE_OUTPUT].setVoltage(0.f, c);
+				}
+			}
+
 		}
-
-		env = stageLevel[c];
-
-		outputs[ENV_OUTPUT].setVoltage(env * 10, c);
-				
 		
-		// --------- eoA eoD eoS eoR
+		outputs[ATTACK_OUTPUT].setChannels(chanTrig);
+		outputs[DECAY_OUTPUT].setChannels(chanTrig);
+		outputs[SUSTAIN_OUTPUT].setChannels(chanTrig);
+		outputs[RELEASE_OUTPUT].setChannels(chanTrig);
 
-		if (eoA) {
-			eoAtime--;
-			if (eoAtime < 0) {
-				eoA = false;
-				outputs[ATTACK_OUTPUT].setVoltage(0.f);
-			}
-		}
-
-		if (eoD) {
-			eoDtime--;
-			if (eoDtime < 0) {
-				eoD = false;
-				outputs[DECAY_OUTPUT].setVoltage(0.f);
-			}
-		}
-
-		if (eoS) {
-			eoStime--;
-			if (eoStime < 0) {
-				eoS = false;
-				outputs[SUSTAIN_OUTPUT].setVoltage(0.f);
-			}
-		}
-
-		if (eoR) {
-			eoRtime--;
-			if (eoRtime < 0) {
-				eoR = false;
-				outputs[RELEASE_OUTPUT].setVoltage(0.f);
-			}
-		}
+		outputs[ENV_OUTPUT].setChannels(chanTrig);
+		outputs[INV_OUTPUT].setChannels(chanTrig);
 
 		// --------- VCA
 
-		if (outputs[LEFT_OUTPUT].isConnected()) {
-			chan = inputs[LEFT_INPUT].getChannels();
-			for (int c = 0; c < chan; c++) {
-				outSignal = inputs[LEFT_INPUT].getVoltage(c) * env;
-				if (outSignal > 10.f)
-					outSignal = 10;
-				else if (outSignal < -10.f)
-					outSignal = -10.f;
-				outputs[LEFT_OUTPUT].setVoltage(outSignal, c);
-			}
-			outputs[LEFT_OUTPUT].setChannels(chan);
-		}
+		if (outputs[LEFT_OUTPUT].isConnected() || outputs[RIGHT_OUTPUT].isConnected()) {
 
-		if (outputs[RIGHT_OUTPUT].isConnected()) {
-			chan = inputs[RIGHT_INPUT].getChannels();
-			for (int c = 0; c < chan; c++) {
-				outSignal = inputs[RIGHT_INPUT].getVoltage(c) * env;
-				if (outSignal > 10.f)
-					outSignal = 10;
-				else if (outSignal < -10.f)
-					outSignal = -10.f;
-				outputs[RIGHT_OUTPUT].setVoltage(outSignal, c);
+			masterLevel = params[VOL_PARAM].getValue();
+
+			if (chanTrig == 1) {
+
+				if (!inputs[VOL_INPUT].isConnected())
+					volLevel = masterLevel;
+				else
+					volLevel = masterLevel * (inputs[VOL_INPUT].getVoltage(0) / 10);
+
+				if (volLevel > 1)
+					volLevel = 1;
+				else if (volLevel < 0)
+					volLevel = 0;
+
+				if (outputs[LEFT_OUTPUT].isConnected()) {
+					chanVca = inputs[LEFT_INPUT].getChannels();
+
+					for (int c = 0; c < chanVca; c++) {
+						outSignal = inputs[LEFT_INPUT].getVoltage(c) * env[0] * volLevel;
+						if (outSignal > 10.f)
+							outSignal = 10;
+						else if (outSignal < -10.f)
+							outSignal = -10.f;
+						outputs[LEFT_OUTPUT].setVoltage(outSignal, c);
+					}
+					outputs[LEFT_OUTPUT].setChannels(chanVca);
+				}
+
+				if (outputs[RIGHT_OUTPUT].isConnected()) {
+					chanVca = inputs[RIGHT_INPUT].getChannels();
+					for (int c = 0; c < chanVca; c++) {
+						outSignal = inputs[RIGHT_INPUT].getVoltage(c) * env[0] * volLevel;
+						if (outSignal > 10.f)
+							outSignal = 10;
+						else if (outSignal < -10.f)
+							outSignal = -10.f;
+						outputs[RIGHT_OUTPUT].setVoltage(outSignal, c);
+					}
+					outputs[RIGHT_OUTPUT].setChannels(chanVca);
+				}
+			} else {	// trigger polyPhony
+
+				for (int c = 0; c < chanTrig; c++) {
+
+					volLevel = masterLevel + (inputs[VOL_INPUT].getVoltage(c) / 10);
+
+					if (volLevel > 1)
+						volLevel = 1;
+					else if (volLevel < 0)
+						volLevel = 0;
+
+					outSignal = inputs[LEFT_INPUT].getVoltage(c) * env[c] * volLevel;
+					if (outSignal > 10.f)
+						outSignal = 10;
+					else if (outSignal < -10.f)
+						outSignal = -10.f;
+					outputs[LEFT_OUTPUT].setVoltage(outSignal, c);
+
+					outSignal = inputs[RIGHT_INPUT].getVoltage(c) * env[c] * volLevel;
+					if (outSignal > 10.f)
+						outSignal = 10;
+					else if (outSignal < -10.f)
+						outSignal = -10.f;
+					outputs[RIGHT_OUTPUT].setVoltage(outSignal, c);
+				}
+				outputs[LEFT_OUTPUT].setChannels(chanTrig);
+				outputs[RIGHT_OUTPUT].setChannels(chanTrig);
 			}
-			outputs[RIGHT_OUTPUT].setChannels(chan);
+
 		}
 		
 	}
@@ -640,71 +767,90 @@ struct EnverWidget : ModuleWidget {
 		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
-		const float xGateBut = 6;
-		const float xGateIn = 14.5;
-		const float yGate = 18;
+		const float xGate = 7.5;
+		const float xRetrig = 16.5;
+		const float yGateBut = 18.5;
+		const float yGateIn = 29;
+		
+		const float xMode = 25.351;
+		const float yMode = 16.668;
 
-		const float xSh = 10;
-		const float ySh = 27;
+		const float xSh = 41;
+		const float ySh = 17.475;
 
-		const float xMode = 34.3;
-		const float yMode = 22.5;
+		const float xShIn = 34;
+		const float xShAtn = 43.471;
+		const float yShIn = 29;
 
-		const float adsrXin = 7;
-		const float adsrXatnv = 16.9;
-		const float adsrXknob = 28.5;
+		const float adsrXstart = 8;
+		const float adsrXdelta = 11.8;
 
-		const float adsrYstart = 40;
-		const float adsrYdelta = 12.5;
+		const float adsrYknob = 48.035;
+		const float adsrYatnv = 59.8;
+		const float adsrYin = 69;
 
 		const float adsrOutX1 = 9.5;
 		const float adsrOutX2 = 22;
-		const float adsrOutY1 = 91.5;
-		const float adsrOutY2 = 101;
+		const float adsrOutY1 = 81.5;
+		const float adsrOutY2 = 91;
 
-		const float xEnv = 33.5;
-		const float yEnv = 97;
+		const float xInv = 33.5;
 
-		const float xA1 = 6;
-		const float xA2 = 15;
-		const float xA3 = 25.5;
-		const float xA4 = 34.5;
-		const float yAudio = 117;
+		const float xEnv = 43.5;
+		const float yEnv = 86;
 
-		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xGateBut, yGate)), module, Enver::TRIGBUT_PARAM, Enver::TRIGBUT_LIGHT));
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xGateIn, yGate)), module, Enver::TRIG_INPUT));
-
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xSh, ySh)), module, Enver::SHAPE_PARAM));
-
-		addParam(createParamCentered<Enver::EnverSwitch>(mm2px(Vec(xMode, yMode)), module, Enver::MODE_SWITCH));
-
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXin, adsrYstart)), module, Enver::ATTACK_INPUT));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXatnv, adsrYstart)), module, Enver::ATTACKATNV_PARAM));
-		addParam(createParamCentered<SickoKnob>(mm2px(Vec(adsrXknob, adsrYstart)), module, Enver::ATTACK_PARAM));
-	
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXin, adsrYstart+adsrYdelta)), module, Enver::DECAY_INPUT));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXatnv, adsrYstart+adsrYdelta)), module, Enver::DECAYATNV_PARAM));
-		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(adsrXknob, adsrYstart+adsrYdelta)), module, Enver::DECAY_PARAM));
-
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXin, adsrYstart+(2*adsrYdelta))), module, Enver::SUSTAIN_INPUT));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXatnv, adsrYstart+(2*adsrYdelta))), module, Enver::SUSTAINATNV_PARAM));
-		addParam(createParamCentered<SickoKnob>(mm2px(Vec(adsrXknob, adsrYstart+(2*adsrYdelta))), module, Enver::SUSTAIN_PARAM));
+		const float xIn = 9;
+		const float xVol = 25;
+		const float yVol = 108;
+		const float xOut = 42;
 		
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXin, adsrYstart+(3*adsrYdelta))), module, Enver::RELEASE_INPUT));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXatnv, adsrYstart+(3*adsrYdelta))), module, Enver::RELEASEATNV_PARAM));
-		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(adsrXknob, adsrYstart+(3*adsrYdelta))), module, Enver::RELEASE_PARAM));
+		const float yAudio1 = 107.5;
+		const float yAudio2 = 117;
+
+		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xGate, yGateBut)), module, Enver::TRIGBUT_PARAM, Enver::TRIGBUT_LIGHT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xGate, yGateIn)), module, Enver::TRIG_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRetrig, yGateIn)), module, Enver::RETRIG_INPUT));
+
+		//addParam(createParamCentered<Enver::EnverSwitch>(mm2px(Vec(xMode, yMode)), module, Enver::MODE_SWITCH));
+		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xMode, yMode)), module, Enver::MODE_SWITCH));
+
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xSh, ySh)), module, Enver::SHAPE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xShAtn, yShIn)), module, Enver::SHAPEATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xShIn, yShIn)), module, Enver::SHAPE_INPUT));
+		
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(adsrXstart, adsrYknob)), module, Enver::ATTACK_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart, adsrYatnv)), module, Enver::ATTACKATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart, adsrYin)), module, Enver::ATTACK_INPUT));
+		
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(adsrXstart+adsrXdelta, adsrYknob)), module, Enver::DECAY_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart+adsrXdelta, adsrYatnv)), module, Enver::DECAYATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart+adsrXdelta, adsrYin)), module, Enver::DECAY_INPUT));
+		
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(adsrXstart+(2*adsrXdelta), adsrYknob)), module, Enver::SUSTAIN_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart+(2*adsrXdelta), adsrYatnv)), module, Enver::SUSTAINATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart+(2*adsrXdelta), adsrYin)), module, Enver::SUSTAIN_INPUT));
+		
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(adsrXstart+(3*adsrXdelta), adsrYknob)), module, Enver::RELEASE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart+(3*adsrXdelta), adsrYatnv)), module, Enver::RELEASEATNV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart+(3*adsrXdelta), adsrYin)), module, Enver::RELEASE_INPUT));
+		
 		
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX1, adsrOutY1)), module, Enver::ATTACK_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX2, adsrOutY1)), module, Enver::DECAY_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX1, adsrOutY2)), module, Enver::SUSTAIN_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX2, adsrOutY2)), module, Enver::RELEASE_OUTPUT));
 
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xInv, adsrOutY2)), module, Enver::INV_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xEnv, yEnv)), module, Enver::ENV_OUTPUT));
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xA1, yAudio)), module, Enver::LEFT_INPUT));
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xA2, yAudio)), module, Enver::RIGHT_INPUT));
-		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xA3, yAudio)), module, Enver::LEFT_OUTPUT));
-		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xA4, yAudio)), module, Enver::RIGHT_OUTPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xIn, yAudio1)), module, Enver::LEFT_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xIn, yAudio2)), module, Enver::RIGHT_INPUT));
+
+		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xVol, yVol)), module, Enver::VOL_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xVol, yAudio2)), module, Enver::VOL_INPUT));
+
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yAudio1)), module, Enver::LEFT_OUTPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yAudio2)), module, Enver::RIGHT_OUTPUT));
 
 	}
 
