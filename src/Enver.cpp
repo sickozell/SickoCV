@@ -332,7 +332,11 @@ struct Enver : Module {
 
 		mode = params[MODE_SWITCH].getValue();
 
-		shape = params[SHAPE_PARAM].getValue();
+		shape = params[SHAPE_PARAM].getValue() + (inputs[SHAPE_INPUT].getVoltage() * params[SHAPEATNV_PARAM].getValue() * 0.1);
+		if (shape > 1)
+			shape = 1;
+		else if (shape < 0)
+			shape = 0;
 
 		sustainValue = params[SUSTAIN_PARAM].getValue() + (inputs[SUSTAIN_INPUT].getVoltage() * params[SUSTAINATNV_PARAM].getValue() * 0.1);
 		if (sustainValue > 1)
