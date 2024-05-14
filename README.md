@@ -581,7 +581,20 @@ If no sync cable is connected, pressing the SYNC button will act as a sample&hol
 ![multiRtMultiSw](https://github.com/sickozell/SickoCV/assets/80784296/b32b2642-5d30-4a08-8f69-ab0a2dbd47a4)
 
 #### - INSTRUCTIONS
-Coming soon.
+multiRouter routes a stereo input signal up to 8 different destinations, while multiSwitcher outputs a single stereo signal selected from one of the eight sources.  
+
+On both modules the steps advance via a trigger or can be addressed via a CV voltage depending on the TRG/CV switch.  
+
+Direction of advancing step is set by DIR switch and can be set to 'R' if random advancing is needed.  
+
+xFD knob sets the amount of crossfading between the steps up to 10 seconds.  
+
+The INs/OUTs selector sets the number of steps of the cycle.  
+
+The RST knob sets the step to be restarted from when RST input is triggered.  
+Please note that reset step can be outside of cycling steps of the INs/OUTs selector. For example the direction can be set to 'up', 6 cycling steps, and reset to step 8. In this case when reset is triggered it will restart from setp 8, then it will advance to step 7 and continue to step 1, and the next step will be the 6th.  
+
+Right inputs and outputs are normalled, so if they are unconnected the signal is taken from the left ones.
 
 [back to top](#table-of-contents)
 
