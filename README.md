@@ -503,7 +503,7 @@ the enver moodule operates with three different modes selecetd by the mode switc
 
 RET input is the retrigger function, available on decay or sustain stages.  
 
-SHAPE knob selects the shape of the envelope curve. It can be set to exponential, gentle, linear, logarithmic and their averaged positions. It can be modulated with a CV input and its attenuverter.
+SHAPE knob selects the shape of the envelope curve. It can be set to exponential, gentle, linear, logarithmic and their average positions. It can be modulated with a CV input and its attenuverter.
 
 Every single stage can be set with the dedicated knobs and modulated with a CV input and its attenuverter.
 
