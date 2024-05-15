@@ -496,7 +496,23 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ![enver](https://github.com/sickozell/SickoCV/assets/80784296/7657611f-b5e2-4783-95ac-798240972209)
 
 #### - INSTRUCTIONS
-Coming soon.
+the enver moodule operates with three different modes selecetd by the mode switch:
+- ENV: envelope mode works as a standard envelope generator.
+- FN: function mode starts the envelope with a trigger, instead of a gate, on the G/T button or its input, and keep holding the sustain stage until a new trigger is detected to go to the release stage.
+- LP: loop mode is a looped attack/decay generator. A trigger starts the attack stage, goes to the decay stage and automatically restarts the attack stage. A new trigger will go to the release stage.
+
+RET input is the retrigger function, available on decay or sustain stages.  
+
+SHAPE knob selects the shape of the envelope curve. It can be set to exponential, gentle, linear, logarithmic and their averaged positions. It can be modulated with a CV input and its attenuverter.
+
+Every single stage can be set with the dedicated knobs and modulated with a CV input and its attenuverter.
+
+ENV out is the envelope output.  
+INV out is the inverted envelope output to use for ducking purposes.  
+A D S R outputs send a 1ms trigger at the end of every single stage.  
+
+The built-in VCA section consists of a stereo audio input, a master volume knob, a volume CV input, and a stereo audio output.  
+Please note that using the volume CV input as a velocity control from an external keyboard, the volume knob has to be set to zero. 
 
 ## holder / holder Compact / holder8
 ### Sample & Hold or Track & Hold with noise generator, probability and range
