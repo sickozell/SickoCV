@@ -559,6 +559,7 @@ struct Enver : Module {
 
 								stageSample[c] = 0;
 								stageLevel[c] = 0;
+								refValue[c] = 0;
 
 								eoD[c] = true;
 								eoDtime[c] = oneMsSamples;
