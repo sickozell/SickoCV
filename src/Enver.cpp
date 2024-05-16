@@ -512,7 +512,6 @@ struct Enver : Module {
 						stage[c] = ATTACK_STAGE;
 
 						stageSample[c] = 0;
-						//stageLevel[c] = 0;
 
 						eoD[c] = true;
 						eoDtime[c] = oneMsSamples;
@@ -582,12 +581,10 @@ struct Enver : Module {
 						stage[c] = ATTACK_STAGE;
 
 						stageSample[c] = 0;
-						//stageLevel[c] = 0;
 
 						eoS[c] = true;
 						eoStime[c] = oneMsSamples;
 						outputs[SUSTAIN_OUTPUT].setVoltage(10.f, c);
-
 
 					} else {
 						stageLevel[c] = sustainValue;
