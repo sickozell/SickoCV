@@ -7,12 +7,10 @@
 #define DECAY_STAGE 2
 #define SUSTAIN_STAGE 3
 #define RELEASE_STAGE 4
-#define MONOPHONIC 0
-#define POLYPHONIC 1
 
 #include "plugin.hpp"
 
-using namespace std;
+//using namespace std;
 
 struct Enver : Module {
 
@@ -79,14 +77,10 @@ struct Enver : Module {
 	float retrigValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevRetrigValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	int polyOuts = POLYPHONIC;
-	int polyMaster = POLYPHONIC;
-	
 	int stage[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float stageSample[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float maxStageSample[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float stageLevel[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
 
 	int chanVca = 1;
 	int chanTrig = 1;
@@ -177,33 +171,8 @@ struct Enver : Module {
 
 	}
 
-	/*
-	struct EnverSwitch : SickoSwitch_CKSS_Three_Vert
-    {
-        Enver* enver;
-    };
-    */
-
 	void onReset(const ResetEvent &e) override {
-		/*
-		for (int i = 0; i < 16; i++) {
-			play[i] = false;
-			stage[i] = STOP_STAGE;
-			stageLevel[i] = 0;
-			voct[i] = 0.f;
-			prevVoct[i] = 11.f;
-			reversePlaying[i] = FORWARD;
-		}
-		clearSlot();
-		antiAlias = 1;
-		polyOuts = POLYPHONIC;
-		polyMaster = POLYPHONIC;
-		disableNav = false;
-		sampleInPatch = true;
-		prevTune = -1.f;
-		reverseStart = false;
-		system::removeRecursively(getPatchStorageDirectory().c_str());
-		*/
+
 		Module::onReset(e);
 	}
 
@@ -211,104 +180,10 @@ struct Enver : Module {
 		sampleRate = APP->engine->getSampleRate();
 		oneMsSamples = sampleRate / 1000;
 		tenSmS = sampleRate * 10;
-		//sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at speed 1x
 	}
-
-	/*
-	json_t *dataToJson() override {
-		
-		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
-		json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
-		json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
-		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
-		json_object_set_new(rootJ, "sampleInPatch", json_boolean(sampleInPatch));
-		json_object_set_new(rootJ, "Slot", json_string(storedPath.c_str()));
-		json_object_set_new(rootJ, "UserFolder", json_string(userFolder.c_str()));
-		
-		return rootJ;
-
-	}
-
-
-	void dataFromJson(json_t *rootJ) override {
-		
-		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
-		if (antiAliasJ)
-			antiAlias = json_integer_value(antiAliasJ);
-		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
-		if (polyOutsJ)
-			polyOuts = json_integer_value(polyOutsJ);
-		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
-		if (polyMasterJ)
-			polyMaster = json_integer_value(polyMasterJ);
-		json_t* disableNavJ = json_object_get(rootJ, "DisableNav");
-		if (disableNavJ)
-			disableNav = json_boolean_value(disableNavJ);
-		json_t* sampleInPatchJ = json_object_get(rootJ, "sampleInPatch");
-		if (sampleInPatchJ)
-			sampleInPatch = json_boolean_value(sampleInPatchJ);
-		json_t *slotJ = json_object_get(rootJ, "Slot");
-		if (slotJ) {
-			storedPath = json_string_value(slotJ);
-			if (storedPath != "")
-				loadSample(storedPath);
-		}
-		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
-		if (userFolderJ) {
-			userFolder = json_string_value(userFolderJ);
-			if (userFolder != "") {
-				createFolder(userFolder);
-				if (rootFound) {
-					folderTreeData.push_back(tempTreeData);
-					folderTreeDisplay.push_back(tempTreeDisplay);
-				}
-			}
-		}
-		
-	}
-	*/
-	
-	/*
-	bool isPolyOuts() {
-		return polyOuts;
-	}
-
-	void setPolyOuts(bool poly) {
-		if (poly) 
-			polyOuts = 1;
-		else {
-			polyOuts = 0;
-			outputs[OUT_OUTPUT].setChannels(1);
-		}
-	}
-	*/
 
 	float shapeResponse(float value) {
 		
-		//return ((expTable[0][int(expTableCoeff * value)] * shape) + (expTable[1][int(expTableCoeff * value)] * (1-shape)));
-
-		/*
-		float a;
-		float b;
-		
-		if (shape < 0.25f) {
-			a = expTable[0][int(expTableCoeff * value)] * (1 - shape * 4.f);
-			b = expTable[2][int(expTableCoeff * value)] * (shape * 4.f);
-		} else if (shape < 0.5f) {
-			a = expTable[2][int(expTableCoeff * value)] * (1 - ((shape - 0.25f) * 4.f));
-			b = value * ((shape - 0.25f) * 4.f);
-		} else if (shape < 0.75f) {
-			a = value * (1 - ((shape - 0.5f) * 4.f));
-			b = expTable[2][int(expTableCoeff * value)] * ((shape - 0.5f) * 4.f);
-		} else {
-			a = expTable[2][int(expTableCoeff * value)] * (1 - ((shape - 0.75f) * 4.f));
-			b = expTable[1][int(expTableCoeff * value)] * ((shape - 0.75f) * 4.f);
-		}
-
-		return a+b;
-		*/
-
 		if (shape < 0.25f) {
 			return (expTable[0][int(expTableCoeff * value)] * (1 - shape * 4.f)) + (expTable[2][int(expTableCoeff * value)] * (shape * 4.f));
 		} else if (shape < 0.5f) {
@@ -318,10 +193,7 @@ struct Enver : Module {
 		} else {
 			return (expTable[2][int(expTableCoeff * value)] * (1 - ((shape - 0.75f) * 4.f))) + (expTable[1][int(expTableCoeff * value)] * ((shape - 0.75f) * 4.f));
 		}		
-	}
 
-	static float convertCVToSeconds(float cv) {		
-		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}
 
 	static float convertCVToMs(float cv) {		
@@ -355,7 +227,6 @@ struct Enver : Module {
 		for (int c = 0; c < chanTrig; c++) {
 
 			trigValue[c] = inputs[TRIG_INPUT].getVoltage(c) + trigButton;
-			//lights[TRIGBUT_LIGHT].setBrightness(trigValue[c]);
 
 			switch (mode) {
 				case ENV_MODE:
@@ -635,7 +506,6 @@ struct Enver : Module {
 			outputs[ENV_OUTPUT].setVoltage(env[c] * 10, c);
 			outputs[INV_OUTPUT].setVoltage((1 - env[c]) * 10, c);
 					
-			
 			// --------- eoA eoD eoS eoR
 
 			if (eoA[c]) {
@@ -813,7 +683,6 @@ struct EnverWidget : ModuleWidget {
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xGate, yGateIn)), module, Enver::TRIG_INPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRetrig, yGateIn)), module, Enver::RETRIG_INPUT));
 
-		//addParam(createParamCentered<Enver::EnverSwitch>(mm2px(Vec(xMode, yMode)), module, Enver::MODE_SWITCH));
 		addParam(createParamCentered<CKSSThreeHorizontal>(mm2px(Vec(xMode, yMode)), module, Enver::MODE_SWITCH));
 
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xSh, ySh)), module, Enver::SHAPE_PARAM));
@@ -836,7 +705,6 @@ struct EnverWidget : ModuleWidget {
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(adsrXstart+(3*adsrXdelta), adsrYatnv)), module, Enver::RELEASEATNV_PARAM));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(adsrXstart+(3*adsrXdelta), adsrYin)), module, Enver::RELEASE_INPUT));
 		
-		
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX1, adsrOutY1)), module, Enver::ATTACK_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX2, adsrOutY1)), module, Enver::DECAY_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX1, adsrOutY2)), module, Enver::SUSTAIN_OUTPUT));
@@ -856,77 +724,6 @@ struct EnverWidget : ModuleWidget {
 
 	}
 
-	/*
-	void appendContextMenu(Menu *menu) override {
-	   	Enver *module = dynamic_cast<Enver*>(this->module);
-			assert(module);
-		
-		menu->addChild(new MenuSeparator());
-
-		menu->addChild(createMenuItem("Load Sample", "", [=]() {
-			//module->menuLoadSample();
-			bool temploadFromPatch = module->loadFromPatch;
-			module->loadFromPatch = false;
-			module->menuLoadSample();
-			if (module->restoreLoadFromPatch)
-				module->loadFromPatch = temploadFromPatch;
-		}));
-
-		if (module->folderTreeData.size() > 0) {
-			menu->addChild(createSubmenuItem("Samples Browser", "", [=](Menu* menu) {
-				//module->folderTreeData.resize(1);
-				//module->folderTreeDisplay.resize(1);
-				module->refreshRootFolder();
-				for (unsigned int i = 1; i < module->folderTreeData[0].size(); i++) {
-					if (module->folderTreeData[0][i].substr(module->folderTreeData[0][i].length()-1, module->folderTreeData[0][i].length()-1) == "/")  {
-						module->tempDir = module->folderTreeData[0][i];
-						menu->addChild(createSubmenuItem(module->folderTreeDisplay[0][i], "", [=](Menu* menu) {
-							loadSubfolder(menu, module->folderTreeData[0][i]);
-						}));
-					} else {
-						menu->addChild(createMenuItem(module->folderTreeDisplay[0][i], "", [=]() {module->loadFromPatch = false;module->loadSample(module->folderTreeData[0][i]);}));
-					}
-				}
-			}));
-		}
-
-		if (module->storedPath != "") {
-			menu->addChild(new MenuSeparator());
-			if (module->fileLoaded) {
-				menu->addChild(createMenuLabel("Current Sample:"));
-				menu->addChild(createMenuLabel(module->fileDescription));
-				menu->addChild(createMenuLabel(" " + module->samplerateDisplay));
-			} else {
-				menu->addChild(createMenuLabel("Sample ERROR:"));
-				menu->addChild(createMenuLabel(module->fileDescription));
-			}
-			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot();}));
-		}
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Select Samples Root", "", [=]() {module->selectRootFolder();}));
-
-		if (module->userFolder != "") {
-			menu->addChild(createMenuLabel(module->userFolder));
-			//menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
-		}
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
-				return module->isPolyOuts();
-			}, [=](bool poly) {
-				module->setPolyOuts(poly);
-		}));
-		menu->addChild(createBoolPtrMenuItem("Polyphonic Master IN", "", &module->polyMaster));
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
-		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
-	}
-	*/
 };
 
 Model *modelEnver = createModel<Enver, EnverWidget>("Enver");
