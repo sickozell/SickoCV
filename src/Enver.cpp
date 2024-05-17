@@ -171,10 +171,12 @@ struct Enver : Module {
 
 	}
 
+	/*
 	void onReset(const ResetEvent &e) override {
 
 		Module::onReset(e);
 	}
+	*/
 
 	void onSampleRateChange() override {
 		sampleRate = APP->engine->getSampleRate();
