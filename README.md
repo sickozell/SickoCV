@@ -26,7 +26,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.11
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/da516ece-894c-43ce-9ed9-1175551a1623)
+![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/4b27464c-7b44-4ffa-a0de-84cf2b323a3f)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -493,7 +493,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ## enver
 ### Envelope generator with stereo VCA
 
-![enver](https://github.com/sickozell/SickoCV/assets/80784296/7657611f-b5e2-4783-95ac-798240972209)
+![enver](https://github.com/sickozell/SickoCV/assets/80784296/4e3a4dde-8415-4cc9-8904-074e93179546)
 
 #### - INSTRUCTIONS
 the enver moodule operates with three different modes selecetd by the mode switch:
