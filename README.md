@@ -27,7 +27,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.11
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/4b27464c-7b44-4ffa-a0de-84cf2b323a3f)
+![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/964c0e26-1db2-4e36-9d80-5c0bb193102f)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -671,7 +671,7 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ## sickoAmp
 ### Polyphonic stereo VCA up to 200% with limiter
 
-![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/3aa3017d-13a1-4fa4-b169-6040c4b07492)
+![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/26e298b0-e804-41c1-b57b-6baeaa9ba388)
 
 #### - INSTRUCTIONS
 The 'Level Input' is the CV input and VCA knob is its attenuverter with a range up to ±200%, default is 100%.  
