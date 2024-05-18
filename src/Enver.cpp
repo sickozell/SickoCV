@@ -161,8 +161,8 @@ struct Enver : Module {
 		configOutput(RELEASE_OUTPUT,"Release");
 
 		configParam(INV_PARAM, 0.f, 1.f, 1.f, "Inv. Strength","%", 0, 100);
-		configOutput(ENV_OUTPUT,"Envelope");
 		configOutput(INV_OUTPUT,"Inv.Envelope");
+		configOutput(ENV_OUTPUT,"Envelope");
 
 		configInput(LEFT_INPUT,"Left");
 		configInput(RIGHT_INPUT,"Right");
