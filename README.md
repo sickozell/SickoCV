@@ -1,4 +1,4 @@
-# SickoCV v2.6.11-beta9
+# SickoCV v2.6.11-beta10
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -22,6 +22,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog**  
 - added 'enver' module.
 - added 'multiSwitcher' and 'multiRouter' modules.
+- improved usability of 'sickoAmp'.
 
 # SickoCV v2.6.11
 VCV Rack plugin modules
@@ -673,11 +674,14 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/3aa3017d-13a1-4fa4-b169-6040c4b07492)
 
 #### - INSTRUCTIONS
-Level knob can be set up to 200% and its CV input is added to its value.  
-Considering a usual modulation of 0-10v, CV attenuverter is set by default to 50% just to act as a traditional VCA.  
-If set to 100% it will modulate the signal level up to 2x.  
-Limit switch activates signal limiter set by Limit knob in the range up to ±10v.  
-If both inputs are used with polyphony, channels on the Right output replicate the same number of channels of the Left input.
+The 'Level Input' is the CV input and VCA knob is its attenuverter with a range up to ±200%, default is 100%.  
+The 'Base Level' knob can be set up to 200% and it's level is added to VCA result voltage.  
+
+LIM switch activates signal limiter set by Limit knob in the range up to ±10v.  
+
+When no CV input is connected, the module acts as attenuator/amplifier just using the base level knob.
+
+If CV input is polyphonc, the output will be polyphonic reflecting CV polyphony channels. Otherwise if CV input is monophonic and signal inputs are polyphonic, every signal channel will be processed with the same amplification.
 
 #### Right-click Menu
 - Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
