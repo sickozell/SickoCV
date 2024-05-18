@@ -1,4 +1,4 @@
-# SickoCV v2.6.11-beta7
+# SickoCV v2.6.11-beta8
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -508,7 +508,7 @@ SHAPE knob selects the shape of the envelope curve. It can be set to exponential
 Every single stage can be set with the dedicated knobs and modulated with a CV input and its attenuverter.
 
 ENV out is the envelope output.  
-INV out is the inverted envelope output to use for ducking purposes.  
+INV out is the inverted envelope output to use for ducking purposes. The INV knob is used to set the inverting strength. 
 A D S R outputs send a 1ms trigger at the end of every single stage.  
 
 The built-in VCA section consists of a stereo audio input, a master volume knob, a volume CV input, and a stereo audio output.  

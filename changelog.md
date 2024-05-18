@@ -1,4 +1,5 @@
 ### 2.6.11 (2024-05-xx)
+- added 'enver' module.
 - added 'multiSwitcher' and 'multiRouter' modules.
 
 ### 2.6.10 (2024-05-02)

@@ -29,6 +29,7 @@ struct Enver : Module {
 		SUSTAINATNV_PARAM,
 		RELEASE_PARAM,
 		RELEASEATNV_PARAM,
+		INV_PARAM,
 		VOL_PARAM,
 		NUM_PARAMS 
 	};
@@ -86,6 +87,7 @@ struct Enver : Module {
 	int chanTrig = 1;
 
 	float env[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+	float invStr;
 	float outSignal = 0.f;
 
 	float attackValue;
@@ -157,6 +159,8 @@ struct Enver : Module {
 		configOutput(DECAY_OUTPUT,"Decay");
 		configOutput(SUSTAIN_OUTPUT,"Sustain");
 		configOutput(RELEASE_OUTPUT,"Release");
+
+		configParam(INV_PARAM, 0.f, 1.f, 1.f, "Inv. Strength","%", 0, 100);
 		configOutput(ENV_OUTPUT,"Envelope");
 		configOutput(INV_OUTPUT,"Inv.Envelope");
 
@@ -217,6 +221,8 @@ struct Enver : Module {
 			sustainValue = 1;
 		else if (sustainValue < 0)
 			sustainValue = 0;
+
+		invStr = params[INV_PARAM].getValue();
 
 		if (inputs[TRIG_INPUT].isConnected())
 			chanTrig = inputs[TRIG_INPUT].getChannels();
@@ -506,7 +512,10 @@ struct Enver : Module {
 				env[c] *= sustainValue;
 
 			outputs[ENV_OUTPUT].setVoltage(env[c] * 10, c);
-			outputs[INV_OUTPUT].setVoltage((1 - env[c]) * 10, c);
+
+			//outputs[INV_OUTPUT].setVoltage((1 - env[c]) * 10, c);
+
+			outputs[INV_OUTPUT].setVoltage( (1 - (env[c])*invStr) * 10, c);
 					
 			// --------- eoA eoD eoS eoR
 
@@ -659,19 +668,20 @@ struct EnverWidget : ModuleWidget {
 		const float adsrXstart = 8;
 		const float adsrXdelta = 11.8;
 
-		const float adsrYknob = 48.035;
-		const float adsrYatnv = 59.8;
-		const float adsrYin = 69;
+		const float adsrYknob = 47.035;
+		const float adsrYatnv = 58.8;
+		const float adsrYin = 68;
 
 		const float adsrOutX1 = 9.5;
 		const float adsrOutX2 = 22;
-		const float adsrOutY1 = 81.5;
+		const float adsrOutY1 = 81;
 		const float adsrOutY2 = 91;
 
-		const float xInv = 33.5;
+		const float xInv = 33;
+		const float yInvKn = 82.9;
 
 		const float xEnv = 43.5;
-		const float yEnv = 86;
+		const float yEnv = 87;
 
 		const float xIn = 9;
 		const float xVol = 25;
@@ -712,6 +722,7 @@ struct EnverWidget : ModuleWidget {
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX1, adsrOutY2)), module, Enver::SUSTAIN_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(adsrOutX2, adsrOutY2)), module, Enver::RELEASE_OUTPUT));
 
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInv, yInvKn)), module, Enver::INV_PARAM));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xInv, adsrOutY2)), module, Enver::INV_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xEnv, yEnv)), module, Enver::ENV_OUTPUT));
 
