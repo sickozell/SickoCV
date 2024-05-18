@@ -155,10 +155,10 @@ struct Enver : Module {
 		configParam(RELEASEATNV_PARAM, -1.f, 1.f, 0.f, "Release CV","%", 0, 100);
 		configInput(RELEASE_INPUT,"Release");
 		
-		configOutput(ATTACK_OUTPUT,"Attack");
-		configOutput(DECAY_OUTPUT,"Decay");
-		configOutput(SUSTAIN_OUTPUT,"Sustain");
-		configOutput(RELEASE_OUTPUT,"Release");
+		configOutput(ATTACK_OUTPUT,"EoA");
+		configOutput(DECAY_OUTPUT,"EoD");
+		configOutput(SUSTAIN_OUTPUT,"EoS");
+		configOutput(RELEASE_OUTPUT,"EoR");
 
 		configParam(INV_PARAM, 0.f, 1.f, 1.f, "Inv. Strength","%", 0, 100);
 		configOutput(INV_OUTPUT,"Inv.Envelope");
