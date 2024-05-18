@@ -281,35 +281,44 @@ struct Enver : Module {
 				case FUNC_MODE:
 					if (trigValue[c] >= 1.f && prevTrigValue[c] < 1.f) {
 						if (stage[c] == STOP_STAGE) {
-							stage[c] = ATTACK_STAGE;
-							stageSample[c] = 0;
 							refValue[c] = 0;
+							stageSample[c] = 0;
+							stage[c] = ATTACK_STAGE;
 						} else {
-							if (stage[c] == RELEASE_STAGE) {
+							if (stage[c] == ATTACK_STAGE) {
+								//eoA[c] = true;
+								//eoAtime[c] = oneMsSamples;
+								//outputs[ATTACK_OUTPUT].setVoltage(10.f, c);
+							} else if (stage[c] == DECAY_STAGE) {
+								eoD[c] = true;
+								eoDtime[c] = oneMsSamples;
+								outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+
+								refValue[c] = stageLevel[c];
+								stageSample[c] = 0;
 								stage[c] = ATTACK_STAGE;
 
+							} else	if (stage[c] == RELEASE_STAGE) {
 								eoR[c] = true;
 								eoRtime[c] = oneMsSamples;
 								outputs[RELEASE_OUTPUT].setVoltage(10.f, c);
-							} else {
-								if (stage[c] == SUSTAIN_STAGE) {
-									eoS[c] = true;
-									eoStime[c] = oneMsSamples;
-									outputs[SUSTAIN_OUTPUT].setVoltage(10.f, c);
-								} else	if (stage[c] == ATTACK_STAGE) {
-									eoA[c] = true;
-									eoAtime[c] = oneMsSamples;
-									outputs[ATTACK_OUTPUT].setVoltage(10.f, c);
-								} else if (stage[c] == DECAY_STAGE) {
-									eoD[c] = true;
-									eoDtime[c] = oneMsSamples;
-									outputs[DECAY_OUTPUT].setVoltage(10.f, c);
-								}
-								stage[c] = RELEASE_STAGE;
-								stageSample[c] = 0;
+
 								refValue[c] = stageLevel[c];
+								stageSample[c] = 0;
+								stage[c] = ATTACK_STAGE;
+
+							} else if (stage[c] == SUSTAIN_STAGE) {
+								eoS[c] = true;
+								eoStime[c] = oneMsSamples;
+								outputs[SUSTAIN_OUTPUT].setVoltage(10.f, c);
+
+								refValue[c] = stageLevel[c];
+								stageSample[c] = 0;
+								stage[c] = ATTACK_STAGE;
 							}
+							
 						}
+					
 					}
 					prevTrigValue[c] = trigValue[c];
 				break;
@@ -374,6 +383,8 @@ struct Enver : Module {
 						stageSample[c] = 0;
 						stageLevel[c] = 1.f;
 
+						refValue[c] = 1.f;
+
 						eoA[c] = true;
 						eoAtime[c] = oneMsSamples;
 						outputs[ATTACK_OUTPUT].setVoltage(10.f, c);
@@ -414,7 +425,7 @@ struct Enver : Module {
 								maxStageSample[c] = 0;
 						}
 
-						if (mode != LOOP_MODE) {
+						if (mode == ENV_MODE) {
 							stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * (1 - sustainValue)) + sustainValue;
 
 							if (stageSample[c] >= maxStageSample[c]) {
@@ -422,6 +433,23 @@ struct Enver : Module {
 
 								stageSample[c] = 0;
 								stageLevel[c] = sustainValue;
+
+								eoD[c] = true;
+								eoDtime[c] = oneMsSamples;
+								outputs[DECAY_OUTPUT].setVoltage(10.f, c);
+
+							}
+						} else if (mode == FUNC_MODE) {
+							//stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * (1 - sustainValue)) + sustainValue;
+							//stageLevel[c] = shapeResponse(1 - (stageSample[c] / maxStageSample[c]));
+
+							stageLevel[c] = shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * refValue[c];
+
+							if (stageSample[c] >= maxStageSample[c]) {
+								stage[c] = STOP_STAGE;
+
+								stageSample[c] = 0;
+								stageLevel[c] = 0;
 
 								eoD[c] = true;
 								eoDtime[c] = oneMsSamples;
@@ -508,14 +536,12 @@ struct Enver : Module {
 
 			env[c] = stageLevel[c];
 
-			if (mode == LOOP_MODE)
+			if (mode != ENV_MODE)
 				env[c] *= sustainValue;
 
 			outputs[ENV_OUTPUT].setVoltage(env[c] * 10, c);
 
-			//outputs[INV_OUTPUT].setVoltage((1 - env[c]) * 10, c);
-
-			outputs[INV_OUTPUT].setVoltage( (1 - (env[c])*invStr) * 10, c);
+			outputs[INV_OUTPUT].setVoltage((1 - env[c] * invStr) * 10, c);
 					
 			// --------- eoA eoD eoS eoR
 
