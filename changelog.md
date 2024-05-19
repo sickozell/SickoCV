@@ -1,4 +1,4 @@
-### 2.6.11 (2024-05-xx)
+### 2.6.11 (2024-05-19)
 - added 'enver' module.
 - added 'multiSwitcher' and 'multiRouter' modules.
 - improved usability of 'sickoAmp'.
