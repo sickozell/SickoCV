@@ -28,12 +28,15 @@ void init(Plugin* p) {
 	p->addModel(modelDrumPlayer);
 	p->addModel(modelDrumPlayerPlus);
 	p->addModel(modelDrumPlayerXtra);
+	p->addModel(modelEnver);
 	p->addModel(modelHolder);
 	p->addModel(modelHolderCompact);
 	p->addModel(modelHolder8);
 	p->addModel(modelModulator);
 	p->addModel(modelModulator7);
 	p->addModel(modelModulator7Compact);
+	p->addModel(modelMultiSwitcher);
+	p->addModel(modelMultiRouter);
 	p->addModel(modelParking);
 	p->addModel(modelPolyMuter8);
 	p->addModel(modelPolyMuter8Plus);

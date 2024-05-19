@@ -1,3 +1,8 @@
+### 2.6.11 (2024-05-19)
+- added 'enver' module.
+- added 'multiSwitcher' and 'multiRouter' modules.
+- improved usability of 'sickoAmp'.
+
 ### 2.6.10 (2024-05-02)
 - added 'sickoCrosser' and 'sickoCrosser4' modules.
 - sickoSampler2: fixed rack crash when modulating stretching and v/oct at the same time.

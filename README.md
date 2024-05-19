@@ -1,7 +1,7 @@
-# SickoCV v2.6.10
+# SickoCV v2.6.11
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 10](https://github.com/sickozell/SickoCV/assets/80784296/566b4fb8-5d90-4737-9dd5-2d2090aa73a7)
+![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/964c0e26-1db2-4e36-9d80-5c0bb193102f)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -17,8 +17,10 @@ VCV Rack plugin modules
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
+- [enver](#enver)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
+- [multiRouter / multiSwitcher](#multirouter--multiswitcher)
 - [parking](#parking)
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [shifter](#shifter)
@@ -463,6 +465,30 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 
 [back to top](#table-of-contents)
 
+## enver
+### Envelope generator with stereo VCA
+
+![enver](https://github.com/sickozell/SickoCV/assets/80784296/4e3a4dde-8415-4cc9-8904-074e93179546)
+
+#### - INSTRUCTIONS
+the enver moodule operates with three different modes selecetd by the mode switch:
+- ENV: envelope mode works as a standard envelope generator.
+- FN: function mode is an AD envelope generator and starts its attack with a trigger on the G/T button or its input. The sustain controls the maximum level of the attack stage.
+- LP: loop mode is a looped attack/decay generator. A trigger starts the attack stage, goes to the decay stage and automatically restarts the attack stage. A new trigger will go to the release stage. The sustain controls the maximum level of the attack stage.
+
+RET input is the retrigger function, available on decay or sustain stages.  
+
+SHAPE knob selects the shape of the envelope curve. It can be set to exponential, gentle, linear, logarithmic and their average positions. It can be modulated with a CV input and its attenuverter.
+
+Every single stage can be set with the dedicated knobs and modulated with a CV input and its attenuverter.
+
+ENV out is the envelope output.  
+INV out is the inverted envelope output to use for ducking purposes. The INV knob is used to set the inverting strength. 
+A D S R outputs send a 1ms trigger at the end of every single stage.  
+
+The built-in VCA section consists of a stereo audio input, a master volume knob, a volume CV input, and a stereo audio output.  
+Please note that using the volume CV input as a velocity control from an external keyboard, the volume knob has to be set to zero. 
+
 ## holder / holder Compact / holder8
 ### Sample & Hold or Track & Hold with noise generator, probability and range
 
@@ -540,6 +566,29 @@ If no sync cable is connected, pressing the SYNC button will act as a sample&hol
 
 [back to top](#table-of-contents)
 
+## multiRouter / multiSwitcher
+### 1>8 stereo router and 8>1 stereo switcher for cvs and audio signals
+
+![multiRtMultiSw](https://github.com/sickozell/SickoCV/assets/80784296/b32b2642-5d30-4a08-8f69-ab0a2dbd47a4)
+
+#### - INSTRUCTIONS
+multiRouter routes a stereo input signal up to 8 different destinations, while multiSwitcher outputs a single stereo signal selected from one of the eight sources.  
+
+On both modules the steps advance via a trigger or can be addressed via a CV voltage depending on the TRG/CV switch.  
+
+Direction of advancing step is set by DIR switch and can be set to 'R' if random advancing is needed.  
+
+xFD knob sets the amount of crossfading between the steps up to 10 seconds.  
+
+The INs/OUTs selector sets the number of steps of the cycle.  
+
+The RST knob sets the step to be restarted from when RST input is triggered.  
+Please note that reset step can be outside of cycling steps of the INs/OUTs selector. For example the direction can be set to 'up', 6 cycling steps, and reset to step 8. In this case when reset is triggered it will restart from setp 8, then it will advance to step 7 and continue to step 1, and the next step will be the 6th.  
+
+Right inputs and outputs are normalled, so if they are unconnected the signal is taken from the left ones.
+
+[back to top](#table-of-contents)
+
 ## parking
 ### Set of unconnected inputs and outputs just to park unused cables
 
@@ -596,14 +645,17 @@ The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because
 ## sickoAmp
 ### Polyphonic stereo VCA up to 200% with limiter
 
-![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/3aa3017d-13a1-4fa4-b169-6040c4b07492)
+![sickoamp](https://github.com/sickozell/SickoCV/assets/80784296/26e298b0-e804-41c1-b57b-6baeaa9ba388)
 
 #### - INSTRUCTIONS
-Level knob can be set up to 200% and its CV input is added to its value.  
-Considering a usual modulation of 0-10v, CV attenuverter is set by default to 50% just to act as a traditional VCA.  
-If set to 100% it will modulate the signal level up to 2x.  
-Limit switch activates signal limiter set by Limit knob in the range up to ±10v.  
-If both inputs are used with polyphony, channels on the Right output replicate the same number of channels of the Left input.
+The 'Level Input' is the CV input and VCA knob is its attenuverter with a range up to ±200%, default is 100%.  
+The 'Base Level' knob can be set up to 200% and it's level is added to VCA result voltage.  
+
+LIM switch activates signal limiter set by Limit knob in the range up to ±10v.  
+
+When no CV input is connected, the module acts as attenuator/amplifier just using the base level knob.
+
+If CV input is polyphonc, the output will be polyphonic reflecting CV polyphony channels. Otherwise if CV input is monophonic and signal inputs are polyphonic, every signal channel will be processed with the same amplification.
 
 #### Right-click Menu
 - Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.

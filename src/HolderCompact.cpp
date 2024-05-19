@@ -51,7 +51,7 @@ struct HolderCompact : Module {
 
 	float oneMsSamples = (APP->engine->getSampleRate()) / 1000;			// samples in 1ms
 	float outTrigSample[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	float outTrig[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool outTrig[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 	//**************************************************************
 	//  DEBUG 
@@ -98,7 +98,7 @@ struct HolderCompact : Module {
 
 		noiseType = FULL_NOISE;
 
-		outputs[OUT_OUTPUT].setVoltage(0);
+		//outputs[OUT_OUTPUT].setChannels(1);
 
 		Module::onReset(e);
 	}

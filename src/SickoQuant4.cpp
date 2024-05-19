@@ -564,7 +564,7 @@ struct SickoQuant4 : Module {
 		}
 	}
 
-		json_t *presetToJson() {
+	json_t *presetToJson() {
 		json_t *rootJ = json_object();
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *prog_json_array = json_array();
