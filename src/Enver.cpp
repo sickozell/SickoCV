@@ -202,6 +202,20 @@ struct Enver : Module {
 
 	}
 
+	float shapeResponse2(float value) {
+		
+		if (shape < 0.25f) {
+			return (expTable[1][int(expTableCoeff * value)] * (1 - shape * 4.f)) + (expTable[2][int(expTableCoeff * value)] * (shape * 4.f));
+		} else if (shape < 0.5f) {
+			return (expTable[2][int(expTableCoeff * value)] * (1 - ((shape - 0.25f) * 4.f))) + (value * ((shape - 0.25f) * 4.f));
+		} else if (shape < 0.75f) {
+			return (value * (1 - ((shape - 0.5f) * 4.f))) + (expTable[2][int(expTableCoeff * value)] * ((shape - 0.5f) * 4.f));
+		} else {
+			return (expTable[2][int(expTableCoeff * value)] * (1 - ((shape - 0.75f) * 4.f))) + (expTable[0][int(expTableCoeff * value)] * ((shape - 0.75f) * 4.f));
+		}		
+
+	}
+
 	static float convertCVToMs(float cv) {		
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv);
 	}
@@ -426,7 +440,8 @@ struct Enver : Module {
 						}
 
 						if (mode == ENV_MODE) {
-							stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * (1 - sustainValue)) + sustainValue;
+
+							stageLevel[c] = (shapeResponse2(1 - (stageSample[c] / maxStageSample[c])) * (1 - sustainValue)) + sustainValue;
 
 							if (stageSample[c] >= maxStageSample[c]) {
 								stage[c] = SUSTAIN_STAGE;
@@ -440,10 +455,8 @@ struct Enver : Module {
 
 							}
 						} else if (mode == FUNC_MODE) {
-							//stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * (1 - sustainValue)) + sustainValue;
-							//stageLevel[c] = shapeResponse(1 - (stageSample[c] / maxStageSample[c]));
 
-							stageLevel[c] = shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * refValue[c];
+							stageLevel[c] = shapeResponse2(1 - (stageSample[c] / maxStageSample[c])) * refValue[c];
 
 							if (stageSample[c] >= maxStageSample[c]) {
 								stage[c] = STOP_STAGE;
@@ -458,7 +471,7 @@ struct Enver : Module {
 							}
 						} else {	// loop mode
 
-							stageLevel[c] = (shapeResponse(1 - (stageSample[c] / maxStageSample[c])) );
+							stageLevel[c] = (shapeResponse2(1 - (stageSample[c] / maxStageSample[c])) );
 
 							if (stageSample[c] >= maxStageSample[c]) {
 								stage[c] = ATTACK_STAGE;
@@ -517,7 +530,7 @@ struct Enver : Module {
 							maxStageSample[c] = 0;
 					}
 
-					stageLevel[c] = shapeResponse(1 - (stageSample[c] / maxStageSample[c])) * refValue[c];
+					stageLevel[c] = shapeResponse2(1 - (stageSample[c] / maxStageSample[c])) * refValue[c];
 
 					if (stageSample[c] >= maxStageSample[c]) {
 						
