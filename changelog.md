@@ -1,3 +1,6 @@
+### 2.6.12 (2024-05-22)
+- improved 'enver' retrigger timing.
+
 ### 2.6.11 (2024-05-20)
 - added 'enver' module.
 - added 'multiSwitcher' and 'multiRouter' modules.

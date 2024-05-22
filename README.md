@@ -1,4 +1,4 @@
-# SickoCV v2.6.11
+# SickoCV v2.6.12
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/964c0e26-1db2-4e36-9d80-5c0bb193102f)
@@ -473,8 +473,8 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 #### - INSTRUCTIONS
 the enver moodule operates with three different modes selecetd by the mode switch:
 - ENV: envelope mode works as a standard envelope generator.
-- FN: function mode is an AD envelope generator and starts its attack with a trigger on the G/T button or its input. The sustain controls the maximum level of the attack stage.
-- LP: loop mode is a looped attack/decay generator. A trigger starts the attack stage, goes to the decay stage and automatically restarts the attack stage. A new trigger will go to the release stage. The sustain controls the maximum level of the attack stage.
+- FN: function mode is an AD envelope generator and starts its attack with a trigger on the G/T button or its input.
+- LP: loop mode is a looped attack/decay generator. A trigger starts the attack stage, goes to the decay stage and automatically restarts the attack stage. A new trigger will go to the release stage.
 
 RET input is the retrigger function, available on decay or sustain stages.  
 
