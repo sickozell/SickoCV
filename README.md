@@ -23,7 +23,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.13
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/964c0e26-1db2-4e36-9d80-5c0bb193102f)
+![SickoCV modules 2 6 13](https://github.com/sickozell/SickoCV/assets/80784296/47736f8c-c568-41ec-bea0-b21c2367e793)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -299,7 +299,7 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature, time signatures and integrated audio click.  
 Clocker2 has 6 dividers/multipliers, but lacks metronome and audio click feature.
 
-![clocker](https://github.com/sickozell/SickoCV/assets/80784296/03b7fd56-4f36-4761-bf59-0357aa182865)
+![clocker](https://github.com/sickozell/SickoCV/assets/80784296/94f12b57-e794-4083-96b6-00a6a9e7baec)
 
 #### - INSTRUCTIONS
 
