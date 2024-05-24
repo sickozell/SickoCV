@@ -454,6 +454,8 @@ struct Clocker2 : Module {
 		lights[DIVSWING_LIGHT+1].setBrightness(divSwing[1]);
 		lights[DIVSWING_LIGHT+2].setBrightness(divSwing[2]);
 		lights[DIVSWING_LIGHT+3].setBrightness(divSwing[3]);
+		lights[DIVSWING_LIGHT+3].setBrightness(divSwing[4]);
+		lights[DIVSWING_LIGHT+3].setBrightness(divSwing[5]);
 
 		// ********* ppqn and smoth changes
 		
