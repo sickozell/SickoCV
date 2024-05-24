@@ -1,4 +1,4 @@
-# SickoCV v2.6.12-beta1
+# SickoCV v2.6.13-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,19 +12,15 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- multiSwitcher
-- multiRouter
-- enver
+- 
 
 ## **to do list:** 
 - 
 
 ## **changelog**  
-- added 'enver' module.
-- added 'multiSwitcher' and 'multiRouter' modules.
-- improved usability of 'sickoAmp'.
+- added 'clocker2' module.
 
-# SickoCV v2.6.12
+# SickoCV v2.6.13
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/964c0e26-1db2-4e36-9d80-5c0bb193102f)
@@ -39,7 +35,7 @@ VCV Rack plugin modules
 - [bToggler8](#btoggler8)
 - [bToggler8+](#btoggler8-1)
 - [calcs](#calcs)
-- [clocker](#clocker)
+- [clocker / clocker2](#clocker--clocker2)
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
@@ -296,15 +292,17 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 
 [back to top](#table-of-contents)
 
-## clocker
-### Clock generator with 4 dividers/multipliers and audio metronome
+## clocker / clocker2
+### Clock generator with dividers/multipliers and audio metronome
 
 #### - DESCRIPTION
-Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature, time signatures and integrated audio click.
+Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature, time signatures and integrated audio click.  
+Clocker2 has 6 dividers/multipliers, but lacks metronome and audio click feature.
 
 ![clocker](https://github.com/sickozell/SickoCV/assets/80784296/03b7fd56-4f36-4761-bf59-0357aa182865)
 
 #### - INSTRUCTIONS
+
 The BPM knob sets the clock speed from 30 to 300 bpm.  
 An external clock can be connected on the EXT input.  
 The RUN button or a trig on its input starts or stops the clock.  
