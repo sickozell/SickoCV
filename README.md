@@ -1,7 +1,29 @@
-# SickoCV v2.6.12
+# SickoCV v2.6.13-beta1
+VCV Rack plugin modules (BETA TEST AREA)  
+Compile or **download binary for ANY platform** on the releases page  
+
+## IMPORTANT INSTALLATION NOTE
+If you don't use VCV development environment and run regular VCV install,  
+the new modules will be shown up only if you have a **full subscription** to Sickozell plugin modules.  
+
+So if you have added only some Sickozell modules to VCV you will not see the new ones.
+
+Please check your subscription on https://library.vcvrack.com/plugins and look for the SickoCV line that has to be like this:  
+![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
+
+## Current modules in beta testing:
+- 
+
+## **to do list:** 
+- 
+
+## **changelog**  
+- added 'clocker2' module.
+
+# SickoCV v2.6.13
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 11](https://github.com/sickozell/SickoCV/assets/80784296/964c0e26-1db2-4e36-9d80-5c0bb193102f)
+![SickoCV modules 2 6 13](https://github.com/sickozell/SickoCV/assets/80784296/47736f8c-c568-41ec-bea0-b21c2367e793)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -13,7 +35,7 @@ VCV Rack plugin modules
 - [bToggler8](#btoggler8)
 - [bToggler8+](#btoggler8-1)
 - [calcs](#calcs)
-- [clocker](#clocker)
+- [clocker / clocker2](#clocker--clocker2)
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
@@ -270,15 +292,17 @@ U/B (Unipolar/Bipolar) switch clamps the outputs to 0/10V or ±5v.
 
 [back to top](#table-of-contents)
 
-## clocker
-### Clock generator with 4 dividers/multipliers and audio metronome
+## clocker / clocker2
+### Clock generator with dividers/multipliers and audio metronome
 
 #### - DESCRIPTION
-Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature, time signatures and integrated audio click.
+Clocker is a high precision clock generator and modulator with 4 dividers/multipliers with swing feature, time signatures and integrated audio click.  
+Clocker2 has 6 dividers/multipliers, but lacks metronome and audio click feature.
 
-![clocker](https://github.com/sickozell/SickoCV/assets/80784296/03b7fd56-4f36-4761-bf59-0357aa182865)
+![clocker](https://github.com/sickozell/SickoCV/assets/80784296/94f12b57-e794-4083-96b6-00a6a9e7baec)
 
 #### - INSTRUCTIONS
+
 The BPM knob sets the clock speed from 30 to 300 bpm.  
 An external clock can be connected on the EXT input.  
 The RUN button or a trig on its input starts or stops the clock.  

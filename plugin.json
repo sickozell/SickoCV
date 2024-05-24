@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.6.12",
+  "version": "2.6.13",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -98,6 +98,15 @@
       "slug": "Clocker",
       "name": "clocker",
       "description": "Clock generator with 4 dividers/multipliers and audio metronome",
+      "tags": [
+        "Clock generator",
+        "Clock modulator"
+      ]
+    },
+    {
+      "slug": "Clocker2",
+      "name": "clocker2",
+      "description": "Clock generator with 6 dividers/multipliers",
       "tags": [
         "Clock generator",
         "Clock modulator"

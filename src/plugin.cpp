@@ -20,6 +20,7 @@ void init(Plugin* p) {
 	p->addModel(modelBtogglerPlus);
 	p->addModel(modelCalcs);
 	p->addModel(modelClocker);
+	p->addModel(modelClocker2);
 	p->addModel(modelCVrouter);
 	p->addModel(modelCVswitcher);
 	p->addModel(modelDrummer);

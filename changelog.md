@@ -1,3 +1,6 @@
+### 2.6.13 (2024-05-24)
+- added 'clocker2' module.
+
 ### 2.6.12 (2024-05-22)
 - improved 'enver' retrigger timing.
 
