@@ -449,13 +449,13 @@ struct Clocker2 : Module {
 	*/
 
 	void process(const ProcessArgs &args) override {
-		
+	
 		lights[DIVSWING_LIGHT+0].setBrightness(divSwing[0]);
 		lights[DIVSWING_LIGHT+1].setBrightness(divSwing[1]);
 		lights[DIVSWING_LIGHT+2].setBrightness(divSwing[2]);
 		lights[DIVSWING_LIGHT+3].setBrightness(divSwing[3]);
-		lights[DIVSWING_LIGHT+3].setBrightness(divSwing[4]);
-		lights[DIVSWING_LIGHT+3].setBrightness(divSwing[5]);
+		lights[DIVSWING_LIGHT+4].setBrightness(divSwing[4]);
+		lights[DIVSWING_LIGHT+5].setBrightness(divSwing[5]);
 
 		// ********* ppqn and smoth changes
 		
