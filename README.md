@@ -23,7 +23,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.14
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 13](https://github.com/sickozell/SickoCV/assets/80784296/47736f8c-c568-41ec-bea0-b21c2367e793)
+![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/9feeefe8-0234-428a-b1b0-9f7e9c849d5c)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -1001,6 +1001,8 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 ## slewer
 ### Slew limiter and LFO
+
+![slewer](https://github.com/sickozell/SickoCV/assets/80784296/48a27a19-7cbf-4bc3-a3d5-1c5f7fa45c5d)
 
 #### - INSTRUCTIONS
 Coming Soon. 
