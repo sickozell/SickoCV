@@ -1013,7 +1013,7 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 #### - INSTRUCTIONS
 ATT knob with its attenuverted input sets the duration of the rise stage up to 60 seconds.  
 DEC knob with its attenuverted input sets the duration of the fall stage up to 60 seconds.  
-CURVE knob with its attenuverted input set the shape of the slew: logarithmic, linear, exponential.  
+CURVE knob with its attenuverted input sets the shape of the slew: logarithmic, linear, exponential.  
 
 SYM button inverts the decay shape to be visually equal to the attack one.
 
