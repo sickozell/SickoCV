@@ -56,6 +56,7 @@ void init(Plugin* p) {
 	p->addModel(modelSickoQuant4);
 	p->addModel(modelSickoSampler);
 	p->addModel(modelSickoSampler2);
+	p->addModel(modelSlewer);
 	p->addModel(modelSwitcher);
 	p->addModel(modelSwitcherSt);
 	p->addModel(modelSwitcher8);

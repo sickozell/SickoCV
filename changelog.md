@@ -1,3 +1,6 @@
+### 2.6.14 (2024-06-02)
+- added 'slewer' module.
+
 ### 2.6.13 (2024-05-24)
 - added 'clocker2' module.
 

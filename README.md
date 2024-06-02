@@ -1,4 +1,4 @@
-# SickoCV v2.6.13-beta1
+# SickoCV v2.6.14-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,9 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - 
 
 ## **changelog**  
-- added 'clocker2' module.
+- added 'slewer' module.
 
-# SickoCV v2.6.13
+# SickoCV v2.6.14
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 13](https://github.com/sickozell/SickoCV/assets/80784296/47736f8c-c568-41ec-bea0-b21c2367e793)
@@ -53,6 +53,7 @@ VCV Rack plugin modules
 - [sickoQuant / sickoQuant4](#sickoquant--sickoquant4)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
+- [slewer](#slewer)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
@@ -995,6 +996,14 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 **Right-click Menu**  
 'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
+
+[back to top](#table-of-contents)
+
+## slewer
+### Slew limiter and LFO
+
+#### - INSTRUCTIONS
+Coming Soon. 
 
 [back to top](#table-of-contents)
 
