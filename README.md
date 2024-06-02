@@ -1001,11 +1001,30 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 ## slewer
 ### Slew limiter and LFO
+#### - DESCRIPTION
+- Slew limiter with precise timing
+- Slew timing setting regardless of the distance between the voltages
+- Symmetric shape curves
+- Allowed audio rates
+- LFO
 
 ![slewer](https://github.com/sickozell/SickoCV/assets/80784296/f83f81d5-9dba-4359-a4e2-2d3fbd712928)
 
 #### - INSTRUCTIONS
-Coming Soon. 
+ATT knob with its attenuverted input sets the duration of the rise stage up to 60 seconds.  
+DEC knob with its attenuverted input sets the duration of the rise stage up to 60 seconds.  
+CURVE knob with its attenuverted input set the shape of the slew: logarithmic, linear, exponential.  
+
+SYM button inverts the decay shape to be visually equal to the attack one.
+
+ATT and DEC outputs are high gates when relative stages occur.
+
+IN and OUT are the signal ports.
+
+If no signal input is connected the module acts as LFO.
+
+In the right-click menu there is the option "Duration/Slew knobs".  
+When ticked, the ATT control sets both the attack and decay durations and the DEC control sets the percentage of attack/decay. Centered setting means that attack and decay have the same duration.
 
 [back to top](#table-of-contents)
 
