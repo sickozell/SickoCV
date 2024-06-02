@@ -277,8 +277,8 @@ struct Slewer : Module {
 			else if (decayKnob > 0.999)
 				decayKnob = 0.999;
 
-			stageCoeff /= (1 - decayKnob) * 2;
-			stageCoeff_D /= decayKnob * 2;
+			stageCoeff *= (1 - decayKnob) * 2;
+			stageCoeff_D *= decayKnob * 2;
 
 		}
 
