@@ -67,7 +67,7 @@ struct Slewer : Module {
 
 	float stageLevel[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float stageCoeff = 1;
-	//float stageCoeff[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+	float stageCoeff_D = 1;
 
 	float attackValue;
 	float decayValue;
@@ -92,6 +92,8 @@ struct Slewer : Module {
 	//float out[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	int chan;
+
+	bool slewKnobs = false;
 
 	/*
 	static constexpr float minStageTime = 1.f;  // in milliseconds
@@ -129,11 +131,11 @@ struct Slewer : Module {
 	Slewer() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
-		configParam(ATTACK_PARAM, 0.f, 1.f, 0.f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
+		configParam(ATTACK_PARAM, 0.f, 1.f, 0.5f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
 		configParam(ATTACK_ATNV_PARAM, -1.f, 1.f, 0.f, "Attack CV", "%", 0, 100);
 		configInput(ATTACK_INPUT,"Attack");
 
-		configParam(DECAY_PARAM, 0.f, 1.f, 0.f, "Decay", " ms", maxStageTime / minStageTime, minStageTime);
+		configParam(DECAY_PARAM, 0.f, 1.f, 0.5f, "Decay", " ms", maxStageTime / minStageTime, minStageTime);
 		configParam(DECAY_ATNV_PARAM, -1.f, 1.f, 0.f, "Decay CV", "%", 0, 100);
 		configInput(DECAY_INPUT,"Decay");
 
@@ -174,6 +176,18 @@ struct Slewer : Module {
 		srCoeff = 1 / sr;
 	}
 
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "slewKnobs", json_boolean(slewKnobs));
+		return rootJ;
+	}
+	
+	void dataFromJson(json_t* rootJ) override {
+		json_t* slewKnobsJ = json_object_get(rootJ, "slewKnobs");
+		if (slewKnobsJ)
+			slewKnobs = json_boolean_value(slewKnobsJ);
+	}
+
 	static float convertCVToSec(float cv) {	
 
 		return minStageTimeSec * std::pow(maxStageTimeSec / minStageTimeSec, cv);
@@ -191,6 +205,84 @@ struct Slewer : Module {
 
 		symm = params[SYMM_PARAM].getValue();
 		lights[SYMM_LIGHT].setBrightness(symm);
+
+		// ----------------- attack / decay
+
+		if (!slewKnobs) {
+			attackKnob = params[ATTACK_PARAM].getValue();
+			if (attackKnob != prevAttackKnob)
+				attackValue = convertCVToSec(attackKnob);
+			prevAttackKnob = attackKnob;
+
+			if (!inputs[ATTACK_INPUT].isConnected()) {
+				stageCoeff = srCoeff / attackValue;
+
+			} else {
+
+				attackInValue = attackValue + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACK_ATNV_PARAM].getValue() * 0.1);
+
+				if (attackInValue < minAdsrTime)
+					attackInValue = minAdsrTime;
+
+				stageCoeff = srCoeff / attackInValue;
+				
+			}
+
+			decayKnob = params[DECAY_PARAM].getValue();
+			if (decayKnob != prevDecayKnob)
+				decayValue = convertCVToSec(decayKnob);
+			prevDecayKnob = decayKnob;
+
+			if (!inputs[DECAY_INPUT].isConnected()) {
+				stageCoeff_D = srCoeff / decayValue;
+
+			} else {
+
+				decayInValue = decayValue + (inputs[DECAY_INPUT].getVoltage() * params[DECAY_ATNV_PARAM].getValue() * 0.1);
+
+				if (decayInValue < minAdsrTime)
+					decayInValue = minAdsrTime;
+
+				stageCoeff_D = srCoeff / decayInValue;
+				
+			}
+		
+		} else {
+
+			attackKnob = params[ATTACK_PARAM].getValue();
+			if (attackKnob != prevAttackKnob)
+				attackValue = convertCVToSec(attackKnob);
+			prevAttackKnob = attackKnob;
+
+			if (!inputs[ATTACK_INPUT].isConnected()) {
+				stageCoeff = srCoeff / attackValue;
+				stageCoeff_D = srCoeff / attackValue;
+
+			} else {
+
+				attackInValue = attackValue + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACK_ATNV_PARAM].getValue() * 0.1);
+
+				if (attackInValue < minAdsrTime)
+					attackInValue = minAdsrTime;
+
+				stageCoeff = srCoeff / attackInValue;
+				stageCoeff_D = srCoeff / attackInValue;
+				
+			}
+			
+			decayKnob = params[DECAY_PARAM].getValue() + (inputs[DECAY_INPUT].getVoltage() * params[DECAY_ATNV_PARAM].getValue() * 0.1);
+			
+			if (decayKnob < 0.001)
+				decayKnob = 0.001;
+			else if (decayKnob > 0.999)
+				decayKnob = 0.999;
+
+			stageCoeff /= (1 - decayKnob) * 2;
+			stageCoeff_D /= decayKnob * 2;
+
+		}
+
+		// ---------------------------
 
 		if (inputs[SIGNAL_INPUT].isConnected()) {
 
@@ -269,6 +361,7 @@ struct Slewer : Module {
 						outputs[EOD_OUTPUT].setVoltage(0.f, c);
 						lights[EOD_LIGHT].setBrightness(0.f);
 
+						/*
 						attackKnob = params[ATTACK_PARAM].getValue();
 						if (attackKnob != prevAttackKnob)
 							attackValue = convertCVToSec(attackKnob);
@@ -287,6 +380,7 @@ struct Slewer : Module {
 							stageCoeff = srCoeff / attackInValue;
 							
 						}
+						*/
 
 						normalCoeff = stageCoeff * 2.06;
 						normalRange = slewEnd[c] - slewStart[c];
@@ -330,6 +424,7 @@ struct Slewer : Module {
 						outputs[EOD_OUTPUT].setVoltage(10.f, c);
 						lights[EOD_LIGHT].setBrightness(1.f);
 
+						/*
 						decayKnob = params[DECAY_PARAM].getValue();
 						if (decayKnob != prevDecayKnob)
 							decayValue = convertCVToSec(decayKnob);
@@ -348,10 +443,11 @@ struct Slewer : Module {
 							stageCoeff = srCoeff / decayInValue;
 							
 						}
+						*/
 
-						normalCoeff = stageCoeff * 2.06;
+						normalCoeff = stageCoeff_D * 2.06;
 						normalRange = slewStart[c] - slewEnd[c];
-						normalCoeff2 = stageCoeff * normalRange;
+						normalCoeff2 = stageCoeff_D * normalRange;
 
 						if (!symm) {
 
@@ -456,6 +552,7 @@ struct Slewer : Module {
 						outputs[EOD_OUTPUT].setVoltage(0.f);
 						lights[EOD_LIGHT].setBrightness(0.f);
 
+						/*
 						attackKnob = params[ATTACK_PARAM].getValue();
 						if (attackKnob != prevAttackKnob)
 							attackValue = convertCVToSec(attackKnob);
@@ -474,6 +571,7 @@ struct Slewer : Module {
 							stageCoeff = srCoeff / attackInValue;
 							
 						}
+						*/
 
 						normalCoeff = stageCoeff * 2.06;
 						normalRange = slewEnd[0] - slewStart[0];
@@ -522,6 +620,7 @@ struct Slewer : Module {
 						outputs[EOD_OUTPUT].setVoltage(10.f);
 						lights[EOD_LIGHT].setBrightness(1.f);
 
+						/*
 						decayKnob = params[DECAY_PARAM].getValue();
 						if (decayKnob != prevDecayKnob)
 							decayValue = convertCVToSec(decayKnob);
@@ -540,10 +639,11 @@ struct Slewer : Module {
 							stageCoeff = srCoeff / decayInValue;
 							
 						}
+						*/
 
-						normalCoeff = stageCoeff * 2.06;
+						normalCoeff = stageCoeff_D * 2.06;
 						normalRange = slewStart[0] - slewEnd[0];
-						normalCoeff2 = stageCoeff * normalRange;
+						normalCoeff2 = stageCoeff_D * normalRange;
 
 						if (!symm) {
 
@@ -765,6 +865,13 @@ struct SlewerWidget : ModuleWidget {
 
 	}
 
+	void appendContextMenu(Menu* menu) override {
+		Slewer* module = dynamic_cast<Slewer*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Duration/Slew knobs", "", &module->slewKnobs));
+
+	}
 };
 
 Model *modelSlewer = createModel<Slewer, SlewerWidget>("Slewer");
