@@ -82,20 +82,17 @@ struct Slewer : Module {
 	float slewEnd[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	float slewLogCoeff[16] = {SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START, SLEW_START};
-	//float slewExpCoeff = 0;
 	float slewExpCoeff[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	bool symm = false;
 	bool prevStop[16] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true};
 
 	float out = 0;
-	//float out[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	int chan;
 
 	bool slewKnobs = false;
 
-	/*
 	static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	
@@ -103,16 +100,6 @@ struct Slewer : Module {
 	static constexpr float maxStageTimeSec = 10.f;  // in seconds
 	
 	const float maxAdsrTime = 10.f;
-	const float minAdsrTime = 0.001f;
-	*/
-
-	static constexpr float minStageTime = 1.f;  // in milliseconds
-	static constexpr float maxStageTime = 60000.f;  // in milliseconds
-	
-	static constexpr float minStageTimeSec = 0.001f;  // in seconds
-	static constexpr float maxStageTimeSec = 60.f;  // in seconds
-	
-	const float maxAdsrTime = 60.f;
 	const float minAdsrTime = 0.001f;
 	
 
@@ -361,27 +348,6 @@ struct Slewer : Module {
 						outputs[EOD_OUTPUT].setVoltage(0.f, c);
 						lights[EOD_LIGHT].setBrightness(0.f);
 
-						/*
-						attackKnob = params[ATTACK_PARAM].getValue();
-						if (attackKnob != prevAttackKnob)
-							attackValue = convertCVToSec(attackKnob);
-						prevAttackKnob = attackKnob;
-
-						if (!inputs[ATTACK_INPUT].isConnected()) {
-							stageCoeff = srCoeff / attackValue;
-
-						} else {
-
-							attackInValue = attackValue + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACK_ATNV_PARAM].getValue() * 0.1);
-
-							if (attackInValue < minAdsrTime)
-								attackInValue = minAdsrTime;
-
-							stageCoeff = srCoeff / attackInValue;
-							
-						}
-						*/
-
 						normalCoeff = stageCoeff * 2.06;
 						normalRange = slewEnd[c] - slewStart[c];
 						normalCoeff2 = stageCoeff * normalRange;
@@ -423,27 +389,6 @@ struct Slewer : Module {
 						lights[EOA_LIGHT].setBrightness(0.f);
 						outputs[EOD_OUTPUT].setVoltage(10.f, c);
 						lights[EOD_LIGHT].setBrightness(1.f);
-
-						/*
-						decayKnob = params[DECAY_PARAM].getValue();
-						if (decayKnob != prevDecayKnob)
-							decayValue = convertCVToSec(decayKnob);
-						prevDecayKnob = decayKnob;
-
-						if (!inputs[DECAY_INPUT].isConnected()) {
-							stageCoeff = srCoeff / decayValue;
-
-						} else {
-
-							decayInValue = decayValue + (inputs[DECAY_INPUT].getVoltage() * params[DECAY_ATNV_PARAM].getValue() * 0.1);
-
-							if (decayInValue < minAdsrTime)
-								decayInValue = minAdsrTime;
-
-							stageCoeff = srCoeff / decayInValue;
-							
-						}
-						*/
 
 						normalCoeff = stageCoeff_D * 2.06;
 						normalRange = slewStart[c] - slewEnd[c];
@@ -552,27 +497,6 @@ struct Slewer : Module {
 						outputs[EOD_OUTPUT].setVoltage(0.f);
 						lights[EOD_LIGHT].setBrightness(0.f);
 
-						/*
-						attackKnob = params[ATTACK_PARAM].getValue();
-						if (attackKnob != prevAttackKnob)
-							attackValue = convertCVToSec(attackKnob);
-						prevAttackKnob = attackKnob;
-
-						if (!inputs[ATTACK_INPUT].isConnected()) {
-							stageCoeff = srCoeff / attackValue;
-
-						} else {
-
-							attackInValue = attackValue + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACK_ATNV_PARAM].getValue() * 0.1);
-
-							if (attackInValue < minAdsrTime)
-								attackInValue = minAdsrTime;
-
-							stageCoeff = srCoeff / attackInValue;
-							
-						}
-						*/
-
 						normalCoeff = stageCoeff * 2.06;
 						normalRange = slewEnd[0] - slewStart[0];
 						normalCoeff2 = stageCoeff * normalRange;
@@ -619,27 +543,6 @@ struct Slewer : Module {
 						lights[EOA_LIGHT].setBrightness(0.f);
 						outputs[EOD_OUTPUT].setVoltage(10.f);
 						lights[EOD_LIGHT].setBrightness(1.f);
-
-						/*
-						decayKnob = params[DECAY_PARAM].getValue();
-						if (decayKnob != prevDecayKnob)
-							decayValue = convertCVToSec(decayKnob);
-						prevDecayKnob = decayKnob;
-
-						if (!inputs[DECAY_INPUT].isConnected()) {
-							stageCoeff = srCoeff / decayValue;
-
-						} else {
-
-							decayInValue = decayValue + (inputs[DECAY_INPUT].getVoltage() * params[DECAY_ATNV_PARAM].getValue() * 0.1);
-
-							if (decayInValue < minAdsrTime)
-								decayInValue = minAdsrTime;
-
-							stageCoeff = srCoeff / decayInValue;
-							
-						}
-						*/
 
 						normalCoeff = stageCoeff_D * 2.06;
 						normalRange = slewStart[0] - slewEnd[0];
@@ -777,10 +680,10 @@ struct SlewerWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Slewer.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
+		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
 		/*
 		{

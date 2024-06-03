@@ -1781,10 +1781,10 @@ struct ClockerWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Clocker.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH))); 
+		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH))); 
 
 		/*		
 		{
@@ -1900,14 +1900,6 @@ struct ClockerWidget : ModuleWidget {
 		const float yDiv2 = 98.f;
 		const float yDiv3 = 107.5f;
 		const float yDiv4 = 117.f;
-		
-		// buttons --- 4.1
-		// trimpot --- x  3.7 --- y 4.3
-		// trimpot senza stanghetta --- y 3.7
-		// smallRoundKnob --- x 4.6 --- y 5.1
-		// roundBlackKnob --- x 5.7 --- y 6.4
-		// input/output --- 4.5
-		// three horizontal switch ---- x 5.5 --- y 2.8
 
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xExtClock, yExtClock)), module, Clocker::EXTCLOCK_INPUT));
 		

@@ -1,4 +1,4 @@
-# SickoCV v2.6.14-beta4
+# SickoCV v2.6.14-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -1005,14 +1005,13 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 - Slew limiter with precise timing
 - Slew timing setting regardless of the distance between the voltages
 - Symmetric shape curves
-- Allowed audio rates
 - LFO
 
 ![slewer](https://github.com/sickozell/SickoCV/assets/80784296/f83f81d5-9dba-4359-a4e2-2d3fbd712928)
 
 #### - INSTRUCTIONS
-ATT knob with its attenuverted input sets the duration of the rise stage up to 60 seconds.  
-DEC knob with its attenuverted input sets the duration of the fall stage up to 60 seconds.  
+ATT knob with its attenuverted input sets the duration of the rise stage.  
+DEC knob with its attenuverted input sets the duration of the fall stage.  
 CURVE knob with its attenuverted input sets the shape of the slew: logarithmic, linear, exponential.  
 
 SYM button inverts the decay shape to be visually equal to the attack one.
@@ -1169,8 +1168,8 @@ Please refer to sickoPlayer documentation.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
+A very big thanks to [Omri Cohen](https://omricohen-music.com/) for developing help and support  
 Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [AuxMux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
-Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
 Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  
 
 **Consider donating**  
