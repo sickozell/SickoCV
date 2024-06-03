@@ -1003,7 +1003,7 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 ### Slew limiter and LFO
 #### - DESCRIPTION
 - Slew limiter with precise timing
-- Slew timing setting regardless of the distance between the voltages
+- Slew timing setting regardless of the distance between the incoming voltages
 - Symmetric shape curves
 - LFO
 
