@@ -7,6 +7,7 @@ struct Modulator7Compact : Module {
 		RATE_PARAM,
 		RATE_ATTENUV_PARAM,
 		ENUMS(XRATE_PARAM, 7),
+		BIPOLAR_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -18,6 +19,7 @@ struct Modulator7Compact : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
+		BIPOLAR_LIGHT,
 		LIGHTS_LEN
 	};
 
@@ -36,6 +38,10 @@ struct Modulator7Compact : Module {
 
 	int polyChans = 1;
 	float out = 0;
+
+	int bipolar = 0;
+
+	int biType[2] = {0, -5};
 
 	static constexpr float minRate = 0.01f;  // in milliseconds
 	static constexpr float maxRate = 100.f;  // in milliseconds
@@ -64,6 +70,7 @@ struct Modulator7Compact : Module {
 			configParam(XRATE_PARAM+i, 0.f, 1.f, 0.5f, "xRate", "x", maxXrate / minXrate, minXrate);
 			configOutput(OUT_OUTPUT+i, "");
 		}
+		configSwitch(BIPOLAR_PARAM, 0.f, 1.f, 0.f, "Bipolar", {"Off", "On"});
 	}
 
 	void onReset(const ResetEvent &e) override {
@@ -216,6 +223,9 @@ struct Modulator7Compact : Module {
 
 	void process(const ProcessArgs& args) override {
 
+		bipolar = int(params[BIPOLAR_PARAM].getValue());
+		lights[BIPOLAR_LIGHT].setBrightness(bipolar);
+
 		rateKnob = params[RATE_PARAM].getValue();
 		
 		if (rateKnob != prevRateKnob) {
@@ -253,9 +263,9 @@ struct Modulator7Compact : Module {
 
 			out = waveValue[i] * 10.f;
 			if (polyChans >= i){
-				outputs[OUT_OUTPUT+6].setVoltage(out, i);	
+				outputs[OUT_OUTPUT+6].setVoltage(out+biType[bipolar], i);	
 			}
-			outputs[OUT_OUTPUT+i].setVoltage(out);
+			outputs[OUT_OUTPUT+i].setVoltage(out+biType[bipolar]);
 
 		}
 
@@ -279,10 +289,10 @@ struct Modulator7Compact : Module {
 		out = waveValue[6] * 10.f;
 
 		if (polyChans == 1) {
-			outputs[OUT_OUTPUT+6].setVoltage(out);
+			outputs[OUT_OUTPUT+6].setVoltage(out+biType[bipolar]);
 			outputs[OUT_OUTPUT+6].setChannels(1);
 		} else {
-			outputs[OUT_OUTPUT+6].setVoltage(out, 6);
+			outputs[OUT_OUTPUT+6].setVoltage(out+biType[bipolar], 6);
 			outputs[OUT_OUTPUT+6].setChannels(polyChans);
 		}
 			
@@ -339,20 +349,23 @@ struct Modulator7CompactWidget : ModuleWidget {
 		}
 		*/
 
-		const float xRtKnob = 12 - 0.6 - 1;
-		const float yRtKnob = 21 + 1;
+		const float xRtKnob = 10.4;
+		const float yRtKnob = 22;
 
-		const float xRateAtnv = 18.8 - 0.6;
-		const float yRateAtnv = 32 + 1;
+		const float xRateAtnv = 18.2;
+		const float yRateAtnv = 33;
 
-		const float xRateIn = 11 - 0.6 - 1;
-		const float yRateIn = 39;
+		const float xRateIn = 8.7;
+		const float yRateIn = 36;
 
 		const float yStart = 57;
 		constexpr float yStartShift = 10;
 
-		const float xRt = 7.3 - 0.6;
+		const float xRt = 6.7;
 		const float xOut = 18.7;
+
+		const float xBi = 19;
+		const float yBi = 41;
 
 		addParam(createParamCentered<SickoLargeKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, Modulator7Compact::RATE_PARAM));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, Modulator7Compact::RATE_ATTENUV_PARAM));
@@ -362,6 +375,8 @@ struct Modulator7CompactWidget : ModuleWidget {
 			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRt, yStart + (yStartShift * i))), module, Modulator7Compact::XRATE_PARAM+i));
 			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart + (yStartShift * i))), module, Modulator7Compact::OUT_OUTPUT+i));
 		}
+
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xBi, yBi)), module, Modulator7Compact::BIPOLAR_PARAM, Modulator7Compact::BIPOLAR_LIGHT));
 	}
 
 	void appendContextMenu(Menu* menu) override {
