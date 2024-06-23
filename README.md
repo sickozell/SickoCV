@@ -1,26 +1,3 @@
-# SickoCV v2.6.14-beta6
-VCV Rack plugin modules (BETA TEST AREA)  
-Compile or **download binary for ANY platform** on the releases page  
-
-## IMPORTANT INSTALLATION NOTE
-If you don't use VCV development environment and run regular VCV install,  
-the new modules will be shown up only if you have a **full subscription** to Sickozell plugin modules.  
-
-So if you have added only some Sickozell modules to VCV you will not see the new ones.
-
-Please check your subscription on https://library.vcvrack.com/plugins and look for the SickoCV line that has to be like this:  
-![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
-
-## Current modules in beta testing:
-- 
-
-## **to do list:** 
-- 
-
-## **changelog**  
-- added 'slewer' module.
-- added bipolar button on 'modulator7 compact'.
-
 # SickoCV v2.6.14
 VCV Rack plugin modules
 
