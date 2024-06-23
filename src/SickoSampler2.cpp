@@ -3471,10 +3471,8 @@ struct SickoSampler2Widget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SickoSampler2.svg")));
 
-		//addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		//addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));  
+		addChild(createWidget<SickoScrewBlack1>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));  
 
 		{
 			SickoSampler2Display *display = new SickoSampler2Display();
@@ -3545,13 +3543,6 @@ struct SickoSampler2Widget : ModuleWidget {
 		const float xOut2 = 45.1f;
 		const float yOut1 = 104.4f;
 		const float yOut2 = 117.3f;
-
-		// buttons --- 4.1
-		// trimpot --- x  3.7 --- y 4.3
-		// trimpot senza stanghetta --- y 3.7
-		// smallRoundKnob --- x 4.6 --- y 5.1
-		// roundBlackKnob --- x 5.7 --- y 6.4
-		// input/output --- 4.5 
 
 		addParam(createParamCentered<VCVButton>(mm2px(Vec(4, 4)), module, SickoSampler2::PREVSAMPLE_PARAM));
 		addParam(createParamCentered<VCVButton>(mm2px(Vec(46.8, 4)), module, SickoSampler2::NEXTSAMPLE_PARAM));

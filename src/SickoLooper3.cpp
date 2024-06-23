@@ -5037,10 +5037,10 @@ struct SickoLooper3Widget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SickoLooper3.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
+		addChild(createWidget<SickoScrewBlack1>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
 		const float xTrackShift = 44;
 
@@ -5238,14 +5238,6 @@ struct SickoLooper3Widget : ModuleWidget {
 		const float xMastL = 241.4 - 87.842 + 0.8 + 0.8;
 		const float xMastR = 251.4 - 87.842 + 0.8 + 0.8;
 		const float yMast = 117;
-
-
-		// buttons --- 4.1
-		// trimpot --- x  3.7 --- y 4.3
-		// trimpot senza stanghetta --- y 3.7
-		// smallRoundKnob --- x 4.6 --- y 5.1
-		// roundBlackKnob --- x 5.7 --- y 6.4
-		// input/output --- 4.5
 
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xBpm, yBpm)), module, SickoLooper3::BPM_KNOB_PARAM));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xBeat, yBeat)), module, SickoLooper3::SIGNATURE_KNOB_PARAM));

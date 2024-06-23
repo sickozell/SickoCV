@@ -810,15 +810,8 @@ struct HolderCompactWidget : ModuleWidget {
 		}
 		*/
 
-		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-
-		// buttons --- 4.1
-		// trimpot --- x  3.7 --- y 4.3
-		// trimpot senza stanghetta --- y 3.7
-		// smallRoundKnob --- x 4.6 --- y 5.1
-		// roundBlackKnob --- x 5.7 --- y 6.4
-		// input/output --- 4.5
+		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		const float xCenter = 7.62f;
 

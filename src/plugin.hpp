@@ -56,6 +56,7 @@ extern Model* modelSickoQuant;
 extern Model* modelSickoQuant4;
 extern Model* modelSickoSampler;
 extern Model* modelSickoSampler2;
+extern Model* modelSlewer;
 extern Model* modelSwitcher;
 extern Model* modelSwitcherSt;
 extern Model* modelSwitcher8;

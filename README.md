@@ -1,7 +1,30 @@
-# SickoCV v2.6.13
+# SickoCV v2.6.14-beta6
+VCV Rack plugin modules (BETA TEST AREA)  
+Compile or **download binary for ANY platform** on the releases page  
+
+## IMPORTANT INSTALLATION NOTE
+If you don't use VCV development environment and run regular VCV install,  
+the new modules will be shown up only if you have a **full subscription** to Sickozell plugin modules.  
+
+So if you have added only some Sickozell modules to VCV you will not see the new ones.
+
+Please check your subscription on https://library.vcvrack.com/plugins and look for the SickoCV line that has to be like this:  
+![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
+
+## Current modules in beta testing:
+- 
+
+## **to do list:** 
+- 
+
+## **changelog**  
+- added 'slewer' module.
+- added bipolar button on 'modulator7 compact'.
+
+# SickoCV v2.6.14
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 13](https://github.com/sickozell/SickoCV/assets/80784296/47736f8c-c568-41ec-bea0-b21c2367e793)
+![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/8c5fc876-a3a8-4d59-9357-6a5ffff85d7f)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -31,6 +54,7 @@ VCV Rack plugin modules
 - [sickoQuant / sickoQuant4](#sickoquant--sickoquant4)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
+- [slewer](#slewer)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
@@ -541,11 +565,11 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 ## modulator / modulator7 / modulator7 Compact
 ### single or 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a clock.
 
-![modulator](https://github.com/sickozell/SickoCV/assets/80784296/706a9a80-0b1e-462a-b3a4-21d8e80066e3)
+![modulator](https://github.com/sickozell/SickoCV/assets/80784296/9008ffd9-6ddb-486e-a957-3874e21b9750)
 
 #### - INSTRUCTIONS
 Following instructions refer to modulator7, but can be applied also to modulator module.  
-The 'modulator7 Compact' module is just a 7 triangle only unipolar LFOs whithout sync and reset features.  
+The 'modulator7 Compact' module is just a 7 triangle only uni/bipolar LFOs whithout sync and reset features.  
 
 Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
 The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
@@ -976,6 +1000,34 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 [back to top](#table-of-contents)
 
+## slewer
+### Slew limiter and LFO
+#### - DESCRIPTION
+- Slew limiter with precise timing
+- Slew timing setting regardless of the distance between the incoming voltages
+- Symmetric shape curves
+- LFO
+
+![slewer](https://github.com/sickozell/SickoCV/assets/80784296/f83f81d5-9dba-4359-a4e2-2d3fbd712928)
+
+#### - INSTRUCTIONS
+ATT knob with its attenuverted input sets the duration of the rise stage.  
+DEC knob with its attenuverted input sets the duration of the fall stage.  
+CURVE knob with its attenuverted input sets the shape of the slew: logarithmic, linear, exponential.  
+
+SYM button inverts the decay shape to be visually equal to the attack one.
+
+ATT and DEC outputs are high gates when relative stages occur.
+
+IN and OUT are the signal ports.
+
+If no signal input is connected the module acts as LFO.
+
+In the right-click menu there is the option "Duration/Slew knobs".  
+When ticked, the ATT control sets both the attack and decay durations and the DEC control sets the percentage of attack/decay. Centered setting means that attack and decay have the same duration.
+
+[back to top](#table-of-contents)
+
 ## switcher / switcherSt / switcher8
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - DESCRIPTION
@@ -1117,8 +1169,8 @@ Please refer to sickoPlayer documentation.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
+A very big thanks to [Omri Cohen](https://omricohen-music.com/) for developing help and support  
 Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [AuxMux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
-Thanks to [Omri Cohen](https://omricohen-music.com/) for support  
 Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  
 
 **Consider donating**  

@@ -368,10 +368,10 @@ struct BgatesWidget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Bgates.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(23, 14.2)), module, Bgates::RSTBUT_PARAM, Bgates::RSTBUT_LIGHT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(32, 14.2)), module, Bgates::RSTALL_INPUT));

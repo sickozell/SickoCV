@@ -5209,10 +5209,10 @@ struct SickoSamplerWidget : ModuleWidget {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SickoSampler.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
+		addChild(createWidget<SickoScrewBlack1>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
 		{
 			SickoSamplerDisplay *display = new SickoSamplerDisplay();
@@ -5291,27 +5291,18 @@ struct SickoSamplerWidget : ModuleWidget {
 
 		//----------------------------------------------------------------------------------------------------------------------------
 
-		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(9, yTunVol+2.5)), module, SickoSampler::VO_INPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(9, 105.3)), module, SickoSampler::VO_INPUT));
 
-		//addParam(createParamCentered<SickoKnob>(mm2px(Vec(23, yTunVol)), module, SickoSampler::TUNE_PARAM));
 		addParam(createParamCentered<SickoKnob>(mm2px(Vec(24.5, yTunVol)), module, SickoSampler::TUNE_PARAM));
-		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(18, yTunVol2)), module, SickoSampler::TUNE_INPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(19.5, yTunVol2)), module, SickoSampler::TUNE_INPUT));
-		//addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(28, yTunVol2)), module, SickoSampler::TUNEATNV_PARAM));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(29.5, yTunVol2)), module, SickoSampler::TUNEATNV_PARAM));
 
-		//addParam(createParamCentered<SickoKnob>(mm2px(Vec(45.5, yTunVol)), module, SickoSampler::VOL_PARAM));
 		addParam(createParamCentered<SickoKnob>(mm2px(Vec(46, yTunVol)), module, SickoSampler::VOL_PARAM));
-		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(40.5, yTunVol2)), module, SickoSampler::VOL_INPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(41, yTunVol2)), module, SickoSampler::VOL_INPUT));
-		//addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(50.5, yTunVol2)), module, SickoSampler::VOLATNV_PARAM));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(51, yTunVol2)), module, SickoSampler::VOLATNV_PARAM));
 
-		//addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(53, yTunVol-4.5)), module, SickoSampler::CLIPPING_LIGHT));
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(53.5, yTunVol-4.5)), module, SickoSampler::CLIPPING_LIGHT));
 
-		//addParam(createParamCentered<CKSS>(mm2px(Vec(59.3, 113)), module, SickoSampler::LIMIT_SWITCH));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(59.8, 113)), module, SickoSampler::LIMIT_SWITCH));
 
 		//----------------------------------------------------------------------------------------------------------------------------

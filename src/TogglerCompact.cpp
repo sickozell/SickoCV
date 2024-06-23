@@ -282,8 +282,8 @@ struct TogglerCompactWidget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/TogglerCompact.svg")));
 
-		addChild(createWidget<ScrewBlack>(Vec(0, 0)));
-		addChild(createWidget<ScrewBlack>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
+		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(4, 11.35)), module, TogglerCompact::MODE_SWITCH));
 

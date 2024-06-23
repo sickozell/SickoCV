@@ -1,5 +1,29 @@
 #pragma once
 
+struct SickoScrewSilver1 : app::SvgScrew {
+    SickoScrewSilver1() {
+        setSvg(Svg::load(asset::plugin(pluginInstance, "res/component/ScrewSilver1.svg")));
+    }
+};
+
+struct SickoScrewSilver2 : app::SvgScrew {
+    SickoScrewSilver2() {
+        setSvg(Svg::load(asset::plugin(pluginInstance, "res/component/ScrewSilver2.svg")));
+    }
+};
+
+struct SickoScrewBlack1 : app::SvgScrew {
+    SickoScrewBlack1() {
+        setSvg(Svg::load(asset::plugin(pluginInstance, "res/component/ScrewBlack1.svg")));
+    }
+};
+
+struct SickoScrewBlack2 : app::SvgScrew {
+    SickoScrewBlack2() {
+        setSvg(Svg::load(asset::plugin(pluginInstance, "res/component/ScrewBlack2.svg")));
+    }
+};
+
 struct SickoSwitch_Three_Horiz : SvgSwitch {
     SickoSwitch_Three_Horiz() {
         addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/Switch_H3_left.svg")));
