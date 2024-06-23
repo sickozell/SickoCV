@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.14
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/417f392e-8bf9-40fe-98dc-204889dc66ef)
+![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/8c5fc876-a3a8-4d59-9357-6a5ffff85d7f)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -565,11 +565,11 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 ## modulator / modulator7 / modulator7 Compact
 ### single or 7 triangle/ramp LFOs depending on a main rate managed by a manual knob or synchronized with a clock.
 
-![modulator](https://github.com/sickozell/SickoCV/assets/80784296/706a9a80-0b1e-462a-b3a4-21d8e80066e3)
+![modulator](https://github.com/sickozell/SickoCV/assets/80784296/9008ffd9-6ddb-486e-a957-3874e21b9750)
 
 #### - INSTRUCTIONS
 Following instructions refer to modulator7, but can be applied also to modulator module.  
-The 'modulator7 Compact' module is just a 7 triangle only unipolar LFOs whithout sync and reset features.  
+The 'modulator7 Compact' module is just a 7 triangle only uni/bipolar LFOs whithout sync and reset features.  
 
 Rate Knob range is 0.01/100 Hz and can be modulated by Rate Input and adjusted with its attenuverter.  
 The Sync button or a trigger on the Sync Switch Input, toggles between manual or synced rate.  
