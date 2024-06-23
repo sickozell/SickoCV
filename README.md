@@ -18,8 +18,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - 
 
 ## **changelog**  
-- added bipolar button on 'modulator7 compact'.
 - added 'slewer' module.
+- added bipolar button on 'modulator7 compact'.
 
 # SickoCV v2.6.14
 VCV Rack plugin modules

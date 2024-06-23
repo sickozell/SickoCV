@@ -1,4 +1,4 @@
-### 2.6.14 (2024-06-8)
+### 2.6.14 (2024-06-23)
 - added 'slewer' module.
 - added bipolar button on 'modulator7 compact'.
 

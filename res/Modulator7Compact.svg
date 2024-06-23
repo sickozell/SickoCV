@@ -503,15 +503,15 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
-       x="14.104499"
-       y="41.860413"
+       x="14.289062"
+       y="43.381248"
        id="text893"
        inkscape:label="b"><tspan
          sodipodi:role="line"
          id="tspan891"
          style="font-size:3.175px;text-align:center;text-anchor:middle;stroke:none;stroke-width:0.265"
-         x="14.104499"
-         y="41.860413">b</tspan></text>
+         x="14.289062"
+         y="43.381248">b</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
@@ -577,7 +577,7 @@
        id="text1013"
        style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#000000;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="b"
-       transform="translate(6.1474537,-0.8218732)">
+       transform="translate(6.3320173,0.69896265)">
       <path
          d="m 7.3617374,42.285414 h 0.7937499 v -0.79375 H 7.3617374 Z m -0.79375,0.396875 v -2.38125 h 0.79375 v 0.79375 h 1.1906249 v 0.396875 h 0.396875 v 0.79375 h -0.396875 v 0.396875 z"
          style="fill:#000000;stroke-width:0.265"
@@ -655,7 +655,7 @@
        id="g1064"
        style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999"
        inkscape:label="b"
-       transform="translate(6.1474537,-0.8218732)">
+       transform="translate(6.3320173,0.69896265)">
       <path
          d="m 7.3617374,42.285414 h 0.7937499 v -0.79375 H 7.3617374 Z m -0.79375,0.396875 v -2.38125 h 0.79375 v 0.79375 h 1.1906249 v 0.396875 h 0.396875 v 0.79375 h -0.396875 v 0.396875 z"
          style="stroke-width:0.265"
