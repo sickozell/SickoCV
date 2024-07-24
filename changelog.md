@@ -1,6 +1,6 @@
 ### 2.6.15 (2024-07-xx)
 - Enver: changed envelope shapes order and improved curve resolution.
-- PolyMuter8+, PolyMuter16+ : added channel shrink option in right-click menu
+- PolyMuter8+, PolyMuter16+ : added 'Shrink channels' option in right-click menu
 
 ### 2.6.14 (2024-06-23)
 - added 'slewer' module.

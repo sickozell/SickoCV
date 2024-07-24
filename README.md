@@ -19,7 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog**  
 - Enver: changed envelope shapes order and improved curve resolution.
-- PolyMuter8+, PolyMuter16+ : added channel shrink option in right-click menu
+- PolyMuter8+, PolyMuter16+ : added 'Shrink channels' option in right-click menu
 
 # SickoCV v2.6.15
 VCV Rack plugin modules
@@ -641,7 +641,10 @@ polyMuter16 is the standard version of the module, polyMuter8 will output a maxi
 
 The plus version of each module can also 'solo' the channels by right-clicking on mute buttons, so the led button will become green. Multiple solo channels can be selected.  
 If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be directly unmuted.  
-By using the plus version of polyMuter the right-click menu of buttons is no longer available (that's why there are two versions), but the buttons are still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function by a +3.4v/9.9v gate.
+By using the plus version of polyMuter the right-click menu of buttons is no longer available (that's why there are two versions of these modules), but the buttons are still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function by a +3.4v/9.9v gate.
+
+#### RIGHT-CLICK MENU
+On the plus versions of polyMuter there is the 'Shrink Channels' option that deletes the muted channels from the output stream or let only the soloed channels to be on the output stream.
 
 [back to top](#table-of-contents)
 
