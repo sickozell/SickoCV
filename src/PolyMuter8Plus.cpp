@@ -409,7 +409,7 @@ struct PolyMuter8Plus : Module {
 					case SOLOED:
 						prevGlobalSolo = false;
 						globalSolo = true;
-						prevStatus[c] = SOLOED;
+						prevStatus[c] = UNMUTED;
 						status[c] = SOLOED;
 						ampValue[c] = 1;
 						fading[c] = false;
@@ -418,7 +418,7 @@ struct PolyMuter8Plus : Module {
 					case MUTED_SOLOED:
 						prevGlobalSolo = false;
 						globalSolo = true;
-						prevStatus[c] = MUTED_SOLOED;
+						prevStatus[c] = MUTED;
 						status[c] = MUTED_SOLOED;
 						ampValue[c] = 1;
 						fading[c] = false;
