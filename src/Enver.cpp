@@ -200,6 +200,7 @@ struct Enver : Module {
 		tenSmS = sampleRate * 10;
 	}
 
+	/*
 	float shapeResponse(float value) {
 		
 		if (shape < 0.25f) {
@@ -224,6 +225,35 @@ struct Enver : Module {
 			return (value * (1 - ((shape - 0.5f) * 4.f))) + (expTable[2][int(expTableCoeff * value)] * ((shape - 0.5f) * 4.f));
 		} else {
 			return (expTable[2][int(expTableCoeff * value)] * (1 - ((shape - 0.75f) * 4.f))) + (expTable[0][int(expTableCoeff * value)] * ((shape - 0.75f) * 4.f));
+		}		
+
+	}
+	*/
+	
+	float shapeResponse(float value) {
+		
+		if (shape < 0.25f) {
+			return (expTable[2][int(expTableCoeff * value)] * (1 - shape * 4.f)) + (expTable[0][int(expTableCoeff * value)] * (shape * 4.f));
+		} else if (shape < 0.5f) {
+			return (expTable[0][int(expTableCoeff * value)] * (1 - ((shape - 0.25f) * 4.f))) + (value * ((shape - 0.25f) * 4.f));
+		} else if (shape < 0.75f) {
+			return (value * (1 - ((shape - 0.5f) * 4.f))) + (expTable[1][int(expTableCoeff * value)] * ((shape - 0.5f) * 4.f));
+		} else {
+			return (expTable[1][int(expTableCoeff * value)] * (1 - ((shape - 0.75f) * 4.f))) + (expTable[3][int(expTableCoeff * value)] * ((shape - 0.75f) * 4.f));
+		}		
+
+	}
+
+	float shapeResponse2(float value) {
+		
+		if (shape < 0.25f) {
+			return (expTable[2][int(expTableCoeff * value)] * (1 - shape * 4.f)) + (expTable[1][int(expTableCoeff * value)] * (shape * 4.f));
+		} else if (shape < 0.5f) {
+			return (expTable[1][int(expTableCoeff * value)] * (1 - ((shape - 0.25f) * 4.f))) + (value * ((shape - 0.25f) * 4.f));
+		} else if (shape < 0.75f) {
+			return (value * (1 - ((shape - 0.5f) * 4.f))) + (expTable[0][int(expTableCoeff * value)] * ((shape - 0.5f) * 4.f));
+		} else {
+			return (expTable[0][int(expTableCoeff * value)] * (1 - ((shape - 0.75f) * 4.f))) + (expTable[3][int(expTableCoeff * value)] * ((shape - 0.75f) * 4.f));
 		}		
 
 	}

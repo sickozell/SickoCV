@@ -1,4 +1,4 @@
-# SickoCV v2.6.14-beta6
+# SickoCV v2.6.15-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,10 +18,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - 
 
 ## **changelog**  
-- added 'slewer' module.
-- added bipolar button on 'modulator7 compact'.
+- Enver: changed envelope shapes order and improved curve resolution.
+- PolyMuter8+, PolyMuter16+ : added channel shrink option in right-click menu
 
-# SickoCV v2.6.14
+# SickoCV v2.6.15
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/8c5fc876-a3a8-4d59-9357-6a5ffff85d7f)
