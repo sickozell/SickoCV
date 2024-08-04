@@ -647,7 +647,7 @@ By using the plus version of polyMuter the right-click menu of buttons is no lon
 #### Right-click menu
 - Show OUT channels. This options show the output channels in green, instead of input channels in red.
 - Shrink Channels. It deletes the muted channels from the output stream or let only the soloed channels to be on the output stream.
-- Exclude -10v channels too (on polyMuter8 and polyMuter16 only). When shrinking channels option is enabled, this will exclude from the output stream the channels with exactly -10v
+- Exclude -10v channels too (on polyMuter8 and polyMuter16 only). When shrinking channels option is enabled, this will exclude from the output stream the channels with exactly -10v.
 
 [back to top](#table-of-contents)
 
