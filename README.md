@@ -644,8 +644,10 @@ The plus version of each module can also 'solo' the channels by right-clicking o
 If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be directly unmuted.  
 By using the plus version of polyMuter the right-click menu of buttons is no longer available (that's why there are two versions of these modules), but the buttons are still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function by a +3.4v/9.9v gate.
 
-#### RIGHT-CLICK MENU
-On the plus versions of polyMuter there is the 'Shrink Channels' option that deletes the muted channels from the output stream or let only the soloed channels to be on the output stream.
+#### Right-click menu
+- Show OUT channels. This options show the output channels in green, instead of input channels in red.
+- Shrink Channels. It deletes the muted channels from the output stream or let only the soloed channels to be on the output stream.
+- Exclude -10v channels too (on polyMuter8 and polyMuter16 only). When shrinking channels option is enabled, this will exclude from the output stream the channels with exactly -10v
 
 [back to top](#table-of-contents)
 
