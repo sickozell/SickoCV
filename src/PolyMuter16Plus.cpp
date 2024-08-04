@@ -4,6 +4,7 @@
 #define MUTED 3
 
 #define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
+#define COLOR_LCD_GREEN 0x33, 0xdd, 0x33, 0xff
 
 #include "plugin.hpp"
 
@@ -182,9 +183,11 @@ struct PolyMuter16Plus : Module {
 	bool prevShrink = false;
 	int progChan;
 
+	bool showOut = false;
+
 	bool initStart = false;
 
-	//int inChans = 0;
+	int inChans = 0;
 	int outChans = 0;
 	int buttonValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int prevButtonValue[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -234,9 +237,10 @@ struct PolyMuter16Plus : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
-		initStart = false;
+		showOut = false;
 		shrink = false;
 		prevShrink = false;
+		initStart = false;
 
 		fadeKnob = 0.f;
 		prevFadeKnob = 1.f;
@@ -265,28 +269,20 @@ struct PolyMuter16Plus : Module {
 
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "showOut", json_boolean(showOut));
 		json_object_set_new(rootJ, "shrink", json_boolean(shrink));
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
-		json_object_set_new(rootJ, "status1", json_integer(params[MUTE_PARAM].getValue()));
-		json_object_set_new(rootJ, "status2", json_integer(params[MUTE_PARAM+1].getValue()));
-		json_object_set_new(rootJ, "status3", json_integer(params[MUTE_PARAM+2].getValue()));
-		json_object_set_new(rootJ, "status4", json_integer(params[MUTE_PARAM+3].getValue()));
-		json_object_set_new(rootJ, "status5", json_integer(params[MUTE_PARAM+4].getValue()));
-		json_object_set_new(rootJ, "status6", json_integer(params[MUTE_PARAM+5].getValue()));
-		json_object_set_new(rootJ, "status7", json_integer(params[MUTE_PARAM+6].getValue()));
-		json_object_set_new(rootJ, "status8", json_integer(params[MUTE_PARAM+7].getValue()));
-		json_object_set_new(rootJ, "status9", json_integer(params[MUTE_PARAM+8].getValue()));
-		json_object_set_new(rootJ, "status10", json_integer(params[MUTE_PARAM+9].getValue()));
-		json_object_set_new(rootJ, "status11", json_integer(params[MUTE_PARAM+10].getValue()));
-		json_object_set_new(rootJ, "status12", json_integer(params[MUTE_PARAM+11].getValue()));
-		json_object_set_new(rootJ, "status13", json_integer(params[MUTE_PARAM+12].getValue()));
-		json_object_set_new(rootJ, "status14", json_integer(params[MUTE_PARAM+13].getValue()));
-		json_object_set_new(rootJ, "status15", json_integer(params[MUTE_PARAM+14].getValue()));
-		json_object_set_new(rootJ, "status16", json_integer(params[MUTE_PARAM+15].getValue()));
+		for (int i=0; i < 16; i++)
+			json_object_set_new(rootJ, ("status"+to_string(i)).c_str(), json_integer(params[MUTE_PARAM+i].getValue()));
+
 		return rootJ;
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
+		json_t* showOutJ = json_object_get(rootJ, "showOut");
+		if (showOutJ)
+			showOut = json_boolean_value(showOutJ);
+
 		json_t* shrinkJ = json_object_get(rootJ, "shrink");
 		if (shrinkJ)
 			shrink = json_boolean_value(shrinkJ);
@@ -296,107 +292,16 @@ struct PolyMuter16Plus : Module {
 			initStart = json_boolean_value(initStartJ);
 
 		if (initStart) {
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < 16; i++)
 				params[MUTE_PARAM+i].setValue(0.f);
-			}
 		} else {
-			json_t* status1J = json_object_get(rootJ, "status1");
-			if (status1J){
-				buttonValue[0] = json_integer_value(status1J);
-				firstStatusCheck(0);
+			for (int i = 0; i < 16; i++) {
+				json_t* statusJ = json_object_get(rootJ, ("status"+to_string(i)).c_str());
+				if (statusJ) {
+					buttonValue[i] = json_integer_value(statusJ);
+					firstStatusCheck(i);
+				}
 			}
-
-			json_t* status2J = json_object_get(rootJ, "status2");
-			if (status2J){
-				buttonValue[1] = json_integer_value(status2J);
-				firstStatusCheck(1);
-			}
-
-			json_t* status3J = json_object_get(rootJ, "status3");
-			if (status3J){
-				buttonValue[2] = json_integer_value(status3J);
-				firstStatusCheck(2);
-			}
-
-			json_t* status4J = json_object_get(rootJ, "status4");
-			if (status4J){
-				buttonValue[3] = json_integer_value(status4J);
-				firstStatusCheck(3);
-			}
-
-			json_t* status5J = json_object_get(rootJ, "status5");
-			if (status5J){
-				buttonValue[4] = json_integer_value(status5J);
-				firstStatusCheck(4);
-			}
-
-			json_t* status6J = json_object_get(rootJ, "status6");
-			if (status6J){
-				buttonValue[5] = json_integer_value(status6J);
-				firstStatusCheck(5);
-			}
-
-			json_t* status7J = json_object_get(rootJ, "status7");
-			if (status7J){
-				buttonValue[6] = json_integer_value(status7J);
-				firstStatusCheck(6);
-				
-			}
-
-			json_t* status8J = json_object_get(rootJ, "status8");
-			if (status8J){
-				buttonValue[7] = json_integer_value(status8J);
-				firstStatusCheck(7);
-			}
-
-			json_t* status9J = json_object_get(rootJ, "status9");
-			if (status9J){
-				buttonValue[8] = json_integer_value(status9J);
-				firstStatusCheck(8);
-			}
-
-			json_t* status10J = json_object_get(rootJ, "status10");
-			if (status10J){
-				buttonValue[9] = json_integer_value(status10J);
-				firstStatusCheck(9);
-			}
-
-			json_t* status11J = json_object_get(rootJ, "status11");
-			if (status11J){
-				buttonValue[10] = json_integer_value(status11J);
-				firstStatusCheck(10);
-			}
-
-			json_t* status12J = json_object_get(rootJ, "status12");
-			if (status12J){
-				buttonValue[11] = json_integer_value(status12J);
-				firstStatusCheck(11);
-			}
-
-			json_t* status13J = json_object_get(rootJ, "status13");
-			if (status13J){
-				buttonValue[12] = json_integer_value(status13J);
-				firstStatusCheck(12);
-			}
-
-			json_t* status14J = json_object_get(rootJ, "status14");
-			if (status14J){
-				buttonValue[13] = json_integer_value(status14J);
-				firstStatusCheck(13);
-			}
-
-			json_t* status15J = json_object_get(rootJ, "status15");
-			if (status15J){
-				buttonValue[14] = json_integer_value(status15J);
-				firstStatusCheck(14);
-			}
-
-			json_t* status16J = json_object_get(rootJ, "status16");
-			if (status16J){
-				buttonValue[15] = json_integer_value(status16J);
-				firstStatusCheck(15);
-			}
-
 		}
 	}
 
@@ -451,6 +356,8 @@ struct PolyMuter16Plus : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+
+		inChans = std::max(1, inputs[IN_INPUT].getChannels());
 
 		if (!shrink && prevShrink) {
 			for (int c = 0; c < 16; c++) {
@@ -519,12 +426,10 @@ struct PolyMuter16Plus : Module {
 					for (int c = 0; c < 16; c++) {
 						if (prevStatus[c] == UNMUTED) {
 							fadeIn(c);
-							
 							status[c] = UNMUTED;
 
 						} else if (prevStatus[c] == MUTED) {
 							fadeOut(c);
-
 							status[c] = MUTED;						
 						}
 
@@ -579,7 +484,6 @@ struct PolyMuter16Plus : Module {
 										fadeIn(c);
 									prevStatus[c] = UNMUTED;
 									
-										
 									status[c] = UNMUTED;
 
 								break;
@@ -608,9 +512,9 @@ struct PolyMuter16Plus : Module {
 								case UNMUTED:
 									soloChans--;
 									if (globalSolo) {
-										if (prevStatus[c] == MUTED) {
+										if (prevStatus[c] == MUTED)
 											fadeOut(c);
-										} else
+										else
 											fadeIn(c);
 										prevStatus[c] = UNMUTED;
 									} else {
@@ -634,11 +538,10 @@ struct PolyMuter16Plus : Module {
 							switch (buttonValue[c]) {
 
 								case UNMUTED:
-									if (!globalSolo) {
+									if (!globalSolo)
 										fadeIn(c);
-									} else {
+									else
 										fadeOut(c);
-									}
 									soloChans--;
 
 									status[c] = UNMUTED;
@@ -659,15 +562,12 @@ struct PolyMuter16Plus : Module {
 				prevButtonValue[c] = buttonValue[c];
 			}
 
-			if (soloChans == 0) {
+			if (soloChans == 0)
 				globalSolo = false;
-			} else {
+			else
 				globalSolo = true;
-			}
 
-			outChans = std::max(1, inputs[IN_INPUT].getChannels());
-
-			for (int c = 0; c < outChans; c++) {
+			for (int c = 0; c < inChans; c++) {
 
 				if (fading[c]) {
 					ampValue[c] += ampDelta[c];
@@ -683,7 +583,7 @@ struct PolyMuter16Plus : Module {
 				outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * ampValue[c], c);
 			}
 
-			outputs[OUT_OUTPUT].setChannels(outChans);
+			outChans = inChans;
 
 			prevShrink = false;
 		
@@ -700,13 +600,11 @@ struct PolyMuter16Plus : Module {
 							switch (buttonValue[c]) {
 								case MUTED:
 									prevStatus[c] = MUTED;
-									//fadeOut(c);
 									status[c] = MUTED;
 								break;
 
 								case SOLOED:
 									soloChans++;
-									//fadeIn(c);
 									status[c] = SOLOED;
 									if (!globalSolo)
 										prevStatus[c] = UNMUTED;
@@ -714,7 +612,6 @@ struct PolyMuter16Plus : Module {
 
 								case MUTED_SOLOED:
 									soloChans++;
-									//fadeIn(c);
 									status[c] = MUTED_SOLOED;
 								break;
 
@@ -727,23 +624,17 @@ struct PolyMuter16Plus : Module {
 						case MUTED:
 							switch (buttonValue[c]) {
 								case UNMUTED:
-									/*if (!globalSolo) 
-										fadeIn(c);*/
 									prevStatus[c] = UNMUTED;
-									
 									status[c] = UNMUTED;
-
 								break;
 
 								case SOLOED:
 									soloChans++;
-									//fadeIn(c);
 									status[c] = SOLOED;
 								break;
 
 								case MUTED_SOLOED:
 									soloChans++;
-									//fadeIn(c);
 									status[c] = MUTED_SOLOED;
 									if (!globalSolo)
 										prevStatus[c] = MUTED;
@@ -758,21 +649,13 @@ struct PolyMuter16Plus : Module {
 							switch (buttonValue[c]) {
 								case UNMUTED:
 									soloChans--;
-									if (globalSolo) {
-										/*if (prevStatus[c] == MUTED) {
-											fadeOut(c);
-										} else
-											fadeIn(c);*/
+									if (globalSolo)
 										prevStatus[c] = UNMUTED;
-									} /*else {
-										fadeIn(c);
-									}*/
 									status[c] = UNMUTED;
 								break;
 
 								case MUTED:
 									soloChans--;
-									//fadeOut(c);
 									status[c] = MUTED;
 								break;
 							}
@@ -785,18 +668,11 @@ struct PolyMuter16Plus : Module {
 							switch (buttonValue[c]) {
 
 								case UNMUTED:
-									/*if (!globalSolo) {
-										fadeIn(c);
-									} else {
-										fadeOut(c);
-									}*/
 									soloChans--;
-
 									status[c] = UNMUTED;
 								break;
 
 								case MUTED:
-									//fadeOut(c);
 									soloChans--;
 									status[c] = MUTED;
 								break;
@@ -811,39 +687,39 @@ struct PolyMuter16Plus : Module {
 
 			}
 
-			if (soloChans == 0) {
+			if (soloChans == 0)
 				globalSolo = false;
-			} else {
+			else
 				globalSolo = true;
-			}
-
-			outChans = std::max(1, inputs[IN_INPUT].getChannels());
 
 			progChan = 0;
 			
 			if (globalSolo) {
 
-				for (int c = 0; c < outChans; c++) {
+				for (int c = 0; c < inChans; c++) {
 					if (status[c] == SOLOED || status[c] == MUTED_SOLOED) {
 						outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c), progChan);
 						progChan++;
 					}
 				}
-				outputs[OUT_OUTPUT].setChannels(progChan);
 
 			} else {
 
-				for (int c = 0; c < outChans; c++) {
+				for (int c = 0; c < inChans; c++) {
 					if (status[c] == UNMUTED) {
 						outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c), progChan);
 						progChan++;
 					}
 				}
-				outputs[OUT_OUTPUT].setChannels(progChan);
+				
 			}
 
+			outChans = progChan;
+			
 			prevShrink = true;
 		}
+
+		outputs[OUT_OUTPUT].setChannels(outChans);
 
 	}
 };
@@ -861,13 +737,20 @@ struct PolyMuter16PlusDisplayChan : TransparentWidget {
 				nvgFontSize(args.vg, 16);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
-
-				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));					
-				//if (module->inChans > 9)
-				if (module->outChans > 9)
-					nvgTextBox(args.vg, 4, 20.8, 60, to_string(module->outChans).c_str(), NULL);
-				else
-					nvgTextBox(args.vg, 17, 20.8, 60, to_string(module->outChans).c_str(), NULL);
+					
+				if (!module->showOut) {
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));
+					if (module->inChans > 9)
+						nvgTextBox(args.vg, 4, 21.2, 60, to_string(module->inChans).c_str(), NULL);
+					else
+						nvgTextBox(args.vg, 17, 21.2, 60, to_string(module->inChans).c_str(), NULL);
+				} else {
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
+					if (module->outChans > 9)
+						nvgTextBox(args.vg, 4, 21.2, 60, to_string(module->outChans).c_str(), NULL);
+					else
+						nvgTextBox(args.vg, 17, 21.2, 60, to_string(module->outChans).c_str(), NULL);
+				}
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -914,7 +797,7 @@ struct PolyMuter16PlusWidget : ModuleWidget {
 
 		{
 			PolyMuter16PlusDisplayChan *display = new PolyMuter16PlusDisplayChan();
-			display->box.pos = mm2px(Vec(20.9, 8.5));
+			display->box.pos = mm2px(Vec(20.9, 8.2));
 			display->box.size = mm2px(Vec(13.2, 8.6));
 			display->module = module;
 			addChild(display);
@@ -962,6 +845,8 @@ struct PolyMuter16PlusWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Right-click on buttons"));
 		menu->addChild(createMenuLabel("to SOLO channel"));
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Show OUT channels", "", &module->showOut));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Shrink channels", "", &module->shrink));
 		menu->addChild(new MenuSeparator());

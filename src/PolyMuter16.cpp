@@ -1,4 +1,5 @@
 #define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
+#define COLOR_LCD_GREEN 0x33, 0xdd, 0x33, 0xff
 
 #include "plugin.hpp"
 
@@ -35,13 +36,21 @@ struct PolyMuter16 : Module {
 	int debugInt = 0;
 	bool debugBool = false;
 	*/
+
+	bool shrink = false;
+	bool prevShrink = false;
+	bool shrink10v = false;
+	int progChan;
+
+	bool showOut = false;
 	
 	bool initStart = false;
 
 	int inChans = 0;
-	//int outChans = 0;
-	//int chan;
-	float mute[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	float inValue = 0.f;
+	int outChans = 0;
+
+	int mute[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevMute[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float ampValue[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 	float ampDelta[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -81,6 +90,10 @@ struct PolyMuter16 : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
+		showOut = false;
+		shrink = false;
+		prevShrink = false;
+		shrink10v = false;
 		initStart = false;
 
 		fadeKnob = 0.f;
@@ -101,177 +114,46 @@ struct PolyMuter16 : Module {
 	
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "showOut", json_boolean(showOut));
+		json_object_set_new(rootJ, "shrink", json_boolean(shrink));
+		json_object_set_new(rootJ, "shrink10v", json_boolean(shrink10v));
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
-		json_object_set_new(rootJ, "mute1", json_real(params[MUTE_PARAM].getValue()));
-		json_object_set_new(rootJ, "mute2", json_real(params[MUTE_PARAM+1].getValue()));
-		json_object_set_new(rootJ, "mute3", json_real(params[MUTE_PARAM+2].getValue()));
-		json_object_set_new(rootJ, "mute4", json_real(params[MUTE_PARAM+3].getValue()));
-		json_object_set_new(rootJ, "mute5", json_real(params[MUTE_PARAM+4].getValue()));
-		json_object_set_new(rootJ, "mute6", json_real(params[MUTE_PARAM+5].getValue()));
-		json_object_set_new(rootJ, "mute7", json_real(params[MUTE_PARAM+6].getValue()));
-		json_object_set_new(rootJ, "mute8", json_real(params[MUTE_PARAM+7].getValue()));
-		json_object_set_new(rootJ, "mute9", json_real(params[MUTE_PARAM+8].getValue()));
-		json_object_set_new(rootJ, "mute10", json_real(params[MUTE_PARAM+9].getValue()));
-		json_object_set_new(rootJ, "mute11", json_real(params[MUTE_PARAM+10].getValue()));
-		json_object_set_new(rootJ, "mute12", json_real(params[MUTE_PARAM+11].getValue()));
-		json_object_set_new(rootJ, "mute13", json_real(params[MUTE_PARAM+12].getValue()));
-		json_object_set_new(rootJ, "mute14", json_real(params[MUTE_PARAM+13].getValue()));
-		json_object_set_new(rootJ, "mute15", json_real(params[MUTE_PARAM+14].getValue()));
-		json_object_set_new(rootJ, "mute16", json_real(params[MUTE_PARAM+15].getValue()));
+		for (int i=0; i < 16; i++)
+			json_object_set_new(rootJ, ("mute"+to_string(i)).c_str(), json_integer(params[MUTE_PARAM+i].getValue()));
+
 		return rootJ;
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
+		json_t* showOutJ = json_object_get(rootJ, "showOut");
+		if (showOutJ)
+			showOut = json_boolean_value(showOutJ);
+
+		json_t* shrinkJ = json_object_get(rootJ, "shrink");
+		if (shrinkJ)
+			shrink = json_boolean_value(shrinkJ);
+
+		json_t* shrink10vJ = json_object_get(rootJ, "shrink10v");
+		if (shrink10vJ)
+			shrink10v = json_boolean_value(shrink10vJ);
+
 		json_t* initStartJ = json_object_get(rootJ, "initStart");
 		if (initStartJ)
 			initStart = json_boolean_value(initStartJ);
 
 		if (initStart) {
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < 16; i++) {
 				params[MUTE_PARAM+i].setValue(0.f);
 			}
 		} else {
-			json_t* mute1J = json_object_get(rootJ, "mute1");
-			if (mute1J){
-				mute[0] = json_real_value(mute1J);
-				if (mute[0] == 1.f) {
-					prevMute[0] = 1;
-					ampValue[0] = 0;
-				}
-			}
-
-			json_t* mute2J = json_object_get(rootJ, "mute2");
-			if (mute2J){
-				mute[1] = json_real_value(mute2J);
-				if (mute[1] == 1.f) {
-					prevMute[1] = 1;
-					ampValue[1] = 0;
-				}
-			}
-
-			json_t* mute3J = json_object_get(rootJ, "mute3");
-			if (mute3J){
-				mute[2] = json_real_value(mute3J);
-				if (mute[2] == 1.f) {
-					prevMute[2] = 1;
-					ampValue[2] = 0;
-				}
-			}
-
-			json_t* mute4J = json_object_get(rootJ, "mute4");
-			if (mute4J){
-				mute[3] = json_real_value(mute4J);
-				if (mute[3] == 1.f) {
-					prevMute[3] = 1;
-					ampValue[3] = 0;
-				}
-			}
-
-			json_t* mute5J = json_object_get(rootJ, "mute5");
-			if (mute5J){
-				mute[4] = json_real_value(mute5J);
-				if (mute[4] == 1.f) {
-					prevMute[4] = 1;
-					ampValue[4] = 0;
-				}
-			}
-
-			json_t* mute6J = json_object_get(rootJ, "mute6");
-			if (mute6J){
-				mute[5] = json_real_value(mute6J);
-				if (mute[5] == 1.f) {
-					prevMute[5] = 1;
-					ampValue[5] = 0;
-				}
-			}
-
-			json_t* mute7J = json_object_get(rootJ, "mute7");
-			if (mute7J){
-				mute[6] = json_real_value(mute7J);
-				if (mute[6] == 1.f) {
-					prevMute[6] = 1;
-					ampValue[6] = 0;
-				}
-			}
-
-			json_t* mute8J = json_object_get(rootJ, "mute8");
-			if (mute8J){
-				mute[7] = json_real_value(mute8J);
-				if (mute[7] == 1.f) {
-					prevMute[7] = 1;
-					ampValue[7] = 0;
-				}
-			}
-
-			json_t* mute9J = json_object_get(rootJ, "mute9");
-			if (mute9J){
-				mute[8] = json_real_value(mute9J);
-				if (mute[8] == 1.f) {
-					prevMute[8] = 1;
-					ampValue[8] = 0;
-				}
-			}
-
-			json_t* mute10J = json_object_get(rootJ, "mute10");
-			if (mute10J){
-				mute[9] = json_real_value(mute9J);
-				if (mute[9] == 1.f) {
-					prevMute[9] = 1;
-					ampValue[9] = 0;
-				}
-			}
-
-			json_t* mute11J = json_object_get(rootJ, "mute11");
-			if (mute11J){
-				mute[10] = json_real_value(mute11J);
-				if (mute[10] == 1.f) {
-					prevMute[10] = 1;
-					ampValue[10] = 0;
-				}
-			}
-
-			json_t* mute12J = json_object_get(rootJ, "mute12");
-			if (mute12J){
-				mute[11] = json_real_value(mute12J);
-				if (mute[11] == 1.f) {
-					prevMute[11] = 1;
-					ampValue[11] = 0;
-				}
-			}
-
-			json_t* mute13J = json_object_get(rootJ, "mute13");
-			if (mute13J){
-				mute[12] = json_real_value(mute13J);
-				if (mute[12] == 1.f) {
-					prevMute[12] = 1;
-					ampValue[12] = 0;
-				}
-			}
-
-			json_t* mute14J = json_object_get(rootJ, "mute14");
-			if (mute14J){
-				mute[13] = json_real_value(mute14J);
-				if (mute[13] == 1.f) {
-					prevMute[13] = 1;
-					ampValue[13] = 0;
-				}
-			}
-
-			json_t* mute15J = json_object_get(rootJ, "mute15");
-			if (mute15J){
-				mute[14] = json_real_value(mute15J);
-				if (mute[14] == 1.f) {
-					prevMute[14] = 1;
-					ampValue[14] = 0;
-				}
-			}
-
-			json_t* mute16J = json_object_get(rootJ, "mute16");
-			if (mute16J){
-				mute[15] = json_real_value(mute16J);
-				if (mute[15] == 1.f) {
-					prevMute[15] = 1;
-					ampValue[15] = 0;
+			for (int i = 0; i < 16; i++){
+				json_t* muteJ = json_object_get(rootJ, ("mute"+to_string(i)).c_str());
+				if (muteJ){
+					mute[i] = json_integer_value(muteJ);
+					if (mute[i] == 1) {
+						prevMute[i] = 1;
+						ampValue[i] = 0;
+					}
 				}
 			}
 		}
@@ -279,52 +161,103 @@ struct PolyMuter16 : Module {
 	
 	void process(const ProcessArgs& args) override {
 
-		fadeKnob = params[FADE_PARAM].getValue();
-
-		if (fadeKnob != prevFadeKnob) {
-			fadeValue = std::pow(10000.f, fadeKnob) / 1000;
-			prevFadeKnob = fadeKnob;
-		}
-
-		inChans = std::max(1, inputs[IN_INPUT].getChannels());
-		
-		for (int c = 0; c < 16; c++) {
-			mute[c] = params[MUTE_PARAM+c].getValue();
-			lights[MUTE_LIGHT+c].setBrightness(mute[c]);
-
-			if (mute[c] && !prevMute[c]) {	// mute chan
-				if (fadeValue > noEnvTime) {
-					fading[c] = true;
-					ampDelta[c] = -1 / fadeValue / args.sampleRate;
+		if (!shrink && prevShrink) {
+			for (int c = 0; c < 16; c++) {
+				if (mute[c]) {
+					prevMute[c] = 1;
+					ampValue[c] = 0;
 				} else {
-					ampValue[c] = 0.f;
-				}
-				
-			} else if (!mute[c] && prevMute[c]) { // unmute chan
-				if (fadeValue > noEnvTime) {
-					fading[c] = true;
-					ampDelta[c] = 1 / fadeValue / args.sampleRate;
-				} else {
-					ampValue[c] = 1.f;
+					prevMute[c] = 0;
+					ampValue[c] = 1;
 				}
 			}
-			prevMute[c] = mute[c];
+		}
 
-			if (fading[c]) {
-				ampValue[c] += ampDelta[c];
-				if (ampValue[c] > 1.f) {
-					fading[c] = false;
-					ampValue[c] = 1.f;
-				} else if (ampValue[c] < 0.f) {
-					fading[c] = false;
-					ampValue[c] = 0.f;
+		if (!shrink) {
+
+			// ********************************* STANDARD MUTER *****************************
+
+			fadeKnob = params[FADE_PARAM].getValue();
+
+			if (fadeKnob != prevFadeKnob) {
+				fadeValue = std::pow(10000.f, fadeKnob) / 1000;
+				prevFadeKnob = fadeKnob;
+			}
+
+			inChans = std::max(1, inputs[IN_INPUT].getChannels());
+			
+			for (int c = 0; c < 16; c++) {
+				mute[c] = params[MUTE_PARAM+c].getValue();
+				lights[MUTE_LIGHT+c].setBrightness(mute[c]);
+
+				if (mute[c] && !prevMute[c]) {	// mute chan
+					if (fadeValue > noEnvTime) {
+						fading[c] = true;
+						ampDelta[c] = -1 / fadeValue / args.sampleRate;
+					} else {
+						ampValue[c] = 0.f;
+					}
+					
+				} else if (!mute[c] && prevMute[c]) { // unmute chan
+					if (fadeValue > noEnvTime) {
+						fading[c] = true;
+						ampDelta[c] = 1 / fadeValue / args.sampleRate;
+					} else {
+						ampValue[c] = 1.f;
+					}
+				}
+				prevMute[c] = mute[c];
+
+				if (fading[c]) {
+					ampValue[c] += ampDelta[c];
+					if (ampValue[c] > 1.f) {
+						fading[c] = false;
+						ampValue[c] = 1.f;
+					} else if (ampValue[c] < 0.f) {
+						fading[c] = false;
+						ampValue[c] = 0.f;
+					}
+				}
+
+				outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * ampValue[c], c);
+			}
+
+			outChans = inChans;
+
+			prevShrink = false;
+
+		} else {
+
+			// ***************************** SHRINK CHANNELS *******************
+
+			inChans = std::max(1, inputs[IN_INPUT].getChannels());
+			progChan = 0;
+			
+			for (int c = 0; c < inChans; c++) {
+				mute[c] = params[MUTE_PARAM+c].getValue();
+				lights[MUTE_LIGHT+c].setBrightness(mute[c]);
+
+				inValue = inputs[IN_INPUT].getVoltage(c);
+
+				if (!mute[c]) {
+					if (shrink10v) {
+						if (inValue > -10.f) {
+							outputs[OUT_OUTPUT].setVoltage(inValue, progChan);
+							progChan++;
+						}
+					} else {
+						outputs[OUT_OUTPUT].setVoltage(inValue, progChan);
+						progChan++;
+					}
 				}
 			}
 
-			outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * ampValue[c], c);
+			outChans = progChan;
+
+			prevShrink = true;
 		}
 
-		outputs[OUT_OUTPUT].setChannels(inChans);
+		outputs[OUT_OUTPUT].setChannels(outChans);
 
 	}
 };
@@ -343,11 +276,19 @@ struct PolyMuter16DisplayChan : TransparentWidget {
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
 
-				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));					
-				if (module->inChans > 9)
-					nvgTextBox(args.vg, 4, 20.8, 60, to_string(module->inChans).c_str(), NULL);
-				else
-					nvgTextBox(args.vg, 17, 20.8, 60, to_string(module->inChans).c_str(), NULL);
+				if (!module->showOut) {	
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));		
+					if (module->inChans > 9)
+						nvgTextBox(args.vg, 4, 21.2, 60, to_string(module->inChans).c_str(), NULL);
+					else
+						nvgTextBox(args.vg, 17, 21.2, 60, to_string(module->inChans).c_str(), NULL);
+				} else {
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
+					if (module->outChans > 9)
+						nvgTextBox(args.vg, 4, 21.2, 60, to_string(module->outChans).c_str(), NULL);
+					else
+						nvgTextBox(args.vg, 17, 21.2, 60, to_string(module->outChans).c_str(), NULL);
+				}
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -428,19 +369,26 @@ struct PolyMuter16Widget : ModuleWidget {
 
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yOut)), module, PolyMuter16::OUT_OUTPUT));
 
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 8; i++)
 			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter16::MUTE_PARAM+i, PolyMuter16::MUTE_LIGHT+i));
-		}
 
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 8; i++)
 			addParam(createLightParamCentered<VCVLightBezelLatch<RedLight>>(mm2px(Vec(xRight, yStart2+(i*y))), module, PolyMuter16::MUTE_PARAM+8+i, PolyMuter16::MUTE_LIGHT+8+i));
-		}
 
 	}
 
 	void appendContextMenu(Menu* menu) override {
 		PolyMuter16* module = dynamic_cast<PolyMuter16*>(this->module);
 
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Show OUT channels", "", &module->showOut));
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Shrink channels", "", &module->shrink));
+		if (module->shrink)
+			menu->addChild(createBoolPtrMenuItem("exclude -10v chans too", "", &module->shrink10v));
+		else
+			menu->addChild(createMenuLabel("exclude -10v chans too"));
+		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 	}

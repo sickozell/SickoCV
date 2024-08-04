@@ -1,4 +1,4 @@
-# SickoCV v2.6.15-beta1
+# SickoCV v2.6.15-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,8 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - 
 
 ## **changelog**  
-- Enver: changed envelope shapes order and improved curve resolution.
-- PolyMuter8+, PolyMuter16+ : added 'Shrink channels' option in right-click menu
+- enver: changed envelope shapes order and increased curve resolution.
+- polyMuter modules: added 'Shrink channels' and 'Show OUT channels' options in the right-click menu
+- polyMuter8, polyMuter16: added 'exclude -10v channels too' option in addition to channel shrinking
 
 # SickoCV v2.6.15
 VCV Rack plugin modules
