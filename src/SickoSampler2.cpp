@@ -868,7 +868,12 @@ struct SickoSampler2 : Module {
 		if (path) {
 			saveMode = mode;
 			saveSample(path);
-			storedPath = std::string(path);
+			//storedPath = std::string(path);
+			std::string newPath = std::string(path);
+			if (newPath.substr(newPath.size() - 4) != ".wav" && newPath.substr(newPath.size() - 4) != ".WAV")
+				newPath += ".wav";
+			storedPath = newPath;
+			
 		}
 		channels = fileChannels;
 		fileLoaded = true;
@@ -945,7 +950,7 @@ struct SickoSampler2 : Module {
 
 		format.bitsPerSample = 32;
 
-		if (path.substr(path.size() - 4) != ".wav" and path.substr(path.size() - 4) != ".WAV")
+		if (path.substr(path.size() - 4) != ".wav" && path.substr(path.size() - 4) != ".WAV")
 			path += ".wav";
 
 		drwav *pWav = drwav_open_file_write(path.c_str(), &format);
