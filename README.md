@@ -579,7 +579,29 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 ![keysampler](https://github.com/user-attachments/assets/aeb16f51-e9c9-46d9-9b37-5c4d11eb5f4f)
 
 #### - INSTRUCTIONS
+
 COMING SOON  
+
+Some hints:  
+
+Every sample is stored in one of the 8 available slots and can be individually routed to one of the 8 outputs.  
+Multiple slots can be routed on the same output.  
+Each slot has its individual settings.  
+
+PB button, enables pitchbending on desired samples. Pitchbend range can be set in the right-click menu.
+
+The 'Quantize incoming v/Oct' option in the right-click menu avoids erroneus pitches when using non perfect v/oct signals.
+
+Key zones programming:  
+Every zone is composed by lower, upper and reference note. The reference note is the one that is supposed to be the original recorded pitch.
+Zones of just one note are allowed, usually for percussions or not pitchable samples.
+
+Press the yellow KEY SELECT button to choose the parameter to modify, then adjust the KEY knob to set the interested note.  
+
+Midi Learn is activated by holding the KEY SELECT button for about 1 second, the yellow led will fade in and out waiting the note to be pressed. Then the yellow led will flash for a while. Midi learn can be aborted by clicking the button again.
+
+
+
 
 [back to top](#table-of-contents)
 
