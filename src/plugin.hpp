@@ -33,6 +33,7 @@ extern Model* modelEnver;
 extern Model* modelHolder;
 extern Model* modelHolderCompact;
 extern Model* modelHolder8;
+extern Model* modelKeySampler;
 extern Model* modelModulator;
 extern Model* modelModulator7;
 extern Model* modelModulator7Compact;

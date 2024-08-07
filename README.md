@@ -1,4 +1,4 @@
-# SickoCV v2.6.15-beta2
+# SickoCV v2.6.16-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,11 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - 
 
 ## **changelog**  
-- enver: changed envelope shapes order and increased curve resolution.
-- polyMuter modules: added 'Shrink channels' and 'Show OUT channels' options in the right-click menu
-- polyMuter8, polyMuter16: added 'exclude -10v channels too' option in addition to channel shrinking
+- added keySampler module.
 
-# SickoCV v2.6.15
+# SickoCV v2.6.16
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/8c5fc876-a3a8-4d59-9357-6a5ffff85d7f)
@@ -43,6 +41,7 @@ VCV Rack plugin modules
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [enver](#enver)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
+- [keySampler](#keysampler)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
 - [multiRouter / multiSwitcher](#multirouter--multiswitcher)
 - [parking](#parking)
@@ -560,6 +559,26 @@ Comparison:
 
 **Noise Generator preset**  
 This function sets the module to Track & Hold mode, sample on HIGH gate, scale on 100% and offset to 0v, just to output white noise if trig/gate input is not connected or not triggered.
+
+[back to top](#table-of-contents)
+
+## keySampler
+### Keyboard controlled sampler
+
+#### - DESCRIPTION
+- up to 8 mono/stereo sample player/recorder
+- routable samples to 8 separate stereo outputs
+- keyboard controlled player with velocity and pitch bend controls
+- programmable key zones for each sample with midi learn
+- mono/stereo samples and 1-cycle waveforms player
+- gate or triggered play mode
+- envelope generator with adjustable shape, loop, reverse, pingpong
+- anti-aliasing filter, phase-scan feature
+- 90s style cyclic time-stretch feature
+
+
+#### - INSTRUCTIONS
+COMING SOON  
 
 [back to top](#table-of-contents)
 
