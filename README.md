@@ -576,6 +576,7 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 - anti-aliasing filter, phase-scan feature
 - 90s style cyclic time-stretch feature
 
+![keysampler](https://github.com/user-attachments/assets/aeb16f51-e9c9-46d9-9b37-5c4d11eb5f4f)
 
 #### - INSTRUCTIONS
 COMING SOON  
