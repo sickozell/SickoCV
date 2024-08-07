@@ -163,7 +163,7 @@ struct KeySampler : Module {
 	};
 
 	int currSlot = 0;
-	int prevSlot = 0;
+	int prevSlot = -1;
   
 	unsigned int fileChannels[8];
 	unsigned int channels[8];
@@ -913,6 +913,8 @@ struct KeySampler : Module {
 			
 		}
 
+		prevSlot = -1;
+		
 		selectedRange = 0;
 		//prevPitchBend = -11.f;
 		
