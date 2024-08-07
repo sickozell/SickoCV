@@ -1,4 +1,4 @@
-# SickoCV v2.6.14
+# SickoCV v2.6.15
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/8c5fc876-a3a8-4d59-9357-6a5ffff85d7f)
@@ -618,7 +618,12 @@ polyMuter16 is the standard version of the module, polyMuter8 will output a maxi
 
 The plus version of each module can also 'solo' the channels by right-clicking on mute buttons, so the led button will become green. Multiple solo channels can be selected.  
 If an already muted channel is soloed the button becomes green and red, with a further right-click it will go back to mute, or if left-clicked the channel will be directly unmuted.  
-By using the plus version of polyMuter the right-click menu of buttons is no longer available (that's why there are two versions), but the buttons are still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function by a +3.4v/9.9v gate.
+By using the plus version of polyMuter the right-click menu of buttons is no longer available (that's why there are two versions of these modules), but the buttons are still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function by a +3.4v/9.9v gate.
+
+#### Right-click menu
+- Show OUT channels. This options show the output channels in green, instead of input channels in red.
+- Shrink Channels. It deletes the muted channels from the output stream or let only the soloed channels to be on the output stream.
+- Exclude -10v channels too (on polyMuter8 and polyMuter16 only). When shrinking channels option is enabled, this will exclude from the output stream the channels with exactly -10v.
 
 [back to top](#table-of-contents)
 

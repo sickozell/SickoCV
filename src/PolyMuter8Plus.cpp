@@ -4,9 +4,9 @@
 #define MUTED 3
 
 #define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
+#define COLOR_LCD_GREEN 0x33, 0xdd, 0x33, 0xff
 
 #include "plugin.hpp"
-
 
 using namespace std;
 
@@ -14,138 +14,130 @@ using namespace std;
 
 template <class BASE>
 struct LightEmittingWidget : BASE {
-    virtual bool isLit() = 0;
+	virtual bool isLit() = 0;
 
-    void drawLayer(const typename BASE::DrawArgs& args, int layer) override {
-        if (layer == 1 && isLit()) {
-            drawLit(args);
-        }
-        BASE::drawLayer(args, layer);
-    }
+	void drawLayer(const typename BASE::DrawArgs& args, int layer) override {
+		if (layer == 1 && isLit()) {
+			drawLit(args);
+		}
+		BASE::drawLayer(args, layer);
+	}
 
-    virtual void drawLit(const typename BASE::DrawArgs& args) {}
+	virtual void drawLit(const typename BASE::DrawArgs& args) {}
 };
 
 // ----------------------------------------------------------------------------
 
 struct PM8SoloMuteButton : LightEmittingWidget<ParamWidget> {
-    std::vector<std::shared_ptr<Svg>> _frames;
-    SvgWidget* _svgWidget;
-    CircularShadow* shadow = NULL;
+	std::vector<std::shared_ptr<Svg>> _frames;
+	SvgWidget* _svgWidget;
+	CircularShadow* shadow = NULL;
 
-    PM8SoloMuteButton();
-    void onButton(const event::Button& e) override;
-    void onChange(const event::Change& e) override;
-    bool isLit() override;
-    void draw(const DrawArgs& args) override;
-    void drawLit(const DrawArgs& args) override;
+	PM8SoloMuteButton();
+	void onButton(const event::Button& e) override;
+	void onChange(const event::Change& e) override;
+	bool isLit() override;
+	void draw(const DrawArgs& args) override;
+	void drawLit(const DrawArgs& args) override;
 };
 
 
 // ----------------------------------------------------------------------------
 
-
 PM8SoloMuteButton::PM8SoloMuteButton() {
-    shadow = new CircularShadow();
-    addChild(shadow);
+	shadow = new CircularShadow();
+	addChild(shadow);
 
-    _svgWidget = new SvgWidget();
-    addChild(_svgWidget);
+	_svgWidget = new SvgWidget();
+	addChild(_svgWidget);
 
-    auto svg = APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_0.svg"));
-    _frames.push_back(svg);
-    _frames.push_back(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_1_green.svg")));
-    _frames.push_back(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_3_red_green.svg")));
-    //_frames.push_back(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_2_red.svg")));
-    //_frames.push_back(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_1_green.svg")));
-    _frames.push_back(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_2_red.svg")));
-    _svgWidget->setSvg(svg);
-    box.size = _svgWidget->box.size;
-    shadow->box.size = _svgWidget->box.size;
-    shadow->blurRadius = 1.0;
-    shadow->box.pos = Vec(0.0, 1.0);
+	auto svg = APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_0.svg"));
+	_frames.push_back(svg);
+	_frames.push_back(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_1_green.svg")));
+	_frames.push_back(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_3_red_green.svg")));
+	_frames.push_back(APP->window->loadSvg(asset::plugin(pluginInstance, "res/component/SickoMuteButton_2_red.svg")));
+	_svgWidget->setSvg(svg);
+	box.size = _svgWidget->box.size;
+	shadow->box.size = _svgWidget->box.size;
+	shadow->blurRadius = 1.0;
+	shadow->box.pos = Vec(0.0, 1.0);
 }
 
 void PM8SoloMuteButton::onButton(const event::Button& e) {
-    if (!getParamQuantity() || !(e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0)) {
-        ParamWidget::onButton(e);
-        return;
-    }
+	if (!getParamQuantity() || !(e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0)) {
+		ParamWidget::onButton(e);
+		return;
+	}
 
 
-    float value = getParamQuantity()->getValue();
+	float value = getParamQuantity()->getValue();
 
-    // 0 unmuted
-    // 1 soloed
-    // 2 soloed muted
-    // 3 muted
+	// 0 unmuted
+	// 1 soloed
+	// 2 soloed muted
+	// 3 muted
 
-    
-    if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-        if (value == 0.f)
-            getParamQuantity()->setValue(1.f);
-        else if (value == 1.f)
-            getParamQuantity()->setValue(0.f);
-        else if (value == 2.f)
-            getParamQuantity()->setValue(3.f);
-        else
-            getParamQuantity()->setValue(2.f);
-    }
-    else if (value == 0) {
-        getParamQuantity()->setValue(3.f);
-    }
-    else {
-        getParamQuantity()->setValue(0.0f);
-    }
-    
+	if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		if (value == 0.f)
+			getParamQuantity()->setValue(1.f);
+		else if (value == 1.f)
+			getParamQuantity()->setValue(0.f);
+		else if (value == 2.f)
+			getParamQuantity()->setValue(3.f);
+		else
+			getParamQuantity()->setValue(2.f);
+	} else if (value == 0) {
+		getParamQuantity()->setValue(3.f);
+	} else {
+		getParamQuantity()->setValue(0.0f);
+	}
 
-    /*
-    if (value >= 2.0f) {
-    //if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-        getParamQuantity()->setValue(value + 2.0f);
-    }
-    else if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-    //else if (value >= 2.0f) {
-        //getParamQuantity()->setValue(value - 2.0f);
-        getParamQuantity()->setValue(value - 2.0f);
-    }
-    else {
-        getParamQuantity()->setValue(value > 0.5f ? 0.0f : 1.0f);
-    }
-    */
+	/*
+	if (value >= 2.0f) {
+	//if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		getParamQuantity()->setValue(value + 2.0f);
+	} else if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+	//else if (value >= 2.0f) {
+		//getParamQuantity()->setValue(value - 2.0f);
+		getParamQuantity()->setValue(value - 2.0f);
+	} else {
+		getParamQuantity()->setValue(value > 0.5f ? 0.0f : 1.0f);
+	}
+	*/
 
-    if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-        e.consume(this);
-    } else {
-        ParamWidget::onButton(e);
-    }
+	if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		e.consume(this);
+	} else {
+		ParamWidget::onButton(e);
+	}
 }
 
 void PM8SoloMuteButton::onChange(const event::Change& e) {
-    assert(_frames.size() == 4);
-    if (getParamQuantity()) {
-        float value = getParamQuantity()->getValue();
-        assert(value >= 0.0f && value <= 3.0f);
-        _svgWidget->setSvg(_frames[(int)value]);
-    }
-    ParamWidget::onChange(e);
+	assert(_frames.size() == 4);
+	if (getParamQuantity()) {
+		float value = getParamQuantity()->getValue();
+		assert(value >= 0.0f && value <= 3.0f);
+		_svgWidget->setSvg(_frames[(int)value]);
+	}
+	ParamWidget::onChange(e);
 }
 
 bool PM8SoloMuteButton::isLit() {
-    return module && !module->isBypassed() && getParamQuantity() && getParamQuantity()->getValue() > 0.0f;
+	return module && !module->isBypassed() && getParamQuantity() && getParamQuantity()->getValue() > 0.0f;
 }
 
 void PM8SoloMuteButton::draw(const DrawArgs& args) {
-    if (!isLit() || !getParamQuantity() || getParamQuantity()->getValue() < 1.0f) {
-        ParamWidget::draw(args);
-    }
+	if (!isLit() || !getParamQuantity() || getParamQuantity()->getValue() < 1.0f) {
+		ParamWidget::draw(args);
+	}
 }
 
 void PM8SoloMuteButton::drawLit(const DrawArgs& args) {
-    if (getParamQuantity() && getParamQuantity()->getValue() >= 1.0f) {
-        ParamWidget::draw(args);
-    }
+	if (getParamQuantity() && getParamQuantity()->getValue() >= 1.0f) {
+		ParamWidget::draw(args);
+	}
 }
+
 // ---------------------- 
 
 struct PolyMuter8Plus : Module {
@@ -163,7 +155,6 @@ struct PolyMuter8Plus : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		//ENUMS(MUTE_LIGHT, 8),
 		LIGHTS_LEN
 	};
 
@@ -186,12 +177,18 @@ struct PolyMuter8Plus : Module {
 	*/
 	
 	//std::string db[4] = {"unm", "sol", "m-s", "mut"};
+
+	bool shrink = false;
+	bool prevShrink = false;
+	int progChan;
+
+	bool showOut = false;
 	
 	bool initStart = false;
 
 	int inChans = 0;
 	int outChans = 0;
-	//int chan;
+	int tempOutChans = 0;
 	int buttonValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	int prevButtonValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	int status[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -227,21 +224,14 @@ struct PolyMuter8Plus : Module {
 		configSwitch(MUTE_PARAM+5, 0.0f, 3.0f, 0.0f, "Mute #6", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
 		configSwitch(MUTE_PARAM+6, 0.0f, 3.0f, 0.0f, "Mute #7", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
 		configSwitch(MUTE_PARAM+7, 0.0f, 3.0f, 0.0f, "Mute #8", {"Unmuted", "Solo", "Solo/Mute", "Muted"});
-
-		/*
-		configSwitch(MUTE_PARAM+9, 0.f, 1.f, 0.f, "Mute #9", {"Off", "On"});
-		configSwitch(MUTE_PARAM+10, 0.f, 1.f, 0.f, "Mute #10", {"Off", "On"});
-		configSwitch(MUTE_PARAM+11, 0.f, 1.f, 0.f, "Mute #11", {"Off", "On"});
-		configSwitch(MUTE_PARAM+12, 0.f, 1.f, 0.f, "Mute #12", {"Off", "On"});
-		configSwitch(MUTE_PARAM+13, 0.f, 1.f, 0.f, "Mute #13", {"Off", "On"});
-		configSwitch(MUTE_PARAM+14, 0.f, 1.f, 0.f, "Mute #14", {"Off", "On"});
-		configSwitch(MUTE_PARAM+15, 0.f, 1.f, 0.f, "Mute #15", {"Off", "On"});
-		*/
 		
 		configOutput(OUT_OUTPUT, "Poly");
 	}
 
 	void onReset(const ResetEvent &e) override {
+		showOut = false;
+		shrink = false;
+		prevShrink = false;
 		initStart = false;
 
 		fadeKnob = 0.f;
@@ -271,19 +261,24 @@ struct PolyMuter8Plus : Module {
 
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "showOut", json_boolean(showOut));
+		json_object_set_new(rootJ, "shrink", json_boolean(shrink));
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
-		json_object_set_new(rootJ, "status1", json_integer(params[MUTE_PARAM].getValue()));
-		json_object_set_new(rootJ, "status2", json_integer(params[MUTE_PARAM+1].getValue()));
-		json_object_set_new(rootJ, "status3", json_integer(params[MUTE_PARAM+2].getValue()));
-		json_object_set_new(rootJ, "status4", json_integer(params[MUTE_PARAM+3].getValue()));
-		json_object_set_new(rootJ, "status5", json_integer(params[MUTE_PARAM+4].getValue()));
-		json_object_set_new(rootJ, "status6", json_integer(params[MUTE_PARAM+5].getValue()));
-		json_object_set_new(rootJ, "status7", json_integer(params[MUTE_PARAM+6].getValue()));
-		json_object_set_new(rootJ, "status8", json_integer(params[MUTE_PARAM+7].getValue()));
+		for (int i=0; i < 8; i++)
+			json_object_set_new(rootJ, ("status"+to_string(i)).c_str(), json_integer(params[MUTE_PARAM+i].getValue()));
+
 		return rootJ;
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
+		json_t* showOutJ = json_object_get(rootJ, "showOut");
+		if (showOutJ)
+			showOut = json_boolean_value(showOutJ);
+
+		json_t* shrinkJ = json_object_get(rootJ, "shrink");
+		if (shrinkJ)
+			shrink = json_boolean_value(shrinkJ);
+
 		json_t* initStartJ = json_object_get(rootJ, "initStart");
 		if (initStartJ)
 			initStart = json_boolean_value(initStartJ);
@@ -293,53 +288,12 @@ struct PolyMuter8Plus : Module {
 				params[MUTE_PARAM+i].setValue(0.f);
 			}
 		} else {
-			json_t* status1J = json_object_get(rootJ, "status1");
-			if (status1J){
-				buttonValue[0] = json_integer_value(status1J);
-				firstStatusCheck(0);
-			}
-
-			json_t* status2J = json_object_get(rootJ, "status2");
-			if (status2J){
-				buttonValue[1] = json_integer_value(status2J);
-				firstStatusCheck(1);
-			}
-
-			json_t* status3J = json_object_get(rootJ, "status3");
-			if (status3J){
-				buttonValue[2] = json_integer_value(status3J);
-				firstStatusCheck(2);
-			}
-
-			json_t* status4J = json_object_get(rootJ, "status4");
-			if (status4J){
-				buttonValue[3] = json_integer_value(status4J);
-				firstStatusCheck(3);
-			}
-
-			json_t* status5J = json_object_get(rootJ, "status5");
-			if (status5J){
-				buttonValue[4] = json_integer_value(status5J);
-				firstStatusCheck(4);
-			}
-
-			json_t* status6J = json_object_get(rootJ, "status6");
-			if (status6J){
-				buttonValue[5] = json_integer_value(status6J);
-				firstStatusCheck(5);
-			}
-
-			json_t* status7J = json_object_get(rootJ, "status7");
-			if (status7J){
-				buttonValue[6] = json_integer_value(status7J);
-				firstStatusCheck(6);
-				
-			}
-
-			json_t* status8J = json_object_get(rootJ, "status8");
-			if (status8J){
-				buttonValue[7] = json_integer_value(status8J);
-				firstStatusCheck(7);
+			for (int i = 0; i < 8; i++) {
+				json_t* statusJ = json_object_get(rootJ, ("status"+to_string(i)).c_str());
+				if (statusJ) {
+					buttonValue[i] = json_integer_value(statusJ);
+					firstStatusCheck(i);
+				}
 			}
 		}
 	}
@@ -396,213 +350,376 @@ struct PolyMuter8Plus : Module {
 
 	void process(const ProcessArgs& args) override {
 
-		fadeKnob = params[FADE_PARAM].getValue();
+		inChans = std::max(1, inputs[IN_INPUT].getChannels());
 
-		if (fadeKnob != prevFadeKnob) {
-			fadeValue = std::pow(10000.f, fadeKnob) / 1000;
-			prevFadeKnob = fadeKnob;
-		}
+		if (inChans < 9)
+			tempOutChans = inChans;
+		else
+			tempOutChans = 8;
 
-		if (globalSolo != prevGlobalSolo) {
-			if (globalSolo) {	// solo on
-				for (int c = 0; c < 8; c++) {
-					if (status[c] == UNMUTED) {
-						fadeOut(c);
-						prevStatus[c] = status[c];
-
-					} else if (status[c] == MUTED) {
-						fadeOut(c);
-						prevStatus[c] = status[c];
-					}
-				}
-			} else {	// solo off
-				for (int c = 0; c < 8; c++) {
-					if (prevStatus[c] == UNMUTED) {
-						fadeIn(c);
-						
-						status[c] = UNMUTED;
-
-					} else if (prevStatus[c] == MUTED) {
-						fadeOut(c);
-
-						status[c] = MUTED;						
-					}
-
-				}
-			}
-			prevGlobalSolo = globalSolo;
-		}
-
-		for (int c = 0; c < 8; c++) {
-
-			// 0 unmuted
-			// 1 soloed
-			// 2 soloed muted
-			// 3 muted
-
-			buttonValue[c] = int(params[MUTE_PARAM+c].getValue());
-
-			if (buttonValue[c] != prevButtonValue[c]) {
-				switch (prevButtonValue[c]) {
+		if (!shrink && prevShrink) {
+			for (int c = 0; c < 8; c++) {
+				switch (buttonValue[c]) {
 					case UNMUTED:
-						switch (buttonValue[c]) {
-							case MUTED:
-								prevStatus[c] = MUTED;
-								fadeOut(c);
-								status[c] = MUTED;
-							break;
-
-							case SOLOED:
-								soloChans++;
-								fadeIn(c);
-								status[c] = SOLOED;
-								if (!globalSolo)
-									prevStatus[c] = UNMUTED;
-							break;
-
-							case MUTED_SOLOED:
-								soloChans++;
-								fadeIn(c);
-								status[c] = MUTED_SOLOED;
-							break;
-
-						}
-
+						prevButtonValue[c] = UNMUTED;
+						prevStatus[c] = UNMUTED;
+						status[c] = UNMUTED;
+						ampValue[c] = 1;
+						fading[c] = false;
 					break;
-
-					// -------------------------------------
 
 					case MUTED:
-						switch (buttonValue[c]) {
-							case UNMUTED:
-								if (!globalSolo) 
-									fadeIn(c);
-								prevStatus[c] = UNMUTED;
-								
-									
-								status[c] = UNMUTED;
-
-							break;
-
-							case SOLOED:
-								soloChans++;
-								fadeIn(c);
-								status[c] = SOLOED;
-							break;
-
-							case MUTED_SOLOED:
-								soloChans++;
-								fadeIn(c);
-								status[c] = MUTED_SOLOED;
-								if (!globalSolo)
-									prevStatus[c] = MUTED;
-							break;
-						}
-
+						prevButtonValue[c] = MUTED;
+						prevStatus[c] = MUTED;
+						status[c] = MUTED;
+						ampValue[c] = 0;
+						fading[c] = false;
 					break;
-
-					// -------------------------------------
-
-					case MUTED_SOLOED:
-						switch (buttonValue[c]) {
-							case UNMUTED:
-								soloChans--;
-								if (globalSolo) {
-									if (prevStatus[c] == MUTED) {
-										fadeOut(c);
-									} else
-										fadeIn(c);
-									prevStatus[c] = UNMUTED;
-								} else {
-									fadeIn(c);
-								}
-								status[c] = UNMUTED;
-							break;
-
-							case MUTED:
-								soloChans--;
-								fadeOut(c);
-								status[c] = MUTED;
-							break;
-						}
-
-					break;
-
-					// -------------------------------------
 
 					case SOLOED:
-						switch (buttonValue[c]) {
-
-							case UNMUTED:
-								if (!globalSolo) {
-									fadeIn(c);
-								} else {
-									fadeOut(c);
-								}
-								soloChans--;
-
-								status[c] = UNMUTED;
-							break;
-
-							case MUTED:
-								fadeOut(c);
-								soloChans--;
-								status[c] = MUTED;
-							break;
-
-						}
-
+						prevGlobalSolo = false;
+						globalSolo = true;
+						prevStatus[c] = UNMUTED;
+						status[c] = SOLOED;
+						ampValue[c] = 1;
+						fading[c] = false;
 					break;
 
+					case MUTED_SOLOED:
+						prevGlobalSolo = false;
+						globalSolo = true;
+						prevStatus[c] = MUTED;
+						status[c] = MUTED_SOLOED;
+						ampValue[c] = 1;
+						fading[c] = false;
+					break;
 				}
 			}
-			prevButtonValue[c] = buttonValue[c];
 		}
 
-		if (soloChans == 0) {
-			globalSolo = false;
+		if (!shrink) {
+
+			// ********************************* STANDARD MUTER *****************************
+
+			fadeKnob = params[FADE_PARAM].getValue();
+
+			if (fadeKnob != prevFadeKnob) {
+				fadeValue = std::pow(10000.f, fadeKnob) / 1000;
+				prevFadeKnob = fadeKnob;
+			}
+
+			if (globalSolo != prevGlobalSolo) {
+				if (globalSolo) {	// solo on
+					for (int c = 0; c < 8; c++) {
+						if (status[c] == UNMUTED) {
+							fadeOut(c);
+							prevStatus[c] = status[c];
+
+						} else if (status[c] == MUTED) {
+							fadeOut(c);
+							prevStatus[c] = status[c];
+						}
+					}
+				} else {	// solo off
+					for (int c = 0; c < 8; c++) {
+						if (prevStatus[c] == UNMUTED) {
+							fadeIn(c);
+							status[c] = UNMUTED;
+
+						} else if (prevStatus[c] == MUTED) {
+							fadeOut(c);
+							status[c] = MUTED;						
+						}
+
+					}
+				}
+				prevGlobalSolo = globalSolo;
+			}
+
+			for (int c = 0; c < 8; c++) {
+
+				buttonValue[c] = int(params[MUTE_PARAM+c].getValue());
+
+				if (buttonValue[c] != prevButtonValue[c]) {
+					switch (prevButtonValue[c]) {
+						case UNMUTED:
+							switch (buttonValue[c]) {
+
+								case MUTED:
+									prevStatus[c] = MUTED;
+									fadeOut(c);
+									status[c] = MUTED;
+								break;
+
+								case SOLOED:
+									soloChans++;
+									fadeIn(c);
+									status[c] = SOLOED;
+									if (!globalSolo)
+										prevStatus[c] = UNMUTED;
+								break;
+
+								case MUTED_SOLOED:
+									soloChans++;
+									fadeIn(c);
+									status[c] = MUTED_SOLOED;
+								break;
+
+							}
+
+						break;
+
+						// -------------------------------------
+
+						case MUTED:
+							switch (buttonValue[c]) {
+
+								case UNMUTED:
+									if (!globalSolo) 
+										fadeIn(c);
+									prevStatus[c] = UNMUTED;
+									
+										
+									status[c] = UNMUTED;
+
+								break;
+
+								case SOLOED:
+									soloChans++;
+									fadeIn(c);
+									status[c] = SOLOED;
+								break;
+
+								case MUTED_SOLOED:
+									soloChans++;
+									fadeIn(c);
+									status[c] = MUTED_SOLOED;
+									if (!globalSolo)
+										prevStatus[c] = MUTED;
+								break;
+							}
+
+						break;
+
+						// -------------------------------------
+
+						case MUTED_SOLOED:
+							switch (buttonValue[c]) {
+
+								case UNMUTED:
+									soloChans--;
+									if (globalSolo) {
+										if (prevStatus[c] == MUTED) {
+											fadeOut(c);
+										} else
+											fadeIn(c);
+										prevStatus[c] = UNMUTED;
+									} else {
+										fadeIn(c);
+									}
+									status[c] = UNMUTED;
+								break;
+
+								case MUTED:
+									soloChans--;
+									fadeOut(c);
+									status[c] = MUTED;
+								break;
+							}
+
+						break;
+
+						// -------------------------------------
+
+						case SOLOED:
+							switch (buttonValue[c]) {
+
+								case UNMUTED:
+									if (!globalSolo) {
+										fadeIn(c);
+									} else {
+										fadeOut(c);
+									}
+									soloChans--;
+
+									status[c] = UNMUTED;
+								break;
+
+								case MUTED:
+									fadeOut(c);
+									soloChans--;
+									status[c] = MUTED;
+								break;
+
+							}
+
+						break;
+					}
+				}
+				prevButtonValue[c] = buttonValue[c];
+			}
+
+			if (soloChans == 0)
+				globalSolo = false;
+			else
+				globalSolo = true;
+
+			for (int c = 0; c < tempOutChans; c++) {
+
+				if (fading[c]) {
+					ampValue[c] += ampDelta[c];
+					if (ampValue[c] > 1.f) {
+						fading[c] = false;
+						ampValue[c] = 1.f;
+					} else if (ampValue[c] < 0.f) {
+						fading[c] = false;
+						ampValue[c] = 0.f;
+					}
+				}
+
+				outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * ampValue[c], c);
+			}
+
+			outChans = tempOutChans;
+
+			prevShrink = false;
+		
 		} else {
-			globalSolo = true;
-		}
 
-		/*
-		debugDisplay = db[prevButtonValue[0]];
-		debugDisplay2 = db[buttonValue[0]];
-		debugDisplay3 = db[prevStatus[0]];
-		debugDisplay4 = db[status[0]];
-		debugDisplay5 = db[prevButtonValue[1]];
-		debugDisplay6 = db[buttonValue[1]];
-		debugDisplay7 = db[prevStatus[1]];
-		debugDisplay8 = db[status[1]];
-		debugDisplay9 = to_string(soloChans);
-		*/
+			// ***************************** SHRINK CHANNELS *******************
 
-		inChans = std::max(1, inputs[IN_INPUT].getChannels());
-		
-		if (inChans < 9)
-			outChans = inChans;
-		else
-			outChans = 8;
-		
+			for (int c = 0; c < 8; c++) {
+				buttonValue[c] = int(params[MUTE_PARAM+c].getValue());
 
-		for (int c = 0; c < outChans; c++) {
+				if (buttonValue[c] != prevButtonValue[c]) {
 
-			if (fading[c]) {
-				ampValue[c] += ampDelta[c];
-				if (ampValue[c] > 1.f) {
-					fading[c] = false;
-					ampValue[c] = 1.f;
-				} else if (ampValue[c] < 0.f) {
-					fading[c] = false;
-					ampValue[c] = 0.f;
+					switch (prevButtonValue[c]) {
+
+						case UNMUTED:
+							switch (buttonValue[c]) {
+
+								case MUTED:
+									prevStatus[c] = MUTED;
+									status[c] = MUTED;
+								break;
+
+								case SOLOED:
+									soloChans++;
+									status[c] = SOLOED;
+									if (!globalSolo)
+										prevStatus[c] = UNMUTED;
+								break;
+
+								case MUTED_SOLOED:
+									soloChans++;
+									status[c] = MUTED_SOLOED;
+								break;
+
+							}
+
+						break;
+
+						// -------------------------------------
+
+						case MUTED:
+							switch (buttonValue[c]) {
+
+								case UNMUTED:
+									prevStatus[c] = UNMUTED;
+									status[c] = UNMUTED;
+								break;
+
+								case SOLOED:
+									soloChans++;
+									status[c] = SOLOED;
+								break;
+
+								case MUTED_SOLOED:
+									soloChans++;
+									status[c] = MUTED_SOLOED;
+									if (!globalSolo)
+										prevStatus[c] = MUTED;
+								break;
+							}
+
+						break;
+
+						// -------------------------------------
+
+						case MUTED_SOLOED:
+
+							switch (buttonValue[c]) {
+								case UNMUTED:
+									soloChans--;
+									if (globalSolo)
+										prevStatus[c] = UNMUTED;
+									status[c] = UNMUTED;
+								break;
+
+								case MUTED:
+									soloChans--;
+									status[c] = MUTED;
+								break;
+							}
+
+						break;
+
+						// -------------------------------------
+
+						case SOLOED:
+
+							switch (buttonValue[c]) {
+								case UNMUTED:
+									soloChans--;
+									status[c] = UNMUTED;
+								break;
+
+								case MUTED:
+									soloChans--;
+									status[c] = MUTED;
+								break;
+							}
+
+						break;
+					}
 				}
+				prevButtonValue[c] = buttonValue[c];
+
 			}
 
-			outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c) * ampValue[c], c);
+			if (soloChans == 0)
+				globalSolo = false;
+			else
+				globalSolo = true;
+
+			progChan = 0;
+			
+			if (globalSolo) {
+
+				for (int c = 0; c < tempOutChans; c++) {
+					if (status[c] == SOLOED || status[c] == MUTED_SOLOED) {
+						outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c), progChan);
+						progChan++;
+					}
+				}
+
+			} else {
+
+				for (int c = 0; c < tempOutChans; c++) {
+					if (status[c] == UNMUTED) {
+						outputs[OUT_OUTPUT].setVoltage(inputs[IN_INPUT].getVoltage(c), progChan);
+						progChan++;
+					}
+				}
+
+			}
+			outChans = progChan;
+
+			prevShrink = true;
+
 		}
 
 		outputs[OUT_OUTPUT].setChannels(outChans);
-
 	}
 };
 
@@ -619,12 +736,17 @@ struct PolyMuter8PlusDisplayChan : TransparentWidget {
 				nvgFontSize(args.vg, 10);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
-
-				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));					
-				if (module->inChans > 9)
-					nvgTextBox(args.vg, 1.5, 17, 60, to_string(module->inChans).c_str(), NULL);
-				else
-					nvgTextBox(args.vg, 9.8, 17, 60, to_string(module->inChans).c_str(), NULL);
+				
+				if (!module->showOut) {
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));
+					if (module->inChans > 9)
+						nvgTextBox(args.vg, 1.5, 17, 60, to_string(module->inChans).c_str(), NULL);
+					else
+						nvgTextBox(args.vg, 9.8, 17, 60, to_string(module->inChans).c_str(), NULL);
+				} else {
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
+					nvgTextBox(args.vg, 9.8, 17, 60, to_string(module->outChans).c_str(), NULL);
+				}
 			}
 		}
 		Widget::drawLayer(args, layer);
@@ -708,13 +830,11 @@ struct PolyMuter8PlusWidget : ModuleWidget {
 
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yFade)), module, PolyMuter8Plus::FADE_PARAM));
 
-		for (int i = 0; i < 8; i=i+2) {
+		for (int i = 0; i < 8; i=i+2)
 			addParam(createParamCentered<PM8SoloMuteButton>(mm2px(Vec(xLeft, yStart+(i*y))), module, PolyMuter8Plus::MUTE_PARAM+i));
-		}
 
-		for (int i = 1; i < 8; i=i+2) {
+		for (int i = 1; i < 8; i=i+2)
 			addParam(createParamCentered<PM8SoloMuteButton>(mm2px(Vec(xRight, yStart2+((i-1)*y))), module, PolyMuter8Plus::MUTE_PARAM+i));
-		}
 
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut)), module, PolyMuter8Plus::OUT_OUTPUT));
 
@@ -726,6 +846,10 @@ struct PolyMuter8PlusWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Right-click on buttons"));
 		menu->addChild(createMenuLabel("to SOLO channel"));
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Show OUT channels", "", &module->showOut));
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Shrink channels", "", &module->shrink));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 	}
