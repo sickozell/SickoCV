@@ -1986,7 +1986,8 @@ struct SickoSampler2 : Module {
 					} else
 						distancePos[c] = sampleCoeff;
 
-					if (play[c] && voct[c] < voctDisplay) {
+					//if (play[c] && voct[c] < voctDisplay) {
+					if (voct[c] < voctDisplay) {
 						currentDisplay = c;
 						voctDisplay = voct[c];
 					}
