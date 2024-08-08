@@ -3,12 +3,6 @@
 #define COLOR_LCD_BLUE 0xca, 0xca, 0xff, 0xff
 #define COLOR_LCD_BLACK 0x00, 0x00, 0x00, 0xff
 
-/*
-#define LO_COLOR_LCD_RED 0xaa, 0x33, 0x33, 0xff
-#define LO_COLOR_LCD_GREEN 0x33, 0x99, 0x33, 0xff
-#define LO_COLOR_LCD_BLUE 0x66, 0x66, 0xaa, 0xff
-*/
-
 #define LEFT 0
 #define RIGHT 1
 #define STOP_STAGE 0
@@ -85,80 +79,57 @@ struct KeySampler : Module {
 		GAIN_PARAM,
 		REC_PARAM,
 		MONITOR_SWITCH,
-
 		SLOT_SELECTOR_PARAM,
-		//TEST_SAMPLE_PARAM,
-		//TESTBUT_PARAM, // al posto di TEST_SAMPLE_PARAM
 		RANGE_PARAM,
 		RANGE_SELECTOR_PARAM,
 		OUT_SELECTOR_PARAM,
-
 		CUESTART_PARAM,
 		CUEEND_PARAM,
 		LOOPSTART_PARAM,
 		LOOPEND_PARAM,
-
 		REV_PARAM,
 		XFADE_PARAM,
 		LOOP_PARAM,
 		PINGPONG_PARAM,
-
 		TRIGGATEMODE_SWITCH,
 		TRIGMODE_SWITCH,
 		PB_SWITCH,
-
 		PHASESCAN_SWITCH,
-
 		ATTACK_PARAM,
 		DECAY_PARAM,
 		SUSTAIN_PARAM,
 		RELEASE_PARAM,
 		CURVE_PARAM,
-		
 		STRETCH_PARAM,
 		STR_SIZE_PARAM,
-
 		VOL_PARAM,
-		
 		PREVSAMPLE_PARAM,
 		NEXTSAMPLE_PARAM,
-
 		NUM_PARAMS 
 	};
 	enum InputIds {
 		ENUMS(IN_INPUT, 2),
-
 		GATE_INPUT,
 		VO_INPUT,
 		VEL_INPUT,
 		PB_INPUT,
-		
 		NUM_INPUTS
 	};
 	enum OutputIds {
-		//ENUMS(OUT_OUTPUT, 2),
 		ENUMS(LEFT_OUTPUT, 8),
 		ENUMS(RIGHT_OUTPUT, 8),
-		//EOC_OUTPUT,
-		//EOR_OUTPUT,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
 		REC_LIGHT,
 		MONITOR_LIGHT,
-
-		//TESTBUT_LIGHT,
 		RANGE_SELECTOR_LIGHT,
-
 		LOOP_LIGHT,
 		REV_LIGHT,
 		PINGPONG_LIGHT,
-
 		TRIGMODE_LIGHT,
 		PB_LIGHT,
-
 		PHASESCAN_LIGHT,
-
 		NUM_LIGHTS
 	};
 
@@ -315,7 +286,7 @@ struct KeySampler : Module {
 								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 							};
-	//int trigButValue = 0;
+
 	float prevTrigValue[8][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -330,8 +301,6 @@ struct KeySampler : Module {
 	bool trimOnSave = false;
 	int antiAlias = 1;
 	bool quantize = false;
-	//int polyOuts = MONOPHONIC;
-	//int polyMaster = POLYPHONIC;
 	
 	bool prevPhaseScan[8] = {false, false, false, false, false, false, false, false};
 
@@ -366,7 +335,7 @@ struct KeySampler : Module {
 								{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f},
 								{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f}
 								};
-	//float fadeDecrement[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
 	double fadedPosition[8][16] = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
 									{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
 									{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -385,14 +354,14 @@ struct KeySampler : Module {
 	float sumOutput[8] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	float sumOutputR[8] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 
-	
+	/*
 	std::string debugDisplay[16] = {"X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"};
 	std::string debugDisplay2 = "X";
 	std::string debugDisplay3 = "X";
 	std::string debugDisplay4 = "X";
 	int debugInt = 0;
 	bool debugBool = false;
-	
+	*/
 
 	double a0, a1, a2, b1, b2, z1, z2, z1r, z2r;
 
@@ -411,7 +380,6 @@ struct KeySampler : Module {
 	bool phaseScan[8] = {true, true, true, true, true, true, true, true};
 	float attackKnob[8] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	float decayKnob[8] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
-	//float sustainKnob[8] = {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f};
 	float releaseKnob[8] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	float shape[8] = {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
 	float stretchKnob[8] = {1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f};
@@ -440,7 +408,6 @@ struct KeySampler : Module {
 
 	float prevAttackKnob[8] = {-1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f};
 	float prevDecayKnob[8] = {-1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f};
-	//float prevSustainKnob[8] = {-1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f};
 	float prevReleaseKnob[8] = {-1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f, -1.f};
 
 	float trigRange = 0;
@@ -505,6 +472,7 @@ struct KeySampler : Module {
 								{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f}
 								};
 	
+	/* // // RELEASE NEW DEVE SERVIRE SOLO PER GLI EOC ????? SI PUO' TOGLIERE
 	bool releaseNew[8][16] = {{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 							{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 							{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -513,26 +481,11 @@ struct KeySampler : Module {
 							{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 							{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 							{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
-						};	// RELEASE NEW DEVE SERVIRE SOLO PER GLI EOC ????? SI PUO' TOGLIERE
-
-	/*
-	bool eoc[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-	bool eor[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-	float eocTime[16];
-	float eorTime[16];
+						};	
 	*/
+
 	float oneMsSamples  = (APP->engine->getSampleRate()) / 1000;	// number of samples in 1ms
 	float envSrCoeff = 1 / APP->engine->getSampleRate();
-
-	/*
-	bool eocFromTrg = false;
-	bool eocFromCueEnd = true;
-	bool eocFromCueStart = true;
-	bool eocFromLoopEnd = true;
-	bool eocFromLoopStart = true;
-	bool eocFromPing = true;
-	bool eocFromPong = true;
-	*/
 
 	int chan;
 
@@ -636,7 +589,7 @@ struct KeySampler : Module {
 										{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 									};
 	double stretchMaxPos[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	//drwav_uint64 grainPos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 	double grainPos[8][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -715,12 +668,9 @@ struct KeySampler : Module {
 		configParam(SLOT_SELECTOR_PARAM, 1.f, 8.f, 1.f, "Slot");
 		paramQuantities[SLOT_SELECTOR_PARAM]->snapEnabled = true;
 
-		//configSwitch(TESTBUT_PARAM, 0.f, 1.f, 0.f, "Test", {"OFF", "ON"});
-
 		configParam(RANGE_PARAM, 0.f, 127.f, 72.f, "Midi");
 		paramQuantities[RANGE_PARAM]->snapEnabled = true;
 
-		//configSwitch(RANGE_SELECTOR_PARAM, 0.f, 1.f, 0.f, "Key Select", {"OFF", "ON"});
 		configSwitch(RANGE_SELECTOR_PARAM, 0.f, 1.f, 0.f, "Key Select");
 
 		configParam(OUT_SELECTOR_PARAM, 1.f, 8.f, 1.f, "Out");
@@ -773,9 +723,6 @@ struct KeySampler : Module {
 		configInput(PB_INPUT,"Pitch Bend");
 
 		//******************************************************************************
-		
-		//configOutput(OUT_OUTPUT,"Left");
-		//configOutput(OUT_OUTPUT+1,"Right");
 
 		configOutput(LEFT_OUTPUT,"Left #1");
 		configOutput(RIGHT_OUTPUT,"Right #1");
@@ -916,25 +863,14 @@ struct KeySampler : Module {
 		prevSlot = -1;
 		
 		selectedRange = 0;
-		//prevPitchBend = -11.f;
 		
 		trimOnSave = false;
 		antiAlias = 1;
-		//polyOuts = MONOPHONIC;
-		//polyMaster = POLYPHONIC;
+
 		quantize = false;
 		pbRange = 1;
 		
 		autoMonOff = true;
-		/*
-		eocFromTrg = false;
-		eocFromCueEnd = true;
-		eocFromCueStart = true;
-		eocFromLoopEnd = true;
-		eocFromLoopStart = true;
-		eocFromPing = true;
-		eocFromPong = true;
-		*/
 		
 		resetCursorsOnLoad = true;
 		saveOversampled = false;
@@ -959,7 +895,6 @@ struct KeySampler : Module {
 				loadSample(patchFile, slot);
 			}
 		}
-		//DEBUG("POST onAdd()");
 		Module::onAdd(e);
 	}
 
@@ -986,19 +921,7 @@ struct KeySampler : Module {
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "quantize", json_boolean(quantize));
 		json_object_set_new(rootJ, "pbRange", json_integer(pbRange));
-
-		//json_object_set_new(rootJ, "PolyOuts", json_integer(polyOuts));
-		//json_object_set_new(rootJ, "PolyMaster", json_integer(polyMaster));
 		json_object_set_new(rootJ, "AutoMonOff", json_integer(autoMonOff));
-		/*
-		json_object_set_new(rootJ, "EocFromTrg", json_boolean(eocFromTrg));
-		json_object_set_new(rootJ, "EocFromCueEnd", json_boolean(eocFromCueEnd));
-		json_object_set_new(rootJ, "EocFromCueStart", json_boolean(eocFromCueStart));
-		json_object_set_new(rootJ, "EocFromLoopEnd", json_boolean(eocFromLoopEnd));
-		json_object_set_new(rootJ, "EocFromLoopStart", json_boolean(eocFromLoopStart));
-		json_object_set_new(rootJ, "EocFromPing", json_boolean(eocFromPing));
-		json_object_set_new(rootJ, "EocFromPong", json_boolean(eocFromPong));
-		*/
 		json_object_set_new(rootJ, "ResetCursorsOnLoad", json_boolean(resetCursorsOnLoad));
 		json_object_set_new(rootJ, "DisableNav", json_boolean(disableNav));
 		json_object_set_new(rootJ, "sampleInPatch", json_boolean(sampleInPatch));
@@ -1048,25 +971,15 @@ struct KeySampler : Module {
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
 			antiAlias = json_integer_value(antiAliasJ);
-
 		json_t* quantizeJ = json_object_get(rootJ, "quantize");
 		if (quantizeJ)
 			quantize = json_boolean_value(quantizeJ);
 		json_t* pbRangeJ = json_object_get(rootJ, "pbRange");
 		if (pbRangeJ)
 			pbRange = json_integer_value(pbRangeJ);
-		/*
-		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
-		if (polyOutsJ)
-			polyOuts = json_integer_value(polyOutsJ);
-		json_t* polyMasterJ = json_object_get(rootJ, "PolyMaster");
-		if (polyMasterJ)
-			polyMaster = json_integer_value(polyMasterJ);
-		*/
 		json_t* autoMonOffJ = json_object_get(rootJ, "AutoMonOff");
 		if (autoMonOffJ)
 			autoMonOff = json_integer_value(autoMonOffJ);
-
 		json_t* resetCursorsOnLoadJ = json_object_get(rootJ, "ResetCursorsOnLoad");
 		if (resetCursorsOnLoadJ)
 			resetCursorsOnLoad = json_boolean_value(resetCursorsOnLoadJ);
@@ -1079,7 +992,6 @@ struct KeySampler : Module {
 		json_t* unlimitedRecordingJ = json_object_get(rootJ, "unlimitedRecording");
 		if (unlimitedRecordingJ)
 			unlimitedRecording = json_boolean_value(unlimitedRecordingJ);
-		
 		json_t* currSlotJ = json_object_get(rootJ, "currSlot");
 		if (currSlotJ)
 			currSlot = json_integer_value(currSlotJ);
@@ -1182,7 +1094,6 @@ struct KeySampler : Module {
 					firstLoad[slot] = false;
 			}
 		}
-
 		
 		json_t *userFolderJ = json_object_get(rootJ, "UserFolder");
 		if (userFolderJ) {
@@ -1195,7 +1106,6 @@ struct KeySampler : Module {
 				}
 			}
 		}
-		//DEBUG("JSON loaded");
 	}
 
 	inline void calcAttack(int slot) {
@@ -1400,7 +1310,6 @@ struct KeySampler : Module {
 // https://fsymbols.com/generators/carty/
 
 	void onSampleRateChange() override {
-		//DEBUG("[KeySampler] START RESAMPLING FUNC");
 
 		monitorFadeCoeff = 10 / (APP->engine->getSampleRate()); // 100ms monitor fade
 		oneMsSamples = (APP->engine->getSampleRate())/1000;			// number of samples for 1 ms used for output triggers
@@ -1433,7 +1342,6 @@ struct KeySampler : Module {
 			for (int slot = 0; slot < 8; slot++) {
 				
 				if (fileLoaded[slot]) {
-					//DEBUG("[KeySampler] start resampling %d", slot);
 
 					double resampleCoeff;
 
@@ -1667,7 +1575,9 @@ struct KeySampler : Module {
 			infoToSave[slot] = "";
 			fileDescription[slot] = basename(pathDup);
 		} else {
-			if (fileDescription[slot] != "_unknown_.wav")
+			/*if (fileDescription[slot] != "_unknown_.wav")
+				fileDescription[slot] = basename(pathDup);*/
+			if (fileDescription[slot] != "_slot"+to_string(slot+1)+".wav")
 				fileDescription[slot] = basename(pathDup);
 		}
 
@@ -1956,7 +1866,8 @@ struct KeySampler : Module {
 				if (storedPath[slot] != "")
 					path = storedPath[slot];
 				else
-					path = "_unknown_.wav";
+					//path = "_unknown_.wav";
+					path = "_slot"+to_string(slot+1)+".waw";
 			}
 
 			char* pathDup = strdup(path.c_str());
@@ -2034,8 +1945,8 @@ struct KeySampler : Module {
 				infoToSave[slot] = "";
 			
 			} else {
-				//DEBUG("Load from patch slot %d", slot);
-				// Questi commenti sotto evitano di sovrascrivee i valori dei knob sui diversi slot
+
+				// Questi commenti sotto evitano di sovrascrivere i valori dei knob sui diversi slot
 				// da testare quando vengono caricati slot NON IN PATCH
 
 				//knobCueStartPos[slot] = params[CUESTART_PARAM].getValue();
@@ -2068,8 +1979,6 @@ struct KeySampler : Module {
 
 			fileLoaded[slot] = true;
 			channels[slot] = fileChannels[slot];
-
-			//debugDisplay2 = to_string(totalSamples);
 
 		} else {
 			fileFound[slot] = false;
@@ -2282,7 +2191,7 @@ struct KeySampler : Module {
 			params[RANGE_PARAM].setValue(refKey[currSlot][selectedRange]);
 
 			prevSlot = currSlot;
-			//DEBUG("ciao %d", currSlot);
+			//DEBUG("current slot %d", currSlot);
 		}
 
 		// *************** CURRENT SLOT PARAMS
@@ -2766,7 +2675,7 @@ struct KeySampler : Module {
 
 										if (stage[slot][c] != RELEASE_STAGE) {
 											stage[slot][c] = RELEASE_STAGE;
-											releaseNew[slot][c] = true;
+											//releaseNew[slot][c] = true;
 
 											/*
 											if (stageLevel[slot][c] != 0)
@@ -2796,7 +2705,7 @@ struct KeySampler : Module {
 												if (stage[slot][c] != RELEASE_STAGE) {
 
 													stage[slot][c] = RELEASE_STAGE;
-													releaseNew[slot][c] = true;
+													//releaseNew[slot][c] = true;
 
 													/*
 													if (stageLevel[slot][c] != 0)
@@ -3004,7 +2913,7 @@ struct KeySampler : Module {
 										
 										if (stage[slot][c] != RELEASE_STAGE) {
 											stage[slot][c] = RELEASE_STAGE;
-											releaseNew[slot][c] = true;
+											//releaseNew[slot][c] = true;
 
 											/*
 											if (stageLevel[slot][c] != 0)
@@ -3089,7 +2998,7 @@ struct KeySampler : Module {
 										
 										if (stage[slot][c] != RELEASE_STAGE) {
 											stage[slot][c] = RELEASE_STAGE;
-											releaseNew[slot][c] = true;
+											//releaseNew[slot][c] = true;
 
 											/*
 											if (stageLevel[slot][c] != 0)
@@ -3259,9 +3168,9 @@ struct KeySampler : Module {
 											stage[slot][c] = STOP_STAGE;
 											play[slot][c] = false;
 											
-											if (releaseNew[slot][c]) {
-												releaseNew[slot][c] = false;
-											}
+											//if (releaseNew[slot][c])
+											//	releaseNew[slot][c] = false;										
+
 										}
 										env[slot][c] = refValue[slot][c] + (shapeResponse2(stageLevel[slot][c], slot) * deltaValue[slot][c]);
 									break;
@@ -3528,13 +3437,13 @@ struct KeySampler : Module {
 				if (inputs[IN_INPUT].isConnected()){
 					z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 					recordingState = 1;
+					recSamples = 0;
 					if (inputs[IN_INPUT+1].isConnected())
 						recChannels = 2;
 					else
 						recChannels = 1;
 
 					currentRecordingLimit = recordingLimit / recChannels;
-					//DEBUG("[KeySampler] %d", currentRecordingLimit);
 
 					fileChannels[recSlot] = recChannels;
 
@@ -3596,8 +3505,11 @@ struct KeySampler : Module {
 					recordingState = 0;
 
 					channels[recSlot] = recChannels;
-					fileDescription[recSlot] = "_unknown_.wav";
-					fileDisplay[recSlot] = "_unknown_";
+					//fileDescription[recSlot] = "_unknown_.wav";
+					//fileDisplay[recSlot] = "_unknown_";
+					fileDescription[recSlot] = "_slot"+to_string(recSlot+1)+".waw";
+					fileDisplay[recSlot] = "_slot"+to_string(recSlot+1);
+					storedPath[recSlot] = "_slot"+to_string(recSlot+1)+".waw";;
 					samplerateDisplay[recSlot] = std::to_string(int(vcvSampleRate));
 					channelsDisplay[recSlot] = std::to_string(recChannels) + "ch";
 
@@ -3830,7 +3742,7 @@ struct KeySampler : Module {
 //															███████╗██║░╚███║██████╔╝  ██║░░░░░██║░░██║╚█████╔╝╚█████╔╝███████╗██████╔╝██████╔╝
 //															╚══════╝╚═╝░░╚══╝╚═════╝░  ╚═╝░░░░░╚═╝░░╚═╝░╚════╝░░╚════╝░╚══════╝╚═════╝░╚═════╝░
 
-
+/*
 struct KeySamplerDebugDisplay : TransparentWidget {
 	KeySampler *module;
 	int frame = 0;
@@ -3845,11 +3757,6 @@ struct KeySamplerDebugDisplay : TransparentWidget {
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
 				nvgFillColor(args.vg, nvgRGBA(0xff, 0xff, 0xff, 0xff)); 
-				
-				//nvgTextBox(args.vg, 9, 6,120, module->debugDisplay.c_str(), NULL);
-				//nvgTextBox(args.vg, 9, 16,120, module->debugDisplay2.c_str(), NULL);
-				//nvgTextBox(args.vg, 9, 26,120, module->debugDisplay3.c_str(), NULL);
-				//nvgTextBox(args.vg, 9, 36,120, module->debugDisplay4.c_str(), NULL);
 
 				//module->debugDisplay[0] = to_string(module->fadingType[0][0]) + " " + to_string(module->stretchMaxPos[0]);
 				//module->debugDisplay[1] = to_string(module->fadingType[1][1]) + " " + to_string(module->stretchMaxPos[1]);
@@ -3857,19 +3764,6 @@ struct KeySamplerDebugDisplay : TransparentWidget {
 				module->debugDisplay[1] = "cueEndPos " + to_string(module->cueEndPos[2]) ;
 				module->debugDisplay[2] = "KN cueStartPos " + to_string(module->knobCueStartPos[2]) ;
 				module->debugDisplay[3] = "KN cueEndPos " + to_string(module->knobCueEndPos[2]) ;
-
-				/*
-				prevKnobCueStartPos[slot] = knobCueStartPos[slot];
-				prevKnobCueEndPos[slot] = knobCueEndPos[slot];
-				prevKnobLoopStartPos[slot] = knobLoopStartPos[slot];
-				prevKnobLoopEndPos[slot] = knobLoopEndPos[slot];
-
-				cueStartPos[slot] = floor(totalSamples[slot] * knobCueStartPos[slot]);
-				cueEndPos[slot] = ceil(totalSamples[slot] * knobCueEndPos[slot]);
-				loopStartPos[slot] = floor(totalSamples[slot] * knobLoopStartPos[slot]);
-				loopEndPos[slot] = ceil(totalSamples[slot] * knobLoopEndPos[slot]);
-				*/
-
 
 				for (int i = 0; i < 16; i++)
 					nvgTextBox(args.vg, 0, i*11,120, module->debugDisplay[i].c_str(), NULL);
@@ -3879,7 +3773,7 @@ struct KeySamplerDebugDisplay : TransparentWidget {
 		Widget::drawLayer(args, layer);
 	}
 };
-
+*/
 
 struct KeySamplerDisplay : TransparentWidget {
 	KeySampler *module;
