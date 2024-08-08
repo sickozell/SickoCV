@@ -23,7 +23,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.16
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/8c5fc876-a3a8-4d59-9357-6a5ffff85d7f)
+![SickoCV modules 2 6 16](https://github.com/user-attachments/assets/9124dcb4-4ded-4102-ab24-4c131dac600a)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -585,20 +585,20 @@ COMING SOON
 Some hints:  
 
 Every sample is stored in one of the 8 available slots and can be individually routed to one of the 8 outputs.  
-Multiple slots can be routed on the same output.  
+Multiple slots can be routed to the same output.  
 Each slot has its individual settings.  
 
-PB button, enables pitchbending on desired samples. Pitchbend range can be set in the right-click menu.
+PB button enables pitchbending on the desired sample. Pitchbend range can be set in the right-click menu.
 
-The 'Quantize incoming v/Oct' option in the right-click menu avoids erroneus pitches when using non perfect v/oct signals.
+The 'Quantize incoming v/Oct' option in the right-click menu avoids incorrect pitches when using variable or less than perfect v/oct signals.
 
 Key zones programming:  
-Every zone is composed by lower, upper and reference note. The reference note is the one that is supposed to be the original recorded pitch.
+Every zone is composed by lower, upper and reference notes. The reference note is the one that is supposed to be the original recorded pitch.
 Zones of just one note are allowed, usually for percussions or not pitchable samples.
 
-Press the yellow KEY SELECT button to choose the parameter to modify, then adjust the KEY knob to set the interested note.  
+Press the yellow KEY SELECT button to choose the parameter to modify, then adjust the KEY knob to set the interested note or enter midi learn.  
 
-Midi Learn is activated by holding the KEY SELECT button for about 1 second, the yellow led will fade in and out waiting the note to be pressed. Then the yellow led will flash for a while. Midi learn can be aborted by clicking the button again.
+Midi Learn is activated by holding the KEY SELECT button for about 1 second, the yellow led will fade in and out waiting the key to be pressed. Then the yellow led will flash for a while. Midi learn can be aborted by clicking the KEY SELECT button again.
 
 
 
