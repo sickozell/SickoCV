@@ -1,8 +1,8 @@
-### 2.6.15 (2024-08-07)
+### 2.6.15 (2024-08-17)
 - enver: changed envelope shapes order and increased curve resolution.
 - polyMuter modules: added 'Shrink channels' and 'Show OUT channels' options in the right-click menu.
 - polyMuter8, polyMuter16: added 'exclude -10v channels too' option in addition to channel shrinking.
-- sickoSampler / sickoSampler2: fixed a bug that doesn't store 'wav' extension when saving.
+- sickoSampler / sickoSampler2: fixed some naming bugs when samples are saved.
 
 ### 2.6.14 (2024-06-23)
 - added 'slewer' module.

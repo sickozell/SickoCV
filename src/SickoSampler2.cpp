@@ -867,6 +867,7 @@ struct SickoSampler2 : Module {
 		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
 		if (path) {
 			saveMode = mode;
+			fileDescription = basename(path);
 			saveSample(path);
 			//storedPath = std::string(path);
 			std::string newPath = std::string(path);
