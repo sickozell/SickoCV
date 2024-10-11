@@ -30,8 +30,8 @@ using namespace std;
 
 struct tpDivMult : ParamQuantity {
 	std::string getDisplayValueString() override {
-		const std::string valueDisplay[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+		const std::string valueDisplay[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
 		return valueDisplay[int(getValue())];
 	}
 };
@@ -83,11 +83,11 @@ struct Clocker2 : Module {
  	//**************************************************************
 	//   
 
-	const std::string divMultDisplay[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
+	const std::string divMultDisplay[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
 
-	const float divMult[43] = {256, 128, 64, 32, 24, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
-							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24, 32, 64, 128, 256};
+	const float divMult[45] = {256, 128, 64, 48, 32, 24, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
+							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24, 32, 48, 64, 128, 256};
 
 	//**************************************************************
 	//  	
@@ -1022,9 +1022,9 @@ struct Clocker2DisplayDiv1 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 43; i++) {
+			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
+			for (int i = 0; i < 45; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue()) == i);
 				thisItem->module = module;
@@ -1088,9 +1088,9 @@ struct Clocker2DisplayDiv2 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 43; i++) {
+			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
+			for (int i = 0; i < 45; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue()) == i);
 				thisItem->module = module;
@@ -1154,9 +1154,9 @@ struct Clocker2DisplayDiv3 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 43; i++) {
+			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
+			for (int i = 0; i < 45; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue()) == i);
 				thisItem->module = module;
@@ -1220,9 +1220,9 @@ struct Clocker2DisplayDiv4 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 43; i++) {
+			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
+			for (int i = 0; i < 45; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue()) == i);
 				thisItem->module = module;
@@ -1286,9 +1286,9 @@ struct Clocker2DisplayDiv5 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 43; i++) {
+			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
+			for (int i = 0; i < 45; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+4].getValue()) == i);
 				thisItem->module = module;
@@ -1352,9 +1352,9 @@ struct Clocker2DisplayDiv6 : TransparentWidget {
 				}
 			};
 
-			const std::string menuNames[43] = {"/256", "/128", "/64", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x64", "x128", "x256"};
-			for (int i = 0; i < 43; i++) {
+			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
+			for (int i = 0; i < 45; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
 				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+5].getValue()) == i);
 				thisItem->module = module;

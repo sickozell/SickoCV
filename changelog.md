@@ -1,5 +1,6 @@
-### 2.6.16 (2024-08-xx)
+### 2.6.16 (2024-10-xx)
 - added 'keySampler' module.
+- added 'x48' and '/48' multipliyng options on 'clocker' and 'clocker2' modules
 
 ### 2.6.15 (2024-08-07)
 - enver: changed envelope shapes order and increased curve resolution.
