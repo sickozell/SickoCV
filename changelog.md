@@ -1,4 +1,4 @@
-### 2.6.16 (2024-10-xx)
+### 2.6.16 (2024-10-17)
 - added 'keySampler' module.
 - added 'x48' and '/48' multipliyng options on 'clocker' and 'clocker2' modules
 
