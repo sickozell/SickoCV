@@ -1,7 +1,7 @@
-# SickoCV v2.6.15
+# SickoCV v2.6.16
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 14](https://github.com/sickozell/SickoCV/assets/80784296/8c5fc876-a3a8-4d59-9357-6a5ffff85d7f)
+![SickoCV modules 2 6 16](https://github.com/user-attachments/assets/9124dcb4-4ded-4102-ab24-4c131dac600a)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -19,6 +19,7 @@ VCV Rack plugin modules
 - [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
 - [enver](#enver)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
+- [keySampler](#keysampler)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
 - [multiRouter / multiSwitcher](#multirouter--multiswitcher)
 - [parking](#parking)
@@ -536,6 +537,49 @@ Comparison:
 
 **Noise Generator preset**  
 This function sets the module to Track & Hold mode, sample on HIGH gate, scale on 100% and offset to 0v, just to output white noise if trig/gate input is not connected or not triggered.
+
+[back to top](#table-of-contents)
+
+## keySampler
+### Keyboard controlled sampler
+
+#### - DESCRIPTION
+- up to 8 mono/stereo sample player/recorder
+- routable samples to 8 separate stereo outputs
+- keyboard controlled player with velocity and pitch bend controls
+- programmable key zones for each sample with midi learn
+- mono/stereo samples and 1-cycle waveforms player
+- gate or triggered play mode
+- envelope generator with adjustable shape, loop, reverse, pingpong
+- anti-aliasing filter, phase-scan feature
+- 90s style cyclic time-stretch feature
+
+![keysampler](https://github.com/user-attachments/assets/aeb16f51-e9c9-46d9-9b37-5c4d11eb5f4f)
+
+#### - INSTRUCTIONS
+
+COMING SOON  
+
+Some hints:  
+
+Every sample is stored in one of the 8 available slots and can be individually routed to one of the 8 outputs.  
+Multiple slots can be routed to the same output.  
+Each slot has its individual settings.  
+
+PB button enables pitchbending on the desired sample. Pitchbend range can be set in the right-click menu.
+
+The 'Quantize incoming v/Oct' option in the right-click menu avoids incorrect pitches when using variable or less than perfect v/oct signals.
+
+Key zones programming:  
+Every zone is composed by lower, upper and reference notes. The reference note is the one that is supposed to be the original recorded pitch.
+Zones of just one note are allowed, usually for percussions or not pitchable samples.
+
+Press the yellow KEY SELECT button to choose the parameter to modify, then adjust the KEY knob to set the interested note or enter midi learn.  
+
+Midi Learn is activated by holding the KEY SELECT button for about 1 second, the yellow led will fade in and out waiting the key to be pressed. Then the yellow led will flash for a while. Midi learn can be aborted by clicking the KEY SELECT button again.
+
+
+
 
 [back to top](#table-of-contents)
 

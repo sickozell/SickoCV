@@ -1,8 +1,12 @@
-### 2.6.15 (2024-08-17)
+### 2.6.16 (2024-10-17)
+- added 'keySampler' module.
+- added 'x48' and '/48' multipliyng options on 'clocker' and 'clocker2' modules
+
+### 2.6.15 (2024-08-07)
 - enver: changed envelope shapes order and increased curve resolution.
 - polyMuter modules: added 'Shrink channels' and 'Show OUT channels' options in the right-click menu.
 - polyMuter8, polyMuter16: added 'exclude -10v channels too' option in addition to channel shrinking.
-- sickoSampler / sickoSampler2: fixed some naming bugs when samples are saved.
+- sickoSampler / sickoSampler2: fixed a bug that doesn't store 'wav' extension when saving.
 
 ### 2.6.14 (2024-06-23)
 - added 'slewer' module.
