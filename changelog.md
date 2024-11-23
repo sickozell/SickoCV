@@ -1,3 +1,6 @@
+### 2.6.17 (2024-11-23)
+- 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green
+
 ### 2.6.16 (2024-10-17)
 - added 'keySampler' module.
 - added 'x48' and '/48' multipliyng options on 'clocker' and 'clocker2' modules

@@ -1,4 +1,4 @@
-# SickoCV v2.6.16-beta2
+# SickoCV v2.6.17-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -15,11 +15,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - 
 
 ## **to do list:** 
-- 
+- keySampler: correct midi learn function that doesn't update at first time the new key
 
 ## **changelog**  
-- added keySampler module.
-- added 'x48' and '/48' multipliyng options on 'clocker' and 'clocker2' modules
+- 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green
 
 # SickoCV v2.6.16
 VCV Rack plugin modules
