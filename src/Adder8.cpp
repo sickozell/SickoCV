@@ -4,6 +4,7 @@ struct Adder8 : Module {
 	
 	bool outMode = true;	//  true: Stop On Cable ---- false: sum all outputs
 	int voltDefaultOption = 0;
+	bool attenuator = false;
 	float voltDefaults[3] = {0.f, 1.f, 10.f};
 	float cv[8] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 
@@ -90,6 +91,7 @@ struct Adder8 : Module {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "OutMode", json_boolean(outMode));
 		json_object_set_new(rootJ, "VoltDefaultOption", json_integer(voltDefaultOption));
+		json_object_set_new(rootJ, "Attenuator", json_boolean(attenuator));
 
 		return rootJ;
 	}
@@ -101,6 +103,9 @@ struct Adder8 : Module {
 		json_t* voltDefaultOptionJ = json_object_get(rootJ, "VoltDefaultOption");
 		if (voltDefaultOptionJ)
 			voltDefaultOption = json_integer_value(voltDefaultOptionJ);
+		json_t* attenuatorJ = json_object_get(rootJ, "Attenuator");
+		if (attenuatorJ)
+			attenuator = json_boolean_value(attenuatorJ);
 	}
 
     struct Add8modeSwitch : SickoSwitch_Three_Horiz
@@ -127,7 +132,10 @@ struct Adder8 : Module {
 		pq->defaultValue = voltDefaults[voltDefaultOption];
 
 		if (inputs[CV_INPUT].isConnected())
-			cv[0] = inputs[CV_INPUT].getVoltage() * params[VOLT_PARAMS].getValue() * params[ADDSUB_SWITCH].getValue() / 10.f;
+			if (!attenuator)
+				cv[0] = inputs[CV_INPUT].getVoltage() * params[VOLT_PARAMS].getValue() * params[ADDSUB_SWITCH].getValue() / 10.f;
+			else
+				cv[0] = inputs[CV_INPUT].getVoltage() * (params[VOLT_PARAMS].getValue() + 10.f) * params[ADDSUB_SWITCH].getValue() / 20.f;
 		else
 			cv[0] = params[VOLT_PARAMS].getValue() * params[ADDSUB_SWITCH].getValue();
 
@@ -156,7 +164,10 @@ struct Adder8 : Module {
 			}
 
 			if (inputs[CV_INPUT+i].isConnected())
-				cv[i] = cv[i-1] + (inputs[CV_INPUT+i].getVoltage() * params[VOLT_PARAMS+i].getValue() * params[ADDSUB_SWITCH+i].getValue() / 10.f);
+				if (!attenuator)
+					cv[i] = cv[i-1] + (inputs[CV_INPUT+i].getVoltage() * params[VOLT_PARAMS+i].getValue() * params[ADDSUB_SWITCH+i].getValue() / 10.f);
+				else
+					cv[i] = cv[i-1] + (inputs[CV_INPUT+i].getVoltage() * (params[VOLT_PARAMS+i].getValue() + 10.f) * params[ADDSUB_SWITCH+i].getValue() / 20.f);
 			else
 				cv[i] = cv[i-1] + (params[VOLT_PARAMS+i].getValue() * params[ADDSUB_SWITCH+i].getValue());
 
@@ -215,6 +226,9 @@ struct Adder8Widget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Stop Adding on Out Cable", "", &module->outMode));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Attenuator knobs", "", &module->attenuator));
 
 		menu->addChild(createSubmenuItem("Volt Knob Default", "", [=](Menu* menu) {
 			std::string menuNames[3] = {"0V", "+1V", "+10V"};
