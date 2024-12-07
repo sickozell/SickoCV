@@ -1053,7 +1053,8 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 ## simpleSeq4
 ### 4 step sequencer with direction and knobs range
 
-A tiny and simple 4 step sequencer. If a negative voltage is applied to DIR input the sequencer will advance backwards.
+A tiny and simple 4 step sequencer. If a negative voltage is applied to DIR input the sequencer will advance backwards.  
+Various knob voltage ranges are available in the right-click menu.
 
 [back to top](#table-of-contents)
 
