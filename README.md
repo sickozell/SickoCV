@@ -25,7 +25,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.6.17
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 16](https://github.com/user-attachments/assets/9124dcb4-4ded-4102-ab24-4c131dac600a)
+![SickoCV modules 2 6 17](https://github.com/user-attachments/assets/92ae5ef8-7978-4a96-b908-c4ae31fea391)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -1053,6 +1053,8 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 ## simpleSeq4
 ### 4 step sequencer with direction and knobs range
+
+![simpleseq4](https://github.com/user-attachments/assets/b1ceb7dd-ca60-44f0-9c0d-d3744f86b5d1)
 
 A tiny and simple 4 step sequencer. If a negative voltage is applied to DIR input the sequencer will advance backwards.  
 Various knob voltage ranges are available in the right-click menu.
