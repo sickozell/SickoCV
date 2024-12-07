@@ -411,7 +411,7 @@
     {
       "slug": "SickoQuant4",
       "name": "sickoQuant4",
-      "description": "Four channels polyphonic quantizer with scales and presets (sQUant4)",
+      "description": "Four channels polyphonic quantizer with scales and presets (sQuant4)",
       "tags": [
         "Quantizer",
         "Polyphonic"
