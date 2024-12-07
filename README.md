@@ -92,6 +92,7 @@ The MODE switches force the "-0+" switches to be as: "subtract/ignore", "subtrac
 This unconventional feature lets the user to choose the default knob value depending on the main usage of Adder8:  
 if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add (or subtract) exactly 1 octave in pitch;  
 otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
+- **Attenuator**. This converts attenuverter knobs into attenuators when CV inputs are connected.
 - **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
 
 [back to top](#table-of-contents)
