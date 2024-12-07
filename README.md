@@ -1,4 +1,4 @@
-# SickoCV v2.6.17-beta1
+# SickoCV v2.6.17-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,9 +18,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - keySampler: correct midi learn function that doesn't update at first time the new key
 
 ## **changelog**  
+- added 'simpleSeq4' module
 - 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green
 
-# SickoCV v2.6.16
+# SickoCV v2.6.17
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 16](https://github.com/user-attachments/assets/9124dcb4-4ded-4102-ab24-4c131dac600a)
@@ -54,6 +55,7 @@ VCV Rack plugin modules
 - [sickoQuant / sickoQuant4](#sickoquant--sickoquant4)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
+- [simpleSeq4](#simpleseq4)
 - [slewer](#slewer)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
@@ -1045,6 +1047,13 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 **Right-click Menu**  
 'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
+
+[back to top](#table-of-contents)
+
+## simpleSeq4
+### 4 step sequencer with direction and knobs range
+
+A tiny and simple 4 step sequencer. If a negative voltage is applied to DIR input the sequencer will advance backwards.
 
 [back to top](#table-of-contents)
 

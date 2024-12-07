@@ -1,4 +1,5 @@
-### 2.6.17 (2024-11-23)
+### 2.6.17 (2024-12-07)
+- added 'simpleSeq4' module
 - 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green
 
 ### 2.6.16 (2024-10-17)
