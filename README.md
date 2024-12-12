@@ -1,4 +1,4 @@
-# SickoCV v2.6.17-beta3
+# SickoCV v2.6.17-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - keySampler: correct midi learn function that doesn't update at first time the new key
 
 ## **changelog**  
+- added 'randLoops' module
 - added 'simpleSeq4' module
 - added 'Attenuator' option on adder8 module
 - 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green

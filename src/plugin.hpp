@@ -44,6 +44,7 @@ extern Model* modelPolyMuter8;
 extern Model* modelPolyMuter8Plus;
 extern Model* modelPolyMuter16;
 extern Model* modelPolyMuter16Plus;
+extern Model* modelRandLoops;
 extern Model* modelShifter;
 extern Model* modelSickoAmp;
 extern Model* modelSickoCrosser;
