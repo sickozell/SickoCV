@@ -3,6 +3,7 @@
 - added 'simpleSeq4' module
 - added 'Attenuator' option on adder8 module
 - 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green
+- 'sickoQuant' and 'sickoQuant4' module browser search made easier with keyword 'squant'
 
 ### 2.6.16 (2024-10-17)
 - added 'keySampler' module.
