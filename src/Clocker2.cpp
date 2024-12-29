@@ -1001,7 +1001,7 @@ struct Clocker2DisplayDiv1 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
 				if (tempValue < 22)
@@ -1067,7 +1067,7 @@ struct Clocker2DisplayDiv2 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
 				if (tempValue < 22)
@@ -1133,7 +1133,7 @@ struct Clocker2DisplayDiv3 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
 				if (tempValue < 22)
@@ -1199,7 +1199,7 @@ struct Clocker2DisplayDiv4 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
 				if (tempValue < 22)
@@ -1265,7 +1265,7 @@ struct Clocker2DisplayDiv5 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+4].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
 				if (tempValue < 22)
@@ -1331,7 +1331,7 @@ struct Clocker2DisplayDiv6 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+5].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
 				if (tempValue < 22)
