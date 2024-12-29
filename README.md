@@ -1,4 +1,4 @@
-# SickoCV v2.6.17-beta4
+# SickoCV v2.6.17-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -23,6 +23,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added 'Attenuator' option on adder8 module
 - 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green
 - 'sickoQuant' and 'sickoQuant4' module browser search made easier with keyword 'squant'
+-  multiRouter / multiSwitcher: added 'cycle' and 'RST input = reverse advance' options in the right-click menu
 
 # SickoCV v2.6.17
 VCV Rack plugin modules
@@ -662,6 +663,10 @@ The RST knob sets the step to be restarted from when RST input is triggered.
 Please note that reset step can be outside of cycling steps of the INs/OUTs selector. For example the direction can be set to 'up', 6 cycling steps, and reset to step 8. In this case when reset is triggered it will restart from setp 8, then it will advance to step 7 and continue to step 1, and the next step will be the 6th.  
 
 Right inputs and outputs are normalled, so if they are unconnected the signal is taken from the left ones.
+
+#### Right-click Menu
+- **Cycle**. With this option unticked when the sequence has reached the end, it won't restart from begin.
+- **RST input = reverse advance**. With this option ticked a trigger on the RST input will advance one step backward (if Random direction is set, a trigger will always return a random step).
 
 [back to top](#table-of-contents)
 
