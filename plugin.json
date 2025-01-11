@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.6.17-beta9",
+  "version": "2.6.17-beta10",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -320,14 +320,6 @@
       "description": "Mutes or Soloes single channels of a poly-cable",
       "tags": [
         "Utility"
-      ]
-    },
-    {
-      "slug": "RandLoops",
-      "name": "randLoops",
-      "description": "looped random voltage sequencer inspired by Turing Machine",
-      "tags": [
-        "Sequencer"
       ]
     },
     {

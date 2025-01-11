@@ -18,7 +18,6 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - keySampler: correct midi learn function that doesn't update at first time the new key
 
 ## **changelog** 
-- added 'randLoops' module
 - added 'simpleSeq4' module
 - added 'Attenuator' option on adder8 module
 - 'sickoLooper' and 'clocker' modules: improved audio click management
@@ -52,7 +51,6 @@ VCV Rack plugin modules
 - [multiRouter / multiSwitcher](#multirouter--multiswitcher)
 - [parking](#parking)
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
-- [randLoops](#randloops)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
 - [sickoCrosser / sickoCrosser4](#sickocrosser--sickocrosser4)
@@ -703,21 +701,6 @@ By using the plus version of polyMuter the right-click menu of buttons is no lon
 - Show OUT channels. This options show the output channels in green, instead of input channels in red.
 - Shrink Channels. It deletes the muted channels from the output stream or let only the soloed channels to be on the output stream.
 - Exclude -10v channels too (on polyMuter8 and polyMuter16 only). When shrinking channels option is enabled, this will exclude from the output stream the channels with exactly -10v.
-
-[back to top](#table-of-contents)
-
-## randLoops
-### looped random voltage sequencer inspired by Turing Machine
-
-![randloops](https://github.com/user-attachments/assets/2a585c43-5cd4-44df-93bc-55e89d954cdf)
-
-#### - INSTRUCTIONS
-randLoops replicates functionalities of Turing Machine module by Tom Whitwell, please refer to several instruction/tutorials on the web, for main use.  
-There are some added features that can be helpful using it with VCV rack.  
-ADD and DEL buttons or a trigger on their inputs, just like the 'write' switch, will overwrite the first incoming bit forcing it to be on or off.  
-RND button or a trigger on its input generates a new sequence.  
-A trigger on RST input clears the sequence.  
-Either ADD/DEL controls or RND button/trig are buffered by default, it means that changes will have effect only when a clock pulse is detected. These options can be modified in the right-click menu.
 
 [back to top](#table-of-contents)
 

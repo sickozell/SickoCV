@@ -44,7 +44,6 @@ void init(Plugin* p) {
 	p->addModel(modelPolyMuter8Plus);
 	p->addModel(modelPolyMuter16);
 	p->addModel(modelPolyMuter16Plus);
-	p->addModel(modelRandLoops);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
 	p->addModel(modelSickoCrosser);

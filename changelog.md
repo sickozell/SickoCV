@@ -1,5 +1,4 @@
 ### 2.6.17 (2025-01-11)
-- added 'randLoops' module
 - added 'simpleSeq4' module
 - added 'Attenuator' option on adder8 module
 - 'sickoLooper' and 'clocker' modules: improved audio click management
