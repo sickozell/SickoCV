@@ -47,9 +47,11 @@ struct RandLoops : Module {
 	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
 
 	float delTrig = 0;
+	float prevDelTrig = 0;
 	bool delWait = false;
 
 	float addTrig = 0;
+	float prevAddTrig = 0;
 	bool addWait = false;
 
 	float clock = 0;
@@ -484,25 +486,41 @@ struct RandLoops : Module {
 
 		delTrig = inputs[DEL_INPUT].getVoltage() + params[DEL_BUTTON].getValue();
 		
-		if (delTrig >= 1.f) {
-			delTrig = 1;
-			delWait = true;
-			lights[DEL_LIGHT].setBrightness(1.f);
-		}
-		if (!bufferedAddDel)
+		if (bufferedAddDel) {
+			if (delTrig >= 1.f && prevDelTrig < 1.f) {
+				delTrig = 1;
+				delWait = true;
+				lights[DEL_LIGHT].setBrightness(1.f);
+			}
+		} else {
+			if (delTrig >= 1.f) {
+				delTrig = 1;
+				delWait = true;
+			}
 			lights[DEL_LIGHT].setBrightness(delTrig);
+		}
+		
+		prevDelTrig = delTrig;
 		
 		// -------------------------------- add trigger
 
 		addTrig = inputs[ADD_INPUT].getVoltage() + params[ADD_BUTTON].getValue();
 		
-		if (addTrig >= 1.f) {
-			addTrig = 1;
-			addWait = true;
-			lights[ADD_LIGHT].setBrightness(1.f);
-		}
-		if (!bufferedAddDel)
+		if (bufferedAddDel) {
+			if (addTrig >= 1.f && prevAddTrig < 1.f) {
+				addTrig = 1;
+				addWait = true;
+				lights[ADD_LIGHT].setBrightness(1.f);
+			}
+		} else {
+			if (addTrig >= 1.f) {
+				addTrig = 1;
+				addWait = true;
+			}
 			lights[ADD_LIGHT].setBrightness(addTrig);
+		}
+
+		prevAddTrig = addTrig;
 
 		// -------------------------------- clock trigger
 

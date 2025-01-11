@@ -1,7 +1,8 @@
-### 2.6.17 (2024-12-29)
+### 2.6.17 (2025-01-11)
 - added 'randLoops' module
 - added 'simpleSeq4' module
 - added 'Attenuator' option on adder8 module
+- 'sickoLooper' and 'clocker' modules: improved audio click management
 - 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green
 - 'sickoQuant' and 'sickoQuant4' module browser search made easier with keyword 'squant'
 -  multiRouter / multiSwitcher: added 'cycle' and 'RST input = reverse advance' options in the right-click menu
