@@ -940,6 +940,42 @@ struct DrumPlayerXtra : Module {
 		displayBuff[slot].clear();
 		totalSampleC[slot] = 0;
 	}
+
+	void randomizeAllSlots() {
+		currentFolder[0] = system::getDirectory(userFolder+"/");
+		createCurrentFolder(currentFolder[0], 0);
+		currentFolderV[0].clear();
+		currentFolderV[0] = tempTreeData;
+		currentFolderV[1].clear();
+		currentFolderV[1] = tempTreeData;
+		currentFolderV[2].clear();
+		currentFolderV[2] = tempTreeData;
+		currentFolderV[3].clear();
+		currentFolderV[3] = tempTreeData;
+
+		for (int slot = 0; slot < 4; slot++) {
+			float rnd = random::uniform();
+			play[slot] = false;
+			currentFile[slot] = int(currentFolderV[slot].size() * rnd);
+			if (currentFile[slot] >= int(currentFolderV[slot].size()))
+				currentFile[slot] = currentFolderV[slot].size()-1;
+			loadSample(currentFolderV[slot][currentFile[slot]], slot);
+		}
+	}
+
+	void randomizeSlot(int slot) {
+		currentFolder[slot] = system::getDirectory(userFolder+"/");
+		createCurrentFolder(currentFolder[slot], slot);
+		currentFolderV[slot].clear();
+		currentFolderV[slot] = tempTreeData;
+		float rnd = random::uniform();
+		play[slot] = false;
+		currentFile[slot] = int(currentFolderV[slot].size() * rnd);
+		//DEBUG("folder %s - slot %d - rnd %f - file %d - size %d", userFolder.c_str(), slot, rnd, currentFile[slot], int(currentFolderV[slot].size()));
+		if (currentFile[slot] >= int(currentFolderV[slot].size()))
+			currentFile[slot] = currentFolderV[slot].size()-1;
+		loadSample(currentFolderV[slot][currentFile[slot]], slot);
+	}
 	
 	void process(const ProcessArgs &args) override {
 
@@ -2752,6 +2788,13 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));
 				//menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
+				menu->addChild(createSubmenuItem("Randomize", "", [=](Menu* menu) {
+					menu->addChild(createMenuItem("All slots", "", [=]() {module->randomizeAllSlots();}));
+					menu->addChild(createMenuItem("Slot 1", "", [=]() {module->randomizeSlot(0);}));
+					menu->addChild(createMenuItem("Slot 2", "", [=]() {module->randomizeSlot(1);}));
+					menu->addChild(createMenuItem("Slot 3", "", [=]() {module->randomizeSlot(2);}));
+					menu->addChild(createMenuItem("Slot 4", "", [=]() {module->randomizeSlot(3);}));
+				}));
 			} else {
 				menu->addChild(createMenuLabel("(!)"+module->userFolder));
 			}

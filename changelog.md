@@ -1,6 +1,7 @@
 ### 2.6.17 (2025-01-11)
 - added 'simpleSeq4' module
 - added 'Attenuator' option on adder8 module
+- 'drumPlayerXtra': added 'Randomize samples' in context menu when setting a root folder
 - 'sickoLooper' and 'clocker' modules: improved audio click management
 - 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green
 - 'sickoQuant' and 'sickoQuant4' module browser search made easier with keyword 'squant'

@@ -1,4 +1,4 @@
-# SickoCV v2.6.17-beta9
+# SickoCV v2.6.17-beta11
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -19,6 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog** 
 - added 'simpleSeq4' module
+- 'drumPlayerXtra': added 'Randomize samples' in context menu when setting a root folder
 - added 'Attenuator' option on adder8 module
 - 'sickoLooper' and 'clocker' modules: improved audio click management
 - 'clocker' and 'clocker2' modules: fixed a bug on /2 clock division that was actually x2, and fixed its display color to red instead of green

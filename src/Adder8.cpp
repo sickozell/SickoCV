@@ -1,5 +1,5 @@
 #include "plugin.hpp"
-
+ 
 struct Adder8 : Module {
 	
 	bool outMode = true;	//  true: Stop On Cable ---- false: sum all outputs
