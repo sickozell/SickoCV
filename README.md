@@ -1,4 +1,4 @@
-# SickoCV v2.6.17-beta11
+# SickoCV v2.6.17-beta12
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 

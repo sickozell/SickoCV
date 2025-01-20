@@ -953,13 +953,15 @@ struct DrumPlayerXtra : Module {
 		currentFolderV[3].clear();
 		currentFolderV[3] = tempTreeData;
 
-		for (int slot = 0; slot < 4; slot++) {
-			float rnd = random::uniform();
-			play[slot] = false;
-			currentFile[slot] = int(currentFolderV[slot].size() * rnd);
-			if (currentFile[slot] >= int(currentFolderV[slot].size()))
-				currentFile[slot] = currentFolderV[slot].size()-1;
-			loadSample(currentFolderV[slot][currentFile[slot]], slot);
+		if (currentFolderV[0].size() > 0) {
+			for (int slot = 0; slot < 4; slot++) {
+				float rnd = random::uniform();
+				play[slot] = false;
+				currentFile[slot] = int(currentFolderV[slot].size() * rnd);
+				if (currentFile[slot] >= int(currentFolderV[slot].size()))
+					currentFile[slot] = currentFolderV[slot].size()-1;
+				loadSample(currentFolderV[slot][currentFile[slot]], slot);
+			}
 		}
 	}
 
@@ -968,13 +970,15 @@ struct DrumPlayerXtra : Module {
 		createCurrentFolder(currentFolder[slot], slot);
 		currentFolderV[slot].clear();
 		currentFolderV[slot] = tempTreeData;
-		float rnd = random::uniform();
-		play[slot] = false;
-		currentFile[slot] = int(currentFolderV[slot].size() * rnd);
-		//DEBUG("folder %s - slot %d - rnd %f - file %d - size %d", userFolder.c_str(), slot, rnd, currentFile[slot], int(currentFolderV[slot].size()));
-		if (currentFile[slot] >= int(currentFolderV[slot].size()))
-			currentFile[slot] = currentFolderV[slot].size()-1;
-		loadSample(currentFolderV[slot][currentFile[slot]], slot);
+		if (currentFolderV[slot].size() > 0) {
+			float rnd = random::uniform();
+			play[slot] = false;
+			currentFile[slot] = int(currentFolderV[slot].size() * rnd);
+			//DEBUG("folder %s - slot %d - rnd %f - file %d - size %d", userFolder.c_str(), slot, rnd, currentFile[slot], int(currentFolderV[slot].size()));
+			if (currentFile[slot] >= int(currentFolderV[slot].size()))
+				currentFile[slot] = currentFolderV[slot].size()-1;
+			loadSample(currentFolderV[slot][currentFile[slot]], slot);
+		}
 	}
 	
 	void process(const ProcessArgs &args) override {
