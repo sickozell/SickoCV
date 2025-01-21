@@ -41,6 +41,8 @@ struct MultiRouter : Module {
 
 	bool firstRun = true;
 
+	bool revAdv = false;
+	bool cycle = true;
 	bool initStart = false;
 
 	unsigned int sampleRate = APP->engine->getSampleRate();
@@ -132,6 +134,8 @@ struct MultiRouter : Module {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
+		json_object_set_new(rootJ, "revAdv", json_boolean(revAdv));
+		json_object_set_new(rootJ, "cycle", json_boolean(cycle));
 		json_object_set_new(rootJ, "currOutput", json_integer(currOutput));
 		return rootJ;
 	}
@@ -140,6 +144,14 @@ struct MultiRouter : Module {
 		json_t* initStartJ = json_object_get(rootJ, "initStart");
 		if (initStartJ)
 			initStart = json_boolean_value(initStartJ);
+
+		json_t* revAdvJ = json_object_get(rootJ, "revAdv");
+		if (revAdvJ)
+			revAdv = json_boolean_value(revAdvJ);
+
+		json_t* cycleJ = json_object_get(rootJ, "cycle");
+		if (cycleJ)
+			cycle = json_boolean_value(cycleJ);
 
 		if (!initStart) {
 			json_t* currOutputJ = json_object_get(rootJ, "currOutput");
@@ -182,18 +194,56 @@ struct MultiRouter : Module {
 		if (rstTrig > 1.f && prevRstTrig <= 1.f) {
 			prevOutput = currOutput;
 			lights[OUT_LIGHT+prevOutput].setBrightness(0.f);
-			currOutput = params[RST_PARAM].getValue() - 1;
 
-			xFadeKnob = params[XFD_PARAM].getValue();
+			if (revAdv && mode == TRIG_MODE) {
+				switch (direction) {
+					case UP:
+						if (currOutput > maxOutputs - 2) { 
+							if (cycle)
+								currOutput = 0;
+						} else
+							currOutput++;
+					break;
 
-			if (xFadeKnob == 0) {
-				xFadeValue[currOutput] = 1;
+					case DOWN:
+						
+						if (currOutput < 1) {
+							if (cycle)
+								currOutput = maxOutputs - 1;
+						} else
+							currOutput--;
+					break;
+
+					case RANDOM:
+						currOutput = random::uniform() * maxOutputs;
+						if (currOutput > maxOutputs)
+							currOutput = maxOutputs - 1;
+					break;
+				}
+				xFadeKnob = params[XFD_PARAM].getValue();
+
+				if (xFadeKnob == 0) {
+					xFadeValue[currOutput] = 1;
+				} else {
+					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
+					fadingIn = currOutput;
+					fadingOut[prevOutput] = true;
+				}
+
 			} else {
-				xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
-				fadingIn = currOutput;
-				fadingOut[prevOutput] = true;
-			}
 
+				currOutput = params[RST_PARAM].getValue() - 1;
+
+				xFadeKnob = params[XFD_PARAM].getValue();
+
+				if (xFadeKnob == 0) {
+					xFadeValue[currOutput] = 1;
+				} else {
+					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
+					fadingIn = currOutput;
+					fadingOut[prevOutput] = true;
+				}
+			}
 		}
 		prevRstTrig = rstTrig;
 
@@ -205,21 +255,25 @@ struct MultiRouter : Module {
 					lights[OUT_LIGHT+prevOutput].setBrightness(0.f);
 					switch (direction) {
 						case DOWN:
-							currOutput++;
-							if (currOutput > maxOutputs - 1) 
-								currOutput = 0;
+							if (currOutput > maxOutputs - 2)  {
+								if (cycle)
+									currOutput = 0;
+							} else
+								currOutput++;
 						break;
 
 						case UP:
-							currOutput--;
-							if (currOutput < 0)
-								currOutput = maxOutputs - 1;
+							if (currOutput < 1) {
+								if (cycle)
+									currOutput = maxOutputs - 1;
+							} else
+								currOutput--;
 						break;
 
 						case RANDOM:
 							currOutput = random::uniform() * maxOutputs;
 							if (currOutput > maxOutputs)
-								currOutput = maxOutputs- 1;
+								currOutput = maxOutputs - 1;
 						break;
 					}
 
@@ -435,6 +489,9 @@ struct MultiRouterWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		MultiRouter* module = dynamic_cast<MultiRouter*>(this->module);
 
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Cycle", "", &module->cycle));
+		menu->addChild(createBoolPtrMenuItem("RST input = reverse advance", "", &module->revAdv));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 

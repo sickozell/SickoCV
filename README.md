@@ -1,7 +1,7 @@
-# SickoCV v2.6.16
+# SickoCV v2.6.17
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 16](https://github.com/user-attachments/assets/9124dcb4-4ded-4102-ab24-4c131dac600a)
+![SickoCV modules 2 6 17](https://github.com/user-attachments/assets/19fbe380-dd10-407a-a3c7-d4900863e1fa)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -32,6 +32,7 @@ VCV Rack plugin modules
 - [sickoQuant / sickoQuant4](#sickoquant--sickoquant4)
 - [sickoSampler](#sickosampler)
 - [sickoSampler2](#sickosampler2)
+- [simpleSeq4](#simpleseq4)
 - [slewer](#slewer)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
@@ -67,6 +68,7 @@ The MODE switches force the "-0+" switches to be as: "subtract/ignore", "subtrac
 This unconventional feature lets the user to choose the default knob value depending on the main usage of Adder8:  
 if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add (or subtract) exactly 1 octave in pitch;  
 otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
+- **Attenuator**. This converts attenuverter knobs into attenuators when CV inputs are connected.
 - **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
 
 [back to top](#table-of-contents)
@@ -634,6 +636,10 @@ Please note that reset step can be outside of cycling steps of the INs/OUTs sele
 
 Right inputs and outputs are normalled, so if they are unconnected the signal is taken from the left ones.
 
+#### Right-click Menu
+- **Cycle**. With this option unticked when the sequence has reached the end, it won't restart from begin.
+- **RST input = reverse advance**. With this option ticked a trigger on the RST input will advance one step backward (if Random direction is set, a trigger will always return a random step).
+
 [back to top](#table-of-contents)
 
 ## parking
@@ -1023,6 +1029,16 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 **Right-click Menu**  
 'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
+
+[back to top](#table-of-contents)
+
+## simpleSeq4
+### 4 step sequencer with direction and knobs range
+
+![simpleseq4](https://github.com/user-attachments/assets/b1ceb7dd-ca60-44f0-9c0d-d3744f86b5d1)
+
+A tiny and simple 4 step sequencer. If a negative voltage is applied to DIR input the sequencer will advance backwards.  
+Various knob voltage ranges are available in the right-click menu.
 
 [back to top](#table-of-contents)
 

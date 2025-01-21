@@ -42,6 +42,8 @@ struct MultiSwitcher : Module {
 	float inL[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float inR[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+	bool revAdv = false;
+	bool cycle = true;
 	bool initStart = false;
 
 	unsigned int sampleRate = APP->engine->getSampleRate();
@@ -135,6 +137,8 @@ struct MultiSwitcher : Module {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
+		json_object_set_new(rootJ, "revAdv", json_boolean(revAdv));
+		json_object_set_new(rootJ, "cycle", json_boolean(cycle));
 		json_object_set_new(rootJ, "currInput", json_integer(currInput));
 		return rootJ;
 	}
@@ -143,6 +147,14 @@ struct MultiSwitcher : Module {
 		json_t* initStartJ = json_object_get(rootJ, "initStart");
 		if (initStartJ)
 			initStart = json_boolean_value(initStartJ);
+
+		json_t* revAdvJ = json_object_get(rootJ, "revAdv");
+		if (revAdvJ)
+			revAdv = json_boolean_value(revAdvJ);
+
+		json_t* cycleJ = json_object_get(rootJ, "cycle");
+		if (cycleJ)
+			cycle = json_boolean_value(cycleJ);
 
 		if (!initStart) {
 			json_t* currInputJ = json_object_get(rootJ, "currInput");
@@ -185,18 +197,55 @@ struct MultiSwitcher : Module {
 		if (rstTrig > 1.f && prevRstTrig <= 1.f) {
 			prevInput = currInput;
 			lights[IN_LIGHT+prevInput].setBrightness(0.f);
-			currInput = params[RST_PARAM].getValue() - 1;
 
-			xFadeKnob = params[XFD_PARAM].getValue();
+			if (revAdv && mode == TRIG_MODE) {
+				switch (direction) {
+					case UP:
+						if (currInput > maxInputs - 2) { 
+							if (cycle)
+								currInput = 0;
+						} else
+							currInput++;
+					break;
 
-			if (xFadeKnob == 0) {
-				xFadeValue[currInput] = 1;
+					case DOWN:
+						if (currInput < 1) {
+							if (cycle)
+								currInput = maxInputs - 1;
+						} else
+							currInput--;
+					break;
+
+					case RANDOM:
+						currInput = random::uniform() * maxInputs;
+						if (currInput > maxInputs)
+							currInput = maxInputs - 1;
+					break;
+				}
+				xFadeKnob = params[XFD_PARAM].getValue();
+
+				if (xFadeKnob == 0) {
+					xFadeValue[currInput] = 1;
+				} else {
+					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
+					fadingIn = currInput;
+					fadingOut[prevInput] = true;
+				}
+
 			} else {
-				xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
-				fadingIn = currInput;
-				fadingOut[prevInput] = true;
-			}
 
+				currInput = params[RST_PARAM].getValue() - 1;
+
+				xFadeKnob = params[XFD_PARAM].getValue();
+
+				if (xFadeKnob == 0) {
+					xFadeValue[currInput] = 1;
+				} else {
+					xFadeCoeff = 1 / (sampleRate * (std::pow(10000.f, xFadeKnob) / 1000));
+					fadingIn = currInput;
+					fadingOut[prevInput] = true;
+				}
+			}
 		}
 		prevRstTrig = rstTrig;
 
@@ -208,15 +257,19 @@ struct MultiSwitcher : Module {
 					lights[IN_LIGHT+prevInput].setBrightness(0.f);
 					switch (direction) {
 						case DOWN:
-							currInput++;
-							if (currInput > maxInputs - 1) 
-								currInput = 0;
+							if (currInput > maxInputs - 2) { 
+								if (cycle)
+									currInput = 0;
+							} else
+								currInput++;
 						break;
 
 						case UP:
-							currInput--;
-							if (currInput < 0)
-								currInput = maxInputs - 1;
+							if (currInput < 1) {
+								if (cycle)
+									currInput = maxInputs - 1;
+							} else
+								currInput--;
 						break;
 
 						case RANDOM:
@@ -442,6 +495,9 @@ struct MultiSwitcherWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		MultiSwitcher* module = dynamic_cast<MultiSwitcher*>(this->module);
 
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Cycle", "", &module->cycle));
+		menu->addChild(createBoolPtrMenuItem("RST input = reverse advance", "", &module->revAdv));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 

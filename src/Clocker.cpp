@@ -15,6 +15,9 @@
 #define MEDIUM_SMOOTH 2
 #define HIGH_SMOOTH 3
 
+#define CLICK_STANDARD 0
+#define CLICK_CUSTOM 3
+
 #include "plugin.hpp"
 #include "osdialog.h"
 //#define DR_WAV_IMPLEMENTATION
@@ -138,6 +141,8 @@ struct Clocker : Module {
 	float prevExtTrigValue = 0.f;
 
 	float clickOutput;
+
+	int clickSelect = CLICK_STANDARD;
 
 	double a0, a1, a2, b1, b2, z1, z2;
 
@@ -287,19 +292,19 @@ struct Clocker : Module {
 		configParam<tpSignature>(SIGNATURE_KNOB_PARAM, 0.f, 16.0f, 2.f, "Time Signature");
 		paramQuantities[SIGNATURE_KNOB_PARAM]->snapEnabled = true;
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 42.f, 21.f, "Mult/Div #1");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 44.f, 22.f, "Mult/Div #1");
 		paramQuantities[DIVMULT_KNOB_PARAM+0]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+0, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 42.f, 21.f, "Mult/Div #2");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 44.f, 22.f, "Mult/Div #2");
 		paramQuantities[DIVMULT_KNOB_PARAM+1]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+1, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 42.f, 21.f, "Mult/Div #3");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 44.f, 22.f, "Mult/Div #3");
 		paramQuantities[DIVMULT_KNOB_PARAM+2]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+2, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 42.f, 21.f, "Mult/Div #4");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 44.f, 22.f, "Mult/Div #4");
 		paramQuantities[DIVMULT_KNOB_PARAM+3]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+3, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
@@ -361,11 +366,14 @@ struct Clocker : Module {
 			registerValue[i] = 0;
 		*/
 		
+		/*
 		for (int i = 0; i < 2; i++) {
 			clearSlot(i);
 			play[i] = false;
 		}
+		*/
 		setClick(0);
+
 		Module::onReset(e);
 	}
 
@@ -374,12 +382,15 @@ struct Clocker : Module {
 		oneMsTime = (APP->engine->getSampleRate()) / 1000;
 		//oneMsTime = (APP->engine->getSampleRate()) / 10; // for testing purposes
 
+		/*
 		for (int i = 0; i < 2; i++) {
 			if (fileLoaded[i]) {
 				play[i] = false;
 				loadSample(storedPath[i],i);
 			}
 		}
+		*/
+		setClick(clickSelect);
 	}
 
 	json_t *dataToJson() override {
@@ -398,6 +409,7 @@ struct Clocker : Module {
 		json_object_set_new(rootJ, "Swing4", json_boolean(divSwing[3]));
 		json_object_set_new(rootJ, "Slot1", json_string(storedPath[0].c_str()));
 		json_object_set_new(rootJ, "Slot2", json_string(storedPath[1].c_str()));
+		json_object_set_new(rootJ, "clickSelect", json_integer(clickSelect));
 		return rootJ;
 	}
 
@@ -466,6 +478,7 @@ struct Clocker : Module {
 		if (swing4J)
 			divSwing[3] = json_boolean_value(swing4J);
 
+		/*
 		json_t *slot1J = json_object_get(rootJ, "Slot1");
 		if (slot1J) {
 			storedPath[0] = json_string_value(slot1J);
@@ -475,6 +488,31 @@ struct Clocker : Module {
 		if (slot2J) {
 			storedPath[1] = json_string_value(slot2J);
 			loadSample(storedPath[1], 1);
+		}
+		*/
+		json_t *clickSlot1J = json_object_get(rootJ, "Slot1");
+		if (clickSlot1J) {
+			storedPath[0] = json_string_value(clickSlot1J);
+			if (storedPath[0] == "")
+				clearSlot(0);
+			else
+				loadSample(storedPath[0], 0, true);
+		}
+		json_t *clickSlot2J = json_object_get(rootJ, "Slot2");
+		if (clickSlot2J) {
+			storedPath[1] = json_string_value(clickSlot2J);
+			if (storedPath[1] == "")
+				clearSlot(1);
+			else
+				loadSample(storedPath[1], 1, true);
+		}
+
+		json_t* clickSelectJ = json_object_get(rootJ, "clickSelect");
+		if (clickSelectJ) {
+			clickSelect = json_integer_value(clickSelectJ);
+			if (clickSelect < 0 || clickSelect > 3)
+				clickSelect = CLICK_STANDARD;
+			setClick(clickSelect);
 		}
 	}
 
@@ -513,8 +551,14 @@ struct Clocker : Module {
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		fileLoaded[slot] = false;
 		if (path) {
+			/*
 			loadSample(path, slot);
 			storedPath[slot] = std::string(path);
+			*/
+			loadSample(path, slot, true);
+			storedPath[slot] = std::string(path);
+			if (clickSelect != CLICK_CUSTOM)
+				setClick(clickSelect);
 		} else {
 			fileLoaded[slot] = true;
 		}
@@ -524,7 +568,7 @@ struct Clocker : Module {
 		free(path);
 	}
 
-	void loadSample(std::string path, int slot) {
+	void loadSample(std::string path, int slot, bool customClick) {
 		z1 = 0; z2 = 0;
 
 		unsigned int c;
@@ -640,12 +684,22 @@ struct Clocker : Module {
 			tempBuffer2.clear();
 
 			char* pathDup = strdup(path.c_str());
+			/*
 			fileDescription[slot] = basename(pathDup);
 
 			free(pathDup);
 			storedPath[slot] = path;
 
 			fileLoaded[slot] = true;
+			*/
+			if (customClick) {
+				fileDescription[slot] = basename(pathDup);
+
+				storedPath[slot] = path;
+	
+			}
+			fileLoaded[slot] = true;
+			free(pathDup);
 
 		} else {
 			fileFound[slot] = false;
@@ -658,27 +712,39 @@ struct Clocker : Module {
 	void clearSlot(int slot) {
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
-		fileFound[slot] = false;
-		fileLoaded[slot] = false;
-		playBuffer[slot].clear();
-		totalSampleC[slot] = 0;
+		if (clickSelect == CLICK_CUSTOM) {
+			fileFound[slot] = false;
+			fileLoaded[slot] = false;
+			playBuffer[slot].clear();
+			totalSampleC[slot] = 0;
+		}
 	}
 
 	void setClick(int clickNo) {
 		switch (clickNo) {
 			case 0:
-				loadSample(asset::plugin(pluginInstance, "res/clicks/click0_beat.wav"),0);
-				loadSample(asset::plugin(pluginInstance, "res/clicks/click0_bar.wav"),1);
+				loadSample(asset::plugin(pluginInstance, "res/clicks/click0_beat.wav"), 0, false);
+				loadSample(asset::plugin(pluginInstance, "res/clicks/click0_bar.wav"), 1, false);
 			break;
 
 			case 1:
-				loadSample(asset::plugin(pluginInstance, "res/clicks/click1_beat.wav"),0);
-				loadSample(asset::plugin(pluginInstance, "res/clicks/click1_bar.wav"),1);
+				loadSample(asset::plugin(pluginInstance, "res/clicks/click1_beat.wav"), 0, false);
+				loadSample(asset::plugin(pluginInstance, "res/clicks/click1_bar.wav"), 1, false);
 			break;
 
 			case 2:
-				loadSample(asset::plugin(pluginInstance, "res/clicks/click2_beat.wav"),0);
-				loadSample(asset::plugin(pluginInstance, "res/clicks/click2_bar.wav"),1);
+				loadSample(asset::plugin(pluginInstance, "res/clicks/click2_beat.wav"), 0, false);
+				loadSample(asset::plugin(pluginInstance, "res/clicks/click2_bar.wav"), 1, false);
+			break;
+
+			case 3:
+				if (storedPath[0] != "")
+					loadSample(storedPath[0], 0, true);
+				else
+					clearSlot(0);
+				if (storedPath[1] != "")
+					loadSample(storedPath[1], 1, true);
+				else clearSlot(1);
 			break;
 		}
 	}
@@ -889,7 +955,7 @@ struct Clocker : Module {
 
 					if (!divSwing[d]) {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][0]) {
 							// ***** CLOCK MULTIPLIER *****
 							divClockSample[d] = 1.0;
 							divPulse[d] = true;
@@ -904,7 +970,7 @@ struct Clocker : Module {
 						
 					} else {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
 							// ***** CLOCK MULTIPLIER *****
 							divPulse[d] = true;
 							divPulseTime[d] = oneMsTime;
@@ -969,7 +1035,7 @@ struct Clocker : Module {
 						
 						if (!divSwing[d]) {
 
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
 								// ***** CLOCK MULTIPLIER *****
 								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 								divMaxSample[d][1] = divMaxSample[d][0];
@@ -990,7 +1056,7 @@ struct Clocker : Module {
 							}
 						} else {
 							
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
 								// ***** CLOCK MULTIPLIER *****
 								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 								divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
@@ -1129,7 +1195,7 @@ struct Clocker : Module {
 
 					if(!divSwing[d]) {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][0]) {
 							// ***** CLOCK MULTIPLIER *****
 							divClockSample[d] = 1.0;
 							divPulse[d] = true;
@@ -1143,7 +1209,7 @@ struct Clocker : Module {
 						}
 
 					} else {
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
 							// ***** CLOCK MULTIPLIER *****
 							divPulse[d] = true;
 							divPulseTime[d] = oneMsTime;
@@ -1203,7 +1269,7 @@ struct Clocker : Module {
 						for (int d = 0; d < 4; d++) {
 
 							if (!divSwing[d]) {
-								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
 									// ***** CLOCK MULTIPLIER *****
 									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 									divMaxSample[d][1] = divMaxSample[d][0];
@@ -1223,7 +1289,7 @@ struct Clocker : Module {
 									}
 								}
 							} else {
-								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
 									// ***** CLOCK MULTIPLIER *****
 									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 									divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
@@ -1498,10 +1564,10 @@ struct ClockerDisplayDiv1 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1566,10 +1632,10 @@ struct ClockerDisplayDiv2 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1634,10 +1700,10 @@ struct ClockerDisplayDiv3 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1702,10 +1768,10 @@ struct ClockerDisplayDiv4 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -2024,6 +2090,8 @@ struct ClockerWidget : ModuleWidget {
 		}));
 		*/
 
+
+		/*
 		menu->addChild(new MenuSeparator());
 
 		menu->addChild(createSubmenuItem("Click Presets", "", [=](Menu * menu) {
@@ -2042,8 +2110,7 @@ struct ClockerWidget : ModuleWidget {
 		menu->addChild(createMenuItem("File: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
 		menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(1);}));
 
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Beat pulse also on Bar", "", &module->beatOnBar));
+		*/
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("On Run", "", [=](Menu* menu) {
@@ -2053,6 +2120,40 @@ struct ClockerWidget : ModuleWidget {
 		menu->addChild(createSubmenuItem("On Stop", "", [=](Menu* menu) {
 			menu->addChild(createBoolPtrMenuItem("Reset Bar", "", &module->resetOnStop));
 			menu->addChild(createBoolPtrMenuItem("Pulse to RST out", "", &module->resetPulseOnStop));
+		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Beat pulse also on Bar", "", &module->beatOnBar));
+
+		struct ClickItem : MenuItem {
+			Clocker* module;
+			int clickSelect;
+			void onAction(const event::Action& e) override {
+				module->clickSelect = clickSelect;
+				module->setClick(clickSelect);
+			}
+		};
+
+		menu->addChild(createSubmenuItem("Click Settings", "", [=](Menu * menu) {
+
+			std::string clickNames[4] = {"Standard", "Click1", "Click2", "Custom"};
+			for (int i = 0; i < 4; i++) {
+				ClickItem* clickItem = createMenuItem<ClickItem>(clickNames[i]);
+				clickItem->rightText = CHECKMARK(module->clickSelect == i);
+				clickItem->module = module;
+				clickItem->clickSelect = i;
+				menu->addChild(clickItem);
+			}
+
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createMenuItem("Custom BEAT click", "", [=]() {module->menuLoadSample(0);}));
+			menu->addChild(createMenuItem("File: " + module->fileDescription[0], "", [=]() {module->menuLoadSample(0);}));
+			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(0);}));
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Custom BAR click", "", [=]() {module->menuLoadSample(1);}));
+			menu->addChild(createMenuItem("File: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
+			menu->addChild(createMenuItem("", "Clear", [=]() {module->clearSlot(1);}));
 		}));
 	}
 };

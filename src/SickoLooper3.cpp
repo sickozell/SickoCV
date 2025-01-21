@@ -38,6 +38,9 @@
 #define REC_PLAY_OVERDUB 1
 #define REC_OVERDUB_PLAY 2
 
+#define CLICK_STANDARD 0
+#define CLICK_CUSTOM 3
+
 #include "plugin.hpp"
 #include "osdialog.h"
 //#define DR_WAV_IMPLEMENTATION
@@ -347,6 +350,8 @@ struct SickoLooper3 : Module {
 
 	const unsigned int minSamplesToLoad = 9;
 
+	int clickSelect = CLICK_STANDARD;
+
 	vector<float> clickPlayBuffer[2];
 	vector<float> clickTempBuffer;
 	vector<float> clickTempBuffer2;
@@ -552,6 +557,7 @@ struct SickoLooper3 : Module {
 		json_object_set_new(rootJ, "internalClockAlwaysOn", json_boolean(internalClockAlwaysOn));
 		json_object_set_new(rootJ, "ClickSlot1", json_string(clickStoredPath[0].c_str()));
 		json_object_set_new(rootJ, "ClickSlot2", json_string(clickStoredPath[1].c_str()));
+		json_object_set_new(rootJ, "clickSelect", json_integer(clickSelect));
 		return rootJ;
 	}
 
@@ -615,6 +621,7 @@ struct SickoLooper3 : Module {
 			setInternalClock(internalClockAlwaysOn);
 		}
 
+		/*
 		json_t *clickSlot1J = json_object_get(rootJ, "ClickSlot1");
 		if (clickSlot1J) {
 			clickStoredPath[0] = json_string_value(clickSlot1J);
@@ -624,6 +631,32 @@ struct SickoLooper3 : Module {
 		if (clickSlot2J) {
 			clickStoredPath[1] = json_string_value(clickSlot2J);
 			clickLoadSample(clickStoredPath[1], 1);
+		}
+		*/
+
+		json_t *clickSlot1J = json_object_get(rootJ, "ClickSlot1");
+		if (clickSlot1J) {
+			clickStoredPath[0] = json_string_value(clickSlot1J);
+			if (clickStoredPath[0] == "")
+				clickClearSlot(0);
+			else
+				clickLoadSample(clickStoredPath[0], 0, true);
+		}
+		json_t *clickSlot2J = json_object_get(rootJ, "ClickSlot2");
+		if (clickSlot2J) {
+			clickStoredPath[1] = json_string_value(clickSlot2J);
+			if (clickStoredPath[1] == "")
+				clickClearSlot(1);
+			else
+				clickLoadSample(clickStoredPath[1], 1, true);
+		}
+
+		json_t* clickSelectJ = json_object_get(rootJ, "clickSelect");
+		if (clickSelectJ) {
+			clickSelect = json_integer_value(clickSelectJ);
+			if (clickSelect < 0 || clickSelect > 3)
+				clickSelect = CLICK_STANDARD;
+			setClick(clickSelect);
 		}
 
 	}
@@ -716,12 +749,15 @@ struct SickoLooper3 : Module {
 		fastPulseTime = sampleRate / 50;
 		slowPulseTime = sampleRate / 5;
 		
+		/*
 		for (int i = 0; i < 2; i++) {
 			if (clickFileLoaded[i]) {
 				clickPlay[i] = false;
 				clickLoadSample(clickStoredPath[i],i);
 			}
 		}
+		*/
+		setClick(clickSelect);
 
 		for (int track = 0; track < MAX_TRACKS; track++) {
 
@@ -1136,6 +1172,7 @@ struct SickoLooper3 : Module {
 		json_object_set_new(rootJ, "internalClockAlwaysOn", json_boolean(internalClockAlwaysOn));
 		json_object_set_new(rootJ, "clickSlot1", json_string(clickStoredPath[0].c_str()));
 		json_object_set_new(rootJ, "clickSlot2", json_string(clickStoredPath[1].c_str()));
+		json_object_set_new(rootJ, "clickSelect", json_integer(clickSelect));
 		json_object_set_new(rootJ, "click", json_integer(int(params[CLICK_BUT_PARAM].getValue())));
 		json_object_set_new(rootJ, "clickVol", json_real(params[CLICKVOL_KNOB_PARAM].getValue()));
 		json_object_set_new(rootJ, "clickToMaster", json_integer(int(params[CLICKTOMASTER_SWITCH].getValue())));
@@ -1204,6 +1241,7 @@ struct SickoLooper3 : Module {
 			internalClockAlwaysOn = json_boolean_value(internalClockAlwaysOnJ);
 			setInternalClock(internalClockAlwaysOn);
 		}
+		/*
 		json_t *clickSlot1J = json_object_get(rootJ, "clickSlot1");
 		if (clickSlot1J) {
 			clickStoredPath[0] = json_string_value(clickSlot1J);
@@ -1214,6 +1252,33 @@ struct SickoLooper3 : Module {
 			clickStoredPath[1] = json_string_value(clickSlot2J);
 			clickLoadSample(clickStoredPath[1], 1);
 		}
+		*/
+		json_t *clickSlot1J = json_object_get(rootJ, "ClickSlot1");
+		if (clickSlot1J) {
+			clickStoredPath[0] = json_string_value(clickSlot1J);
+			if (clickStoredPath[0] == "")
+				clickClearSlot(0);
+			else
+				clickLoadSample(clickStoredPath[0], 0, true);
+		}
+		json_t *clickSlot2J = json_object_get(rootJ, "ClickSlot2");
+		if (clickSlot2J) {
+			clickStoredPath[1] = json_string_value(clickSlot2J);
+			if (clickStoredPath[1] == "")
+				clickClearSlot(1);
+			else
+				clickLoadSample(clickStoredPath[1], 1, true);
+		}
+
+		json_t* clickSelectJ = json_object_get(rootJ, "clickSelect");
+		if (clickSelectJ) {
+			clickSelect = json_integer_value(clickSelectJ);
+			if (clickSelect < 0 || clickSelect > 3)
+				clickSelect = CLICK_STANDARD;
+			setClick(clickSelect);
+		}
+
+
 		json_t *clickJ = json_object_get(rootJ, "click");
 		if (clickJ) {
 			params[CLICK_BUT_PARAM].setValue(json_integer_value(clickJ));
@@ -1551,8 +1616,14 @@ struct SickoLooper3 : Module {
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 		clickFileLoaded[slot] = false;
 		if (path) {
+			/*
 			clickLoadSample(path, slot);
 			clickStoredPath[slot] = std::string(path);
+			*/
+			clickLoadSample(path, slot, true);
+			clickStoredPath[slot] = std::string(path);
+			if (clickSelect != CLICK_CUSTOM)
+				setClick(clickSelect);
 		} else {
 			clickFileLoaded[slot] = true;
 		}
@@ -1562,7 +1633,7 @@ struct SickoLooper3 : Module {
 		free(path);
 	}
 
-	void clickLoadSample(std::string path, int slot) {
+	void clickLoadSample(std::string path, int slot, bool customClick) {
 		z1 = 0; z2 = 0;
 
 		unsigned int c;
@@ -1674,12 +1745,22 @@ struct SickoLooper3 : Module {
 			clickTempBuffer2.clear();
 
 			char* pathDup = strdup(path.c_str());
+			/*
 			clickFileDescription[slot] = basename(pathDup);
 
 			free(pathDup);
 			clickStoredPath[slot] = path;
 
 			clickFileLoaded[slot] = true;
+			*/
+			if (customClick) {
+				clickFileDescription[slot] = basename(pathDup);
+
+				clickStoredPath[slot] = path;
+	
+			}
+			clickFileLoaded[slot] = true;
+			free(pathDup);
 
 		} else {
 			clickFileLoaded[slot] = false;
@@ -1692,26 +1773,38 @@ struct SickoLooper3 : Module {
 	void clickClearSlot(int slot) {
 		clickStoredPath[slot] = "";
 		clickFileDescription[slot] = "--none--";
-		clickFileLoaded[slot] = false;
-		clickPlayBuffer[slot].clear();
-		clickTotalSampleC[slot] = 0;
+		if (clickSelect == CLICK_CUSTOM) {
+			clickFileLoaded[slot] = false;
+			clickPlayBuffer[slot].clear();
+			clickTotalSampleC[slot] = 0;
+		}
 	}
 
 	void setClick(int clickNo) {
 		switch (clickNo) {
 			case 0:
-				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click0_beat.wav"),0);
-				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click0_bar.wav"),1);
+				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click0_beat.wav"), 0, false);
+				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click0_bar.wav"), 1, false);
 			break;
 
 			case 1:
-				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click1_beat.wav"),0);
-				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click1_bar.wav"),1);
+				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click1_beat.wav"), 0, false);
+				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click1_bar.wav"), 1, false);
 			break;
 
 			case 2:
-				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click2_beat.wav"),0);
-				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click2_bar.wav"),1);
+				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click2_beat.wav"), 0, false);
+				clickLoadSample(asset::plugin(pluginInstance, "res/clicks/click2_bar.wav"), 1, false);
+			break;
+
+			case 3:
+				if (clickStoredPath[0] != "")
+					clickLoadSample(clickStoredPath[0], 0, true);
+				else
+					clickClearSlot(0);
+				if (clickStoredPath[1] != "")
+					clickLoadSample(clickStoredPath[1], 1, true);
+				else clickClearSlot(1);
 			break;
 		}
 	}
@@ -5386,6 +5479,8 @@ struct SickoLooper3Widget : ModuleWidget {
 			}, [=](bool internalClockAlwaysOn) {
 				module->setInternalClock(internalClockAlwaysOn);
 		}));
+
+		/*
 		menu->addChild(createSubmenuItem("Click Settings", "", [=](Menu * menu) {
 			menu->addChild(createSubmenuItem("Click Presets", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("Standard", "", [=]() {module->setClick(0);}));
@@ -5403,7 +5498,38 @@ struct SickoLooper3Widget : ModuleWidget {
 			menu->addChild(createMenuItem("File: " + module->clickFileDescription[1], "", [=]() {module->clickMenuLoadSample(1);}));
 			menu->addChild(createMenuItem("", "Clear", [=]() {module->clickClearSlot(1);}));
 		}));	
-		
+		*/
+
+		struct ClickItem : MenuItem {
+			SickoLooper3* module;
+			int clickSelect;
+			void onAction(const event::Action& e) override {
+				module->clickSelect = clickSelect;
+				module->setClick(clickSelect);
+			}
+		};
+
+		menu->addChild(createSubmenuItem("Click Settings", "", [=](Menu * menu) {
+
+			std::string clickNames[4] = {"Standard", "Click1", "Click2", "Custom"};
+			for (int i = 0; i < 4; i++) {
+				ClickItem* clickItem = createMenuItem<ClickItem>(clickNames[i]);
+				clickItem->rightText = CHECKMARK(module->clickSelect == i);
+				clickItem->module = module;
+				clickItem->clickSelect = i;
+				menu->addChild(clickItem);
+			}
+
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createMenuItem("Custom BEAT click", "", [=]() {module->clickMenuLoadSample(0);}));
+			menu->addChild(createMenuItem("File: " + module->clickFileDescription[0], "", [=]() {module->clickMenuLoadSample(0);}));
+			menu->addChild(createMenuItem("", "Clear", [=]() {module->clickClearSlot(0);}));
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Custom BAR click", "", [=]() {module->clickMenuLoadSample(1);}));
+			menu->addChild(createMenuItem("File: " + module->clickFileDescription[1], "", [=]() {module->clickMenuLoadSample(1);}));
+			menu->addChild(createMenuItem("", "Clear", [=]() {module->clickClearSlot(1);}));
+		}));
 
 	}
 };

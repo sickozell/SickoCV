@@ -234,27 +234,27 @@ struct Clocker2 : Module {
 
 		configParam(PW_KNOB_PARAM, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 42.f, 21.f, "Mult/Div #1");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 44.f, 22.f, "Mult/Div #1");
 		paramQuantities[DIVMULT_KNOB_PARAM+0]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+0, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 42.f, 21.f, "Mult/Div #2");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+1, 0.f, 44.f, 22.f, "Mult/Div #2");
 		paramQuantities[DIVMULT_KNOB_PARAM+1]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+1, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 42.f, 21.f, "Mult/Div #3");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+2, 0.f, 44.f, 22.f, "Mult/Div #3");
 		paramQuantities[DIVMULT_KNOB_PARAM+2]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+2, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 42.f, 21.f, "Mult/Div #4");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+3, 0.f, 44.f, 22.f, "Mult/Div #4");
 		paramQuantities[DIVMULT_KNOB_PARAM+3]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+3, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+4, 0.f, 42.f, 21.f, "Mult/Div #5");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+4, 0.f, 44.f, 22.f, "Mult/Div #5");
 		paramQuantities[DIVMULT_KNOB_PARAM+4]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+4, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
-		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+5, 0.f, 42.f, 21.f, "Mult/Div #6");
+		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+5, 0.f, 44.f, 22.f, "Mult/Div #6");
 		paramQuantities[DIVMULT_KNOB_PARAM+5]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+5, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
 
@@ -600,7 +600,8 @@ struct Clocker2 : Module {
 
 					if (!divSwing[d]) {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
+						//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][0]) {
 							// ***** CLOCK MULTIPLIER *****
 							divClockSample[d] = 1.0;
 							divPulse[d] = true;
@@ -615,7 +616,8 @@ struct Clocker2 : Module {
 						
 					} else {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
 							// ***** CLOCK MULTIPLIER *****
 							divPulse[d] = true;
 							divPulseTime[d] = oneMsTime;
@@ -648,7 +650,8 @@ struct Clocker2 : Module {
 						
 						if (!divSwing[d]) {
 
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+							//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
 								// ***** CLOCK MULTIPLIER *****
 								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 								divMaxSample[d][1] = divMaxSample[d][0];
@@ -669,7 +672,8 @@ struct Clocker2 : Module {
 							}
 						} else {
 							
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+							//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
 								// ***** CLOCK MULTIPLIER *****
 								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 								divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
@@ -790,7 +794,8 @@ struct Clocker2 : Module {
 
 					if(!divSwing[d]) {
 
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
+						//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][0]) {
 							// ***** CLOCK MULTIPLIER *****
 							divClockSample[d] = 1.0;
 							divPulse[d] = true;
@@ -804,7 +809,8 @@ struct Clocker2 : Module {
 						}
 
 					} else {
-						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][divOddCounter[d]]) {
 							// ***** CLOCK MULTIPLIER *****
 							divPulse[d] = true;
 							divPulseTime[d] = oneMsTime;
@@ -832,7 +838,8 @@ struct Clocker2 : Module {
 						for (int d = 0; d < 6; d++) {
 
 							if (!divSwing[d]) {
-								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
 									// ***** CLOCK MULTIPLIER *****
 									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 									divMaxSample[d][1] = divMaxSample[d][0];
@@ -852,7 +859,8 @@ struct Clocker2 : Module {
 									}
 								}
 							} else {
-								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
 									// ***** CLOCK MULTIPLIER *****
 									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
 									divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
@@ -993,10 +1001,10 @@ struct Clocker2DisplayDiv1 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1059,10 +1067,10 @@ struct Clocker2DisplayDiv2 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1125,10 +1133,10 @@ struct Clocker2DisplayDiv3 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1191,10 +1199,10 @@ struct Clocker2DisplayDiv4 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1257,10 +1265,10 @@ struct Clocker2DisplayDiv5 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+4].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
@@ -1323,10 +1331,10 @@ struct Clocker2DisplayDiv6 : TransparentWidget {
 
 				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+5].getValue());
 				float tempXpos = 3;
-				if (tempValue > 11 && tempValue < 29)
+				if (tempValue > 13 && tempValue < 31)
 					tempXpos = 12.8;
 
-				if (tempValue < 21)
+				if (tempValue < 22)
 					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
 				else
 					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
