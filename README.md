@@ -416,9 +416,11 @@ LIM switch enables hard clipping limiter set to ±5v on the output.
 Click on the slot number to open dialog.  
 When the sample is loaded the green led on the panel is turned on (drumPlayer), or the small 7segment display will show the first chars of the filename (drumPlayer+ drumPlayerXtra).  
 
-
 **Set samples root folder**  
 Once a folder is set, 'Samples browser' option is activated in the quick load menu (right click in the relative led slot area/display) to quickly choose samples from the selected folder.  
+
+**Randomize**  (drumPlayerXtra only)
+This option is displayed only if a root folder is set. It will load random samples from the root folder.
 
 **Interpolation**  
 There are 3 different interpolation algorithms, that are engaged during playback only when the sample samplerate differs from VCV working samplerate or playback speed differs from 100%.  
@@ -1037,8 +1039,12 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 
 ![simpleseq4](https://github.com/user-attachments/assets/b1ceb7dd-ca60-44f0-9c0d-d3744f86b5d1)
 
-A tiny and simple 4 step sequencer. If a negative voltage is applied to DIR input the sequencer will advance backwards.  
-Various knob voltage ranges are available in the right-click menu.
+A tiny and simple 4 step sequencer. If a positive (greater than +1v) voltage is applied to REV input the sequencer will advance backwards.  
+
+**Right-click Menu**  
+- Various knob voltage ranges are available (default is -10/+10v).
+- 'Reverse Input Voltage': if 'Negative' is ticked the sequence will advance backwards only if a negative (less than -1v) gate is applied to REV input
+
 
 [back to top](#table-of-contents)
 

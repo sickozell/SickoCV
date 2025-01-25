@@ -1,5 +1,7 @@
 #define FORWARD 0
 #define REVERSE 1
+#define POSITIVE_V 0
+#define NEGATIVE_V 1
 
 #include "plugin.hpp"
 
@@ -13,7 +15,7 @@ struct SimpleSeq4 : Module {
 	enum InputId {
 		TRIG_INPUT,
 		RST_INPUT,
-		DIR_INPUT,
+		REV_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -42,6 +44,8 @@ struct SimpleSeq4 : Module {
 	bool initStart = false;
 	int recStep = 0;
 
+	int revType = POSITIVE_V;
+
 	SimpleSeq4() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configInput(TRIG_INPUT, "Trig");
@@ -52,7 +56,7 @@ struct SimpleSeq4 : Module {
 		configParam(KNOB_PARAM+2, 0, 1.f, 0.5f, "Knob 3");
 		configParam(KNOB_PARAM+3, 0, 1.f, 0.5f, "Knob 4");
 
-		configInput(DIR_INPUT, "Direction");
+		configInput(REV_INPUT, "Direction");
 
 		configOutput(OUT_OUTPUT, "Output");
 
@@ -79,6 +83,7 @@ struct SimpleSeq4 : Module {
 
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "range", json_integer(range));
+		json_object_set_new(rootJ, "revType", json_integer(revType));
 		json_object_set_new(rootJ, "step", json_integer(recStep));
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
 
@@ -92,6 +97,13 @@ struct SimpleSeq4 : Module {
 			range = json_integer_value(rangeJ);
 			if (range < 0 || range > 9)
 				range = 4;
+		}
+
+		json_t* revTypeJ = json_object_get(rootJ, "revType");
+		if (revTypeJ) {
+			revType = json_integer_value(revTypeJ);
+			if (revType < 0 || revType > 1)
+				revType = 0;
 		}
 
 		json_t* stepJ = json_object_get(rootJ, "step");
@@ -114,11 +126,6 @@ struct SimpleSeq4 : Module {
 	
 	void process(const ProcessArgs& args) override {
 
-		if (inputs[DIR_INPUT].getVoltage() >= 0)
-			direction = FORWARD;
-		else
-			direction = REVERSE;
-
 		rstValue = inputs[RST_INPUT].getVoltage();
 		if (rstValue >= 1.f && prevRstValue < 1.f) {
 			lights[KNOB_LIGHT+step].setBrightness(0);
@@ -128,6 +135,19 @@ struct SimpleSeq4 : Module {
 
 		trigValue = inputs[TRIG_INPUT].getVoltage();
 		if (trigValue >= 1.f && prevTrigValue < 1.f) {
+
+			if (revType == POSITIVE_V) {
+				if (inputs[REV_INPUT].getVoltage() < 1)
+					direction = FORWARD;
+				else
+					direction = REVERSE;
+			} else {
+				if (inputs[REV_INPUT].getVoltage() < -1)
+					direction = REVERSE;
+				else
+					direction = FORWARD;
+			}
+
 			lights[KNOB_LIGHT + step].setBrightness(0);
 			if (direction == FORWARD) {
 				step++;
@@ -225,7 +245,7 @@ struct SimpleSeq4Widget : ModuleWidget {
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLight, yLgStart + (yKnShift * 2))), module, SimpleSeq4::KNOB_LIGHT+2));
 		addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLight, yLgStart + (yKnShift * 3))), module, SimpleSeq4::KNOB_LIGHT+3));
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yDir)), module, SimpleSeq4::DIR_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yDir)), module, SimpleSeq4::REV_INPUT));
 
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut)), module, SimpleSeq4::OUT_OUTPUT));
 
@@ -251,6 +271,25 @@ struct SimpleSeq4Widget : ModuleWidget {
 			rangeItem->module = module;
 			rangeItem->range = i;
 			menu->addChild(rangeItem);
+		}
+
+		struct RevTypeItem : MenuItem {
+			SimpleSeq4* module;
+			int revType;
+			void onAction(const event::Action& e) override {
+				module->revType = revType;
+			}
+		};
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Reverse Input Voltage"));
+		std::string RevTypeNames[2] = {"Positive", "Negative"};
+		for (int i = 0; i < 2; i++) {
+			RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
+			revTypeItem->rightText = CHECKMARK(module->revType == i);
+			revTypeItem->module = module;
+			revTypeItem->revType = i;
+			menu->addChild(revTypeItem);
 		}
 
 		menu->addChild(new MenuSeparator());
