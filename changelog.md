@@ -1,4 +1,4 @@
-### 2.6.17 (2025-01-20)
+### 2.6.17 (2025-01-25)
 - added 'simpleSeq4' module
 - added 'Attenuator' option on adder8 module
 - 'drumPlayerXtra': added 'Randomize samples' in context menu when setting a root folder
