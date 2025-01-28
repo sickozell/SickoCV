@@ -1,4 +1,4 @@
-# SickoCV v2.6.17-beta13
+# SickoCV v2.6.18-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,7 +12,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- 
+- trigSeq
 
 ## **to do list:** 
 - keySampler: correct midi learn function that doesn't update at first time the new key
@@ -26,7 +26,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - 'sickoQuant' and 'sickoQuant4' module browser search made easier with keyword 'squant'
 -  multiRouter / multiSwitcher: added 'cycle' and 'RST input = reverse advance' options in the right-click menu
 
-# SickoCV v2.6.17
+# SickoCV v2.6.18
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 17](https://github.com/user-attachments/assets/2836492b-1e4f-444b-8e3e-79a3c18144fa)

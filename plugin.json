@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.6.17-beta13",
+  "version": "2.6.18-beta1",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -504,6 +504,14 @@
         "Envelope generator",
         "Voltage-controlled amplifier",
         "Polyphonic"
+      ]
+    },
+    {
+      "slug": "TrigSeq",
+      "name": "trigSeq",
+      "description": "16 step trig sequencer with direction (ts16)",
+      "tags": [
+        "Sequencer"
       ]
     },
     {

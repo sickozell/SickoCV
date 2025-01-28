@@ -64,5 +64,6 @@ void init(Plugin* p) {
 	p->addModel(modelSwitcher8);
 	p->addModel(modelToggler);
 	p->addModel(modelTogglerCompact);
+	p->addModel(modelTrigSeq);
 	p->addModel(modelWavetabler);
 }
