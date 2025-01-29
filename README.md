@@ -1,4 +1,4 @@
-# SickoCV v2.6.18-beta2
+# SickoCV v2.6.18-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -13,12 +13,14 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## Current modules in beta testing:
 - trigSeq
+- stepSeq
 
 ## **to do list:** 
 - keySampler: correct midi learn function that doesn't update at first time the new key
 
 ## **changelog** 
 - added 'trigSeq' module
+- added 'stepSeq' module
 
 # SickoCV v2.6.18
 VCV Rack plugin modules

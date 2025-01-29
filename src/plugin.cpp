@@ -59,6 +59,7 @@ void init(Plugin* p) {
 	p->addModel(modelSickoSampler2);
 	p->addModel(modelSimpleSeq4);
 	p->addModel(modelSlewer);
+	p->addModel(modelStepSeq);
 	p->addModel(modelSwitcher);
 	p->addModel(modelSwitcherSt);
 	p->addModel(modelSwitcher8);
