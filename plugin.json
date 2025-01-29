@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.6.18-beta1",
+  "version": "2.6.18-beta2",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -509,7 +509,7 @@
     {
       "slug": "TrigSeq",
       "name": "trigSeq",
-      "description": "16 step trig sequencer with direction (ts16)",
+      "description": "16 step trig sequencer with direction (ts)",
       "tags": [
         "Sequencer"
       ]

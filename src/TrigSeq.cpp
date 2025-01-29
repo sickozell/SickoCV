@@ -1,11 +1,14 @@
 #define FORWARD 0
 #define REVERSE 1
-#define TRIG_MODE 1
+#define CLOCK_MODE 1
 #define CV_MODE 0
 #define POSITIVE_V 0
 #define NEGATIVE_V 1
 #define RUN_GATE 0
 #define RUN_TRIG 1
+#define OUT_TRIG 0
+#define OUT_GATE 1
+#define OUT_CLOCK 2
 
 #include "plugin.hpp"
 
@@ -25,6 +28,7 @@ struct TrigSeq : Module {
 		REV_INPUT,
 		RUN_INPUT,
 		RST_INPUT,
+		LENGTH_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -51,6 +55,7 @@ struct TrigSeq : Module {
 	int step = 0;
 
 	bool runSetting = true;
+	bool prevRunSetting = false;
 
 	float runButton = 0;
 	float runTrig = 0.f;
@@ -75,6 +80,13 @@ struct TrigSeq : Module {
 	int currAddr = 0;
 	int prevAddr = 0;
 
+	int outType = OUT_TRIG;
+	bool rstOnRun = true;
+	bool dontAdvance = false;
+	bool dontAdvanceSetting = true;
+
+	bool outGate = false;
+
 	TrigSeq() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Cv", "Clock"});
@@ -91,7 +103,9 @@ struct TrigSeq : Module {
 		configOutput(OUT_OUTPUT, "Output");
 
 		configParam(LENGTH_PARAM, 1.f,16.f, 16.f, "Length");
-		paramQuantities[LENGTH_PARAM]->snapEnabled = true;		
+		paramQuantities[LENGTH_PARAM]->snapEnabled = true;
+
+		configInput(LENGTH_INPUT, "Length");
 
 		configSwitch(STEPBUT_PARAM+0, 0.f, 1.f, 0.f, "Step #1", {"OFF", "ON"});
 		configSwitch(STEPBUT_PARAM+1, 0.f, 1.f, 0.f, "Step #2", {"OFF", "ON"});
@@ -152,6 +166,9 @@ struct TrigSeq : Module {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "runType", json_integer(runType));
 		json_object_set_new(rootJ, "revType", json_integer(revType));
+		json_object_set_new(rootJ, "outType", json_integer(outType));
+		json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
+		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
 		json_object_set_new(rootJ, "step", json_integer(recStep));
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
 
@@ -174,6 +191,23 @@ struct TrigSeq : Module {
 				revType = 0;
 		}
 
+		json_t* outTypeJ = json_object_get(rootJ, "outType");
+		if (outTypeJ) {
+			outType = json_integer_value(outTypeJ);
+			if (outType < 0 || outType > 2)
+				outType = 0;
+		}
+
+		json_t* rstOnRunJ = json_object_get(rootJ, "rstOnRun");
+		if (rstOnRunJ) {
+			rstOnRun = json_boolean_value(rstOnRunJ);
+		}
+
+		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
+		if (dontAdvanceSettingJ) {
+			dontAdvanceSetting = json_boolean_value(dontAdvanceSettingJ);
+		}
+
 		json_t* stepJ = json_object_get(rootJ, "step");
 		if (stepJ) {
 			step = json_integer_value(stepJ);
@@ -191,6 +225,14 @@ struct TrigSeq : Module {
 		}
 
 	}
+
+	void inline resetStep() {
+		lights[STEP_LIGHT+step].setBrightness(0);
+		step = int(params[RST_PARAM].getValue() - 1);
+		if (mode == CLOCK_MODE && dontAdvanceSetting)
+			dontAdvance = true;
+	}
+
 	
 	void process(const ProcessArgs& args) override {
 
@@ -199,16 +241,30 @@ struct TrigSeq : Module {
 
 		out = 0.f;
 
+		mode = params[MODE_SWITCH].getValue();
+
+		rstValue = inputs[RST_INPUT].getVoltage();
+		if (mode == CLOCK_MODE && rstValue >= 1.f && prevRstValue < 1.f)
+			resetStep();
+
+		prevRstValue = rstValue;
+
 		if (inputs[RUN_INPUT].isConnected()) {
 
+			runTrig = inputs[RUN_INPUT].getVoltage();
+
 			if (runType == RUN_GATE) {
-				runTrig = inputs[RUN_INPUT].getVoltage();
-				if (runTrig > 1)
+				
+				if (runTrig > 1) {
 					runSetting = 1;
-				else
+					if (!prevRunSetting && mode == CLOCK_MODE && rstOnRun)
+						resetStep();
+				} else {
 					runSetting = 0;
-			} else {
-				runTrig = inputs[RUN_INPUT].getVoltage();
+				}
+
+			} else {	// runType == RUN_TRIG
+
 				if (runTrig > 1 && prevRunTrig <=1) {
 					if (runSetting) {
 						runSetting = 0;
@@ -216,14 +272,22 @@ struct TrigSeq : Module {
 					} else {
 						runSetting = 1;
 						params[RUNBUT_PARAM].setValue(1);
+						if (!prevRunSetting && mode == CLOCK_MODE && rstOnRun)
+							resetStep();
 					}
-				}
-				prevRunTrig = runTrig;
+				}				
 			}
+			prevRunSetting = runSetting;
+			prevRunTrig = runTrig;
+		
 		} else {
-			runSetting = params[RUNBUT_PARAM].getValue();
 			
+			runSetting = params[RUNBUT_PARAM].getValue();
+			if (mode == CLOCK_MODE && rstOnRun && runSetting && !prevRunSetting)
+				resetStep();
 		}
+
+		prevRunSetting = runSetting;
 
 		lights[RUNBUT_LIGHT].setBrightness(runSetting);
 
@@ -231,10 +295,24 @@ struct TrigSeq : Module {
 		if (runSetting) {
 
 			maxSteps = params[LENGTH_PARAM].getValue();
-			
-			mode = params[MODE_SWITCH].getValue();
 
-			if (mode == CV_MODE && prevMode == TRIG_MODE) {
+			if (inputs[LENGTH_INPUT].isConnected()) {
+				float stepsIn = inputs[LENGTH_INPUT].getVoltage();
+				if (stepsIn < 0.f)
+					stepsIn = 0.f;
+				else if (stepsIn > 10.f)
+					stepsIn = 10.f;
+
+
+				// 1+int(clkValue / 10 * (maxSteps));
+				int addSteps = int(stepsIn / 10 * (16 - maxSteps));
+
+				maxSteps += addSteps;
+				if (maxSteps > 16)
+					maxSteps = 16;
+			}
+			
+			if (mode == CV_MODE && prevMode == CLOCK_MODE) {
 				prevClkValue = 11.f;
 				prevAddr = 11.f;
 			}
@@ -243,15 +321,7 @@ struct TrigSeq : Module {
 			clkValue = inputs[CLK_INPUT].getVoltage();
 
 			switch (mode) {
-				case TRIG_MODE:
-
-					rstValue = inputs[RST_INPUT].getVoltage();
-					if (rstValue >= 1.f && prevRstValue < 1.f) {
-						lights[STEP_LIGHT+step].setBrightness(0);
-						//step = 0;
-						step = int(params[RST_PARAM].getValue() - 1);
-					}
-					prevRstValue = rstValue;
+				case CLOCK_MODE:
 
 					if (clkValue >= 1.f && prevClkValue < 1.f) {
 
@@ -268,12 +338,23 @@ struct TrigSeq : Module {
 						}
 
 						lights[STEP_LIGHT + step].setBrightness(0);
+
 						if (direction == FORWARD) {
-							step++;
+
+							if (!dontAdvance)
+								step++;
+							else
+								dontAdvance = false;
+
 							if (step >= maxSteps)
 								step = 0;
 						} else {
-							step--;
+
+							if (!dontAdvance)
+								step--;
+							else
+								dontAdvance = false;
+
 							if (step < 0)
 								step = maxSteps - 1;
 						}
@@ -281,6 +362,13 @@ struct TrigSeq : Module {
 						if (params[STEPBUT_PARAM+step].getValue()) {
 							stepPulse = true;
 							stepPulseTime = oneMsTime;
+							if (outType == OUT_GATE)
+								outGate = true;
+						} else {
+							if (outType == OUT_GATE) {
+								outGate = false;
+								out = 0.f;
+							}
 						}
 					}
 					prevClkValue = clkValue;
@@ -304,6 +392,13 @@ struct TrigSeq : Module {
 							if (params[STEPBUT_PARAM+step].getValue()) {
 								stepPulse = true;
 								stepPulseTime = oneMsTime;
+								if (outType == OUT_GATE)
+									outGate = true;
+							} else {
+								if (outType == OUT_GATE) {
+									outGate = false;
+									out = 0.f;
+								}
 							}
 							prevAddr = currAddr;
 							//step = currAddr-1;
@@ -317,12 +412,26 @@ struct TrigSeq : Module {
 			
 
 		if (stepPulse) {
-			stepPulseTime--;
-			if (stepPulseTime < 0) {
-				stepPulse = false;
-				out = 0.f;
-			} else {
-				out = 10.f;
+
+			if ( (mode == CLOCK_MODE && outType == OUT_TRIG) || (mode == CV_MODE && (outType == OUT_TRIG || outType == OUT_CLOCK) ) ) {
+				stepPulseTime--;
+				if (stepPulseTime < 0) {
+					stepPulse = false;
+					out = 0.f;
+				} else {
+					out = 10.f;
+				}
+			} else if (mode == CLOCK_MODE && outType == OUT_CLOCK) {
+				out = inputs[CLK_INPUT].getVoltage();
+				if (out < 1.f) {
+					out = 0.f;
+					stepPulse = false;
+				}
+			} else if (outType == OUT_GATE) {
+				if (outGate)
+					out = 10.f;
+				else
+					out = 0.f;
 			}
 		}
 		outputs[OUT_OUTPUT].setVoltage(out);
@@ -357,21 +466,25 @@ struct TrigSeqWidget : ModuleWidget {
 
 		const float yOut = 117.5;
 
-		const float xLength = 28.5;
-		const float yLength = 15.6;
+		const float xLength = 20.5;
+		const float yLength = 19.6;
 
-		const float xInL = 19;
+		const float xStepsIn = 29.5;
+		const float yStepsIn = 24;
+
+		const float xInL = 19.3;
 		const float xInR = xInL+9;
-		const float xLightL = xInL+4;
-		const float xLightR = xInR+4;
+		const float xLightL = xInL+3;
+		const float xLightR = xInR+3;
 
-		const float ys = 28;
-		const float yShift = 11.5;
+		const float ys = 34;
+		const float yShift = 11;
 
-		const float yShiftBlock = 4;
+		const float yShiftBlock = 3;
 		const float yShiftBlock2 = 3.5;
 
-		const float yLightShift = 3.3;
+		//const float yLightShift = 3.3;
+		const float yLightShift = 4.3;
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xLeft, yCvSw)), module, TrigSeq::MODE_SWITCH));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xLeft, yTrig)), module, TrigSeq::CLK_INPUT));
@@ -385,6 +498,8 @@ struct TrigSeqWidget : ModuleWidget {
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xLeft, yRev)), module, TrigSeq::REV_INPUT));
 
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xLeft, yOut)), module, TrigSeq::OUT_OUTPUT));
+
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStepsIn, yStepsIn)), module, TrigSeq::LENGTH_INPUT));
 
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xLength, yLength)), module, TrigSeq::LENGTH_PARAM));
 
@@ -470,6 +585,31 @@ struct TrigSeqWidget : ModuleWidget {
 			revTypeItem->revType = i;
 			menu->addChild(revTypeItem);
 		}
+
+		struct OutTypeItem : MenuItem {
+			TrigSeq* module;
+			int outType;
+			void onAction(const event::Action& e) override {
+				module->outType = outType;
+			}
+		};
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Output type"));
+		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
+		for (int i = 0; i < 3; i++) {
+			OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
+			outTypeItem->rightText = CHECKMARK(module->outType == i);
+			outTypeItem->module = module;
+			outTypeItem->outType = i;
+			menu->addChild(outTypeItem);
+		}
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Reset on Run", "", &module->rstOnRun));
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("1st clock after reset:"));
+		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
