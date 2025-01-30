@@ -82,8 +82,8 @@ struct StepSeq : Module {
 
 	//int outType = OUT_TRIG;
 	bool rstOnRun = true;
-	//bool dontAdvance = false;
-	//bool dontAdvanceSetting = true;
+	bool dontAdvance = false;
+	bool dontAdvanceSetting = true;
 
 	//bool outGate = false;
 
@@ -167,7 +167,7 @@ struct StepSeq : Module {
 		json_object_set_new(rootJ, "revType", json_integer(revType));
 		//json_object_set_new(rootJ, "outType", json_integer(outType));
 		json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
-		//json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
+		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
 		json_object_set_new(rootJ, "step", json_integer(recStep));
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
 
@@ -203,12 +203,10 @@ struct StepSeq : Module {
 			rstOnRun = json_boolean_value(rstOnRunJ);
 		}
 
-		/*
 		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
 		if (dontAdvanceSettingJ) {
 			dontAdvanceSetting = json_boolean_value(dontAdvanceSettingJ);
 		}
-		*/
 
 		json_t* stepJ = json_object_get(rootJ, "step");
 		if (stepJ) {
@@ -232,8 +230,8 @@ struct StepSeq : Module {
 	void inline resetStep() {
 		lights[STEP_LIGHT+step].setBrightness(0);
 		step = int(params[RST_PARAM].getValue() - 1);
-		//if (mode == CLOCK_MODE && dontAdvanceSetting)
-		//	dontAdvance = true;
+		if (mode == CLOCK_MODE && dontAdvanceSetting)
+			dontAdvance = true;
 	}
 	
 	
@@ -346,24 +344,22 @@ struct StepSeq : Module {
 
 						if (direction == FORWARD) {
 
-							/*
 							if (!dontAdvance)
 								step++;
 							else
 								dontAdvance = false;
-							*/
-							step++;
+							
+							//step++;
 
 							if (step >= maxSteps)
 								step = 0;
 						} else {
 
-							/*
 							if (!dontAdvance)
 								step--;
 							else
 								dontAdvance = false;
-							*/
+
 							step--;
 
 							if (step < 0)
@@ -671,11 +667,9 @@ struct StepSeqWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset on Run", "", &module->rstOnRun));
 		
-		/*
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
-		*/
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));

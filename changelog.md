@@ -1,4 +1,4 @@
-### 2.6.18 (2025-01-29)
+### 2.6.18 (2025-01-30)
 - added 'trigSeq' module
 - added 'stepSeq' module
 
