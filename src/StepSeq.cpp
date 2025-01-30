@@ -6,9 +6,6 @@
 #define NEGATIVE_V 1
 #define RUN_GATE 0
 #define RUN_TRIG 1
-//#define OUT_TRIG 0
-//#define OUT_GATE 1
-//#define OUT_CLOCK 2
 
 #include "plugin.hpp"
 
@@ -36,7 +33,6 @@ struct StepSeq : Module {
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		//ENUMS(STEPBUT_LIGHT, 16),
 		ENUMS(STEP_LIGHT, 16),
 		RUNBUT_LIGHT,
 		LIGHTS_LEN
@@ -69,10 +65,6 @@ struct StepSeq : Module {
 	int revType = POSITIVE_V;
 	int runType = RUN_GATE;
 
-	//float oneMsTime = (APP->engine->getSampleRate()) / 1000;
-	//bool stepPulse = false;
-	//float stepPulseTime = 0;
-
 	int maxSteps = 16;
 	int mode = 0;
 	int prevMode = 1;
@@ -80,12 +72,9 @@ struct StepSeq : Module {
 	int currAddr = 0;
 	int prevAddr = 0;
 
-	//int outType = OUT_TRIG;
 	bool rstOnRun = true;
 	bool dontAdvance = false;
 	bool dontAdvanceSetting = true;
-
-	//bool outGate = false;
 
 	StepSeq() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -150,12 +139,6 @@ struct StepSeq : Module {
 		Module::onReset(e);
 	}
 
-	/*
-	void onSampleRateChange() override {
-		oneMsTime = (APP->engine->getSampleRate()) / 1000;
-	}
-	*/
-
 	json_t* dataToJson() override {
 		if (initStart)
 			recStep = 0;
@@ -165,7 +148,6 @@ struct StepSeq : Module {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "runType", json_integer(runType));
 		json_object_set_new(rootJ, "revType", json_integer(revType));
-		//json_object_set_new(rootJ, "outType", json_integer(outType));
 		json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
 		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
 		json_object_set_new(rootJ, "step", json_integer(recStep));
@@ -189,14 +171,6 @@ struct StepSeq : Module {
 			if (revType < 0 || revType > 1)
 				revType = 0;
 		}
-		/*
-		json_t* outTypeJ = json_object_get(rootJ, "outType");
-		if (outTypeJ) {
-			outType = json_integer_value(outTypeJ);
-			if (outType < 0 || outType > 2)
-				outType = 0;
-		}
-		*/
 
 		json_t* rstOnRunJ = json_object_get(rootJ, "rstOnRun");
 		if (rstOnRunJ) {
@@ -236,11 +210,6 @@ struct StepSeq : Module {
 	
 	
 	void process(const ProcessArgs& args) override {
-
-		/*
-		for (int i = 0; i < 16; i++)
-			lights[STEPBUT_LIGHT+i].setBrightness(params[STEPKNOB_PARAM+i].getValue());
-		*/
 
 		out = 0.f;
 
@@ -306,8 +275,6 @@ struct StepSeq : Module {
 				else if (stepsIn > 10.f)
 					stepsIn = 10.f;
 
-
-				// 1+int(clkValue / 10 * (maxSteps));
 				int addSteps = int(stepsIn / 10 * (16 - maxSteps));
 
 				maxSteps += addSteps;
@@ -348,8 +315,6 @@ struct StepSeq : Module {
 								step++;
 							else
 								dontAdvance = false;
-							
-							//step++;
 
 							if (step >= maxSteps)
 								step = 0;
@@ -366,21 +331,9 @@ struct StepSeq : Module {
 								step = maxSteps - 1;
 						}
 
-						/*
-						if (params[STEPKNOB_PARAM+step].getValue()) {
-							stepPulse = true;
-							stepPulseTime = oneMsTime;
-							if (outType == OUT_GATE)
-								outGate = true;
-						} else {
-							if (outType == OUT_GATE) {
-								outGate = false;
-								out = 0.f;
-							}
-						}
-						*/
 					}
 					prevClkValue = clkValue;
+
 				break;
 
 				case CV_MODE:
@@ -398,22 +351,8 @@ struct StepSeq : Module {
 						if (currAddr != prevAddr) {
 							lights[STEP_LIGHT+step].setBrightness(0);
 							step = currAddr-1;
-
-							/*
-							if (params[STEPKNOB_PARAM+step].getValue()) {
-								stepPulse = true;
-								stepPulseTime = oneMsTime;
-								if (outType == OUT_GATE)
-									outGate = true;
-							} else {
-								if (outType == OUT_GATE) {
-									outGate = false;
-									out = 0.f;
-								}
-							}
-							*/
 							prevAddr = currAddr;
-							//step = currAddr-1;
+
 						}
 					}
 					prevClkValue = clkValue;
@@ -422,34 +361,6 @@ struct StepSeq : Module {
 			}
 		}
 			
-		/*
-		if (stepPulse) {
-
-			if ( (mode == CLOCK_MODE && outType == OUT_TRIG) || (mode == CV_MODE && (outType == OUT_TRIG || outType == OUT_CLOCK) ) ) {
-				stepPulseTime--;
-				if (stepPulseTime < 0) {
-					stepPulse = false;
-					out = 0.f;
-				} else {
-					out = 10.f;
-				}
-			} else if (mode == CLOCK_MODE && outType == OUT_CLOCK) {
-				out = inputs[CLK_INPUT].getVoltage();
-				if (out < 1.f) {
-					out = 0.f;
-					stepPulse = false;
-				}
-			} else if (outType == OUT_GATE) {
-				if (outGate)
-					out = 10.f;
-				else
-					out = 0.f;
-			}
-		}
-		outputs[OUT_OUTPUT].setVoltage(out);
-		
-		lights[STEP_LIGHT+step].setBrightness(1);
-		*/
 		out = params[STEPKNOB_PARAM+step].getValue();
 
 		switch (range) {
@@ -642,27 +553,6 @@ struct StepSeqWidget : ModuleWidget {
 			revTypeItem->revType = i;
 			menu->addChild(revTypeItem);
 		}
-
-		/*
-		struct OutTypeItem : MenuItem {
-			StepSeq* module;
-			int outType;
-			void onAction(const event::Action& e) override {
-				module->outType = outType;
-			}
-		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Output type"));
-		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
-		for (int i = 0; i < 3; i++) {
-			OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
-			outTypeItem->rightText = CHECKMARK(module->outType == i);
-			outTypeItem->module = module;
-			outTypeItem->outType = i;
-			menu->addChild(outTypeItem);
-		}
-		*/
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset on Run", "", &module->rstOnRun));

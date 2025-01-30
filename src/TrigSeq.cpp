@@ -124,8 +124,6 @@ struct TrigSeq : Module {
 		configSwitch(STEPBUT_PARAM+14, 0.f, 1.f, 0.f, "Step #15", {"OFF", "ON"});
 		configSwitch(STEPBUT_PARAM+15, 0.f, 1.f, 0.f, "Step #16", {"OFF", "ON"});
 
-
-
 	}
 
 	void onReset(const ResetEvent &e) override {
@@ -155,7 +153,6 @@ struct TrigSeq : Module {
 	void onSampleRateChange() override {
 		oneMsTime = (APP->engine->getSampleRate()) / 1000;
 	}
-
 
 	json_t* dataToJson() override {
 		if (initStart)
@@ -233,7 +230,6 @@ struct TrigSeq : Module {
 			dontAdvance = true;
 	}
 
-	
 	void process(const ProcessArgs& args) override {
 
 		for (int i = 0; i < 16; i++)
@@ -303,8 +299,6 @@ struct TrigSeq : Module {
 				else if (stepsIn > 10.f)
 					stepsIn = 10.f;
 
-
-				// 1+int(clkValue / 10 * (maxSteps));
 				int addSteps = int(stepsIn / 10 * (16 - maxSteps));
 
 				maxSteps += addSteps;
@@ -401,7 +395,7 @@ struct TrigSeq : Module {
 								}
 							}
 							prevAddr = currAddr;
-							//step = currAddr-1;
+
 						}
 					}
 					prevClkValue = clkValue;
@@ -483,7 +477,6 @@ struct TrigSeqWidget : ModuleWidget {
 		const float yShiftBlock = 3;
 		const float yShiftBlock2 = 3.5;
 
-		//const float yLightShift = 3.3;
 		const float yLightShift = 4.3;
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xLeft, yCvSw)), module, TrigSeq::MODE_SWITCH));
@@ -526,27 +519,6 @@ struct TrigSeqWidget : ModuleWidget {
 
 	void appendContextMenu(Menu* menu) override {
 		TrigSeq* module = dynamic_cast<TrigSeq*>(this->module);
-
-		/*
-		struct RangeItem : MenuItem {
-			TrigSeq* module;
-			int range;
-			void onAction(const event::Action& e) override {
-				module->range = range;
-			}
-		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Knobs Range"));
-		std::string rangeNames[10] = {"0/1v", "0/2v", "0/3v", "0/5v", "0/10v", "-1/+1v", "-2/+2v", "-3/+3v", "-5/+5v", "-10/+10v"};
-		for (int i = 0; i < 10; i++) {
-			RangeItem* rangeItem = createMenuItem<RangeItem>(rangeNames[i]);
-			rangeItem->rightText = CHECKMARK(module->range == i);
-			rangeItem->module = module;
-			rangeItem->range = i;
-			menu->addChild(rangeItem);
-		}
-		*/
 
 		struct RunTypeItem : MenuItem {
 			TrigSeq* module;
