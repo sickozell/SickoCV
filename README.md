@@ -1,4 +1,4 @@
-# SickoCV v2.6.17
+# SickoCV v2.6.18
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 17](https://github.com/user-attachments/assets/2836492b-1e4f-444b-8e3e-79a3c18144fa)
@@ -34,8 +34,10 @@ VCV Rack plugin modules
 - [sickoSampler2](#sickosampler2)
 - [simpleSeq4](#simpleseq4)
 - [slewer](#slewer)
+- [stepSeq](#stepSeq)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
+- [trigSeq](#trigSeq)
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
 
@@ -1074,6 +1076,15 @@ If no signal input is connected the module acts as LFO.
 In the right-click menu there is the option "Duration/Slew knobs".  
 When ticked, the ATT control sets both the attack and decay durations and the DEC control sets the percentage of attack/decay. Centered setting means that attack and decay have the same duration.
 
+
+[back to top](#table-of-contents)
+
+## stepSeq
+### 16 step sequencer with direction
+#### - INSTRUCTIONS
+Coming Soon
+
+
 [back to top](#table-of-contents)
 
 ## switcher / switcherSt / switcher8
@@ -1181,6 +1192,13 @@ These behaviors are more understandable connecting a scope on the output.
 
 #### Right-click Menu
 - Initialize On Start: discards previous module state on VCV restart
+
+[back to top](#table-of-contents)
+
+## trigSeq
+### 16 step trig sequencer with direction 
+#### - INSTRUCTIONS
+Coming Soon
 
 [back to top](#table-of-contents)
 

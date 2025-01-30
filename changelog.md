@@ -1,3 +1,7 @@
+### 2.6.18 (2025-01-30)
+- added 'trigSeq' module
+- added 'stepSeq' module
+
 ### 2.6.17 (2025-01-25)
 - added 'simpleSeq4' module
 - added 'Attenuator' option on adder8 module

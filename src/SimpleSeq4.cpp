@@ -56,7 +56,7 @@ struct SimpleSeq4 : Module {
 		configParam(KNOB_PARAM+2, 0, 1.f, 0.5f, "Knob 3");
 		configParam(KNOB_PARAM+3, 0, 1.f, 0.5f, "Knob 4");
 
-		configInput(REV_INPUT, "Direction");
+		configInput(REV_INPUT, "Reverse");
 
 		configOutput(OUT_OUTPUT, "Output");
 
