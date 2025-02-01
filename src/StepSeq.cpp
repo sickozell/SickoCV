@@ -13,7 +13,7 @@
 
 struct StepSeq : Module {
 	enum ParamId {
-		ENUMS(STEPKNOB_PARAM, 16),
+		ENUMS(STEP_PARAM, 16),
 		LENGTH_PARAM,
 		MODE_SWITCH,
 		RST_PARAM,
@@ -51,7 +51,7 @@ struct StepSeq : Module {
 	int step = 0;
 
 	bool runSetting = true;
-	bool prevRunSetting = false;
+	bool prevRunSetting = true;
 
 	float runButton = 0;
 	float runTrig = 0.f;
@@ -96,22 +96,22 @@ struct StepSeq : Module {
 
 		configInput(LENGTH_INPUT, "Length");
 
-		configParam(STEPKNOB_PARAM+0, 0, 1.f, 0.5f, "Knob 1");
-		configParam(STEPKNOB_PARAM+1, 0, 1.f, 0.5f, "Knob 2");
-		configParam(STEPKNOB_PARAM+2, 0, 1.f, 0.5f, "Knob 3");
-		configParam(STEPKNOB_PARAM+3, 0, 1.f, 0.5f, "Knob 4");
-		configParam(STEPKNOB_PARAM+4, 0, 1.f, 0.5f, "Knob 5");
-		configParam(STEPKNOB_PARAM+5, 0, 1.f, 0.5f, "Knob 6");
-		configParam(STEPKNOB_PARAM+6, 0, 1.f, 0.5f, "Knob 7");
-		configParam(STEPKNOB_PARAM+7, 0, 1.f, 0.5f, "Knob 8");
-		configParam(STEPKNOB_PARAM+8, 0, 1.f, 0.5f, "Knob 9");
-		configParam(STEPKNOB_PARAM+9, 0, 1.f, 0.5f, "Knob 10");
-		configParam(STEPKNOB_PARAM+10, 0, 1.f, 0.5f, "Knob 11");
-		configParam(STEPKNOB_PARAM+11, 0, 1.f, 0.5f, "Knob 12");
-		configParam(STEPKNOB_PARAM+12, 0, 1.f, 0.5f, "Knob 13");
-		configParam(STEPKNOB_PARAM+13, 0, 1.f, 0.5f, "Knob 14");
-		configParam(STEPKNOB_PARAM+14, 0, 1.f, 0.5f, "Knob 15");
-		configParam(STEPKNOB_PARAM+15, 0, 1.f, 0.5f, "Knob 16");
+		configParam(STEP_PARAM+0, 0, 1.f, 0.5f, "Step 1");
+		configParam(STEP_PARAM+1, 0, 1.f, 0.5f, "Step 2");
+		configParam(STEP_PARAM+2, 0, 1.f, 0.5f, "Step 3");
+		configParam(STEP_PARAM+3, 0, 1.f, 0.5f, "Step 4");
+		configParam(STEP_PARAM+4, 0, 1.f, 0.5f, "Step 5");
+		configParam(STEP_PARAM+5, 0, 1.f, 0.5f, "Step 6");
+		configParam(STEP_PARAM+6, 0, 1.f, 0.5f, "Step 7");
+		configParam(STEP_PARAM+7, 0, 1.f, 0.5f, "Step 8");
+		configParam(STEP_PARAM+8, 0, 1.f, 0.5f, "Step 9");
+		configParam(STEP_PARAM+9, 0, 1.f, 0.5f, "Step 10");
+		configParam(STEP_PARAM+10, 0, 1.f, 0.5f, "Step 11");
+		configParam(STEP_PARAM+11, 0, 1.f, 0.5f, "Step 12");
+		configParam(STEP_PARAM+12, 0, 1.f, 0.5f, "Step 13");
+		configParam(STEP_PARAM+13, 0, 1.f, 0.5f, "Step 14");
+		configParam(STEP_PARAM+14, 0, 1.f, 0.5f, "Step 15");
+		configParam(STEP_PARAM+15, 0, 1.f, 0.5f, "Step 16");
 
 	}
 
@@ -146,6 +146,7 @@ struct StepSeq : Module {
 			recStep = step;
 
 		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "range", json_integer(range));
 		json_object_set_new(rootJ, "runType", json_integer(runType));
 		json_object_set_new(rootJ, "revType", json_integer(revType));
 		json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
@@ -157,6 +158,13 @@ struct StepSeq : Module {
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
+
+		json_t* rangeJ = json_object_get(rootJ, "range");
+		if (rangeJ) {
+			range = json_integer_value(rangeJ);
+			if (range < 0 || range > 9)
+				range = 9;
+		}
 		
 		json_t* runTypeJ = json_object_get(rootJ, "runType");
 		if (runTypeJ) {
@@ -185,8 +193,8 @@ struct StepSeq : Module {
 		json_t* stepJ = json_object_get(rootJ, "step");
 		if (stepJ) {
 			step = json_integer_value(stepJ);
-			if (step < 0 || step > 3)
-				range = 0;
+			if (step < 0 || step > 15)
+				step = 0;
 			lights[STEP_LIGHT+step].setBrightness(1);
 
 		} 
@@ -361,7 +369,7 @@ struct StepSeq : Module {
 			}
 		}
 			
-		out = params[STEPKNOB_PARAM+step].getValue();
+		out = params[STEP_PARAM+step].getValue();
 
 		switch (range) {
 			//case 0:
@@ -474,8 +482,8 @@ struct StepSeqWidget : ModuleWidget {
 
 		for (int i = 0; i < 4; i++) {
 
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInL, ys+(i*yShift))), module, StepSeq::STEPKNOB_PARAM+i));
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInR, ys+(i*yShift)+yShiftBlock2)), module, StepSeq::STEPKNOB_PARAM+i+8));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInL, ys+(i*yShift))), module, StepSeq::STEP_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInR, ys+(i*yShift)+yShiftBlock2)), module, StepSeq::STEP_PARAM+i+8));
 
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLightL, ys+(i*yShift)-yLightShift)), module, StepSeq::STEP_LIGHT+i));
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLightR, ys+(i*yShift)+yShiftBlock2-yLightShift)), module, StepSeq::STEP_LIGHT+i+8));
@@ -484,8 +492,8 @@ struct StepSeqWidget : ModuleWidget {
 
 		for (int i = 4; i < 8; i++) {
 
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInL, ys+(i*yShift)+yShiftBlock)), module, StepSeq::STEPKNOB_PARAM+i));
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInR, ys+(i*yShift)+yShiftBlock+yShiftBlock2)), module, StepSeq::STEPKNOB_PARAM+i+8));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInL, ys+(i*yShift)+yShiftBlock)), module, StepSeq::STEP_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInR, ys+(i*yShift)+yShiftBlock+yShiftBlock2)), module, StepSeq::STEP_PARAM+i+8));
 
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLightL, ys+(i*yShift)+yShiftBlock-yLightShift)), module, StepSeq::STEP_LIGHT+i));
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLightR, ys+(i*yShift)+yShiftBlock+yShiftBlock2-yLightShift)), module, StepSeq::STEP_LIGHT+i+8));
@@ -506,15 +514,16 @@ struct StepSeqWidget : ModuleWidget {
 		};
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Knobs Range"));
 		std::string rangeNames[10] = {"0/1v", "0/2v", "0/3v", "0/5v", "0/10v", "-1/+1v", "-2/+2v", "-3/+3v", "-5/+5v", "-10/+10v"};
-		for (int i = 0; i < 10; i++) {
-			RangeItem* rangeItem = createMenuItem<RangeItem>(rangeNames[i]);
-			rangeItem->rightText = CHECKMARK(module->range == i);
-			rangeItem->module = module;
-			rangeItem->range = i;
-			menu->addChild(rangeItem);
-		}
+		menu->addChild(createSubmenuItem("Knobs Range", rangeNames[module->range], [=](Menu * menu) {
+			for (int i = 0; i < 10; i++) {
+				RangeItem* rangeItem = createMenuItem<RangeItem>(rangeNames[i]);
+				rangeItem->rightText = CHECKMARK(module->range == i);
+				rangeItem->module = module;
+				rangeItem->range = i;
+				menu->addChild(rangeItem);
+			}
+		}));
 		
 		struct RunTypeItem : MenuItem {
 			StepSeq* module;

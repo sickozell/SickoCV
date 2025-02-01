@@ -1,4 +1,4 @@
-# SickoCV v2.6.18
+# SickoCV v2.7.0
 VCV Rack plugin modules
 
 ![SickoCV modules 2 6 17](https://github.com/user-attachments/assets/2836492b-1e4f-444b-8e3e-79a3c18144fa)
@@ -34,10 +34,10 @@ VCV Rack plugin modules
 - [sickoSampler2](#sickosampler2)
 - [simpleSeq4](#simpleseq4)
 - [slewer](#slewer)
-- [stepSeq](#stepSeq)
+- [stepSeq / stepSeq+](#stepSeq--stepSeq)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
-- [trigSeq](#trigSeq)
+- [trigSeq / trigSeq+](#trigSeq--trigSeq)
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
 
@@ -1079,7 +1079,7 @@ When ticked, the ATT control sets both the attack and decay durations and the DE
 
 [back to top](#table-of-contents)
 
-## stepSeq
+## stepSeq / stepSeq+
 ### 16 step sequencer with direction
 #### - INSTRUCTIONS
 Coming Soon
@@ -1195,7 +1195,7 @@ These behaviors are more understandable connecting a scope on the output.
 
 [back to top](#table-of-contents)
 
-## trigSeq
+## trigSeq / trigSeq+
 ### 16 step trig sequencer with direction 
 #### - INSTRUCTIONS
 Coming Soon

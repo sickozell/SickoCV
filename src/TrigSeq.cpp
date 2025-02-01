@@ -55,7 +55,7 @@ struct TrigSeq : Module {
 	int step = 0;
 
 	bool runSetting = true;
-	bool prevRunSetting = false;
+	bool prevRunSetting = true;
 
 	float runButton = 0;
 	float runTrig = 0.f;
@@ -208,8 +208,8 @@ struct TrigSeq : Module {
 		json_t* stepJ = json_object_get(rootJ, "step");
 		if (stepJ) {
 			step = json_integer_value(stepJ);
-			if (step < 0 || step > 3)
-				range = 0;
+			if (step < 0 || step > 15)
+				step = 0;
 			lights[STEP_LIGHT+step].setBrightness(1);
 
 		} 
