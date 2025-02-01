@@ -1,3 +1,7 @@
+### 2.7.0 (2025-02-01)
+- added 'trigSeq+' module
+- added 'stepSeq+' module
+
 ### 2.6.18 (2025-01-30)
 - added 'trigSeq' module
 - added 'stepSeq' module

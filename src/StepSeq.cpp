@@ -506,15 +506,16 @@ struct StepSeqWidget : ModuleWidget {
 		};
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Knobs Range"));
 		std::string rangeNames[10] = {"0/1v", "0/2v", "0/3v", "0/5v", "0/10v", "-1/+1v", "-2/+2v", "-3/+3v", "-5/+5v", "-10/+10v"};
-		for (int i = 0; i < 10; i++) {
-			RangeItem* rangeItem = createMenuItem<RangeItem>(rangeNames[i]);
-			rangeItem->rightText = CHECKMARK(module->range == i);
-			rangeItem->module = module;
-			rangeItem->range = i;
-			menu->addChild(rangeItem);
-		}
+		menu->addChild(createSubmenuItem("Knobs Range", rangeNames[module->range], [=](Menu * menu) {
+			for (int i = 0; i < 10; i++) {
+				RangeItem* rangeItem = createMenuItem<RangeItem>(rangeNames[i]);
+				rangeItem->rightText = CHECKMARK(module->range == i);
+				rangeItem->module = module;
+				rangeItem->range = i;
+				menu->addChild(rangeItem);
+			}
+		}));
 		
 		struct RunTypeItem : MenuItem {
 			StepSeq* module;
