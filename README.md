@@ -25,7 +25,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.7.0
 VCV Rack plugin modules
 
-![SickoCV modules 2 6 17](https://github.com/user-attachments/assets/2836492b-1e4f-444b-8e3e-79a3c18144fa)
+![SickoCV modules 2 7 0](https://github.com/user-attachments/assets/d837baac-3f27-4286-8e09-ad5c3f0a4a3c)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -1104,6 +1104,9 @@ When ticked, the ATT control sets both the attack and decay durations and the DE
 
 ## stepSeq / stepSeq+ / trigSeq / trigSeq+
 ### 16 step/trigger sequencer with direction and presets
+
+![stepseqtrigseq](https://github.com/user-attachments/assets/6852b2d5-dc64-421a-9955-5c97f4a86103)
+
 #### - INSTRUCTIONS
 Coming Soon
 
