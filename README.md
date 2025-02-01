@@ -34,10 +34,9 @@ VCV Rack plugin modules
 - [sickoSampler2](#sickosampler2)
 - [simpleSeq4](#simpleseq4)
 - [slewer](#slewer)
-- [stepSeq / stepSeq+](#stepSeq--stepSeq)
+- [stepSeq / stepSeq+ / trigSeq / trigSeq+](#stepSeq--stepSeq--trigSeq--trigSeq)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
-- [trigSeq / trigSeq+](#trigSeq--trigSeq)
 - [wavetabler](#wavetabler)
 - [Credits](#credits)
 
@@ -1195,13 +1194,6 @@ These behaviors are more understandable connecting a scope on the output.
 
 #### Right-click Menu
 - Initialize On Start: discards previous module state on VCV restart
-
-[back to top](#table-of-contents)
-
-## trigSeq / trigSeq+
-### 16 step trig sequencer with direction 
-#### - INSTRUCTIONS
-Coming Soon
 
 [back to top](#table-of-contents)
 
