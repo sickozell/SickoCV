@@ -525,7 +525,7 @@
     {
       "slug": "TrigSeq",
       "name": "trigSeq",
-      "description": "16 step trig sequencer with direction (ts)",
+      "description": "16 step trig sequencer with direction (ts16)",
       "tags": [
         "Sequencer"
       ]
@@ -533,7 +533,7 @@
     {
       "slug": "TrigSeqPlus",
       "name": "trigSeq+",
-      "description": "16 step trig sequencer with direction and presets (ts+)",
+      "description": "16 step trig sequencer with direction and presets (ts16+)",
       "tags": [
         "Sequencer"
       ]
