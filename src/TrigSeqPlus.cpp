@@ -73,7 +73,7 @@ struct TrigSeqPlus : Module {
 	int step = 0;
 
 	bool runSetting = true;
-	bool prevRunSetting = false;
+	bool prevRunSetting = true;
 
 	float runButton = 0;
 	float runTrig = 0.f;
@@ -390,8 +390,8 @@ struct TrigSeqPlus : Module {
 		json_t* stepJ = json_object_get(rootJ, "step");
 		if (stepJ) {
 			step = json_integer_value(stepJ);
-			if (step < 0 || step > 3)
-				range = 0;
+			if (step < 0 || step > 15)
+				step = 0;
 			lights[STEP_LIGHT+step].setBrightness(1);
 
 		} 
@@ -456,7 +456,15 @@ struct TrigSeqPlus : Module {
 	}
 
 	json_t *presetToJson() {
+
 		json_t *rootJ = json_object();
+
+		json_object_set_new(rootJ, "runType", json_integer(runType));
+		json_object_set_new(rootJ, "revType", json_integer(revType));
+		json_object_set_new(rootJ, "outType", json_integer(outType));
+		json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
+		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
+
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *prog_json_array = json_array();
 			for (int tempSeq = 0; tempSeq < 16; tempSeq++) {
@@ -481,6 +489,38 @@ struct TrigSeqPlus : Module {
 	}
 
 	void presetFromJson(json_t *rootJ) {
+
+		json_t* runTypeJ = json_object_get(rootJ, "runType");
+		if (runTypeJ) {
+			runType = json_integer_value(runTypeJ);
+			if (runType < 0 || runType > 1)
+				runType = 0;
+		}
+
+		json_t* revTypeJ = json_object_get(rootJ, "revType");
+		if (revTypeJ) {
+			revType = json_integer_value(revTypeJ);
+			if (revType < 0 || revType > 1)
+				revType = 0;
+		}
+
+		json_t* outTypeJ = json_object_get(rootJ, "outType");
+		if (outTypeJ) {
+			outType = json_integer_value(outTypeJ);
+			if (outType < 0 || outType > 2)
+				outType = 0;
+		}
+
+		json_t* rstOnRunJ = json_object_get(rootJ, "rstOnRun");
+		if (rstOnRunJ) {
+			rstOnRun = json_boolean_value(rstOnRunJ);
+		}
+
+		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
+		if (dontAdvanceSettingJ) {
+			dontAdvanceSetting = json_boolean_value(dontAdvanceSettingJ);
+		}
+
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(prog)).c_str());
 			size_t tempSeq;
@@ -1089,7 +1129,7 @@ struct TrigSeqPlusDisplay : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 2)
-						nvgTextBox(args.vg, 9, 30, 80, currentDisplay.c_str(), NULL);
+						nvgTextBox(args.vg, 8, 30, 80, currentDisplay.c_str(), NULL);
 					else
 						nvgTextBox(args.vg, 16, 30, 80, currentDisplay.c_str(), NULL);
 
@@ -1292,11 +1332,11 @@ struct TrigSeqPlusWidget : ModuleWidget {
 
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Copy", "", [=]() {module->copyClipboard();}));
+		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
 		if (module->clipboard)
-			menu->addChild(createMenuItem("Paste", "", [=]() {module->pasteClipboard();}));
+			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
 		else
-			menu->addChild(createMenuLabel("Paste"));
+			menu->addChild(createMenuLabel("Paste Seq"));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));

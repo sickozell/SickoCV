@@ -21,7 +21,7 @@ using namespace std;
 
 struct StepSeqPlus : Module {
 	enum ParamId {
-		ENUMS(STEPKNOB_PARAM, 16),
+		ENUMS(STEP_PARAM, 16),
 		LENGTH_PARAM,
 		MODE_SWITCH,
 		RST_PARAM,
@@ -69,7 +69,7 @@ struct StepSeqPlus : Module {
 	int step = 0;
 
 	bool runSetting = true;
-	bool prevRunSetting = false;
+	bool prevRunSetting = true;
 
 	float runButton = 0;
 	float runTrig = 0.f;
@@ -219,22 +219,22 @@ struct StepSeqPlus : Module {
 
 		configInput(LENGTH_INPUT, "Length");
 
-		configParam(STEPKNOB_PARAM+0, 0, 1.f, 0.5f, "Step 1");
-		configParam(STEPKNOB_PARAM+1, 0, 1.f, 0.5f, "Step 2");
-		configParam(STEPKNOB_PARAM+2, 0, 1.f, 0.5f, "Step 3");
-		configParam(STEPKNOB_PARAM+3, 0, 1.f, 0.5f, "Step 4");
-		configParam(STEPKNOB_PARAM+4, 0, 1.f, 0.5f, "Step 5");
-		configParam(STEPKNOB_PARAM+5, 0, 1.f, 0.5f, "Step 6");
-		configParam(STEPKNOB_PARAM+6, 0, 1.f, 0.5f, "Step 7");
-		configParam(STEPKNOB_PARAM+7, 0, 1.f, 0.5f, "Step 8");
-		configParam(STEPKNOB_PARAM+8, 0, 1.f, 0.5f, "Step 9");
-		configParam(STEPKNOB_PARAM+9, 0, 1.f, 0.5f, "Step 10");
-		configParam(STEPKNOB_PARAM+10, 0, 1.f, 0.5f, "Step 11");
-		configParam(STEPKNOB_PARAM+11, 0, 1.f, 0.5f, "Step 12");
-		configParam(STEPKNOB_PARAM+12, 0, 1.f, 0.5f, "Step 13");
-		configParam(STEPKNOB_PARAM+13, 0, 1.f, 0.5f, "Step 14");
-		configParam(STEPKNOB_PARAM+14, 0, 1.f, 0.5f, "Step 15");
-		configParam(STEPKNOB_PARAM+15, 0, 1.f, 0.5f, "Step 16");
+		configParam(STEP_PARAM+0, 0, 1.f, 0.5f, "Step 1");
+		configParam(STEP_PARAM+1, 0, 1.f, 0.5f, "Step 2");
+		configParam(STEP_PARAM+2, 0, 1.f, 0.5f, "Step 3");
+		configParam(STEP_PARAM+3, 0, 1.f, 0.5f, "Step 4");
+		configParam(STEP_PARAM+4, 0, 1.f, 0.5f, "Step 5");
+		configParam(STEP_PARAM+5, 0, 1.f, 0.5f, "Step 6");
+		configParam(STEP_PARAM+6, 0, 1.f, 0.5f, "Step 7");
+		configParam(STEP_PARAM+7, 0, 1.f, 0.5f, "Step 8");
+		configParam(STEP_PARAM+8, 0, 1.f, 0.5f, "Step 9");
+		configParam(STEP_PARAM+9, 0, 1.f, 0.5f, "Step 10");
+		configParam(STEP_PARAM+10, 0, 1.f, 0.5f, "Step 11");
+		configParam(STEP_PARAM+11, 0, 1.f, 0.5f, "Step 12");
+		configParam(STEP_PARAM+12, 0, 1.f, 0.5f, "Step 13");
+		configParam(STEP_PARAM+13, 0, 1.f, 0.5f, "Step 14");
+		configParam(STEP_PARAM+14, 0, 1.f, 0.5f, "Step 15");
+		configParam(STEP_PARAM+15, 0, 1.f, 0.5f, "Step 16");
 
 		configParam(PROG_PARAM, 0.f, 31.f, 0.f, "Prog");
 		configInput(PROG_INPUT, "Prog");
@@ -273,7 +273,7 @@ struct StepSeqPlus : Module {
 
 		for (int i = 0; i < 16; i++) {
 			wSeq[i] = 0.5;
-			params[STEPKNOB_PARAM+i].setValue(wSeq[i]);
+			params[STEP_PARAM+i].setValue(wSeq[i]);
 		}
 		wSteps = 16;
 		params[LENGTH_PARAM].setValue(wSteps);
@@ -298,6 +298,7 @@ struct StepSeqPlus : Module {
 			recStep = step;
 
 		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "range", json_integer(range));
 		json_object_set_new(rootJ, "runType", json_integer(runType));
 		json_object_set_new(rootJ, "revType", json_integer(revType));
 		json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
@@ -307,17 +308,6 @@ struct StepSeqPlus : Module {
 
 		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
 
-		/*
-		json_t *seq_json_array = json_array();
-		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			json_array_append_new(seq_json_array, json_real(wSeq[tempStep]));
-		}
-		json_object_set_new(rootJ, "wSeq", seq_json_array);	
-
-		json_object_set_new(rootJ, "wSteps", json_integer(wSteps));
-		json_object_set_new(rootJ, "wRst", json_integer(wRst));
-		*/
-			
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *prog_json_array = json_array();
 			for (int tempStep = 0; tempStep < 16; tempStep++) {
@@ -342,6 +332,13 @@ struct StepSeqPlus : Module {
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
+
+		json_t* rangeJ = json_object_get(rootJ, "range");
+		if (rangeJ) {
+			range = json_integer_value(rangeJ);
+			if (range < 0 || range > 9)
+				range = 9;
+		}
 		
 		json_t* runTypeJ = json_object_get(rootJ, "runType");
 		if (runTypeJ) {
@@ -370,8 +367,8 @@ struct StepSeqPlus : Module {
 		json_t* stepJ = json_object_get(rootJ, "step");
 		if (stepJ) {
 			step = json_integer_value(stepJ);
-			if (step < 0 || step > 3)
-				range = 0;
+			if (step < 0 || step > 15)
+				step = 0;
 			lights[STEP_LIGHT+step].setBrightness(1);
 
 		} 
@@ -436,7 +433,15 @@ struct StepSeqPlus : Module {
 	}
 
 	json_t *presetToJson() {
+
 		json_t *rootJ = json_object();
+
+		json_object_set_new(rootJ, "range", json_integer(range));
+		json_object_set_new(rootJ, "runType", json_integer(runType));
+		json_object_set_new(rootJ, "revType", json_integer(revType));
+		json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
+		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
+
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *prog_json_array = json_array();
 			for (int tempSeq = 0; tempSeq < 16; tempSeq++) {
@@ -461,6 +466,38 @@ struct StepSeqPlus : Module {
 	}
 
 	void presetFromJson(json_t *rootJ) {
+
+		json_t* rangeJ = json_object_get(rootJ, "range");
+		if (rangeJ) {
+			range = json_integer_value(rangeJ);
+			if (range < 0 || range > 9)
+				range = 9;
+		}
+		
+		json_t* runTypeJ = json_object_get(rootJ, "runType");
+		if (runTypeJ) {
+			runType = json_integer_value(runTypeJ);
+			if (runType < 0 || runType > 1)
+				runType = 0;
+		}
+
+		json_t* revTypeJ = json_object_get(rootJ, "revType");
+		if (revTypeJ) {
+			revType = json_integer_value(revTypeJ);
+			if (revType < 0 || revType > 1)
+				revType = 0;
+		}
+
+		json_t* rstOnRunJ = json_object_get(rootJ, "rstOnRun");
+		if (rstOnRunJ) {
+			rstOnRun = json_boolean_value(rstOnRunJ);
+		}
+
+		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
+		if (dontAdvanceSettingJ) {
+			dontAdvanceSetting = json_boolean_value(dontAdvanceSettingJ);
+		}
+
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(prog)).c_str());
 			size_t tempSeq;
@@ -574,7 +611,7 @@ struct StepSeqPlus : Module {
 	void pasteClipboard() {
 		for (int i = 0; i < 16; i++) {
 			wSeq[i] = cbSeq[i];
-			params[STEPKNOB_PARAM+i].setValue(wSeq[i]);
+			params[STEP_PARAM+i].setValue(wSeq[i]);
 		}
 		
 		wSteps = cbSteps;
@@ -628,7 +665,7 @@ struct StepSeqPlus : Module {
 				nextSeq[i] = progSeq[selectedProg][i];
 				pendingSeq[i] = nextSeq[i];
 
-				params[STEPKNOB_PARAM+i].setValue(nextSeq[i]);
+				params[STEP_PARAM+i].setValue(nextSeq[i]);
 			}
 			nextSteps = progSteps[selectedProg];
 			pendingSteps = nextSteps;
@@ -648,12 +685,12 @@ struct StepSeqPlus : Module {
 
 		if (pendingUpdate) {
 			for (int i = 0; i < 16; i++) {
-				nextSeq[i] = params[STEPKNOB_PARAM+i].getValue();
+				nextSeq[i] = params[STEP_PARAM+i].getValue();
 				if (nextSeq[i] != pendingSeq[i])
 					seqChanged = true;
 
 				//lights[NOTE_LIGHT+i].setBrightness(nextNote[i]);
-				params[STEPKNOB_PARAM+i].setValue(nextSeq[i]);
+				params[STEP_PARAM+i].setValue(nextSeq[i]);
 			}
 			if (nextSteps != pendingSteps)
 				seqChanged = true;
@@ -664,12 +701,12 @@ struct StepSeqPlus : Module {
 
 		} else {
 			for (int i = 0; i < 16; i++) {
-				nextSeq[i] = params[STEPKNOB_PARAM+i].getValue();
+				nextSeq[i] = params[STEP_PARAM+i].getValue();
 				if (nextSeq[i] != wSeq[i])
 					seqChanged = true;
 
 				//lights[NOTE_LIGHT+i].setBrightness(nextNote[i]);
-				params[STEPKNOB_PARAM+i].setValue(nextSeq[i]);
+				params[STEP_PARAM+i].setValue(nextSeq[i]);
 			}
 			nextSteps = params[LENGTH_PARAM].getValue();
 			if (nextSteps != wSteps)
@@ -760,7 +797,7 @@ struct StepSeqPlus : Module {
 			for (int i = 0; i < 16; i++) {
 				wSeq[i] = progSeq[selectedProg][i];
 				nextSeq[i] = wSeq[i];
-				params[STEPKNOB_PARAM+i].setValue(wSeq[i]);
+				params[STEP_PARAM+i].setValue(wSeq[i]);
 			}
 			wSteps = progSteps[selectedProg];
 			params[LENGTH_PARAM].setValue(wSteps);
@@ -985,7 +1022,7 @@ struct StepSeqPlus : Module {
 			}
 		}
 			
-		//out = params[STEPKNOB_PARAM+step].getValue();
+		//out = params[STEP_PARAM+step].getValue();
 		out = wSeq[step];
 
 		switch (range) {
@@ -1058,7 +1095,7 @@ struct StepSeqPlusDisplay : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 2)
-						nvgTextBox(args.vg, 9, 30, 80, currentDisplay.c_str(), NULL);
+						nvgTextBox(args.vg, 8, 30, 80, currentDisplay.c_str(), NULL);
 					else
 						nvgTextBox(args.vg, 16, 30, 80, currentDisplay.c_str(), NULL);
 
@@ -1168,8 +1205,8 @@ struct StepSeqPlusWidget : ModuleWidget {
 
 		for (int i = 0; i < 4; i++) {
 
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInL, ys+(i*yShift))), module, StepSeqPlus::STEPKNOB_PARAM+i));
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInR, ys+(i*yShift)+yShiftBlock2)), module, StepSeqPlus::STEPKNOB_PARAM+i+8));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInL, ys+(i*yShift))), module, StepSeqPlus::STEP_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInR, ys+(i*yShift)+yShiftBlock2)), module, StepSeqPlus::STEP_PARAM+i+8));
 
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLightL, ys+(i*yShift)-yLightShift)), module, StepSeqPlus::STEP_LIGHT+i));
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLightR, ys+(i*yShift)+yShiftBlock2-yLightShift)), module, StepSeqPlus::STEP_LIGHT+i+8));
@@ -1178,8 +1215,8 @@ struct StepSeqPlusWidget : ModuleWidget {
 
 		for (int i = 4; i < 8; i++) {
 
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInL, ys+(i*yShift)+yShiftBlock)), module, StepSeqPlus::STEPKNOB_PARAM+i));
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInR, ys+(i*yShift)+yShiftBlock+yShiftBlock2)), module, StepSeqPlus::STEPKNOB_PARAM+i+8));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInL, ys+(i*yShift)+yShiftBlock)), module, StepSeqPlus::STEP_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xInR, ys+(i*yShift)+yShiftBlock+yShiftBlock2)), module, StepSeqPlus::STEP_PARAM+i+8));
 
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLightL, ys+(i*yShift)+yShiftBlock-yLightShift)), module, StepSeqPlus::STEP_LIGHT+i));
 			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xLightR, ys+(i*yShift)+yShiftBlock+yShiftBlock2-yLightShift)), module, StepSeqPlus::STEP_LIGHT+i+8));
@@ -1267,11 +1304,11 @@ struct StepSeqPlusWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Copy", "", [=]() {module->copyClipboard();}));
+		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
 		if (module->clipboard)
-			menu->addChild(createMenuItem("Paste", "", [=]() {module->pasteClipboard();}));
+			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
 		else
-			menu->addChild(createMenuLabel("Paste"));
+			menu->addChild(createMenuLabel("Paste Seq"));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));
