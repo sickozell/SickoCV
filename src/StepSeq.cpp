@@ -96,22 +96,22 @@ struct StepSeq : Module {
 
 		configInput(LENGTH_INPUT, "Length");
 
-		configParam(STEPKNOB_PARAM+0, 0, 1.f, 0.5f, "Knob 1");
-		configParam(STEPKNOB_PARAM+1, 0, 1.f, 0.5f, "Knob 2");
-		configParam(STEPKNOB_PARAM+2, 0, 1.f, 0.5f, "Knob 3");
-		configParam(STEPKNOB_PARAM+3, 0, 1.f, 0.5f, "Knob 4");
-		configParam(STEPKNOB_PARAM+4, 0, 1.f, 0.5f, "Knob 5");
-		configParam(STEPKNOB_PARAM+5, 0, 1.f, 0.5f, "Knob 6");
-		configParam(STEPKNOB_PARAM+6, 0, 1.f, 0.5f, "Knob 7");
-		configParam(STEPKNOB_PARAM+7, 0, 1.f, 0.5f, "Knob 8");
-		configParam(STEPKNOB_PARAM+8, 0, 1.f, 0.5f, "Knob 9");
-		configParam(STEPKNOB_PARAM+9, 0, 1.f, 0.5f, "Knob 10");
-		configParam(STEPKNOB_PARAM+10, 0, 1.f, 0.5f, "Knob 11");
-		configParam(STEPKNOB_PARAM+11, 0, 1.f, 0.5f, "Knob 12");
-		configParam(STEPKNOB_PARAM+12, 0, 1.f, 0.5f, "Knob 13");
-		configParam(STEPKNOB_PARAM+13, 0, 1.f, 0.5f, "Knob 14");
-		configParam(STEPKNOB_PARAM+14, 0, 1.f, 0.5f, "Knob 15");
-		configParam(STEPKNOB_PARAM+15, 0, 1.f, 0.5f, "Knob 16");
+		configParam(STEPKNOB_PARAM+0, 0, 1.f, 0.5f, "Step 1");
+		configParam(STEPKNOB_PARAM+1, 0, 1.f, 0.5f, "Step 2");
+		configParam(STEPKNOB_PARAM+2, 0, 1.f, 0.5f, "Step 3");
+		configParam(STEPKNOB_PARAM+3, 0, 1.f, 0.5f, "Step 4");
+		configParam(STEPKNOB_PARAM+4, 0, 1.f, 0.5f, "Step 5");
+		configParam(STEPKNOB_PARAM+5, 0, 1.f, 0.5f, "Step 6");
+		configParam(STEPKNOB_PARAM+6, 0, 1.f, 0.5f, "Step 7");
+		configParam(STEPKNOB_PARAM+7, 0, 1.f, 0.5f, "Step 8");
+		configParam(STEPKNOB_PARAM+8, 0, 1.f, 0.5f, "Step 9");
+		configParam(STEPKNOB_PARAM+9, 0, 1.f, 0.5f, "Step 10");
+		configParam(STEPKNOB_PARAM+10, 0, 1.f, 0.5f, "Step 11");
+		configParam(STEPKNOB_PARAM+11, 0, 1.f, 0.5f, "Step 12");
+		configParam(STEPKNOB_PARAM+12, 0, 1.f, 0.5f, "Step 13");
+		configParam(STEPKNOB_PARAM+13, 0, 1.f, 0.5f, "Step 14");
+		configParam(STEPKNOB_PARAM+14, 0, 1.f, 0.5f, "Step 15");
+		configParam(STEPKNOB_PARAM+15, 0, 1.f, 0.5f, "Step 16");
 
 	}
 

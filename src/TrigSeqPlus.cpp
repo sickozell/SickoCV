@@ -253,6 +253,7 @@ struct TrigSeqPlus : Module {
 		configParam(PROG_PARAM, 0.f, 31.f, 0.f, "Prog");
 		configInput(PROG_INPUT, "Prog");
 		paramQuantities[PROG_PARAM]->snapEnabled = true;
+		configSwitch(SET_PARAM, 0, 1.f, 0.f, "Set", {"OFF", "ON"});
 		configSwitch(RECALL_PARAM, 0, 1.f, 0.f, "Recall", {"OFF", "ON"});
 		configSwitch(STORE_PARAM, 0, 1.f, 0.f, "Store", {"OFF", "ON"});
 		configSwitch(AUTO_PARAM, 0, 1.f, 0.f, "Auto", {"OFF", "ON"});
