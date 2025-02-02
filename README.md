@@ -1084,8 +1084,35 @@ When ticked, the ATT control sets both the attack and decay durations and the DE
 ![stepseqtrigseq](https://github.com/user-attachments/assets/6852b2d5-dc64-421a-9955-5c97f4a86103)
 
 #### - INSTRUCTIONS
-Coming Soon
+stepSeq and trigSeq can respectively output a voltage or a trig/gate/clock up to 16 steps.  
+CLK/CV switch sets the clock or cv working mode.  
+In 'clock' mode a trigger on input will advance one step, in 'cv' mode the current step is determined by the voltage applied to the input in the range 0-10v to always get the maximum step when 10v is applied.  
+RUN button turns on/off the sequencer. A gate on its input runs the sequencer until the gate is high.  
+A high gate on REV input will advance backards on clock trigger (clock mode only).  
+A trig on RST input goes to the step set by RST knob (clock mode only).  
+Sequence length can be set with Length knob that can be modulated by CV input. The CV in the range of 0-10v is added to the knob setting to always get the maximum step when 10v is applied.  
 
+The plus versions of stepSeq and trigSeq can store up to 32 different sequences.  
+Prog knob and a CV on its input sets the program number.  
+When a program change is detected the 'SET' button flashes and waits to be pressed to apply the program.  
+If 'AUTO' button is on, the program is applied instantly when a program change is detected.  
+A double click on 'STOR' button saves the current sequence to the selected program.  
+'RECL' button reloads the stored selected program.  
+
+
+#### RIGHT-CLICK MENU
+Knob Range (stepSeq only): sets the range of the step knobs (default -10/+10v).  
+Run input: 'Gate' is the default setting as explained above, 'Trig' will toggle run on/off by triggers on run input.  
+Reverse Input Voltage: 'Positive' is the default setting as explained above, 'Negative' will advance backwards with -1v or less applied to REV input.  
+Output type (trigSeq only): 'Trig' (default) outputs a 1ms trigger, 'Gate' outputs a high gate for all step duration, 'Clock' outputs a gate of the same length of the clock input.  
+Reset on Run: A step reset is applied when the sequencer goes from OFF to RUN (default).  
+1st Clock after reset: if 'Don't Advance' is ticked, the first clock detected won't advance the sequencer (default).  
+Initialize on start: doesn't remeber the last step reached when Rack is reloaded.
+
+Plus versions only:  
+Copy/paste seq: copy and paste the current sequence and the length/reset settings in the clipboard (does not work across multiple modules).  
+Load/Save PROG presets: load or save a 'ssp' or 'tsp' preset file with all programmed sequences, including lengths, reset settings, and right-click menu settings.  
+Erase ALL progs: resets all stored programs to default.
 
 [back to top](#table-of-contents)
 
