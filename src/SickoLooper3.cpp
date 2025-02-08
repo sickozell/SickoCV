@@ -43,6 +43,9 @@
 
 #include "plugin.hpp"
 #include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
 //#define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 #include <vector>
@@ -412,6 +415,13 @@ struct SickoLooper3 : Module {
 	bool extConn = false;
 	bool prevExtConn = true;
 	bool extBeat = false;
+
+#if defined(METAMODULE)
+	const drwav_uint64 recordingLimit = 48000 * 60; // 60 sec limit on MM = 5.5MB
+#else
+	const drwav_uint64 recordingLimit = 52428800;
+	// const drwav_uint64 recordingLimit = 480000; // 10 sec for test purposes
+#endif
 	
 	// ***************************************************************************************************
 	// ***************************************************************************************************
@@ -896,11 +906,18 @@ struct SickoLooper3 : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
 		if (path)
 			saveSample(track, path);
 
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	};
 
 	void saveSample(int track, std::string path) {
@@ -951,8 +968,11 @@ struct SickoLooper3 : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
-		
+#endif
 		if (path)
 			loadSample(track, path);
 
@@ -966,6 +986,9 @@ struct SickoLooper3 : Module {
 		free(path);
 
 		fileLoaded = false;
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadSample(int track, std::string path) {
@@ -1007,8 +1030,13 @@ struct SickoLooper3 : Module {
 			tempBuffer[LEFT].clear();
 			tempBuffer[RIGHT].clear();
 
+			/*
 			if (tsc > 52428800)
 				tsc = 52428800;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+			*/
+
+			if (tsc > recordingLimit)
+				tsc = recordingLimit;
 
 			if (fileSampleRate == sampleRate) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -1473,13 +1501,18 @@ struct SickoLooper3 : Module {
 		static const char FILE_FILTERS[] = "sickolooper preset (.slp):slp,SLP";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
-
+#endif
 		if (path)
 			loadPreset(path);
 
 		free(path);
-
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadPreset(std::string path) {
@@ -1528,7 +1561,11 @@ struct SickoLooper3 : Module {
 		static const char FILE_FILTERS[] = "sickolooper preset (.slp):slp,SLP";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
 		if (path) {
 			std::string strPath = path;
 			if (strPath.substr(strPath.size() - 4) != ".slp" and strPath.substr(strPath.size() - 4) != ".SLP")
@@ -1538,6 +1575,9 @@ struct SickoLooper3 : Module {
 		}
 
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void savePreset(std::string path, json_t *rootJ, bool loops) {
@@ -1613,7 +1653,11 @@ struct SickoLooper3 : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
 		clickFileLoaded[slot] = false;
 		if (path) {
 			/*
@@ -1631,6 +1675,9 @@ struct SickoLooper3 : Module {
 			clickFileLoaded[slot] = false;
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void clickLoadSample(std::string path, int slot, bool customClick) {

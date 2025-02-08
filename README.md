@@ -1,4 +1,4 @@
-# SickoCV v2.7.0-beta2
+# SickoCV v2.7.1-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -12,17 +12,15 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
 
 ## Current modules in beta testing:
-- trigSeq+
-- stepSeq+
+- nothing in queue
 
 ## **to do list:** 
 - nothing in queue
 
 ## **changelog** 
-- added 'trigSeq+' module
-- added 'stepSeq+' module
+- added 4ms-MetaModule compatibility
 
-# SickoCV v2.7.0
+# SickoCV v2.7.1
 VCV Rack plugin modules
 
 ![SickoCV modules 2 7 0](https://github.com/user-attachments/assets/d837baac-3f27-4286-8e09-ad5c3f0a4a3c)

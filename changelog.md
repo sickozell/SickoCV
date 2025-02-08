@@ -1,3 +1,6 @@
+### 2.7.1 (2025-02-08)
+- added 4ms-MetaModule compatibility
+
 ### 2.7.0 (2025-02-01)
 - added 'trigSeq+' module
 - added 'stepSeq+' module

@@ -25,6 +25,9 @@
 
 #include "plugin.hpp"
 #include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
 //#define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 #include <vector>
@@ -265,8 +268,13 @@ struct SickoPlayer : Module {
 	bool prevPrevSample = false;
 
 	bool unlimitedRecording = false;
-	const drwav_uint64 recordingLimit = 52428800 * 2;	// // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
-	//const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+#if defined(METAMODULE)
+	const drwav_uint64 recordingLimit = 48000 * 2 * 60; // 60 sec limit on MM = 5.5MB
+#else
+	const drwav_uint64 recordingLimit = 52428800 * 2; // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+	// const drwav_uint64 recordingLimit = 480000; // 10 sec for test purposes
+#endif
+
 	drwav_uint64 currentRecordingLimit = recordingLimit;
 
 	static constexpr float minStageTime = 1.f;  // in milliseconds
@@ -556,7 +564,11 @@ struct SickoPlayer : Module {
 
 	void selectRootFolder() {
 		const char* prevFolder = userFolder.c_str();
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL, [this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+#endif
 		if (path) {
 			folderTreeData.clear();
 			folderTreeDisplay.clear();
@@ -568,6 +580,9 @@ struct SickoPlayer : Module {
 			}
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	};
 
 	void refreshRootFolder() {
@@ -687,7 +702,11 @@ struct SickoPlayer : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
 		fileLoaded = false;
 		restoreLoadFromPatch = false;
 		if (path) {
@@ -702,6 +721,9 @@ struct SickoPlayer : Module {
 			fileLoaded = false;
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadSample(std::string fromPath) {

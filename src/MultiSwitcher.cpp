@@ -1,8 +1,8 @@
 #define TRIG_MODE 1
 #define CV_MODE 0
-#define DOWN 0
-#define RANDOM 1
-#define UP 2
+#define DOWN_DIR 0
+#define RANDOM_DIR 1
+#define UP_DIR 2
 
 #include "plugin.hpp"
 
@@ -15,7 +15,7 @@ struct MultiSwitcher : Module {
 	int currAddr = 0;
 	int prevAddr = 0;
 
-	int direction = DOWN;
+	int direction = DOWN_DIR;
 
 	float xFadeKnob = 0.f;
 	float xFadeCoeff;
@@ -200,7 +200,7 @@ struct MultiSwitcher : Module {
 
 			if (revAdv && mode == TRIG_MODE) {
 				switch (direction) {
-					case UP:
+					case UP_DIR:
 						if (currInput > maxInputs - 2) { 
 							if (cycle)
 								currInput = 0;
@@ -208,7 +208,7 @@ struct MultiSwitcher : Module {
 							currInput++;
 					break;
 
-					case DOWN:
+					case DOWN_DIR:
 						if (currInput < 1) {
 							if (cycle)
 								currInput = maxInputs - 1;
@@ -216,7 +216,7 @@ struct MultiSwitcher : Module {
 							currInput--;
 					break;
 
-					case RANDOM:
+					case RANDOM_DIR:
 						currInput = random::uniform() * maxInputs;
 						if (currInput > maxInputs)
 							currInput = maxInputs - 1;
@@ -256,7 +256,7 @@ struct MultiSwitcher : Module {
 					prevInput = currInput;
 					lights[IN_LIGHT+prevInput].setBrightness(0.f);
 					switch (direction) {
-						case DOWN:
+						case DOWN_DIR:
 							if (currInput > maxInputs - 2) { 
 								if (cycle)
 									currInput = 0;
@@ -264,7 +264,7 @@ struct MultiSwitcher : Module {
 								currInput++;
 						break;
 
-						case UP:
+						case UP_DIR:
 							if (currInput < 1) {
 								if (cycle)
 									currInput = maxInputs - 1;
@@ -272,7 +272,7 @@ struct MultiSwitcher : Module {
 								currInput--;
 						break;
 
-						case RANDOM:
+						case RANDOM_DIR:
 							currInput = random::uniform() * maxInputs;
 							if (currInput > maxInputs)
 								currInput = maxInputs- 1;

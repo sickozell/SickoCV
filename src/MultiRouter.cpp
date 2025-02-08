@@ -1,8 +1,8 @@
 #define TRIG_MODE 1
 #define CV_MODE 0
-#define DOWN 0
-#define RANDOM 1
-#define UP 2
+#define DOWN_DIR 0
+#define RANDOM_DIR 1
+#define UP_DIR 2
 
 #include "plugin.hpp"
 
@@ -15,7 +15,7 @@ struct MultiRouter : Module {
 	int currAddr = 0;
 	int prevAddr = 0;
 
-	int direction = DOWN;
+	int direction = DOWN_DIR;
 
 	float xFadeKnob = 0.f;
 	float xFadeCoeff;
@@ -197,7 +197,7 @@ struct MultiRouter : Module {
 
 			if (revAdv && mode == TRIG_MODE) {
 				switch (direction) {
-					case UP:
+					case UP_DIR:
 						if (currOutput > maxOutputs - 2) { 
 							if (cycle)
 								currOutput = 0;
@@ -205,7 +205,7 @@ struct MultiRouter : Module {
 							currOutput++;
 					break;
 
-					case DOWN:
+					case DOWN_DIR:
 						
 						if (currOutput < 1) {
 							if (cycle)
@@ -214,7 +214,7 @@ struct MultiRouter : Module {
 							currOutput--;
 					break;
 
-					case RANDOM:
+					case RANDOM_DIR:
 						currOutput = random::uniform() * maxOutputs;
 						if (currOutput > maxOutputs)
 							currOutput = maxOutputs - 1;
@@ -254,7 +254,7 @@ struct MultiRouter : Module {
 					prevOutput = currOutput;
 					lights[OUT_LIGHT+prevOutput].setBrightness(0.f);
 					switch (direction) {
-						case DOWN:
+						case DOWN_DIR:
 							if (currOutput > maxOutputs - 2)  {
 								if (cycle)
 									currOutput = 0;
@@ -262,7 +262,7 @@ struct MultiRouter : Module {
 								currOutput++;
 						break;
 
-						case UP:
+						case UP_DIR:
 							if (currOutput < 1) {
 								if (cycle)
 									currOutput = maxOutputs - 1;
@@ -270,7 +270,7 @@ struct MultiRouter : Module {
 								currOutput--;
 						break;
 
-						case RANDOM:
+						case RANDOM_DIR:
 							currOutput = random::uniform() * maxOutputs;
 							if (currOutput > maxOutputs)
 								currOutput = maxOutputs - 1;
