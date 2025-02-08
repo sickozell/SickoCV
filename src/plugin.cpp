@@ -1,8 +1,22 @@
 #include "plugin.hpp"
 
-Plugin* pluginInstance;
+//Plugin* pluginInstance;
+//extern Plugin *pluginInstance;
 
-void init(Plugin* p) {
+#if defined(METAMODULE_BUILTIN)
+extern Plugin *pluginInstance;
+#else
+Plugin *pluginInstance;
+#endif
+
+//void init(Plugin* p) {
+//void init_SickoCV(rack::Plugin *p) {
+
+#if defined(METAMODULE_BUILTIN)
+void init_SickoCV(rack::Plugin *p) {
+#else 
+void init(rack::Plugin *p) {
+#endif
 	pluginInstance = p;
 
 	// Add modules here
