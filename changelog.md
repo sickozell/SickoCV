@@ -1,4 +1,5 @@
-### 2.7.1 (2025-02-08)
+### 2.7.1 (2025-02-22)
+- added RandLoopsCV module
 - added 4ms-MetaModule compatibility
 
 ### 2.7.0 (2025-02-01)

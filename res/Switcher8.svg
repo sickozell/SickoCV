@@ -7,7 +7,7 @@
    viewBox="0 0 81.279999 128.5"
    version="1.1"
    id="svg5"
-   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
    sodipodi:docname="Switcher8.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -26,13 +26,13 @@
      showgrid="false"
      inkscape:zoom="2.828427"
      inkscape:cx="127.456"
-     inkscape:cy="532.45143"
+     inkscape:cy="51.795574"
      inkscape:window-width="1366"
      inkscape:window-height="705"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g7864"
+     inkscape:current-layer="layer4"
      showguides="true" />
   <defs
      id="defs2">
@@ -158,15 +158,6 @@
      id="layer4"
      inkscape:label="Elementi"
      style="fill:#f9f9f9">
-    <rect
-       style="display:none;fill:#e6e6e6;stroke:none;stroke-width:0.651372;stroke-dasharray:0.651372, 0.651372;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect2291"
-       width="26.700001"
-       height="83.210373"
-       x="19.200001"
-       y="37.177361"
-       ry="2.5"
-       inkscape:label="out rect" />
     <rect
        style="fill:#000033;fill-opacity:1;stroke:#666699;stroke-width:0.5;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect1002"
