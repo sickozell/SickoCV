@@ -427,7 +427,8 @@ struct RandLoopsTR : Module {
 						out[t] = 10.f;
 					}
 				} else if (outType == OUT_CLOCK) {
-					out[t] = inputs[CLK_INPUT+t].getVoltage();
+					//out[t] = inputs[CLK_INPUT+t].getVoltage();
+					out[t] = clock[t];
 					if (out[t] < 1.f) {
 						out[t] = 0.f;
 						stepPulse[t] = false;
