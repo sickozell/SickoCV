@@ -194,8 +194,8 @@ struct DrumPlayerPlus : Module {
 		outsMode = NORMALLED_OUTS;
 		scrolling = 0;
 		sampleInPatch = true;
-		Module::onReset(e);
 		system::removeRecursively(getPatchStorageDirectory().c_str());
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {

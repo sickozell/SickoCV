@@ -76,7 +76,7 @@ struct Modulator7Compact : Module {
 	void onReset(const ResetEvent &e) override {
 		rateKnob = 0.5;
 		prevRateKnob = 1;
-		polyChans = 1;
+		//polyChans = 1;
 		for (int i = 0; i < 7; i++) {
 			waveSlope[i] = 1;
 			waveValue[i] = 0;

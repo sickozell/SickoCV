@@ -256,6 +256,7 @@ struct DrumPlayerXtra : Module {
 		colorBoxB[1] = 0;
 		colorBoxB[2] = 0;
 		colorBoxB[3] = 0;
+		
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		Module::onReset(e);
 	}

@@ -64,13 +64,24 @@ struct RandLoopsCV : Module {
 								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
 							};
 
+	bool saveRegister[8][16] = {{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
+							};
+
 	bool tempRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool tempSaveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 	float probCtrl = 0;
 	float probCtrlRnd = 0;
 	float probRegister = 0;
 
-	bool incomingRegister = false;
+	bool inRegister = false;
 
 	int startingStep[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
@@ -96,7 +107,7 @@ struct RandLoopsCV : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
-		//initStart = false;
+		initStart = false;
 		clearAll();
 
 	    Module::onReset(e);
@@ -110,12 +121,12 @@ struct RandLoopsCV : Module {
 		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
 
 		for (int t = 0; t < 8; t++)
-			resetSequence(t);
+			saveSequence(t);
 
 		for (int t = 0; t < 8; t++) {
 			json_t *track_json_array = json_array();
 			for (int tempStep = 0; tempStep < 16; tempStep++) {
-				json_array_append_new(track_json_array, json_boolean(shiftRegister[t][tempStep]));
+				json_array_append_new(track_json_array, json_boolean(saveRegister[t][tempStep]));
 			}
 			json_object_set_new(rootJ, ("sr"+to_string(t)).c_str(), track_json_array);	
 		}
@@ -178,6 +189,31 @@ struct RandLoopsCV : Module {
 	}
 	*/
 
+	void inline saveSequence(int t) {
+		int cursor = 0;
+		for (int i = startingStep[t]; i < int(params[LENGTH_PARAM+t].getValue()); i++) {
+			tempSaveRegister[cursor] = shiftRegister[t][i];
+			cursor++;
+		}
+
+		for (int i = 0; i < startingStep[t]; i++) {
+			tempSaveRegister[cursor] = shiftRegister[t][i];
+			cursor++;
+		}
+
+		int fillCursor = 0;
+		for (int i = cursor; i < 16; i++) {
+			tempSaveRegister[i] = tempSaveRegister[fillCursor];
+			fillCursor++;
+			if (fillCursor >= int(params[LENGTH_PARAM+t].getValue()))
+				fillCursor = 0;
+		}
+
+		for (int i = 0; i < 16; i++)
+			saveRegister[t][i] = tempSaveRegister[i];
+
+	}
+
 	void inline resetSequence(int t) {
 		int cursor = 0;
 		for (int i = startingStep[t]; i < int(params[LENGTH_PARAM+t].getValue()); i++) {
@@ -223,8 +259,10 @@ struct RandLoopsCV : Module {
 	void inline calcVoltage(int t) {
 		volt[t] = 0;
 		for (int i=0; i < bitRes[bitResolution]; i++) {
+		//for (int i=0; i < 8; i++) {
 			if (shiftRegister[t][i])
 				volt[t] += tableVolts[bitResolution][i];
+				//volt[t] += tableVolts[0][i];
 		}
 	}
 
@@ -285,16 +323,16 @@ struct RandLoopsCV : Module {
 
 						probRegister = random::uniform();
 						if (probRegister > 0.5f)
-							incomingRegister = true;
+							inRegister = true;
 						else
-							incomingRegister = false;
+							inRegister = false;
 						//DEBUG ("BIT CHANGED");
 
 					} else {
 
-						incomingRegister = shiftRegister[t][int(params[LENGTH_PARAM+t].getValue())-1];
+						inRegister = shiftRegister[t][int(params[LENGTH_PARAM+t].getValue())-1];
 						if (controlValue < 0) {
-							incomingRegister = !incomingRegister;
+							inRegister = !inRegister;
 						}
 					}
 
@@ -313,7 +351,7 @@ struct RandLoopsCV : Module {
 					shiftRegister[t][3] = shiftRegister[t][2];
 					shiftRegister[t][2] = shiftRegister[t][1];
 					shiftRegister[t][1] = shiftRegister[t][0];
-					shiftRegister[t][0] = incomingRegister;
+					shiftRegister[t][0] = inRegister;
 
 					calcVoltage(t);
 
@@ -336,14 +374,14 @@ struct RandLoopsCV : Module {
 			outputs[OUT_OUTPUT+t].setVoltage(out[t]);
 
 		}
-			
+		
 		if (polyChans == 0) {
 			outputs[OUT_OUTPUT+7].setChannels(1);
 		} else {
 			for (int c = 0; c < polyChans + 1; c++)
 				outputs[OUT_OUTPUT+7].setVoltage(out[c], c);
 			outputs[OUT_OUTPUT+7].setChannels(polyChans+1);
-		} 
+		}
 
 	}
 };

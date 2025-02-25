@@ -286,6 +286,7 @@ struct Clocker2 : Module {
 		clockSample = 1.0;
 
 		clockSample = 1.0;
+		
 		resetOnRun = true;
 		resetPulseOnRun = false;
 		resetOnStop = false;

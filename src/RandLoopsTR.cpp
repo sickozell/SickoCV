@@ -1,5 +1,3 @@
-#define BIT_8 0
-#define BIT_16 1
 #define OUT_TRIG 0
 #define OUT_GATE 1
 #define OUT_CLOCK 2
@@ -50,10 +48,12 @@ struct RandLoopsTR : Module {
 	bool dontAdvance[8] = {false, false, false, false, false, false, false, false};
 	bool dontAdvanceSetting = true;
 
+	/*
 	float tableVolts[2][16] = {
 		{0.039 , 0.078, 0.157, 0.314, 0.627, 1.255, 2.51, 5.02, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0.00015 , 0.00031, 0.00061, 0.00122, 0.00244, 0.00488, 0.00977, 0.01953, 0.03906, 0.07813, 0.15625, 0.3125, 0.062501, 1.25002, 2.50004, 5.00008}
 	};
+	*/
 
 	bool shiftRegister[8][16] = {{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -65,7 +65,18 @@ struct RandLoopsTR : Module {
 								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
 							};
 
+	bool saveRegister[8][16] = {{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
+							};
+
 	bool tempRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool tempSaveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 	float probCtrl = 0;
 	float probCtrlRnd = 0;
@@ -75,10 +86,10 @@ struct RandLoopsTR : Module {
 
 	int startingStep[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
-	int bitResolution = BIT_8;
-	int bitRes[2] = {8, 16};
+	//int bitResolution = BIT_8;
+	//int bitRes[2] = {8, 16};
 
-	std::string resolutionName[2] = {"8 bit", "16 bit"};
+	//std::string resolutionName[2] = {"8 bit", "16 bit"};
 
 	int outType = OUT_TRIG;
 
@@ -103,7 +114,7 @@ struct RandLoopsTR : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
-		//initStart = false;
+		initStart = false;
 		clearAll();
 
 	    Module::onReset(e);
@@ -118,11 +129,11 @@ struct RandLoopsTR : Module {
 		json_object_set_new(rootJ, "InitStart", json_boolean(initStart));
 		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
 		json_object_set_new(rootJ, "polyChans", json_integer(polyChans));
-		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
+		//json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
 		json_object_set_new(rootJ, "outType", json_integer(outType));
 
 		for (int t = 0; t < 8; t++)
-			resetSequence(t);
+			saveSequence(t);
 
 		for (int t = 0; t < 8; t++) {
 			json_t *track_json_array = json_array();
@@ -140,12 +151,14 @@ struct RandLoopsTR : Module {
 		if (initStartJ)
 			initStart = json_boolean_value(initStartJ);
 
+		/*
 		json_t* bitResolutionJ = json_object_get(rootJ, "bitResolution");
 		if (bitResolutionJ) {
 			bitResolution = json_integer_value(bitResolutionJ);
 			if (bitResolution < 0 && bitResolution > 1)
 				bitResolution = BIT_8;
 		}
+		*/
 
 		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
 		if (dontAdvanceSettingJ) {
@@ -175,6 +188,31 @@ struct RandLoopsTR : Module {
 				}
 			}
 		}
+
+	}
+
+	void inline saveSequence(int t) {
+		int cursor = 0;
+		for (int i = startingStep[t]; i < int(params[LENGTH_PARAM+t].getValue()); i++) {
+			tempSaveRegister[cursor] = shiftRegister[t][i];
+			cursor++;
+		}
+
+		for (int i = 0; i < startingStep[t]; i++) {
+			tempSaveRegister[cursor] = shiftRegister[t][i];
+			cursor++;
+		}
+
+		int fillCursor = 0;
+		for (int i = cursor; i < 16; i++) {
+			tempSaveRegister[i] = tempSaveRegister[fillCursor];
+			fillCursor++;
+			if (fillCursor >= int(params[LENGTH_PARAM+t].getValue()))
+				fillCursor = 0;
+		}
+
+		for (int i = 0; i < 16; i++)
+			saveRegister[t][i] = tempSaveRegister[i];
 
 	}
 
@@ -237,13 +275,38 @@ struct RandLoopsTR : Module {
 			//calcVoltage(t);
 		}
 	}
-	
+
+	/*
+	void debugSeq(int t) {
+		if (t == 0) {
+			DEBUG ("SEQ %i%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i",
+				shiftRegister[t][0],
+				shiftRegister[t][1],
+				shiftRegister[t][2],
+				shiftRegister[t][3],
+				shiftRegister[t][4],
+				shiftRegister[t][5],
+				shiftRegister[t][6],
+				shiftRegister[t][7],
+				shiftRegister[t][8],
+				shiftRegister[t][9],
+				shiftRegister[t][10],
+				shiftRegister[t][11],
+				shiftRegister[t][12],
+				shiftRegister[t][13],
+				shiftRegister[t][14],
+				shiftRegister[t][15]
+				);
+		}
+	}
+	*/
 
 	void process(const ProcessArgs& args) override {
 
 		outSum = 0.f;
 
 		for (int t = 0; t < 8; t++) {
+			incomingRegister = false;
 
 			if (!inputs[CLK_INPUT+t].isConnected() && t != 0) {
 				
@@ -291,13 +354,15 @@ struct RandLoopsTR : Module {
 							incomingRegister = true;
 						else
 							incomingRegister = false;
-						//DEBUG ("BIT CHANGED");
+						//if (t==0)
+							//DEBUG ("BIT CHANGED ctrl %f > rnd %f", probCtrl, probCtrlRnd);
 
 					} else {
 
 						incomingRegister = shiftRegister[t][int(params[LENGTH_PARAM+t].getValue())-1];
 						if (controlValue < 0) {
 							incomingRegister = !incomingRegister;
+							//DEBUG ("CONTROL < 0");
 						}
 					}
 
@@ -320,7 +385,7 @@ struct RandLoopsTR : Module {
 
 					//calcVoltage(t);
 
-					//debugCurrent(t);
+					//debugSeq(t);
 
 					if (incomingRegister) {
 						stepPulse[t] = true;
@@ -463,11 +528,13 @@ struct RandLoopsTRWidget : ModuleWidget {
 			menu->addChild(outTypeItem);
 		}
 
+		/*
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
 			menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
 			menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
 		}));
+		*/
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Polyphony on 8th out", std::to_string(module->polyChans + 1), [=](Menu * menu) {

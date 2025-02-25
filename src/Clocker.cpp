@@ -346,6 +346,7 @@ struct Clocker : Module {
 		//beatCounter = 1;
 		beatCounter = 20;
 		clockSample = 1.0;
+
 		beatOnBar = false;
 		resetOnRun = true;
 		resetPulseOnRun = false;
@@ -375,7 +376,7 @@ struct Clocker : Module {
 			play[i] = false;
 		}
 		*/
-		setClick(0);
+		//setClick(0);
 
 		Module::onReset(e);
 	}

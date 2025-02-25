@@ -128,6 +128,8 @@ struct TrigSeq : Module {
 
 	void onReset(const ResetEvent &e) override {
 
+		initStart = false;
+
 		step = 0;
 
 		lights[STEP_LIGHT].setBrightness(1);
