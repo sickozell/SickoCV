@@ -171,7 +171,8 @@ struct SickoLooper3 : Module {
 	unsigned int prevSampleRate = APP->engine->getSampleRate();
 
 	//vector<float> undoBuffer[2];
-	vector<float> tempBuffer[2];
+	// metamodule change
+	//vector<float> tempBuffer[2];
 
 	int globalStatus = IDLE;
 	int recordedTracks = 0;
@@ -526,8 +527,10 @@ struct SickoLooper3 : Module {
 		trackBuffer[2][1].resize(0);
 		//undoBuffer[0].resize(0);
 		//undoBuffer[1].resize(0);
-		tempBuffer[0].resize(0);
-		tempBuffer[1].resize(0);
+
+		// metamodule change
+		//tempBuffer[0].resize(0);
+		//tempBuffer[1].resize(0);
 
 		setClick(0);
 
@@ -690,6 +693,11 @@ struct SickoLooper3 : Module {
 			fadeInOnPlay[track] = false;
 			trackBuffer[track][LEFT].clear();
 			trackBuffer[track][RIGHT].clear();
+
+			// metamodule change
+			vector<float>().swap(trackBuffer[track][LEFT]);
+			vector<float>().swap(trackBuffer[track][RIGHT]);
+
 			trackRecorded[track] = false;
 			trackStatus[track] = EMPTY;
 			setEmptyLed(track);
@@ -776,8 +784,10 @@ struct SickoLooper3 : Module {
 
 				z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
-				tempBuffer[0].clear();
-				tempBuffer[1].clear();
+				// metamodule change
+				//tempBuffer[0].clear();
+				//tempBuffer[1].clear();
+				vector<float> tempBuffer[2];
 
 				for (unsigned int i=0; i < trackBuffer[track][LEFT].size(); i++) {
 					tempBuffer[LEFT].push_back(trackBuffer[track][LEFT][i]);
@@ -801,6 +811,10 @@ struct SickoLooper3 : Module {
 
 				trackBuffer[track][LEFT].clear();
 				trackBuffer[track][RIGHT].clear();
+
+				// metamodule change
+				vector<float>().swap(trackBuffer[track][LEFT]);
+				vector<float>().swap(trackBuffer[track][RIGHT]);
 
 				resampleCoeff = double(prevSampleRate) / double(sampleRate);
 				
@@ -875,6 +889,10 @@ struct SickoLooper3 : Module {
 
 				trackBuffer[track][LEFT].clear();
 				trackBuffer[track][RIGHT].clear();
+
+				// metamodule change
+				vector<float>().swap(trackBuffer[track][LEFT]);
+				vector<float>().swap(trackBuffer[track][RIGHT]);
 
 				for (unsigned int i = 0; i < tempSampleC; i++) {
 					trackBuffer[track][LEFT].push_back(tempBuffer[LEFT][i]);
@@ -996,8 +1014,10 @@ struct SickoLooper3 : Module {
 
 		fileLoaded = false;
 
-		tempBuffer[0].clear();
-		tempBuffer[1].clear();
+		// metamodule change
+		//tempBuffer[0].clear();
+		//tempBuffer[1].clear();
+		vector<float> tempBuffer[2];
 
 		unsigned int c;
 		unsigned int sr;
@@ -1029,6 +1049,10 @@ struct SickoLooper3 : Module {
 			trackBuffer[track][RIGHT].clear();
 			tempBuffer[LEFT].clear();
 			tempBuffer[RIGHT].clear();
+
+			// metamodule change
+			vector<float>().swap(trackBuffer[track][LEFT]);
+			vector<float>().swap(trackBuffer[track][RIGHT]);
 
 			/*
 			if (tsc > 52428800)
@@ -1157,6 +1181,10 @@ struct SickoLooper3 : Module {
 
 				trackBuffer[track][LEFT].clear();
 				trackBuffer[track][RIGHT].clear();
+
+				// metamodule change
+				vector<float>().swap(trackBuffer[track][LEFT]);
+				vector<float>().swap(trackBuffer[track][RIGHT]);
 
 				for (unsigned int i = 0; i < tempSampleC; i++) {
 					trackBuffer[track][LEFT].push_back(tempBuffer[LEFT][i]);

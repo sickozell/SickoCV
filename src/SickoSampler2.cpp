@@ -103,7 +103,9 @@ struct SickoSampler2 : Module {
 	const unsigned int minSamplesToLoad = 124;
 
 	vector<float> playBuffer[2][2];
-	vector<float> tempBuffer[2];
+	
+	//metamodule change
+	//vector<float> tempBuffer[2];
 
 	vector<double> displayBuff;
 	int currentDisplay = 0;
@@ -389,8 +391,9 @@ struct SickoSampler2 : Module {
 		playBuffer[0][1].resize(0);
 		playBuffer[1][0].resize(0);
 		playBuffer[1][1].resize(0);
-		tempBuffer[0].resize(0);
-		tempBuffer[1].resize(0);
+		// metamodule change
+		//tempBuffer[0].resize(0);
+		//tempBuffer[1].resize(0);
 
 	}
 
@@ -759,8 +762,10 @@ struct SickoSampler2 : Module {
 
 			z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
-			tempBuffer[0].clear();
-			tempBuffer[1].clear();
+			// metamodule change
+			//tempBuffer[0].clear();
+			//tempBuffer[1].clear();
+			vector<float> tempBuffer[2];
 
 			for (unsigned int i=0; i < totalSampleC; i++) {
 				tempBuffer[LEFT].push_back(playBuffer[LEFT][0][i]);
@@ -773,6 +778,12 @@ struct SickoSampler2 : Module {
 			playBuffer[LEFT][1].clear();
 			playBuffer[RIGHT][0].clear();
 			playBuffer[RIGHT][1].clear();
+
+			// metamodule change
+			vector<float>().swap(playBuffer[LEFT][0]);
+			vector<float>().swap(playBuffer[RIGHT][0]);
+			vector<float>().swap(playBuffer[LEFT][1]);
+			vector<float>().swap(playBuffer[RIGHT][1]);
 
 			drwav_uint64 tempSampleC = totalSampleC;
 			drwav_uint64 tempSamples = totalSamples;
@@ -834,8 +845,9 @@ struct SickoSampler2 : Module {
 				floorCurrResamplePos = floor(currResamplePos);
 			}
 
-			tempBuffer[LEFT].clear();
-			tempBuffer[RIGHT].clear();
+			// metamodule change
+			//tempBuffer[LEFT].clear();
+			//tempBuffer[RIGHT].clear();
 
 			// ***************************************************************************
 			totalSampleC = playBuffer[LEFT][0].size();
@@ -1089,8 +1101,10 @@ struct SickoSampler2 : Module {
 		std::string path = fromPath;
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
-		tempBuffer[0].clear();
-		tempBuffer[1].clear();
+		// metamodule change
+		//tempBuffer[0].clear();
+		//tempBuffer[1].clear();
+		vector<float> tempBuffer[2];
 
 		unsigned int c;
 		unsigned int sr;
@@ -1115,6 +1129,12 @@ struct SickoSampler2 : Module {
 			tempBuffer[LEFT].clear();
 			tempBuffer[RIGHT].clear();
 			displayBuff.clear();
+
+			// metamodule change
+			vector<float>().swap(playBuffer[LEFT][0]);
+			vector<float>().swap(playBuffer[RIGHT][0]);
+			vector<float>().swap(playBuffer[LEFT][1]);
+			vector<float>().swap(playBuffer[RIGHT][1]);
 
 			if (!unlimitedRecording) {
 				if (tsc > recordingLimit / 2)
@@ -1245,8 +1265,10 @@ struct SickoSampler2 : Module {
 					floorCurrResamplePos = floor(currResamplePos);
 				}
 
-				tempBuffer[LEFT].clear();
-				tempBuffer[RIGHT].clear();
+				// metamodule change
+				//tempBuffer[LEFT].clear();
+				//tempBuffer[RIGHT].clear();
+
 				// ***************************************************************************
 
 				totalSampleC = playBuffer[LEFT][0].size();
@@ -1409,6 +1431,13 @@ struct SickoSampler2 : Module {
 		playBuffer[LEFT][1].clear();
 		playBuffer[RIGHT][1].clear();
 		displayBuff.clear();
+
+		// metamodule change
+		vector<float>().swap(playBuffer[LEFT][0]);
+		vector<float>().swap(playBuffer[RIGHT][0]);
+		vector<float>().swap(playBuffer[LEFT][1]);
+		vector<float>().swap(playBuffer[RIGHT][1]);
+
 		totalSampleC = 0;
 		totalSamples = 0;
 		resampled = false;
@@ -2838,6 +2867,12 @@ struct SickoSampler2 : Module {
 						playBuffer[RIGHT][0].clear();
 						playBuffer[RIGHT][1].clear();
 					}
+
+					// metamodule change
+					vector<float>().swap(playBuffer[LEFT][0]);
+					vector<float>().swap(playBuffer[RIGHT][0]);
+					vector<float>().swap(playBuffer[LEFT][1]);
+					vector<float>().swap(playBuffer[RIGHT][1]);
 
 					currRecPosition = 1;
 

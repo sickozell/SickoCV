@@ -335,8 +335,6 @@ struct StepSeq : Module {
 							else
 								dontAdvance = false;
 
-							step--;
-
 							if (step < 0)
 								step = maxSteps - 1;
 						}

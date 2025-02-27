@@ -2,6 +2,7 @@
 - added RandLoopsCV module
 - added RandLoopsTR module
 - added 4ms-MetaModule compatibility
+- fixed bug on reverse direction
 
 ### 2.7.0 (2025-02-01)
 - added 'trigSeq+' module
