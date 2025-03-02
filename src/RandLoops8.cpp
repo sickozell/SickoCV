@@ -1,3 +1,10 @@
+#define STD2x_PROGRESSION 0
+#define P_1_3_PROGRESSION 1 // 1.3x
+#define FIBONACCI_PROGRESSION 2
+
+#define BIT_8 0
+#define BIT_16 1
+
 #define OUT_TRIG 0
 #define OUT_GATE 1
 #define OUT_CLOCK 2
@@ -6,10 +13,12 @@
 
 using namespace std;
 
-struct RandLoopsTR : Module {
+struct RandLoops8 : Module {
 	enum ParamId {
 		ENUMS(CTRL_PARAM, 8),
 		ENUMS(LENGTH_PARAM, 8),
+		ENUMS(SCALE_PARAM, 8),
+		ENUMS(OFFSET_PARAM, 8),
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -19,7 +28,8 @@ struct RandLoopsTR : Module {
 		INPUTS_LEN
 	};
 	enum OutputId {
-		ENUMS(OUT_OUTPUT, 8),
+		ENUMS(TRG_OUTPUT, 8),
+		ENUMS(CV_OUTPUT, 8),
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -35,7 +45,9 @@ struct RandLoopsTR : Module {
 	float prevRstValue[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	float volt[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	float out[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	float cvOut[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+	float trgOut[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	//int recStep[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -48,12 +60,27 @@ struct RandLoopsTR : Module {
 	bool dontAdvance[8] = {false, false, false, false, false, false, false, false};
 	bool dontAdvanceSetting = true;
 
-	/*
-	float tableVolts[2][16] = {
+	/*float tableVolts[2][16] = {
 		{0.039 , 0.078, 0.157, 0.314, 0.627, 1.255, 2.51, 5.02, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0.00015 , 0.00031, 0.00061, 0.00122, 0.00244, 0.00488, 0.00977, 0.01953, 0.03906, 0.07813, 0.15625, 0.3125, 0.062501, 1.25002, 2.50004, 5.00008}
+	};*/
+
+	int progression = STD2x_PROGRESSION;
+
+	const float tableVolts[3][2][16] = {
+		{
+			{0.03922, 0.07844, 0.15688, 0.31376, 0.62752, 1.25504, 2.51008, 5.02016, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0.00015259, 0.000305181, 0.000610361, 0.001220722, 0.002441445, 0.00488289, 0.009765779, 0.019531558, 0.039063117, 0.078126234, 0.156252467, 0.312504934, 0.625009869, 1.250019738, 2.500039475, 5.00007895}
+		},
+		{
+			{0.4191521, 0.54489773, 0.708367049, 0.920877164, 1.197140313, 1.556282407, 2.023167129, 2.630117267, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0.04577242, 0.059504146, 0.07735539, 0.100562007, 0.130730609, 0.169949791, 0.220934729, 0.287215147, 0.373379692, 0.485393599, 0.631011679, 0.820315183, 1.066409737, 1.386332659, 1.802232456, 2.342902193}
+		},
+		{
+			{0.114942529, 0.229885058, 0.344827586, 0.574712644, 0.91954023, 1.494252874, 2.413793105, 3.908045979, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0.002392917, 0.004785834, 0.007178751, 0.011964585, 0.019143336, 0.031107921, 0.050251256, 0.081359177, 0.131610433, 0.21296961, 0.344580044, 0.557549654, 0.902129698, 1.459679352, 2.361809049, 3.821488401}
+		}
 	};
-	*/
 
 	bool shiftRegister[8][16] = {{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -86,10 +113,11 @@ struct RandLoopsTR : Module {
 
 	int startingStep[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
-	//int bitResolution = BIT_8;
-	//int bitRes[2] = {8, 16};
+	int bitResolution = BIT_8;
+	int bitRes[2] = {8, 16};
 
-	//std::string resolutionName[2] = {"8 bit", "16 bit"};
+	std::string resolutionName[2] = {"8 bit", "16 bit"};
+	std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
 
 	int outType = OUT_TRIG;
 
@@ -98,7 +126,10 @@ struct RandLoopsTR : Module {
 	float stepPulseTime[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	bool outGate[8] = {false, false, false, false, false, false, false, false};
 
-	RandLoopsTR() {
+	//bool pulse[8] = {false, false, false, false, false, false, false, false};
+	//float pulseTime[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+	RandLoops8() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		for (int i = 0; i < 8; i++) {
 			configInput(CLK_INPUT+i, "Clock #" + to_string(i+1));
@@ -108,8 +139,10 @@ struct RandLoopsTR : Module {
 			configInput(CTRL_INPUT+i, "CV Control #" + to_string(i+1));
 			configParam(LENGTH_PARAM+i, 1.f, 16.f, 8.f, "Length #" + to_string(i+1));
 			paramQuantities[LENGTH_PARAM+i]->snapEnabled = true;
-			configOutput(OUT_OUTPUT+i, "OUT #" + to_string(i+1));
-
+			configParam(SCALE_PARAM+i, 0.f, 1.f, 1.f, "Scale #" + to_string(i+1), "%", 0, 100);
+			configParam(OFFSET_PARAM+i, -10.f, 10.f, 0.f, "Offset #" + to_string(i+1));
+			configOutput(TRG_OUTPUT+i, "Trig #" + to_string(i+1));
+			configOutput(CV_OUTPUT+i, "CV #" + to_string(i+1));
 		}
 	}
 
@@ -120,16 +153,13 @@ struct RandLoopsTR : Module {
 	    Module::onReset(e);
 	}
 
-	void onSampleRateChange() override {
-		oneMsTime = (APP->engine->getSampleRate()) / 1000;
-	}
-
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "InitStart", json_boolean(initStart));
 		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
 		json_object_set_new(rootJ, "polyChans", json_integer(polyChans));
-		//json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
+		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
+		json_object_set_new(rootJ, "progression", json_integer(progression));
 		json_object_set_new(rootJ, "outType", json_integer(outType));
 
 		for (int t = 0; t < 8; t++)
@@ -138,7 +168,7 @@ struct RandLoopsTR : Module {
 		for (int t = 0; t < 8; t++) {
 			json_t *track_json_array = json_array();
 			for (int tempStep = 0; tempStep < 16; tempStep++) {
-				json_array_append_new(track_json_array, json_boolean(shiftRegister[t][tempStep]));
+				json_array_append_new(track_json_array, json_boolean(saveRegister[t][tempStep]));
 			}
 			json_object_set_new(rootJ, ("sr"+to_string(t)).c_str(), track_json_array);	
 		}
@@ -151,14 +181,26 @@ struct RandLoopsTR : Module {
 		if (initStartJ)
 			initStart = json_boolean_value(initStartJ);
 
-		/*
 		json_t* bitResolutionJ = json_object_get(rootJ, "bitResolution");
 		if (bitResolutionJ) {
 			bitResolution = json_integer_value(bitResolutionJ);
 			if (bitResolution < 0 && bitResolution > 1)
 				bitResolution = BIT_8;
 		}
-		*/
+
+		json_t* progressionJ = json_object_get(rootJ, "progression");
+		if (progressionJ) {
+			progression = json_integer_value(progressionJ);
+			if (progression < 0 && progression > 2)
+				progression = STD2x_PROGRESSION;
+		}
+
+		json_t* outTypeJ = json_object_get(rootJ, "outType");
+		if (outTypeJ) {
+			outType = json_integer_value(outTypeJ);
+			if (outType < 0 || outType > 2)
+				outType = 0;
+		}
 
 		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
 		if (dontAdvanceSettingJ) {
@@ -168,13 +210,6 @@ struct RandLoopsTR : Module {
 		json_t* polyChansJ = json_object_get(rootJ, "polyChans");
 		if (polyChansJ)
 			polyChans = json_integer_value(polyChansJ);
-
-		json_t* outTypeJ = json_object_get(rootJ, "outType");
-		if (outTypeJ) {
-			outType = json_integer_value(outTypeJ);
-			if (outType < 0 || outType > 2)
-				outType = 0;
-		}
 
 		if (!initStart) {
 			for (int t = 0; t < 8; t++) {
@@ -190,6 +225,25 @@ struct RandLoopsTR : Module {
 		}
 
 	}
+
+	/*
+	void inline debugCurrent(int t) {
+		if (t == 0) {
+			DEBUG ("%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i", shiftRegister[t][0], shiftRegister[t][1], shiftRegister[t][2], shiftRegister[t][3],
+					shiftRegister[t][4], shiftRegister[t][5], shiftRegister[t][6], shiftRegister[t][7], shiftRegister[t][8], shiftRegister[t][9],
+					shiftRegister[t][10], shiftRegister[t][11], shiftRegister[t][12], shiftRegister[t][13], shiftRegister[t][14], shiftRegister[t][15]);
+		}
+	}
+
+	void inline debugResettt(int t) {
+		if (t == 0) {
+			DEBUG ("%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i RESET %i", shiftRegister[t][0], shiftRegister[t][1], shiftRegister[t][2], shiftRegister[t][3],
+					shiftRegister[t][4], shiftRegister[t][5], shiftRegister[t][6], shiftRegister[t][7], shiftRegister[t][8], shiftRegister[t][9],
+					shiftRegister[t][10], shiftRegister[t][11], shiftRegister[t][12], shiftRegister[t][13], shiftRegister[t][14], shiftRegister[t][15],
+					startingStep[t]);
+		}
+	}
+	*/
 
 	void inline saveSequence(int t) {
 		int cursor = 0;
@@ -252,59 +306,33 @@ struct RandLoopsTR : Module {
 			if (dontAdvanceSetting)
 				dontAdvance[t] = true;
 		
-			//calcVoltage(t);
+			calcVoltage(t);
 
 		}
 		prevRstValue[t] = rstValue[t];
 	}
 
-	/*
 	void inline calcVoltage(int t) {
 		volt[t] = 0;
 		for (int i=0; i < bitRes[bitResolution]; i++) {
 			if (shiftRegister[t][i])
-				volt[t] += tableVolts[bitResolution][i];
+				volt[t] += tableVolts[progression][bitResolution][i];
 		}
 	}
-	*/
 
 	void clearAll() {
 		for (int t = 0; t < 8; t++) {
 			for (int step = 0; step < 16; step++)
 				shiftRegister[t][step] = false;
-			//calcVoltage(t);
+			calcVoltage(t);
 		}
 	}
-
-	/*
-	void debugSeq(int t) {
-		if (t == 0) {
-			DEBUG ("SEQ %i%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i",
-				shiftRegister[t][0],
-				shiftRegister[t][1],
-				shiftRegister[t][2],
-				shiftRegister[t][3],
-				shiftRegister[t][4],
-				shiftRegister[t][5],
-				shiftRegister[t][6],
-				shiftRegister[t][7],
-				shiftRegister[t][8],
-				shiftRegister[t][9],
-				shiftRegister[t][10],
-				shiftRegister[t][11],
-				shiftRegister[t][12],
-				shiftRegister[t][13],
-				shiftRegister[t][14],
-				shiftRegister[t][15]
-				);
-		}
-	}
-	*/
-
+	
 	void process(const ProcessArgs& args) override {
+		
+		//outSum = 0.f;
 
 		for (int t = 0; t < 8; t++) {
-			incomingRegister = false;
 
 			if (!inputs[CLK_INPUT+t].isConnected() && t != 0) {
 				
@@ -352,13 +380,13 @@ struct RandLoopsTR : Module {
 							incomingRegister = true;
 						else
 							incomingRegister = false;
+						//DEBUG ("BIT CHANGED");
 
 					} else {
 
 						incomingRegister = shiftRegister[t][int(params[LENGTH_PARAM+t].getValue())-1];
 						if (controlValue < 0)
 							incomingRegister = !incomingRegister;
-
 					}
 
 					shiftRegister[t][15] = shiftRegister[t][14];
@@ -378,9 +406,9 @@ struct RandLoopsTR : Module {
 					shiftRegister[t][1] = shiftRegister[t][0];
 					shiftRegister[t][0] = incomingRegister;
 
-					//calcVoltage(t);
+					calcVoltage(t);
 
-					//debugSeq(t);
+					//debugCurrent(t);
 
 					if (incomingRegister) {
 						stepPulse[t] = true;
@@ -390,7 +418,7 @@ struct RandLoopsTR : Module {
 					} else {
 						if (outType == OUT_GATE) {
 							outGate[t] = false;
-							out[t] = 0.f;
+							trgOut[t] = 0.f;
 						}
 					}
 
@@ -401,59 +429,64 @@ struct RandLoopsTR : Module {
 			}
 			prevClock[t] = clock[t];
 
-			/*out[t] = (volt[t] * params[SCALE_PARAM+t].getValue()) + params[OFFSET_PARAM+t].getValue();
 
 
-			if (out[t] > 10.f)
-				out[t] = 10.f;
-			else if (out[t] < -10.f)
-				out[t] = -10.f;
+			cvOut[t] = (volt[t] * params[SCALE_PARAM+t].getValue()) + params[OFFSET_PARAM+t].getValue();
 
-			outputs[OUT_OUTPUT+t].setVoltage(out[t]);
-			*/
+			if (cvOut[t] > 10.f)
+				cvOut[t] = 10.f;
+			else if (cvOut[t] < -10.f)
+				cvOut[t] = -10.f;
+
+			outputs[CV_OUTPUT+t].setVoltage(cvOut[t]);
+
 			if (stepPulse[t]) {
 
 				if (outType == OUT_TRIG) {
 					stepPulseTime[t]--;
 					if (stepPulseTime[t] < 0) {
 						stepPulse[t] = false;
-						out[t] = 0.f;
+						trgOut[t] = 0.f;
 					} else {
-						out[t] = 10.f;
+						trgOut[t] = 10.f;
 					}
 				} else if (outType == OUT_CLOCK) {
-					//out[t] = inputs[CLK_INPUT+t].getVoltage();
-					out[t] = clock[t];
-					if (out[t] < 1.f) {
-						out[t] = 0.f;
+					trgOut[t] = clock[t];
+					if (trgOut[t] < 1.f) {
+						trgOut[t] = 0.f;
 						stepPulse[t] = false;
 					}
 				} else if (outType == OUT_GATE) {
 					if (outGate[t])
-						out[t] = 10.f;
+						trgOut[t] = 10.f;
 					else
-						out[t] = 0.f;
+						trgOut[t] = 0.f;
 				}
 			}
-			outputs[OUT_OUTPUT+t].setVoltage(out[t]);
+
+			outputs[TRG_OUTPUT+t].setVoltage(trgOut[t]);
 
 		}
-			
-		if (polyChans == 0) {
-			outputs[OUT_OUTPUT+7].setChannels(1);
-		} else {
-			for (int c = 0; c < polyChans + 1; c++)
-				outputs[OUT_OUTPUT+7].setVoltage(out[c], c);
-			outputs[OUT_OUTPUT+7].setChannels(polyChans+1);
-		} 
 		
+		if (polyChans == 0) {
+			outputs[TRG_OUTPUT+7].setChannels(1);
+			outputs[CV_OUTPUT+7].setChannels(1);
+		} else {
+			for (int c = 0; c < polyChans + 1; c++) {
+				outputs[TRG_OUTPUT+7].setVoltage(trgOut[c], c);
+				outputs[CV_OUTPUT+7].setVoltage(cvOut[c], c);
+			}
+			outputs[TRG_OUTPUT+7].setChannels(polyChans+1);
+			outputs[CV_OUTPUT+7].setChannels(polyChans+1);
+		}
+
 	}
 };
 
-struct RandLoopsTRWidget : ModuleWidget {
-	RandLoopsTRWidget(RandLoopsTR* module) {
+struct RandLoops8Widget : ModuleWidget {
+	RandLoops8Widget(RandLoops8* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/RandLoopsTR.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/RandLoops8.svg")));
 
 		addChild(createWidget<SickoScrewBlack1>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
@@ -467,54 +500,69 @@ struct RandLoopsTRWidget : ModuleWidget {
 
 		const float xRst = 16.3f;
 
-		const float xCtrlKn = 27.4f;
-		const float xCtrlIn = 37.3f;
+		const float xCtrlKn = 26.4f;
+		const float xCtrlIn = 36.3f;
 
-		const float xLength = 47.4f;
+		const float xLength = 45.9f;
 		
-		//const float xScale = 55.7f;
+		const float xScale = 55.7f;
 
-		//const float xOfs = 64.6f;
+		const float xOfs = 64.6f;
 
-		//const float xOut = 74.5f;
-		const float xOut = 59.3f;
+		const float xTrg = 74.9f;
+
+		const float xOut = 84.5f;
 
 
 		for (int track = 0; track < 8; track++) {
 
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xClk, yStart+(track*yDelta))), module, RandLoopsTR::CLK_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xClk, yStart+(track*yDelta))), module, RandLoops8::CLK_INPUT+track));
 
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRst, yStart+(track*yDelta))), module, RandLoopsTR::RST_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRst, yStart+(track*yDelta))), module, RandLoops8::RST_INPUT+track));
 
-			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xCtrlKn, yStart+(track*yDelta))), module, RandLoopsTR::CTRL_PARAM+track));
+			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xCtrlKn, yStart+(track*yDelta))), module, RandLoops8::CTRL_PARAM+track));
 
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCtrlIn, yStart+(track*yDelta))), module, RandLoopsTR::CTRL_INPUT+track));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCtrlIn, yStart+(track*yDelta))), module, RandLoops8::CTRL_INPUT+track));
 
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xLength, yStart+(track*yDelta))), module, RandLoopsTR::LENGTH_PARAM+track));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xLength, yStart+(track*yDelta))), module, RandLoops8::LENGTH_PARAM+track));
 
-			//addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xScale, yStart+(track*yDelta))), module, RandLoopsTR::SCALE_PARAM+track));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xScale, yStart+(track*yDelta))), module, RandLoops8::SCALE_PARAM+track));
 
-			//addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xOfs, yStart+(track*yDelta))), module, RandLoopsTR::OFFSET_PARAM+track));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xOfs, yStart+(track*yDelta))), module, RandLoops8::OFFSET_PARAM+track));
 
-			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart+(track*yDelta))), module, RandLoopsTR::OUT_OUTPUT+track));
-
+			//addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xMode, yStart+(track*yDelta))), module, RandLoops8::MODE_PARAM+track, RandLoops8::MODE_LIGHT+track));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xTrg, yStart+(track*yDelta))), module, RandLoops8::TRG_OUTPUT+track));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart+(track*yDelta))), module, RandLoops8::CV_OUTPUT+track));
 
 		}
 	}
 
 	void appendContextMenu(Menu* menu) override {
-		RandLoopsTR* module = dynamic_cast<RandLoopsTR*>(this->module);
+		RandLoops8* module = dynamic_cast<RandLoops8*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
+			menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
+			menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
+		}));
+
+		menu->addChild(createSubmenuItem("Voltage progression", (module->progressionName[module->progression]), [=](Menu * menu) {
+			menu->addChild(createMenuItem("2x (standard)", "", [=]() {module->progression = STD2x_PROGRESSION;}));
+			menu->addChild(createMenuItem("1.3x", "", [=]() {module->progression = P_1_3_PROGRESSION;}));
+			menu->addChild(createMenuItem("Fibonacci", "", [=]() {module->progression = FIBONACCI_PROGRESSION;}));
+		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Trig Output type"));
 
 		struct OutTypeItem : MenuItem {
-			RandLoopsTR* module;
+			RandLoops8* module;
 			int outType;
 			void onAction(const event::Action& e) override {
 				module->outType = outType;
 			}
 		};
 
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Output type"));
 		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
 		for (int i = 0; i < 3; i++) {
 			OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
@@ -523,14 +571,6 @@ struct RandLoopsTRWidget : ModuleWidget {
 			outTypeItem->outType = i;
 			menu->addChild(outTypeItem);
 		}
-
-		/*
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
-			menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
-			menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
-		}));
-		*/
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Polyphony on 8th out", std::to_string(module->polyChans + 1), [=](Menu * menu) {
@@ -556,4 +596,4 @@ struct RandLoopsTRWidget : ModuleWidget {
 	}
 };
 
-Model* modelRandLoopsTR = createModel<RandLoopsTR, RandLoopsTRWidget>("RandLoopsTR");
+Model* modelRandLoops8 = createModel<RandLoops8, RandLoops8Widget>("RandLoops8");

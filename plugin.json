@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.7.1-beta6",
+  "version": "2.7.1-beta7",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -323,11 +323,29 @@
       ]
     },
     {
+      "slug": "RandLoops",
+      "name": "randLoops",
+      "description": "random voltage/trigger sequencer inspired by Turing Machine",
+      "tags": [
+        "Sequencer"
+      ]
+    },
+    {
+      "slug": "RandLoops8",
+      "name": "randLoops8",
+      "description": "8 looped random voltage/trigger sequencer inspired by Turing Machine",
+      "tags": [
+        "Sequencer",
+        "Polyphonic"
+      ]
+    },
+    {
       "slug": "RandLoopsCV",
       "name": "randLoopsCV",
       "description": "8 looped random voltage sequencer inspired by Turing Machine",
       "tags": [
-        "Sequencer"
+        "Sequencer",
+        "Polyphonic"
       ]
     },
     {
@@ -335,7 +353,8 @@
       "name": "randLoopsTR",
       "description": "8 looped random trigger sequencer inspired by Turing Machine",
       "tags": [
-        "Sequencer"
+        "Sequencer",
+        "Polyphonic"
       ]
     },
     {

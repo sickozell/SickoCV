@@ -12,7 +12,16 @@
 
 #include "plugin.hpp"
 
-//using namespace std;
+#include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
+#include <dirent.h>
+#include <libgen.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+using namespace std;
 
 struct TrigSeq : Module {
 	enum ParamId {
@@ -223,6 +232,112 @@ struct TrigSeq : Module {
 				step = 0;
 		}
 
+	}
+
+	json_t *presetToJson() {
+
+		json_t *rootJ = json_object();
+		//for (int prog = 0; prog < 32; prog++) {
+			json_t *prog_json_array = json_array();
+			for (int tempStep = 0; tempStep < 16; tempStep++) {
+				json_array_append_new(prog_json_array, json_boolean((bool)params[STEPBUT_PARAM+tempStep].getValue()));
+			}
+			json_object_set_new(rootJ, "sr", prog_json_array);	
+		//}
+
+		return rootJ;
+	}
+
+	void presetFromJson(json_t *rootJ) {
+		//for (int prog = 0; prog < 32; prog++) {
+			json_t *prog_json_array = json_object_get(rootJ, "sr");
+			size_t tempSeq;
+			json_t *json_value;
+			if (prog_json_array) {
+				json_array_foreach(prog_json_array, tempSeq, json_value) {
+					params[STEPBUT_PARAM+tempSeq].setValue(json_boolean_value(json_value));
+				}
+			}
+		//}
+	}
+
+	void menuLoadPreset() {
+		static const char FILE_FILTERS[] = "trigSeq preset (.tsp):tsp,TSP";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
+		if (path)
+			loadPreset(path);
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void loadPreset(std::string path) {
+
+		FILE *file = fopen(path.c_str(), "r");
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (rootJ == NULL) {
+			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		}
+
+		fclose(file);
+
+		if (rootJ) {
+
+			presetFromJson(rootJ);
+
+		} else {
+			WARN("problem loading preset json file");
+			//return;
+		}
+		
+	}
+
+	void menuSavePreset() {
+
+		static const char FILE_FILTERS[] = "trigSeq preset (.tsp):tsp,TSP";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
+		if (path) {
+			std::string strPath = path;
+			if (strPath.substr(strPath.size() - 4) != ".tsp" and strPath.substr(strPath.size() - 4) != ".TSP")
+				strPath += ".tsp";
+			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
+			savePreset(path, presetToJson());
+		}
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void savePreset(std::string path, json_t *rootJ) {
+
+		if (rootJ) {
+			FILE *file = fopen(path.c_str(), "w");
+			if (!file) {
+				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
+				//return;
+			} else {
+				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+				json_decref(rootJ);
+				fclose(file);
+			}
+		}
 	}
 
 	void inline resetStep() {
@@ -584,6 +699,10 @@ struct TrigSeqWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Load BIT preset", "", [=]() {module->menuLoadPreset();}));
+		menu->addChild(createMenuItem("Save BIT preset", "", [=]() {module->menuSavePreset();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));

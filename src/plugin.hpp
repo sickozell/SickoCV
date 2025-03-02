@@ -44,6 +44,8 @@ extern Model* modelPolyMuter8;
 extern Model* modelPolyMuter8Plus;
 extern Model* modelPolyMuter16;
 extern Model* modelPolyMuter16Plus;
+extern Model* modelRandLoops;
+extern Model* modelRandLoops8;
 extern Model* modelRandLoopsCV;
 extern Model* modelRandLoopsTR;
 extern Model* modelShifter;

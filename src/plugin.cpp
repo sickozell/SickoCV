@@ -58,6 +58,8 @@ void init(rack::Plugin *p) {
 	p->addModel(modelPolyMuter8Plus);
 	p->addModel(modelPolyMuter16);
 	p->addModel(modelPolyMuter16Plus);
+	p->addModel(modelRandLoops);
+	p->addModel(modelRandLoops8);
 	p->addModel(modelRandLoopsCV);
 	p->addModel(modelRandLoopsTR);
 	p->addModel(modelShifter);
