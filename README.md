@@ -1,4 +1,4 @@
-# SickoCV v2.7.1-beta7
+# SickoCV v2.7.1-beta8
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -13,6 +13,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## Current modules in beta testing:
 - RandLoops
+- RandLoops8
 - RandLoopsCV
 - RandLoopsTR
 
@@ -21,9 +22,11 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog** 
 - added RandLoops module
+- added RandLoops8 module
 - added RandLoopsCV module
 - added RandLoopsTR module
 - added 4ms-MetaModule compatibility
+- improved memory management on sampler modules
 
 # SickoCV v2.7.1
 VCV Rack plugin modules

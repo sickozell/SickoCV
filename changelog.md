@@ -1,7 +1,6 @@
-### 2.7.1 (2025-03-201)
+### 2.7.1 (2025-03-05)
 - added RandLoops module
-- added RandLoopsCV module
-- added RandLoopsTR module
+- added RandLoops8 module
 - added 4ms-MetaModule compatibility
 - stepSeq stepSeq+ fixed bug on reverse direction
 - improved samples memory management on sampler modules

@@ -1233,14 +1233,16 @@ struct SickoQuantWidget : ModuleWidget {
 		menu->addChild(createMenuItem("Save PROG preset", "", [=]() {module->menuSavePreset();}));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Store Programs"));
-		menu->addChild(createMenuLabel("with double-click"));
-
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
 			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
 			}));
+		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("Store Programs with"));
+			menu->addChild(createMenuLabel("double-click on STOR button"));
 		}));
 	}
 

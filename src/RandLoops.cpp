@@ -87,12 +87,17 @@ struct RandLoops : Module {
 		}
 	};
 
-	bool shiftRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	//bool shiftRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	int shiftRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	bool saveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	//bool saveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	int saveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	bool tempRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-	bool tempSaveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	//bool tempRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	int tempRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	
+	//bool tempSaveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	int tempSaveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	float probCtrl = 0;
 	float probCtrlRnd = 0;
@@ -203,11 +208,11 @@ struct RandLoops : Module {
 		json_object_set_new(rootJ, "trigMode", json_boolean(trigMode));
 		json_object_set_new(rootJ, "outType", json_integer(outType));
 		
-		saveSequence();
+		storeSequence();
 
 		json_t *track_json_array = json_array();
 		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			json_array_append_new(track_json_array, json_boolean(saveRegister[tempStep]));
+			json_array_append_new(track_json_array, json_integer(saveRegister[tempStep]));
 		}
 		json_object_set_new(rootJ, "sr", track_json_array);	
 
@@ -265,43 +270,51 @@ struct RandLoops : Module {
 			json_t *json_value;
 			if (track_json_array) {
 				json_array_foreach(track_json_array, tempSeq, json_value) {
-					shiftRegister[tempSeq] = json_boolean_value(json_value);
+					shiftRegister[tempSeq] = json_integer_value(json_value);
 				}
 			}
 		}
 	}
 
-	json_t *presetToJson() {
-		saveSequence();
+	json_t *sequenceToJson() {
+		storeSequence();
 
 		json_t *rootJ = json_object();
-		//for (int prog = 0; prog < 32; prog++) {
-			json_t *prog_json_array = json_array();
-			for (int tempStep = 0; tempStep < 16; tempStep++) {
-				json_array_append_new(prog_json_array, json_boolean(saveRegister[tempStep]));
-			}
-			json_object_set_new(rootJ, "sr", prog_json_array);	
-		//}
-
+		
+		json_t *prog_json_array = json_array();
+		for (int tempStep = 0; tempStep < 16; tempStep++) {
+			json_array_append_new(prog_json_array, json_integer(saveRegister[tempStep]));
+		}
+		json_object_set_new(rootJ, "sr", prog_json_array);	
+	
+		json_object_set_new(rootJ, "length", json_integer((int)params[LENGTH_PARAM].getValue()));
 		return rootJ;
 	}
 
-	void presetFromJson(json_t *rootJ) {
-		//for (int prog = 0; prog < 32; prog++) {
-			json_t *prog_json_array = json_object_get(rootJ, "sr");
-			size_t tempSeq;
-			json_t *json_value;
-			if (prog_json_array) {
-				json_array_foreach(prog_json_array, tempSeq, json_value) {
-					shiftRegister[tempSeq] = json_boolean_value(json_value);
-				}
+	void sequenceFromJson(json_t *rootJ) {
+
+		json_t *prog_json_array = json_object_get(rootJ, "sr");
+		size_t tempSeq;
+		json_t *json_value;
+		if (prog_json_array) {
+			json_array_foreach(prog_json_array, tempSeq, json_value) {
+				shiftRegister[tempSeq] = json_integer_value(json_value);
 			}
-			startingStep = 0;
-		//}
+		}
+		startingStep = 0;
+
+		json_t* lengthJ = json_object_get(rootJ, "length");
+		if (lengthJ) {
+			if (json_integer_value(lengthJ) < 1 || json_integer_value(lengthJ) > 16)
+				params[LENGTH_PARAM].setValue(16);
+			else
+				params[LENGTH_PARAM].setValue(int(json_integer_value(lengthJ)));
+		}
+
 	}
 
-	void menuLoadPreset() {
-		static const char FILE_FILTERS[] = "trigSeq preset (.tsp):tsp,TSP";
+	void menuLoadSequence() {
+		static const char FILE_FILTERS[] = "trigSeq preset (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -310,7 +323,7 @@ struct RandLoops : Module {
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
 #endif
 		if (path)
-			loadPreset(path);
+			loadSequence(path);
 
 		free(path);
 #if defined(METAMODULE)
@@ -318,7 +331,7 @@ struct RandLoops : Module {
 #endif
 	}
 
-	void loadPreset(std::string path) {
+	void loadSequence(std::string path) {
 
 		FILE *file = fopen(path.c_str(), "r");
 		json_error_t error;
@@ -331,7 +344,7 @@ struct RandLoops : Module {
 
 		if (rootJ) {
 
-			presetFromJson(rootJ);
+			sequenceFromJson(rootJ);
 
 		} else {
 			WARN("problem loading preset json file");
@@ -340,9 +353,9 @@ struct RandLoops : Module {
 		
 	}
 
-	void menuSavePreset() {
+	void menuSaveSequence() {
 
-		static const char FILE_FILTERS[] = "trigSeq preset (.tsp):tsp,TSP";
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -352,10 +365,10 @@ struct RandLoops : Module {
 #endif
 		if (path) {
 			std::string strPath = path;
-			if (strPath.substr(strPath.size() - 4) != ".tsp" and strPath.substr(strPath.size() - 4) != ".TSP")
-				strPath += ".tsp";
+			if (strPath.substr(strPath.size() - 4) != ".tss" and strPath.substr(strPath.size() - 4) != ".TSS")
+				strPath += ".tss";
 			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
-			savePreset(path, presetToJson());
+			saveSequence(path, sequenceToJson());
 		}
 
 		free(path);
@@ -364,7 +377,7 @@ struct RandLoops : Module {
 #endif
 	}
 
-	void savePreset(std::string path, json_t *rootJ) {
+	void saveSequence(std::string path, json_t *rootJ) {
 
 		if (rootJ) {
 			FILE *file = fopen(path.c_str(), "w");
@@ -380,7 +393,7 @@ struct RandLoops : Module {
 	}
 
 
-	void inline saveSequence() {
+	void inline storeSequence() {
 		int cursor = 0;
 		for (int i = startingStep; i < int(params[LENGTH_PARAM].getValue()); i++) {
 			tempSaveRegister[cursor] = shiftRegister[i];
@@ -459,7 +472,7 @@ struct RandLoops : Module {
 
 	void clearAll() {
 		for (int step = 0; step < 16; step++)
-			shiftRegister[step] = false;
+			shiftRegister[step] = 0;
 
 		if (!trigMode)
 			calcVoltage();
@@ -472,9 +485,9 @@ struct RandLoops : Module {
 		for (int i = 0; i < int(params[LENGTH_PARAM].getValue()); i++) {
 			probRegister = random::uniform();
 			if (probRegister > 0.5)
-				shiftRegister[i] = true;
+				shiftRegister[i] = 1;
 			else
-				shiftRegister[i] = false;
+				shiftRegister[i] = 0;
 			cursor++;
 		}
 
@@ -606,14 +619,14 @@ struct RandLoops : Module {
 
 				if (addWait) {
 
-					incomingRegister = true;
+					incomingRegister = 1;
 					addWait = false;
 					if (bufferedAddDel)
 						lights[ADD_LIGHT].setBrightness(0.f);
 
 				} else if (delWait) {
 
-					incomingRegister = false;
+					incomingRegister = 0;
 					delWait = false;
 					if (bufferedAddDel)
 						lights[DEL_LIGHT].setBrightness(0.f);
@@ -632,9 +645,9 @@ struct RandLoops : Module {
 					if (probCtrlRnd > probCtrl) {
 						probRegister = random::uniform();
 						if (probRegister > 0.5)
-							incomingRegister = true;
+							incomingRegister = 1;
 						else
-							incomingRegister = false;
+							incomingRegister = 0;
 
 					} else {
 
@@ -896,11 +909,16 @@ struct RandLoopsWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load BIT preset", "", [=]() {module->menuLoadPreset();}));
-		menu->addChild(createMenuItem("Save BIT preset", "", [=]() {module->menuSavePreset();}));
+		menu->addChild(createMenuItem("Load Sequence", "", [=]() {module->menuLoadSequence();}));
+		menu->addChild(createMenuItem("Save Sequence", "", [=]() {module->menuSaveSequence();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("Store Programs with double-click"));
+		}));
 	}
 	
 
