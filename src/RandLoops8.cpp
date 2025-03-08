@@ -113,11 +113,12 @@ struct RandLoops8 : Module {
 
 	int startingStep[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
+	
+	int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
-	int bitRes[2] = {8, 16};
 
-	std::string resolutionName[2] = {"8 bit", "16 bit"};
-	std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
+	//std::string resolutionName[2] = {"8 bit", "16 bit"};
+	//std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
 
 	int outType = OUT_TRIG;
 
@@ -137,7 +138,7 @@ struct RandLoops8 : Module {
 			//configParam(CTRL_PARAM+i, 0.f, 1.f, 1.f, "Control #" + to_string(i+1));
 			configParam(CTRL_PARAM+i, -1.f, 1.f, 0.f, "Control #" + to_string(i+1));
 			configInput(CTRL_INPUT+i, "CV Control #" + to_string(i+1));
-			configParam(LENGTH_PARAM+i, 1.f, 16.f, 8.f, "Length #" + to_string(i+1));
+			configParam(LENGTH_PARAM+i, 1.f, 16.f, 16.f, "Length #" + to_string(i+1));
 			paramQuantities[LENGTH_PARAM+i]->snapEnabled = true;
 			configParam(SCALE_PARAM+i, 0.f, 1.f, 1.f, "Scale #" + to_string(i+1), "%", 0, 100);
 			configParam(OFFSET_PARAM+i, -10.f, 10.f, 0.f, "Offset #" + to_string(i+1));
@@ -314,7 +315,7 @@ struct RandLoops8 : Module {
 
 	void inline calcVoltage(int t) {
 		volt[t] = 0;
-		for (int i=0; i < bitRes[bitResolution]; i++) {
+		for (int i=0; i < bitResTable[bitResolution]; i++) {
 			if (shiftRegister[t][i])
 				volt[t] += tableVolts[progression][bitResolution][i];
 		}
@@ -541,16 +542,60 @@ struct RandLoops8Widget : ModuleWidget {
 		RandLoops8* module = dynamic_cast<RandLoops8*>(this->module);
 
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Math Settings"));
+
+		struct BitResTypeItem : MenuItem {
+			RandLoops8* module;
+			int bitResType;
+			void onAction(const event::Action& e) override {
+				module->bitResolution = bitResType;
+			}
+		};
+		std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
+
+		menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
+				bitResTypeItem->rightText = CHECKMARK(module->bitResolution == i);
+				bitResTypeItem->module = module;
+				bitResTypeItem->bitResType = i;
+				menu->addChild(bitResTypeItem);
+			}
+		}));
+
+		/*
 		menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
 			menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
 			menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
 		}));
+		*/
 
+		struct ProgressionTypeItem : MenuItem {
+			RandLoops8* module;
+			int progressionType;
+			void onAction(const event::Action& e) override {
+				module->progression = progressionType;
+			}
+		};
+		std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
+
+		menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
+				progressionTypeItem->rightText = CHECKMARK(module->progression == i);
+				progressionTypeItem->module = module;
+				progressionTypeItem->progressionType = i;
+				menu->addChild(progressionTypeItem);
+			}
+		}));
+
+		/*
 		menu->addChild(createSubmenuItem("Voltage progression", (module->progressionName[module->progression]), [=](Menu * menu) {
 			menu->addChild(createMenuItem("2x (standard)", "", [=]() {module->progression = STD2x_PROGRESSION;}));
 			menu->addChild(createMenuItem("1.3x", "", [=]() {module->progression = P_1_3_PROGRESSION;}));
 			menu->addChild(createMenuItem("Fibonacci", "", [=]() {module->progression = FIBONACCI_PROGRESSION;}));
 		}));
+		*/
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Trig Output type"));

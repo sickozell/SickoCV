@@ -243,11 +243,11 @@ struct TrigSeqPlus : Module {
 		}
 	};
 	
+	int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
-	int bitRes[2] = {8, 16};
 
-	std::string resolutionName[2] = {"8 bit", "16 bit"};
-	std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
+	//std::string resolutionName[2] = {"8 bit", "16 bit"};
+	//std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
 
 	bool turingMode = false;
 	bool prevTuringMode = false;
@@ -866,19 +866,17 @@ struct TrigSeqPlus : Module {
 	}
 
 	void eraseProgs() {
-		for (int i = 0; i < 16; i++)
-			for (int j = 0; j < 32; j++)
-				progSeq[j][i] = 0;
-		
 		for (int i = 0; i < 32; i++) {
 			progSteps[i] = 16;
 			if (!turingMode) 
 				progRst[i] = 1;
 			else
 				progRst[i] = 16;
+
+			for (int j = 0; j < 16; j++)
+				progSeq[i][j] = 0;
 		}
 	}
-
 
 	void inline resetStep() {
 		lights[STEP_LIGHT+step].setBrightness(0);
@@ -1662,6 +1660,7 @@ struct TrigSeqPlusWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("TURING MODE", "", &module->turingMode));
 		if (module->turingMode) {
+			/*
 			menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
 				menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
 				menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
@@ -1672,8 +1671,47 @@ struct TrigSeqPlusWidget : ModuleWidget {
 				menu->addChild(createMenuItem("1.3x", "", [=]() {module->progression = P_1_3_PROGRESSION;}));
 				menu->addChild(createMenuItem("Fibonacci", "", [=]() {module->progression = FIBONACCI_PROGRESSION;}));
 			}));
+			*/
+
+			struct BitResTypeItem : MenuItem {
+				TrigSeqPlus* module;
+				int bitResType;
+				void onAction(const event::Action& e) override {
+					module->bitResolution = bitResType;
+				}
+			};
+			std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
+
+			menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
+				for (int i = 0; i < 2; i++) {
+					BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
+					bitResTypeItem->rightText = CHECKMARK(module->bitResolution == i);
+					bitResTypeItem->module = module;
+					bitResTypeItem->bitResType = i;
+					menu->addChild(bitResTypeItem);
+				}
+			}));
+
+			struct ProgressionTypeItem : MenuItem {
+				TrigSeqPlus* module;
+				int progressionType;
+				void onAction(const event::Action& e) override {
+					module->progression = progressionType;
+				}
+			};
+			std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
+
+			menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
+				for (int i = 0; i < 3; i++) {
+					ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
+					progressionTypeItem->rightText = CHECKMARK(module->progression == i);
+					progressionTypeItem->module = module;
+					progressionTypeItem->progressionType = i;
+					menu->addChild(progressionTypeItem);
+				}
+			}));
 		} else {
-			menu->addChild(createMenuLabel("Out Reference"));
+			menu->addChild(createMenuLabel("Bit Resolution"));
 			menu->addChild(createMenuLabel("Voltage progression"));
 		}
 

@@ -1,6 +1,7 @@
-### 2.7.1 (2025-03-05)
+### 2.7.1 (2025-03-08)
 - added RandLoops module
 - added RandLoops8 module
+- added Turing mode on trigSeq and TrigSeq+
 - added 4ms-MetaModule compatibility
 - stepSeq stepSeq+ fixed bug on reverse direction
 - improved samples memory management on sampler modules

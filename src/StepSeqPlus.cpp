@@ -638,13 +638,12 @@ struct StepSeqPlus : Module {
 	}
 
 	void eraseProgs() {
-		for (int i = 0; i < 16; i++)
-			for (int j = 0; j < 32; j++)
-				progSeq[j][i] = 0.5;
-		
 		for (int i = 0; i < 32; i++) {
 			progSteps[i] = 16;
 			progRst[i] = 1;
+
+			for (int j = 0; j < 16; j++)
+				progSeq[i][j] = 0;
 		}
 	}
 
@@ -654,7 +653,6 @@ struct StepSeqPlus : Module {
 		if (mode == CLOCK_MODE && dontAdvanceSetting)
 			dontAdvance = true;
 	}
-	
 	
 	void process(const ProcessArgs& args) override {
 

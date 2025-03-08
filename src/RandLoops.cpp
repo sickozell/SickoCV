@@ -9,6 +9,9 @@
 #define OUT_GATE 1
 #define OUT_CLOCK 2
 
+#define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
+#define COLOR_LCD_GREEN 0x33, 0xdd, 0x33, 0xff
+
 #include "plugin.hpp"
 
 #include "osdialog.h"
@@ -30,6 +33,12 @@ struct RandLoops : Module {
 		DEL_BUTTON,
 		ADD_BUTTON,
 		RND_BUTTON,
+		//ENUMS(REGISTER_PARAM, 16),
+		PROG_PARAM,
+		RECALL_PARAM,
+		STORE_PARAM,
+		SET_PARAM,
+		AUTO_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -40,9 +49,12 @@ struct RandLoops : Module {
 		RST_INPUT,
 		CLEAR_INPUT,
 		RND_INPUT,
+		PROG_INPUT,
+		RECALL_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
+		TRIG_OUTPUT,
 		OUT_OUTPUT,
 		OUTPUTS_LEN
 	};
@@ -51,6 +63,10 @@ struct RandLoops : Module {
 		ADD_LIGHT,
 		RND_LIGHT,
 		ENUMS(REGISTER_LIGHT, 16),
+		RECALL_LIGHT,
+		STORE_LIGHT,
+		SET_LIGHT,
+		AUTO_LIGHT,
 		LIGHTS_LEN
 	};
 
@@ -63,7 +79,8 @@ struct RandLoops : Module {
 	float prevRstValue = 0;
 
 	float volt = 0;
-	float out = 0;
+	float cvOut = 0;
+	float trigOut = 0;
 
 	float controlValue = 0;
 
@@ -87,17 +104,68 @@ struct RandLoops : Module {
 		}
 	};
 
-	//bool shiftRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	int progSeq[32][16] = {
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+								{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+							};
+
+	int progSteps[32] = {16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16};
+
+	// --------------workingSeq
+
+	int wSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int wSteps = 16;
+
+	int nextSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int nextSteps = 16;
+
+	int pendingSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int pendingSteps = 16;
+
+
+	// ---------- OLD shiftRegister randLoops
+
 	int shiftRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	//bool saveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	int saveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	//bool tempRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	int tempRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	
-	//bool tempSaveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 	int tempSaveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	// ------------------------
 
 	float probCtrl = 0;
 	float probCtrlRnd = 0;
@@ -107,11 +175,11 @@ struct RandLoops : Module {
 
 	int startingStep = 0;
 
+	const int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
-	int bitRes[2] = {8, 16};
 
-	std::string resolutionName[2] = {"8 bit", "16 bit"};
-	std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
+	//std::string resolutionName[2] = {"8 bit", "16 bit"};
+	//std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
 
 	bool bufferedAddDel = true;
 	bool bufferedRandom = true;
@@ -134,9 +202,9 @@ struct RandLoops : Module {
 	//bool pulse = false;
 	//float pulseTime = 0;
 
-	int tableLength[8] = {1, 2, 3, 4, 5, 7, 11, 15};
+	//int tableLength[8] = {1, 2, 3, 4, 5, 7, 11, 15};
 
-	bool trigMode = false;
+	//bool trigMode = false;
 
 	int outType = OUT_TRIG;
 
@@ -145,13 +213,65 @@ struct RandLoops : Module {
 	float stepPulseTime = 0;
 	bool outGate = false;
 
+		// --------------prog
+	int progKnob = 0;
+	int prevProgKnob = 0;
+	int savedProgKnob = 0;
+
+	int selectedProg = 0;
+	bool progChanged = false;
+
+	float recallBut = 0;
+	float prevRecallBut = 0;
+
+	// --------------store
+	float storeBut = 0;
+	float prevStoreBut = 0;
+
+	bool storeWait = false;
+	float storeTime = 0;
+	float storeSamples = APP->engine->getSampleRate() / 1.5f;
+
+	bool storedProgram = false;
+	int storedProgramTime = 0;
+	float maxStoredProgramTime = APP->engine->getSampleRate() * 1.5;
+
+	// -------------- working
+
+	int workingProg = 0;
+
+	bool instantScaleChange = false;
+
+	bool butSetScale = false;
+	float scaleSetBut = 0;
+	float prevScaleSetBut = 0;
+
+	float resetScale = 0;
+	float prevResetScale = 0;
+
+	bool pendingUpdate = false;
+	bool seqChanged = false;
+
+	// ------- set button light
+
+	bool setButLight = false;
+	float setButLightDelta = 2 / APP->engine->getSampleRate();
+	float setButLightValue = 0.f;
+
+	// ------- clipboard
+
+	bool clipboard = false;
+	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int cbSteps = 16;
+
+
 	RandLoops() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
 		configParam(CTRL_PARAM, -1, 1.f, 0.f, "Control");
 		configInput(CTRL_INPUT, "Ctrl CV");
 
-		configParam(LENGTH_PARAM, 1.f, 16.f, 8.f, "Length");
+		configParam(LENGTH_PARAM, 1.f, 16.f, 16.f, "Length");
 		paramQuantities[LENGTH_PARAM]->snapEnabled = true;
 
 		configParam(SCALE_PARAM, 0.f, 1.f, 1.f, "Scale", "%", 0, 100);
@@ -168,32 +288,63 @@ struct RandLoops : Module {
 		configInput(CLEAR_INPUT, "Clear");
 
 		configInput(RST_INPUT, "Reset");
+		
+		configOutput(TRIG_OUTPUT, "Trig");
 		configOutput(OUT_OUTPUT, "Output");
 
-		if (!trigMode)
+		configParam(PROG_PARAM, 0.f, 31.f, 0.f, "Prog");
+		configInput(PROG_INPUT, "Prog");
+		paramQuantities[PROG_PARAM]->snapEnabled = true;
+		configSwitch(SET_PARAM, 0, 1.f, 0.f, "Set", {"OFF", "ON"});
+		configSwitch(RECALL_PARAM, 0, 1.f, 0.f, "Recall", {"OFF", "ON"});
+		configInput(RECALL_INPUT, "Recall");
+		configSwitch(STORE_PARAM, 0, 1.f, 0.f, "Store", {"OFF", "ON"});
+		configSwitch(AUTO_PARAM, 0, 1.f, 0.f, "Auto", {"OFF", "ON"});
+
+		//if (!trigMode)
 			calcVoltage();
 
 	}
 
 	void onReset(const ResetEvent &e) override {
 
+		/*
 		for (int i=0; i < 16; i++) {
 			shiftRegister[i] = false;
 			lights[REGISTER_LIGHT+i].setBrightness(0.f);
 		}
+		*/
 
 		rndWait = false;
 		addWait = false;
 		delWait = false;
 
 		initStart = false;
-		clearAll();
+		
+		clearAll(); // ------------------------------------------------------------<<<<<<<<<<<<<<<<<
+
+		setButLight = false;
+		setButLightDelta = 2 / APP->engine->getSampleRate();
+		setButLightValue = 0.f;
+
+		for (int i = 0; i < 16; i++) {
+			wSeq[i] = 0;
+			//params[STEP_PARAM+i].setValue(wSeq[i]);
+			//lights[REGISTER_LIGHT+i].setBrightness(wSeq[i]);
+		}
+		wSteps = 16;
+		params[LENGTH_PARAM].setValue(wSteps);
+		//wRst = 1;
+		//params[RST_PARAM].setValue(wRst);
 
 		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {
 		oneMsTime = (APP->engine->getSampleRate()) / 1000;
+		storeSamples = APP->engine->getSampleRate() / 1.5f;
+		maxStoredProgramTime = APP->engine->getSampleRate() * 1.5;
+		setButLightDelta = 2 / APP->engine->getSampleRate();
 	}
 	
 	json_t* dataToJson() override {
@@ -205,16 +356,33 @@ struct RandLoops : Module {
 		json_object_set_new(rootJ, "progression", json_integer(progression));
 		json_object_set_new(rootJ, "bufferedAddDel", json_boolean(bufferedAddDel));
 		json_object_set_new(rootJ, "bufferedRandom", json_boolean(bufferedRandom));
-		json_object_set_new(rootJ, "trigMode", json_boolean(trigMode));
 		json_object_set_new(rootJ, "outType", json_integer(outType));
 		
+		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
+
 		storeSequence();
 
-		json_t *track_json_array = json_array();
+		json_t *seq_json_array = json_array();
 		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			json_array_append_new(track_json_array, json_integer(saveRegister[tempStep]));
+			json_array_append_new(seq_json_array, json_integer(saveRegister[tempStep]));
 		}
-		json_object_set_new(rootJ, "sr", track_json_array);	
+		json_object_set_new(rootJ, "wSeq", seq_json_array);	
+
+		json_object_set_new(rootJ, "wSteps", json_integer(wSteps));
+
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *prog_json_array = json_array();
+			for (int tempStep = 0; tempStep < 16; tempStep++) {
+				json_array_append_new(prog_json_array, json_integer(progSeq[prog][tempStep]));
+			}
+			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
+		}
+
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *progSteps_json_array = json_array();
+			json_array_append_new(progSteps_json_array, json_integer(progSteps[prog]));
+			json_object_set_new(rootJ, ("progSteps"+to_string(prog)).c_str(), progSteps_json_array);
+		}
 
 		return rootJ;
 	}
@@ -252,10 +420,6 @@ struct RandLoops : Module {
 		if (bufferedRandomJ)
 			bufferedRandom = json_boolean_value(bufferedRandomJ);
 
-		json_t* trigModeJ = json_object_get(rootJ, "trigMode");
-		if (trigModeJ)
-			trigMode = json_boolean_value(trigModeJ);
-
 		json_t* outTypeJ = json_object_get(rootJ, "outType");
 		if (outTypeJ) {
 			outType = json_integer_value(outTypeJ);
@@ -265,16 +429,235 @@ struct RandLoops : Module {
 
 		if (!initStart) {
 
-			json_t *track_json_array = json_object_get(rootJ, "sr");
+			json_t *prog_json_array = json_object_get(rootJ, "wSeq");
 			size_t tempSeq;
 			json_t *json_value;
-			if (track_json_array) {
-				json_array_foreach(track_json_array, tempSeq, json_value) {
-					shiftRegister[tempSeq] = json_integer_value(json_value);
+			if (prog_json_array) {
+				json_array_foreach(prog_json_array, tempSeq, json_value) {
+					wSeq[tempSeq] = json_integer_value(json_value);
+				}
+			}
+			startingStep = 0;
+
+			json_t* lengthJ = json_object_get(rootJ, "wSteps");
+			if (lengthJ) {
+				if (json_integer_value(lengthJ) < 1 || json_integer_value(lengthJ) > 16)
+					wSteps = 16;				
+				else
+					wSteps = json_integer_value(lengthJ);
+
+				params[LENGTH_PARAM].setValue(wSteps);
+			}
+		}
+
+		json_t* savedProgKnobJ = json_object_get(rootJ, "savedProgKnob");
+		if (savedProgKnobJ) {
+			savedProgKnob = json_integer_value(savedProgKnobJ);
+			if (savedProgKnob < 0 || savedProgKnob > 31)
+				savedProgKnob = 0;
+			
+		} else {
+			savedProgKnob = 0;
+		}
+
+		selectedProg = savedProgKnob;
+		workingProg = selectedProg;
+		prevProgKnob = selectedProg;
+		params[PROG_PARAM].setValue(selectedProg);
+
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(prog)).c_str());
+			size_t tempSeq;
+			json_t *json_value;
+			if (prog_json_array) {
+				json_array_foreach(prog_json_array, tempSeq, json_value) {
+					progSeq[prog][tempSeq] = json_integer_value(json_value);
+				}
+			}
+		}
+
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *progSteps_json_array = json_object_get(rootJ, ("progSteps"+to_string(prog)).c_str());
+			size_t tempSeq;
+			json_t *json_value;
+			if (progSteps_json_array) {
+				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
+					progSteps[prog] = json_integer_value(json_value);
+				}
+			}
+		}
+
+	}
+
+	// ------------------------ LOAD / SAVE   FULL PRESET
+
+	json_t *presetToJson() {
+
+		json_t *rootJ = json_object();
+
+		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
+		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
+		json_object_set_new(rootJ, "progression", json_integer(progression));
+		json_object_set_new(rootJ, "bufferedAddDel", json_boolean(bufferedAddDel));
+		json_object_set_new(rootJ, "bufferedRandom", json_boolean(bufferedRandom));
+		json_object_set_new(rootJ, "outType", json_integer(outType));
+
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *prog_json_array = json_array();
+			for (int tempStep = 0; tempStep < 16; tempStep++) {
+				json_array_append_new(prog_json_array, json_integer(progSeq[prog][tempStep]));
+			}
+			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
+		}
+
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *progSteps_json_array = json_array();
+			json_array_append_new(progSteps_json_array, json_integer(progSteps[prog]));
+			json_object_set_new(rootJ, ("progSteps"+to_string(prog)).c_str(), progSteps_json_array);
+		}
+
+		return rootJ;
+	}
+
+	void presetFromJson(json_t *rootJ) {
+
+		json_t* bitResolutionJ = json_object_get(rootJ, "bitResolution");
+		if (bitResolutionJ) {
+			bitResolution = json_integer_value(bitResolutionJ);
+			if (bitResolution < 0 && bitResolution > 1)
+				bitResolution = BIT_8;
+		}
+
+		json_t* progressionJ = json_object_get(rootJ, "progression");
+		if (progressionJ) {
+			progression = json_integer_value(progressionJ);
+			if (progression < 0 && progression > 2)
+				progression = STD2x_PROGRESSION;
+		}
+
+		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
+		if (dontAdvanceSettingJ) {
+			dontAdvanceSetting = json_boolean_value(dontAdvanceSettingJ);
+		}
+		
+		json_t* bufferedAddDelJ = json_object_get(rootJ, "bufferedAddDel");
+		if (bufferedAddDelJ)
+			bufferedAddDel = json_boolean_value(bufferedAddDelJ);
+
+		json_t* bufferedRandomJ = json_object_get(rootJ, "bufferedRandom");
+		if (bufferedRandomJ)
+			bufferedRandom = json_boolean_value(bufferedRandomJ);
+
+		json_t* outTypeJ = json_object_get(rootJ, "outType");
+		if (outTypeJ) {
+			outType = json_integer_value(outTypeJ);
+			if (outType < 0 || outType > 2)
+				outType = 0;
+		}
+
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(prog)).c_str());
+			size_t tempSeq;
+			json_t *json_value;
+			if (prog_json_array) {
+				json_array_foreach(prog_json_array, tempSeq, json_value) {
+					progSeq[prog][tempSeq] = json_integer_value(json_value);
+				}
+			}
+		}
+
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *progSteps_json_array = json_object_get(rootJ, ("progSteps"+to_string(prog)).c_str());
+			size_t tempSeq;
+			json_t *json_value;
+			if (progSteps_json_array) {
+				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
+					progSteps[prog] = json_integer_value(json_value);
 				}
 			}
 		}
 	}
+
+	void menuLoadPreset() {
+		static const char FILE_FILTERS[] = "randLoops preset (.rlp):rlp,RLP";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
+		if (path)
+			loadPreset(path);
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void loadPreset(std::string path) {
+
+		FILE *file = fopen(path.c_str(), "r");
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (rootJ == NULL) {
+			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		}
+
+		fclose(file);
+
+		if (rootJ) {
+
+			presetFromJson(rootJ);
+
+		} else {
+			WARN("problem loading preset json file");
+			//return;
+		}
+		
+	}
+
+	void menuSavePreset() {
+
+		static const char FILE_FILTERS[] = "randLoops preset (.rlp):rlp,RLP";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
+		if (path) {
+			std::string strPath = path;
+			if (strPath.substr(strPath.size() - 4) != ".rlp" and strPath.substr(strPath.size() - 4) != ".RLP")
+				strPath += ".rlp";
+			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
+			savePreset(path, presetToJson());
+		}
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void savePreset(std::string path, json_t *rootJ) {
+
+		if (rootJ) {
+			FILE *file = fopen(path.c_str(), "w");
+			if (!file) {
+				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
+				//return;
+			} else {
+				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+				json_decref(rootJ);
+				fclose(file);
+			}
+		}
+	}
+
+	// ------------------------ LOAD / SAVE   SINGLE SEQUENCE
 
 	json_t *sequenceToJson() {
 		storeSequence();
@@ -287,7 +670,8 @@ struct RandLoops : Module {
 		}
 		json_object_set_new(rootJ, "sr", prog_json_array);	
 	
-		json_object_set_new(rootJ, "length", json_integer((int)params[LENGTH_PARAM].getValue()));
+		//json_object_set_new(rootJ, "length", json_integer((int)params[LENGTH_PARAM].getValue()));
+		json_object_set_new(rootJ, "length", json_integer(wSteps));
 		return rootJ;
 	}
 
@@ -298,7 +682,7 @@ struct RandLoops : Module {
 		json_t *json_value;
 		if (prog_json_array) {
 			json_array_foreach(prog_json_array, tempSeq, json_value) {
-				shiftRegister[tempSeq] = json_integer_value(json_value);
+				wSeq[tempSeq] = json_integer_value(json_value);
 			}
 		}
 		startingStep = 0;
@@ -306,9 +690,11 @@ struct RandLoops : Module {
 		json_t* lengthJ = json_object_get(rootJ, "length");
 		if (lengthJ) {
 			if (json_integer_value(lengthJ) < 1 || json_integer_value(lengthJ) > 16)
-				params[LENGTH_PARAM].setValue(16);
+				wSteps = 16;				
 			else
-				params[LENGTH_PARAM].setValue(int(json_integer_value(lengthJ)));
+				wSteps = json_integer_value(lengthJ);
+
+			params[LENGTH_PARAM].setValue(wSteps);
 		}
 
 	}
@@ -395,13 +781,13 @@ struct RandLoops : Module {
 
 	void inline storeSequence() {
 		int cursor = 0;
-		for (int i = startingStep; i < int(params[LENGTH_PARAM].getValue()); i++) {
-			tempSaveRegister[cursor] = shiftRegister[i];
+		for (int i = startingStep; i < wSteps; i++) {
+			tempSaveRegister[cursor] = wSeq[i];
 			cursor++;
 		}
 
 		for (int i = 0; i < startingStep; i++) {
-			tempSaveRegister[cursor] = shiftRegister[i];
+			tempSaveRegister[cursor] = wSeq[i];
 			cursor++;
 		}
 
@@ -409,7 +795,7 @@ struct RandLoops : Module {
 		for (int i = cursor; i < 16; i++) {
 			tempSaveRegister[i] = tempSaveRegister[fillCursor];
 			fillCursor++;
-			if (fillCursor >= int(params[LENGTH_PARAM].getValue()))
+			if (fillCursor >= wSteps)
 				fillCursor = 0;
 		}
 
@@ -418,35 +804,61 @@ struct RandLoops : Module {
 
 	}
 
-	void inline resetSequence() {
-		int cursor = 0;
-		for (int i = startingStep; i < int(params[LENGTH_PARAM].getValue()); i++) {
-			tempRegister[cursor] = shiftRegister[i];
-			cursor++;
-		}
-
-		for (int i = 0; i < startingStep; i++) {
-			tempRegister[cursor] = shiftRegister[i];
-			cursor++;
-		}
-
-		int fillCursor = 0;
-		for (int i = cursor; i < 16; i++) {
-			tempRegister[i] = tempRegister[fillCursor];
-			fillCursor++;
-			if (fillCursor >= int(params[LENGTH_PARAM].getValue()))
-				fillCursor = 0;
-		}
-
+	void copyClipboard() {
+		storeSequence();
 		for (int i = 0; i < 16; i++)
-			shiftRegister[i] = tempRegister[i];
+			cbSeq[i] = saveRegister[i];
+		
+		cbSteps = wSteps;
+		clipboard = true;
+	}
 
+	void pasteClipboard() {
+		for (int i = 0; i < 16; i++)
+			wSeq[i] = cbSeq[i];
+		
+		wSteps = cbSteps;
+		params[LENGTH_PARAM].setValue(wSteps);
+
+	}
+
+	void eraseProgs() {
+		for (int i = 0; i < 32; i++) {
+			progSteps[i] = 16;
+			for (int j = 0; j < 16; j++)
+				progSeq[i][j] = 0;
+		}
 	}
 
 	void inline resetCheck() {
 		if (rstValue >= 1.f && prevRstValue < 1.f) {
 			
-			resetSequence();
+			int cursor = 0;
+			//for (int i = startingStep; i < int(params[LENGTH_PARAM].getValue()); i++) {
+			for (int i = startingStep; i < wSteps; i++) {
+				//tempRegister[cursor] = shiftRegister[i];
+				tempRegister[cursor] = wSeq[i];
+				cursor++;
+			}
+
+			for (int i = 0; i < startingStep; i++) {
+				//tempRegister[cursor] = shiftRegister[i];
+				tempRegister[cursor] = wSeq[i];
+				cursor++;
+			}
+
+			int fillCursor = 0;
+			for (int i = cursor; i < 16; i++) {
+				tempRegister[i] = tempRegister[fillCursor];
+				fillCursor++;
+				//if (fillCursor >= int(params[LENGTH_PARAM].getValue()))
+				if (fillCursor >= wSteps)
+					fillCursor = 0;
+			}
+
+			for (int i = 0; i < 16; i++)
+				//shiftRegister[i] = tempRegister[i];
+				wSeq[i] = tempRegister[i];
 
 			//debugResettt(t);
 
@@ -455,8 +867,7 @@ struct RandLoops : Module {
 			if (dontAdvanceSetting)
 				dontAdvance = true;
 		
-			if (!trigMode)
-				calcVoltage();
+			calcVoltage();
 
 		}
 		prevRstValue = rstValue;
@@ -464,63 +875,349 @@ struct RandLoops : Module {
 
 	void inline calcVoltage() {
 		volt = 0;
-		for (int i=0; i < bitRes[bitResolution]; i++) {
-			if (shiftRegister[i])
+		for (int i=0; i < bitResTable[bitResolution]; i++) {
+			//if (shiftRegister[i])
+			if (wSeq[i])
 				volt += tableVolts[progression][bitResolution][i];
 		}
 	}
 
 	void clearAll() {
 		for (int step = 0; step < 16; step++)
-			shiftRegister[step] = 0;
+			//shiftRegister[step] = 0;
+			wSeq[step] = 0;
 
-		if (!trigMode)
-			calcVoltage();
+		calcVoltage();
 	}
 
 	void inline calcRandom() {
-		//int rndLength = 1 + tableLength[int(params[LENGTH_PARAM].getValue())];
 
 		int cursor = 0;
-		for (int i = 0; i < int(params[LENGTH_PARAM].getValue()); i++) {
+		//for (int i = 0; i < int(params[LENGTH_PARAM].getValue()); i++) {
+		for (int i = 0; i < wSteps; i++) {
 			probRegister = random::uniform();
 			if (probRegister > 0.5)
-				shiftRegister[i] = 1;
+				//shiftRegister[i] = 1;
+				wSeq[i] = 1;
 			else
-				shiftRegister[i] = 0;
+				//shiftRegister[i] = 0;
+				wSeq[i] = 0;
 			cursor++;
 		}
 
 
 		int fillCursor = 0;
 		for (int i = cursor; i < 16; i++) {
-			shiftRegister[i] = shiftRegister[fillCursor];
+			//shiftRegister[i] = shiftRegister[fillCursor];
+			wSeq[i] = wSeq[fillCursor];
 			fillCursor++;
-			if (fillCursor >= int(params[LENGTH_PARAM].getValue()))
+			//if (fillCursor >= int(params[LENGTH_PARAM].getValue()))
+			if (fillCursor >= wSteps)
 				fillCursor = 0;
 		}
 
+		/*
 		for (int i=0; i<16; i++)
-			lights[REGISTER_LIGHT+i].setBrightness(shiftRegister[i]);
+			//lights[REGISTER_LIGHT+i].setBrightness(shiftRegister[i]);
+			lights[REGISTER_LIGHT+i].setBrightness(wSeq[i]);
+		*/
 	}
+
+
 	
 	void process(const ProcessArgs& args) override {
+
+		// ----------- AUTO SWITCH
+
+		instantScaleChange = int(params[AUTO_PARAM].getValue());
+		lights[AUTO_LIGHT].setBrightness(instantScaleChange);
+
+		// ----------- PROGRAM MANAGEMENT
+
+		progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
+		if (progKnob < 0)
+			progKnob = 0;
+		else if (progKnob > 31)
+			progKnob = 31;
+
+		if (progKnob != prevProgKnob) {
+
+			if (progKnob != workingProg) {
+
+				//pendingUpdate = true;
+				progChanged = true;
+				selectedProg = progKnob;
+				prevProgKnob = progKnob;
+
+				for (int i = 0; i < 16; i++) {
+					nextSeq[i] = progSeq[selectedProg][i];
+					//pendingSeq[i] = nextSeq[i];
+
+					//params[STEP_PARAM+i].setValue(nextSeq[i]);
+				}
+				nextSteps = progSteps[selectedProg];
+				//pendingSteps = nextSteps;
+				params[LENGTH_PARAM].setValue(nextSteps);
+
+				//nextRst = progRst[selectedProg];
+				//pendingRst = nextRst;
+				//params[RST_PARAM].setValue(nextRst);
+
+				//seqChanged = true;
+
+				setButLight = true;
+				setButLightValue = 0.f;
+			} else {
+				progChanged = false;
+				selectedProg = progKnob;
+				prevProgKnob = progKnob;
+				params[LENGTH_PARAM].setValue(wSteps);
+				setButLight = false;
+				setButLightValue = 0.f;
+			}
+
+		}
+
+		// -------- populate next seq array and show it
+		/*
+		if (pendingUpdate) {
+			for (int i = 0; i < 16; i++) {
+				//nextSeq[i] = params[STEP_PARAM+i].getValue();
+				nextSeq[i] = wSeq[i];
+				if (nextSeq[i] != pendingSeq[i])
+					seqChanged = true;
+
+				//params[STEP_PARAM+i].setValue(nextSeq[i]);
+				//lights[STEPBUT_LIGHT+i].setBrightness(nextSeq[i]);
+				lights[REGISTER_LIGHT+i].setBrightness(nextSeq[i]);
+			}
+			if (nextSteps != pendingSteps)
+				seqChanged = true;
+			params[LENGTH_PARAM].setValue(nextSteps);
+			
+			//if (nextRst != pendingRst)
+			//	seqChanged = true;
+			//params[RST_PARAM].setValue(nextRst);
+			
+
+		} else {
+			for (int i = 0; i < 16; i++) {
+				//nextSeq[i] = params[STEP_PARAM+i].getValue();
+				nextSeq[i] = wSeq[i];
+				if (nextSeq[i] != wSeq[i])
+					seqChanged = true;
+
+				//params[STEP_PARAM+i].setValue(nextSeq[i]);
+				//lights[STEPBUT_LIGHT+i].setBrightness(nextSeq[i]);
+				lights[REGISTER_LIGHT+i].setBrightness(nextSeq[i]);
+			}
+			nextSteps = params[LENGTH_PARAM].getValue();
+			if (nextSteps != wSteps)
+				seqChanged = true;
+			params[LENGTH_PARAM].setValue(nextSteps);
+
+			//nextRst = params[RST_PARAM].getValue();
+			//if (nextRst != wRst)
+			//	seqChanged = true;
+			//params[RST_PARAM].setValue(nextRst);
+			
+		}
+		*/
+		// -------- CURRENT SEQ UPDATE
+
+		butSetScale = false;
+
+		scaleSetBut = params[SET_PARAM].getValue();
+		if (scaleSetBut >= 1.f && prevScaleSetBut < 1.f)
+			butSetScale = true;
+
+		prevScaleSetBut = scaleSetBut;
+
+		//if (seqChanged) {
+			//if (pendingUpdate) {
+			if (progChanged) {
+				if (instantScaleChange) {
+
+					for (int i = 0; i < 16; i++)
+						wSeq[i] = nextSeq[i];
+
+					wSteps = nextSteps;
+					//wRst = nextRst;
+					startingStep = 0;
+
+					//pendingUpdate = false;
+					progChanged = false;
+
+					//if (progChanged) {
+						workingProg = selectedProg;
+						savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+					//}
+					//seqChanged = false;
+
+					setButLight = false;
+					setButLightValue = 0.f;
+
+				} else {
+					
+					if (butSetScale) {
+						butSetScale = false;
+
+						for (int i = 0; i < 16; i++)
+							wSeq[i] = nextSeq[i];
+
+						wSteps = nextSteps;
+						//wRst = nextRst;
+						startingStep = 0;
+
+						//pendingUpdate = false;
+						progChanged = false;
+
+						//if (progChanged) {
+							workingProg = selectedProg;
+							savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+						//}
+						//seqChanged = false;
+
+						setButLight = false;
+						setButLightValue = 0.f;
+					}
+
+				}
+		
+			} /*else {	// if there are NOT pending prog updates (only manual steps are changed)
+
+				for (int i = 0; i < 16; i++)
+					wSeq[i] = nextSeq[i];
+
+				wSteps = nextSteps;
+				//wRst = nextRst;
+
+				seqChanged = false;
+			}*/
+		//}
+
+		// -------------------------- RECALL PROG
+
+		recallBut = params[RECALL_PARAM].getValue() + inputs[RECALL_INPUT].getVoltage();
+		lights[RECALL_LIGHT].setBrightness(recallBut);
+
+		if (recallBut >= 1.f && prevRecallBut < 1.f) {
+
+			for (int i = 0; i < 16; i++) {
+				wSeq[i] = progSeq[selectedProg][i];
+				startingStep = 0;
+				//nextSeq[i] = wSeq[i];
+				//params[STEP_PARAM+i].setValue(wSeq[i]);
+				//lights[STEPBUT_LIGHT+i].setBrightness(wSeq[i]);
+				//lights[REGISTER_LIGHT+i].setBrightness(wSeq[i]);
+			}
+			wSteps = progSteps[selectedProg];
+			params[LENGTH_PARAM].setValue(wSteps);
+			//wRst = progRst[selectedProg];
+			//params[RST_PARAM].setValue(wRst);
+
+			workingProg = selectedProg;
+			savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+			//seqChanged = false;
+			//pendingUpdate = false;
+			progChanged = false;
+
+			setButLight = false;
+			setButLightValue = 0.f;
+		}
+		prevRecallBut = recallBut;
+
+		// -----------------------------------
+		// ------------ STORE MANAGEMENT
+		// -----------------------------------
+
+		storeBut = params[STORE_PARAM].getValue();
+		lights[STORE_LIGHT].setBrightness(storeBut);
+
+		if (storeBut >= 1 && prevStoreBut < 1) {
+			if (!storeWait) {
+				storeWait = true;
+				storeTime = storeSamples;
+			} else {
+				storeWait = false;
+
+				// registra la sequenza nel programma partendo dallo startingStep
+				/*
+				for (int i = 0; i < 16; i++)
+					progSeq[progKnob][i] = nextSeq[i];
+				progSteps[progKnob] = nextSteps;
+				//progRst[progKnob] = nextRst;
+				*/
+				int cursor = 0;
+				//for (int i = startingStep; i < int(params[LENGTH_PARAM].getValue()); i++) {
+				for (int i = startingStep; i < 16; i++) {
+					//tempRegister[cursor] = wSeq[i];
+					progSeq[progKnob][cursor] = wSeq[i];
+					cursor++;
+				}
+
+				for (int i = 0; i <= startingStep; i++) {
+					//tempRegister[cursor] = shiftRegister[i];
+					//tempRegister[cursor] = wSeq[i];
+					progSeq[progKnob][cursor] = wSeq[i];
+					cursor++;
+				}
+
+				progSteps[progKnob] = wSteps;
+
+				storedProgram = true;
+				storedProgramTime = maxStoredProgramTime;
+			}
+		}
+		
+		if (storeWait) {
+			storeTime--;
+			if (storeTime < 0)
+				storeWait = false;
+		}
+		prevStoreBut = storeBut;
+
+		if (storedProgram) {
+			storedProgramTime--;
+			if (storedProgramTime < 0) {
+				lights[STORE_LIGHT].setBrightness(0);
+				storedProgram = false;
+			} else {
+				lights[STORE_LIGHT].setBrightness(1);
+			}
+
+		}
+
+		if (setButLight) {
+			if (setButLightValue > 1 || setButLightValue < 0) {
+				setButLightDelta *= -1;
+			}
+			setButLightValue += setButLightDelta;
+		}
+
+		lights[SET_LIGHT].setBrightness(setButLightValue);
+
+		// -------------------------------------------------
+		// -------------------------------------------------
+		// -------------------------------------------------
+		// -------------------------------------------------
+		// -------------------------------------------------
+
+		// ----------- get working steps
+
+		if (!progChanged)
+			wSteps = params[LENGTH_PARAM].getValue();
 
 		// -------------------------------- clear sequence
 
 		clrValue = inputs[CLEAR_INPUT].getVoltage();
 		if (clrValue >= 1.f && prevClrValue < 1.f) {
-			/*for (int i = 0; i < 8; i++) {
-				shiftRegister[i] = false;
-				lights[REGISTER_LIGHT+i].setBrightness(0.f);
-			}
 
-			for (int i = 8; i < 16; i++)
-				shiftRegister[i] = false;
-			*/
 			for (int i = 0; i < 16; i++) {
-				shiftRegister[i] = false;
-				lights[REGISTER_LIGHT+i].setBrightness(0.f);
+				//shiftRegister[i] = false;
+				wSeq[i] = 0;
+
+				//lights[REGISTER_LIGHT+i].setBrightness(0.f);
 			}
 
 			rndWait = false;
@@ -613,9 +1310,9 @@ struct RandLoops : Module {
 
 				startingStep++;
 
-				if (startingStep >= int(params[LENGTH_PARAM].getValue()))
+				//if (startingStep >= int(params[LENGTH_PARAM].getValue()))
+				if (startingStep >= wSteps)
 					startingStep = 0;
-
 
 				if (addWait) {
 
@@ -651,13 +1348,15 @@ struct RandLoops : Module {
 
 					} else {
 
-						//incomingRegister = shiftRegister[tableLength[int(params[LENGTH_PARAM].getValue())]];
-						incomingRegister = shiftRegister[int(params[LENGTH_PARAM].getValue())-1];
+						//incomingRegister = shiftRegister[int(params[LENGTH_PARAM].getValue())-1];
+						//incomingRegister = wSeq[int(params[LENGTH_PARAM].getValue())-1];
+						incomingRegister = wSeq[wSteps-1];
 						if (controlValue < 0)
 							incomingRegister = !incomingRegister;
 					}
 				}
 
+				/*
 				shiftRegister[15] = shiftRegister[14];
 				shiftRegister[14] = shiftRegister[13];
 				shiftRegister[13] = shiftRegister[12];
@@ -674,20 +1373,35 @@ struct RandLoops : Module {
 				shiftRegister[2] = shiftRegister[1];
 				shiftRegister[1] = shiftRegister[0];
 				shiftRegister[0] = incomingRegister;
+				*/
+				wSeq[15] = wSeq[14];
+				wSeq[14] = wSeq[13];
+				wSeq[13] = wSeq[12];
+				wSeq[12] = wSeq[11];
+				wSeq[11] = wSeq[10];
+				wSeq[10] = wSeq[9];
+				wSeq[9] = wSeq[8];
+				wSeq[8] = wSeq[7];
+				wSeq[7] = wSeq[6];
+				wSeq[6] = wSeq[5];
+				wSeq[5] = wSeq[4];
+				wSeq[4] = wSeq[3];
+				wSeq[3] = wSeq[2];
+				wSeq[2] = wSeq[1];
+				wSeq[1] = wSeq[0];
+				wSeq[0] = incomingRegister;
 
-				if (!trigMode)
-					calcVoltage();
-				else {
-					if (incomingRegister) {
-						stepPulse = true;
-						stepPulseTime = oneMsTime;
-						if (outType == OUT_GATE)
-							outGate = true;
-					} else {
-						if (outType == OUT_GATE) {
-							outGate = false;
-							volt = 0.f;
-						}
+				calcVoltage();
+
+				if (incomingRegister) {
+					stepPulse = true;
+					stepPulseTime = oneMsTime;
+					if (outType == OUT_GATE)
+						outGate = true;
+				} else {
+					if (outType == OUT_GATE) {
+						outGate = false;
+						trigOut = 0.f;
 					}
 				}
 
@@ -698,44 +1412,50 @@ struct RandLoops : Module {
 		}
 		prevClock = clock;
 
-		if (trigMode) {
+		if (stepPulse) {
 
-			if (stepPulse) {
-
-				if (outType == OUT_TRIG) {
-					stepPulseTime--;
-					if (stepPulseTime < 0) {
-						stepPulse = false;
-						volt = 0.f;
-					} else {
-						volt = 10.f;
-					}
-				} else if (outType == OUT_CLOCK) {
-					volt = clock;
-					if (volt < 1.f) {
-						volt = 0.f;
-						stepPulse = false;
-					}
-				} else if (outType == OUT_GATE) {
-					if (outGate)
-						volt = 10.f;
-					else
-						volt = 0.f;
+			if (outType == OUT_TRIG) {
+				stepPulseTime--;
+				if (stepPulseTime < 0) {
+					stepPulse = false;
+					trigOut = 0.f;
+				} else {
+					trigOut = 10.f;
 				}
+			} else if (outType == OUT_CLOCK) {
+				trigOut = clock;
+				if (trigOut < 1.f) {
+					trigOut = 0.f;
+					stepPulse = false;
+				}
+			} else if (outType == OUT_GATE) {
+				if (outGate)
+					trigOut = 10.f;
+				else
+					trigOut = 0.f;
 			}
 		}
 
-		out = volt * params[SCALE_PARAM].getValue();
+		cvOut = volt * params[SCALE_PARAM].getValue();
 
-		if (out > 10.f)
-			out = 10.f;
-		else if (out < -10.f)
-			out = -10.f;
+		if (cvOut > 10.f)
+			cvOut = 10.f;
+		else if (cvOut < -10.f)
+			cvOut = -10.f;
 
-		outputs[OUT_OUTPUT].setVoltage(out);
+		outputs[OUT_OUTPUT].setVoltage(cvOut);
 
-		for (int i = 0; i < 16; i++)
-			lights[REGISTER_LIGHT+i].setBrightness(shiftRegister[i]);
+		outputs[TRIG_OUTPUT].setVoltage(trigOut);
+
+		if (!progChanged) {
+			for (int i = 0; i < 16; i++)
+				//lights[REGISTER_LIGHT+i].setBrightness(shiftRegister[i]);
+				lights[REGISTER_LIGHT+i].setBrightness(wSeq[i]);
+		} else {
+			for (int i = 0; i < 16; i++)
+				//lights[REGISTER_LIGHT+i].setBrightness(shiftRegister[i]);
+				lights[REGISTER_LIGHT+i].setBrightness(nextSeq[i]);
+		}
 
 		if (!bufferedAddDel) {
 			delWait = false;
@@ -749,10 +1469,70 @@ struct RandLoops : Module {
 	}
 };
 
+struct RandLoopsDisplay : TransparentWidget {
+	RandLoops *module;
+	int frame = 0;
+	RandLoopsDisplay() {
+	}
+
+	void drawLayer(const DrawArgs &args, int layer) override {
+		if (module) {
+			if (layer ==1) {
+				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/vgatrue.ttf"));
+				
+				nvgFontFaceId(args.vg, font->handle);
+				nvgTextLetterSpacing(args.vg, 0);
+
+				std::string currentDisplay;
+
+				currentDisplay = to_string(module->workingProg);
+
+				//if (!module->pendingUpdate) {
+				if (!module->progChanged) {
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
+					nvgFontSize(args.vg, 32);
+					if (currentDisplay.size() == 2)
+						nvgTextBox(args.vg, 8, 30, 80, currentDisplay.c_str(), NULL);
+					else
+						nvgTextBox(args.vg, 16, 30, 80, currentDisplay.c_str(), NULL);
+
+				} else {
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
+					nvgFontSize(args.vg, 26);
+					if (currentDisplay.size() == 2)
+						nvgTextBox(args.vg, 6, 21, 80, currentDisplay.c_str(), NULL);
+					else
+						nvgTextBox(args.vg, 12, 21, 80, currentDisplay.c_str(), NULL);
+					
+					currentDisplay = to_string(module->selectedProg);
+
+					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));
+					nvgFontSize(args.vg, 20);
+					if (currentDisplay.size() == 2)
+						nvgTextBox(args.vg, 20, 36, 60, currentDisplay.c_str(), NULL);
+					else
+						nvgTextBox(args.vg, 25, 36, 60, currentDisplay.c_str(), NULL);
+				}
+				
+			}
+		}
+		Widget::drawLayer(args, layer);
+	}
+};
+
 struct RandLoopsWidget : ModuleWidget {
 	RandLoopsWidget(RandLoops* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/RandLoops.svg")));
+
+		{
+			RandLoopsDisplay *display = new RandLoopsDisplay();
+			//display->box.pos = mm2px(Vec(35.6, 7.8));
+			display->box.pos = mm2px(Vec(40.2, 7.8));
+			display->box.size = mm2px(Vec(8, 8));
+			display->module = module;
+			addChild(display);
+		}
 
 		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
@@ -789,21 +1569,19 @@ struct RandLoopsWidget : ModuleWidget {
 		const float xRndIn = 32.5;
 		const float yRndIn = 79.5;
 
-		const float xClk = 11.5;
+		const float xClk = 8.5;
 		const float yClk = 98.5;
 
-		//const float xClr = 29.5;
-		//const float yClr = 98.5;
-
-		const float xClr = 11;
-		const float yClr = 116;
-
-		
-
-		const float xRst = 29.5;
+		const float xRst = 20.5;
 		const float yRst = 98.5;
 
-		const float xOut = 30.8;
+		const float xClr = 32.5;
+		const float yClr = 98.5;
+
+		const float xTrg = 11;
+		const float yTrg = 116;
+
+		const float xOut = 30;
 		const float yOut = 116;
 
 		const float xLgStart = 24.5;
@@ -812,6 +1590,17 @@ struct RandLoopsWidget : ModuleWidget {
 		const float yLgStart2 = 34;
 		const float yLgStart3 = 37;
 		const float yLgStart4 = 40;
+
+		const float xProg = 42.7 + 5;
+		const float yProgKnob = 36.8 - 2;
+		const float yProgIn = 51 - 4;
+
+		const float ySet = 70 - 6;
+		const float yAuto = 82.5 - 6;
+
+		const float yRecall = 92;
+		const float yRecallIn = 101.9;
+		const float yStore = 116.1;
 		
 		addParam(createParamCentered<SickoBigKnob>(mm2px(Vec(xCtrl, yCtrl)), module, RandLoops::CTRL_PARAM));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCtrlCV, yCtrlCV)), module, RandLoops::CTRL_INPUT));
@@ -851,9 +1640,40 @@ struct RandLoopsWidget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart4)), module, RandLoops::REGISTER_LIGHT+14));
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart4)), module, RandLoops::REGISTER_LIGHT+15));
 		
+
+		/*
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart, yLgStart1)), module, RandLoops::REGISTER_PARAM+0, RandLoops::REGISTER_LIGHT+0));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + xLgShift, yLgStart1)), module, RandLoops::REGISTER_PARAM+1, RandLoops::REGISTER_LIGHT+1));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart1)), module, RandLoops::REGISTER_PARAM+2, RandLoops::REGISTER_LIGHT+2));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart1)), module, RandLoops::REGISTER_PARAM+3, RandLoops::REGISTER_LIGHT+3));
+
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart, yLgStart2)), module, RandLoops::REGISTER_PARAM+4, RandLoops::REGISTER_LIGHT+4));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + xLgShift, yLgStart2)), module, RandLoops::REGISTER_PARAM+5, RandLoops::REGISTER_LIGHT+5));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart2)), module, RandLoops::REGISTER_PARAM+6, RandLoops::REGISTER_LIGHT+6));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart2)), module, RandLoops::REGISTER_PARAM+7, RandLoops::REGISTER_LIGHT+7));
+
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart, yLgStart3)), module, RandLoops::REGISTER_PARAM+8, RandLoops::REGISTER_LIGHT+8));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + xLgShift, yLgStart3)), module, RandLoops::REGISTER_PARAM+9, RandLoops::REGISTER_LIGHT+9));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart3)), module, RandLoops::REGISTER_PARAM+10, RandLoops::REGISTER_LIGHT+10));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart3)), module, RandLoops::REGISTER_PARAM+11, RandLoops::REGISTER_LIGHT+11));
+
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart, yLgStart4)), module, RandLoops::REGISTER_PARAM+12, RandLoops::REGISTER_LIGHT+12));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + xLgShift, yLgStart4)), module, RandLoops::REGISTER_PARAM+13, RandLoops::REGISTER_LIGHT+13));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart4)), module, RandLoops::REGISTER_PARAM+14, RandLoops::REGISTER_LIGHT+14));
+		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart4)), module, RandLoops::REGISTER_PARAM+15, RandLoops::REGISTER_LIGHT+15));
+		*/
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRst, yRst)), module, RandLoops::RST_INPUT));
 		
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xTrg, yTrg)), module, RandLoops::TRIG_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yOut)), module, RandLoops::OUT_OUTPUT));
+
+		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xProg, yProgKnob)), module, RandLoops::PROG_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xProg, yProgIn)), module, RandLoops::PROG_INPUT));
+		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xProg, ySet)), module, RandLoops::SET_PARAM, RandLoops::SET_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xProg, yAuto)), module, RandLoops::AUTO_PARAM, RandLoops::AUTO_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xProg, yRecall)), module, RandLoops::RECALL_PARAM, RandLoops::RECALL_LIGHT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xProg, yRecallIn)), module, RandLoops::RECALL_INPUT));
+		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xProg, yStore)), module, RandLoops::STORE_PARAM, RandLoops::STORE_LIGHT));
 
 	}
 
@@ -866,31 +1686,64 @@ struct RandLoopsWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Buffered Random", "", &module->bufferedRandom));
 
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("Math Settings"));
+
+		struct BitResTypeItem : MenuItem {
+			RandLoops* module;
+			int bitResType;
+			void onAction(const event::Action& e) override {
+				module->bitResolution = bitResType;
+			}
+		};
+		std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
+
+		menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
+				bitResTypeItem->rightText = CHECKMARK(module->bitResolution == i);
+				bitResTypeItem->module = module;
+				bitResTypeItem->bitResType = i;
+				menu->addChild(bitResTypeItem);
+			}
+		}));
+
+		/*
 		menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
 			menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
 			menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
 		}));
+		*/
 
-		menu->addChild(createSubmenuItem("Voltage progression", (module->progressionName[module->progression]), [=](Menu * menu) {
-			menu->addChild(createMenuItem("2x (standard)", "", [=]() {module->progression = STD2x_PROGRESSION;}));
-			menu->addChild(createMenuItem("1.3x", "", [=]() {module->progression = P_1_3_PROGRESSION;}));
-			menu->addChild(createMenuItem("Fibonacci", "", [=]() {module->progression = FIBONACCI_PROGRESSION;}));
+		struct ProgressionTypeItem : MenuItem {
+			RandLoops* module;
+			int progressionType;
+			void onAction(const event::Action& e) override {
+				module->progression = progressionType;
+			}
+		};
+		std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
+
+		menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
+				progressionTypeItem->rightText = CHECKMARK(module->progression == i);
+				progressionTypeItem->module = module;
+				progressionTypeItem->progressionType = i;
+				menu->addChild(progressionTypeItem);
+			}
 		}));
 
+		struct OutTypeItem : MenuItem {
+			RandLoops* module;
+			int outType;
+			void onAction(const event::Action& e) override {
+				module->outType = outType;
+			}
+		};
+		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
+
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("TRIG MODE", "", &module->trigMode));
-
-		menu->addChild(createMenuLabel("Output type"));
-		if (module->trigMode) {
-			struct OutTypeItem : MenuItem {
-				RandLoops* module;
-				int outType;
-				void onAction(const event::Action& e) override {
-					module->outType = outType;
-				}
-			};
-
-			std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
+		menu->addChild(createSubmenuItem("Trig Output type", (OutTypeNames[module->outType]), [=](Menu * menu) {
 			for (int i = 0; i < 3; i++) {
 				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
 				outTypeItem->rightText = CHECKMARK(module->outType == i);
@@ -898,19 +1751,26 @@ struct RandLoopsWidget : ModuleWidget {
 				outTypeItem->outType = i;
 				menu->addChild(outTypeItem);
 			}
-		} else {
-			menu->addChild(createMenuLabel("Trig"));
-			menu->addChild(createMenuLabel("Gate"));
-			menu->addChild(createMenuLabel("Clock Width"));
-		}
+		}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load Sequence", "", [=]() {module->menuLoadSequence();}));
-		menu->addChild(createMenuItem("Save Sequence", "", [=]() {module->menuSaveSequence();}));
+		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));
+		menu->addChild(createMenuItem("Save PROG preset", "", [=]() {module->menuSavePreset();}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
+			}));
+		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Import Single Sequence", "", [=]() {module->menuLoadSequence();}));
+		menu->addChild(createMenuItem("Export Single Sequence", "", [=]() {module->menuSaveSequence();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
