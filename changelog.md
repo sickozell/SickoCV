@@ -1,7 +1,6 @@
 ### 2.7.1 (2025-03-08)
 - added RandLoops module
 - added RandLoops8 module
-- added Turing mode on trigSeq and TrigSeq+
 - trigSeq trigSeq+ added Turing mode, changed RST knob behavior according to Turing mode.
 - stepSeq stepSeq+ fixed bug on reverse direction 
 - stepSeq stepSeq+ changed range display on step knobs

@@ -1,4 +1,4 @@
-# SickoCV v2.7.1-beta10
+# SickoCV v2.7.1-beta12
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -21,7 +21,6 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog** 
 - added RandLoops module
 - added RandLoops8 module
-- added Turing mode on trigSeq and TrigSeq+
 - trigSeq trigSeq+ added Turing mode, changed RST knob behavior according to Turing mode.
 - stepSeq stepSeq+ fixed bug on reverse direction 
 - stepSeq stepSeq+ changed range display on step knobs

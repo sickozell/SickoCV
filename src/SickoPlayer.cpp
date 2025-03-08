@@ -2746,7 +2746,6 @@ struct SickoPlayerWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Interpolation"));
 		struct ModeItem : MenuItem {
 			SickoPlayer* module;
 			int interpolationMode;
@@ -2754,19 +2753,19 @@ struct SickoPlayerWidget : ModuleWidget {
 				module->interpolationMode = interpolationMode;
 			}
 		};
-
 		std::string modeNames[4] = {"None", "Linear 1", "Linear 2", "Hermite"};
-		for (int i = 0; i < 4; i++) {
-			ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
-			modeItem->rightText = CHECKMARK(module->interpolationMode == i);
-			modeItem->module = module;
-			modeItem->interpolationMode = i;
-			menu->addChild(modeItem);
-		}
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Phase scan", "", &module->phaseScan));
+		menu->addChild(createSubmenuItem("Interpolation", (modeNames[module->interpolationMode]), [=](Menu * menu) {
+			for (int i = 0; i < 4; i++) {
+				ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
+				modeItem->rightText = CHECKMARK(module->interpolationMode == i);
+				modeItem->module = module;
+				modeItem->interpolationMode = i;
+				menu->addChild(modeItem);
+			}
+		}));
+		
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
+		menu->addChild(createBoolPtrMenuItem("Phase scan", "", &module->phaseScan));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {

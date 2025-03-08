@@ -1533,7 +1533,6 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Interpolation"));
 		struct ModeItem : MenuItem {
 			DrumPlayerPlus* module;
 			int interpolationMode;
@@ -1542,19 +1541,19 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			}
 		};
 		std::string modeNames[4] = {"None", "Linear 1", "Linear 2", "Hermite"};
-		for (int i = 0; i < 4; i++) {
-			ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
-			modeItem->rightText = CHECKMARK(module->interpolationMode == i);
-			modeItem->module = module;
-			modeItem->interpolationMode = i;
-			menu->addChild(modeItem);
-		}
+		menu->addChild(createSubmenuItem("Interpolation", (modeNames[module->interpolationMode]), [=](Menu * menu) {
+			for (int i = 0; i < 4; i++) {
+				ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
+				modeItem->rightText = CHECKMARK(module->interpolationMode == i);
+				modeItem->module = module;
+				modeItem->interpolationMode = i;
+				menu->addChild(modeItem);
+			}
+		}));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Outs mode"));
 		struct OutsItem : MenuItem {
 			DrumPlayerPlus* module;
 			int outsMode;
@@ -1563,13 +1562,16 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			}
 		};
 		std::string outsNames[3] = {"Normalled", "Solo", "Unconnected on out #4"};
-		for (int i = 0; i < 3; i++) {
-			OutsItem* outsItem = createMenuItem<OutsItem>(outsNames[i]);
-			outsItem->rightText = CHECKMARK(module->outsMode == i);
-			outsItem->module = module;
-			outsItem->outsMode = i;
-			menu->addChild(outsItem);
-		}
+		menu->addChild(createSubmenuItem("Outs mode", (outsNames[module->outsMode]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutsItem* outsItem = createMenuItem<OutsItem>(outsNames[i]);
+				outsItem->rightText = CHECKMARK(module->outsMode == i);
+				outsItem->module = module;
+				outsItem->outsMode = i;
+				menu->addChild(outsItem);
+			}
+		}));
+
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
 		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));
