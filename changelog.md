@@ -3,7 +3,9 @@
 - added RandLoops8 module
 - added Turing mode on trigSeq and TrigSeq+
 - added 4ms-MetaModule compatibility
-- stepSeq stepSeq+ fixed bug on reverse direction
+- trigSeq trigSeq+ added Turing mode, changed RST knob behavior according to Turing mode.
+- stepSeq stepSeq+ fixed bug on reverse direction 
+- stepSeq stepSeq+ changed range display on step knobs
 - improved samples memory management on sampler modules
 
 ### 2.7.0 (2025-02-01)

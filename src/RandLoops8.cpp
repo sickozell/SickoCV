@@ -552,7 +552,6 @@ struct RandLoops8Widget : ModuleWidget {
 			}
 		};
 		std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
-
 		menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
 			for (int i = 0; i < 2; i++) {
 				BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
@@ -563,13 +562,6 @@ struct RandLoops8Widget : ModuleWidget {
 			}
 		}));
 
-		/*
-		menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
-			menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
-			menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
-		}));
-		*/
-
 		struct ProgressionTypeItem : MenuItem {
 			RandLoops8* module;
 			int progressionType;
@@ -578,7 +570,6 @@ struct RandLoops8Widget : ModuleWidget {
 			}
 		};
 		std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
-
 		menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
 			for (int i = 0; i < 3; i++) {
 				ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
@@ -589,16 +580,7 @@ struct RandLoops8Widget : ModuleWidget {
 			}
 		}));
 
-		/*
-		menu->addChild(createSubmenuItem("Voltage progression", (module->progressionName[module->progression]), [=](Menu * menu) {
-			menu->addChild(createMenuItem("2x (standard)", "", [=]() {module->progression = STD2x_PROGRESSION;}));
-			menu->addChild(createMenuItem("1.3x", "", [=]() {module->progression = P_1_3_PROGRESSION;}));
-			menu->addChild(createMenuItem("Fibonacci", "", [=]() {module->progression = FIBONACCI_PROGRESSION;}));
-		}));
-		*/
-
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Trig Output type"));
 
 		struct OutTypeItem : MenuItem {
 			RandLoops8* module;
@@ -607,15 +589,16 @@ struct RandLoops8Widget : ModuleWidget {
 				module->outType = outType;
 			}
 		};
-
 		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
-		for (int i = 0; i < 3; i++) {
-			OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
-			outTypeItem->rightText = CHECKMARK(module->outType == i);
-			outTypeItem->module = module;
-			outTypeItem->outType = i;
-			menu->addChild(outTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Output TRG type", (OutTypeNames[module->outType]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
+				outTypeItem->rightText = CHECKMARK(module->outType == i);
+				outTypeItem->module = module;
+				outTypeItem->outType = i;
+				menu->addChild(outTypeItem);
+			}
+		}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Polyphony on 8th out", std::to_string(module->polyChans + 1), [=](Menu * menu) {

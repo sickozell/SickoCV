@@ -1640,28 +1640,6 @@ struct RandLoopsWidget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart4)), module, RandLoops::REGISTER_LIGHT+14));
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart4)), module, RandLoops::REGISTER_LIGHT+15));
 		
-
-		/*
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart, yLgStart1)), module, RandLoops::REGISTER_PARAM+0, RandLoops::REGISTER_LIGHT+0));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + xLgShift, yLgStart1)), module, RandLoops::REGISTER_PARAM+1, RandLoops::REGISTER_LIGHT+1));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart1)), module, RandLoops::REGISTER_PARAM+2, RandLoops::REGISTER_LIGHT+2));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart1)), module, RandLoops::REGISTER_PARAM+3, RandLoops::REGISTER_LIGHT+3));
-
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart, yLgStart2)), module, RandLoops::REGISTER_PARAM+4, RandLoops::REGISTER_LIGHT+4));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + xLgShift, yLgStart2)), module, RandLoops::REGISTER_PARAM+5, RandLoops::REGISTER_LIGHT+5));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart2)), module, RandLoops::REGISTER_PARAM+6, RandLoops::REGISTER_LIGHT+6));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart2)), module, RandLoops::REGISTER_PARAM+7, RandLoops::REGISTER_LIGHT+7));
-
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart, yLgStart3)), module, RandLoops::REGISTER_PARAM+8, RandLoops::REGISTER_LIGHT+8));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + xLgShift, yLgStart3)), module, RandLoops::REGISTER_PARAM+9, RandLoops::REGISTER_LIGHT+9));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart3)), module, RandLoops::REGISTER_PARAM+10, RandLoops::REGISTER_LIGHT+10));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart3)), module, RandLoops::REGISTER_PARAM+11, RandLoops::REGISTER_LIGHT+11));
-
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart, yLgStart4)), module, RandLoops::REGISTER_PARAM+12, RandLoops::REGISTER_LIGHT+12));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + xLgShift, yLgStart4)), module, RandLoops::REGISTER_PARAM+13, RandLoops::REGISTER_LIGHT+13));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart4)), module, RandLoops::REGISTER_PARAM+14, RandLoops::REGISTER_LIGHT+14));
-		addChild(createLightParamCentered<VCVLightLatch<TinySimpleLight<RedLight>>>(mm2px(Vec(xLgStart + (xLgShift * 3), yLgStart4)), module, RandLoops::REGISTER_PARAM+15, RandLoops::REGISTER_LIGHT+15));
-		*/
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRst, yRst)), module, RandLoops::RST_INPUT));
 		
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xTrg, yTrg)), module, RandLoops::TRIG_OUTPUT));

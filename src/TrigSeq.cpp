@@ -140,7 +140,23 @@ struct TrigSeq : Module {
 		configSwitch(RUNBUT_PARAM, 0.f, 1.f, 1.f, "Run", {"OFF", "ON"});
 		configInput(RUN_INPUT, "Run");
 		
-		configParam(RST_PARAM, 1.f,16.f, 1.f, "Rst Step / Atten.");
+		struct ResetQuantity : ParamQuantity {
+			float getDisplayValue() override {
+				TrigSeq* module = reinterpret_cast<TrigSeq*>(this->module);
+				if (!module->turingMode) {
+					unit = "";
+					displayMultiplier = 15.f;
+					displayOffset = 1.f;
+				} else {
+					unit = "%";
+					displayOffset = 0;
+					displayMultiplier = 100.f;
+				}
+				return ParamQuantity::getDisplayValue();
+			}
+		};
+		//configParam(RST_PARAM, 1.f,16.f, 1.f, "Rst Step / Atten.");
+		configParam<ResetQuantity>(RST_PARAM, 0.f,1.f, 0.f, "Rst Step / Atten.");
 		//paramQuantities[RST_PARAM]->snapEnabled = true;
 		configInput(RST_INPUT, "Reset");
 
@@ -409,7 +425,8 @@ struct TrigSeq : Module {
 		lights[STEP_LIGHT+step].setBrightness(0);
 
 		if (!turingMode) {
-			step = int(params[RST_PARAM].getValue() - 1);
+			//step = int(params[RST_PARAM].getValue() - 1);
+			step = int(params[RST_PARAM].getValue() * 15);
 		} else {
 			step = 0;
 			calcVoltage();
@@ -456,11 +473,13 @@ struct TrigSeq : Module {
 
 		if (turingMode && !prevTuringMode) {
 			calcVoltage();
-			params[RST_PARAM].setValue(16.f);
+			//params[RST_PARAM].setValue(16.f);
+			params[RST_PARAM].setValue(1.f);
 		}
 
 		if (!turingMode && prevTuringMode) {
-			params[RST_PARAM].setValue(1.f);
+			//params[RST_PARAM].setValue(1.f);
+			params[RST_PARAM].setValue(0.f);
 		}
 			
 		prevTuringMode = turingMode;
@@ -672,7 +691,8 @@ struct TrigSeq : Module {
 				}
 			}
 		} else {
-			out = volt * (params[RST_PARAM].getValue() - 1) / 15;
+			//out = volt * (params[RST_PARAM].getValue() - 1) / 15;
+			out = volt * params[RST_PARAM].getValue();
 		}
 
 		outputs[OUT_OUTPUT].setVoltage(out);
@@ -767,6 +787,8 @@ struct TrigSeqWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		TrigSeq* module = dynamic_cast<TrigSeq*>(this->module);
 
+		menu->addChild(new MenuSeparator());
+		
 		struct RunTypeItem : MenuItem {
 			TrigSeq* module;
 			int runType;
@@ -775,16 +797,16 @@ struct TrigSeqWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Run Input"));
 		std::string RunTypeNames[2] = {"Gate", "Trig"};
-		for (int i = 0; i < 2; i++) {
-			RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-			runTypeItem->rightText = CHECKMARK(module->runType == i);
-			runTypeItem->module = module;
-			runTypeItem->runType = i;
-			menu->addChild(runTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+				runTypeItem->rightText = CHECKMARK(module->runType == i);
+				runTypeItem->module = module;
+				runTypeItem->runType = i;
+				menu->addChild(runTypeItem);
+			}
+		}));
 
 		struct RevTypeItem : MenuItem {
 			TrigSeq* module;
@@ -793,18 +815,17 @@ struct TrigSeqWidget : ModuleWidget {
 				module->revType = revType;
 			}
 		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Reverse Input Voltage"));
 		std::string RevTypeNames[2] = {"Positive", "Negative"};
-		for (int i = 0; i < 2; i++) {
-			RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
-			revTypeItem->rightText = CHECKMARK(module->revType == i);
-			revTypeItem->module = module;
-			revTypeItem->revType = i;
-			menu->addChild(revTypeItem);
-		}
-
+		menu->addChild(createSubmenuItem("Reverse Input Voltage", (RevTypeNames[module->revType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
+				revTypeItem->rightText = CHECKMARK(module->revType == i);
+				revTypeItem->module = module;
+				revTypeItem->revType = i;
+				menu->addChild(revTypeItem);
+			}
+		}));
+		
 		struct OutTypeItem : MenuItem {
 			TrigSeq* module;
 			int outType;
@@ -812,20 +833,19 @@ struct TrigSeqWidget : ModuleWidget {
 				module->outType = outType;
 			}
 		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Output type"));
 		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
-		for (int i = 0; i < 3; i++) {
-			OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
-			outTypeItem->rightText = CHECKMARK(module->outType == i);
-			outTypeItem->module = module;
-			outTypeItem->outType = i;
-			menu->addChild(outTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Output type", (OutTypeNames[module->outType]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
+				outTypeItem->rightText = CHECKMARK(module->outType == i);
+				outTypeItem->module = module;
+				outTypeItem->outType = i;
+				menu->addChild(outTypeItem);
+			}
+		}));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset on Run", "", &module->rstOnRun));
+
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
@@ -833,18 +853,6 @@ struct TrigSeqWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("TURING MODE", "", &module->turingMode));
 		if (module->turingMode) {
-			/*
-			menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
-				menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
-				menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
-			}));
-
-			menu->addChild(createSubmenuItem("Voltage progression", (module->progressionName[module->progression]), [=](Menu * menu) {
-				menu->addChild(createMenuItem("2x (standard)", "", [=]() {module->progression = STD2x_PROGRESSION;}));
-				menu->addChild(createMenuItem("1.3x", "", [=]() {module->progression = P_1_3_PROGRESSION;}));
-				menu->addChild(createMenuItem("Fibonacci", "", [=]() {module->progression = FIBONACCI_PROGRESSION;}));
-			}));
-			*/
 			struct BitResTypeItem : MenuItem {
 				TrigSeq* module;
 				int bitResType;

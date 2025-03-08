@@ -160,17 +160,18 @@ struct TrigSeqPlus : Module {
 
 	int wSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int wSteps = 16;
-	float wRst = 1;
+	//float wRst = 1;
+	float wRst = 0;
 
 	int nextSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int nextSteps = 16;
 	//int nextRst = 1;
-	float nextRst = 1;
+	float nextRst = 0;
 
 	int pendingSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int pendingSteps = 16;
 	//int pendingRst = 1;
-	float pendingRst = 1;
+	float pendingRst = 0;
 
 	// --------------prog
 	int progKnob = 0;
@@ -222,7 +223,7 @@ struct TrigSeqPlus : Module {
 	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int cbSteps = 16;
 	//int cbRst = 1;
-	float cbRst = 1;
+	float cbRst = 0;
 
 	float volt = 0.f;
 
@@ -261,7 +262,23 @@ struct TrigSeqPlus : Module {
 		configSwitch(RUNBUT_PARAM, 0.f, 1.f, 1.f, "Run", {"OFF", "ON"});
 		configInput(RUN_INPUT, "Run");
 		
-		configParam(RST_PARAM, 1.f,16.f, 1.f, "Rst Step / Atten.");
+		struct ResetQuantity : ParamQuantity {
+			float getDisplayValue() override {
+				TrigSeqPlus* module = reinterpret_cast<TrigSeqPlus*>(this->module);
+				if (!module->turingMode) {
+					unit = "";
+					displayMultiplier = 15.f;
+					displayOffset = 1.f;
+				} else {
+					unit = "%";
+					displayOffset = 0;
+					displayMultiplier = 100.f;
+				}
+				return ParamQuantity::getDisplayValue();
+			}
+		};
+		//configParam(RST_PARAM, 1.f,16.f, 1.f, "Rst Step / Atten.");
+		configParam<ResetQuantity>(RST_PARAM, 0.f,1.f, 0.f, "Rst Step / Atten.");
 		//paramQuantities[RST_PARAM]->snapEnabled = true;
 		configInput(RST_INPUT, "Reset");
 
@@ -333,7 +350,11 @@ struct TrigSeqPlus : Module {
 		}
 		wSteps = 16;
 		params[LENGTH_PARAM].setValue(wSteps);
-		wRst = 1;
+		//wRst = 1;
+		if (!turingMode)
+			wRst = 0;
+		else
+			wRst = 1;
 		params[RST_PARAM].setValue(wRst);
 
 		Module::onReset(e);
@@ -888,8 +909,8 @@ struct TrigSeqPlus : Module {
 		*/
 
 		if (!turingMode) {
-			//step = int(params[RST_PARAM].getValue() - 1);
-			step = wRst -1;
+			//step = wRst - 1;
+			step = int(wRst * 15);
 		} else {
 			step = 0;
 			calcVoltage();
@@ -1416,7 +1437,8 @@ struct TrigSeqPlus : Module {
 				}
 			}
 		} else {
-			out = volt * (wRst - 1.f) / 15.f;
+			//out = volt * (wRst - 1.f) / 15.f;
+			out = volt * wRst;
 		}
 
 		outputs[OUT_OUTPUT].setVoltage(out);
@@ -1586,6 +1608,8 @@ struct TrigSeqPlusWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		TrigSeqPlus* module = dynamic_cast<TrigSeqPlus*>(this->module);
 
+		menu->addChild(new MenuSeparator());
+
 		struct RunTypeItem : MenuItem {
 			TrigSeqPlus* module;
 			int runType;
@@ -1594,16 +1618,16 @@ struct TrigSeqPlusWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Run Input"));
 		std::string RunTypeNames[2] = {"Gate", "Trig"};
-		for (int i = 0; i < 2; i++) {
-			RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-			runTypeItem->rightText = CHECKMARK(module->runType == i);
-			runTypeItem->module = module;
-			runTypeItem->runType = i;
-			menu->addChild(runTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+				runTypeItem->rightText = CHECKMARK(module->runType == i);
+				runTypeItem->module = module;
+				runTypeItem->runType = i;
+				menu->addChild(runTypeItem);
+			}
+		}));
 
 		struct RevTypeItem : MenuItem {
 			TrigSeqPlus* module;
@@ -1612,18 +1636,17 @@ struct TrigSeqPlusWidget : ModuleWidget {
 				module->revType = revType;
 			}
 		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Reverse Input Voltage"));
 		std::string RevTypeNames[2] = {"Positive", "Negative"};
-		for (int i = 0; i < 2; i++) {
-			RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
-			revTypeItem->rightText = CHECKMARK(module->revType == i);
-			revTypeItem->module = module;
-			revTypeItem->revType = i;
-			menu->addChild(revTypeItem);
-		}
-
+		menu->addChild(createSubmenuItem("Reverse Input Voltage", (RevTypeNames[module->revType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
+				revTypeItem->rightText = CHECKMARK(module->revType == i);
+				revTypeItem->module = module;
+				revTypeItem->revType = i;
+				menu->addChild(revTypeItem);
+			}
+		}));
+		
 		struct OutTypeItem : MenuItem {
 			TrigSeqPlus* module;
 			int outType;
@@ -1631,20 +1654,19 @@ struct TrigSeqPlusWidget : ModuleWidget {
 				module->outType = outType;
 			}
 		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Output type"));
 		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
-		for (int i = 0; i < 3; i++) {
-			OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
-			outTypeItem->rightText = CHECKMARK(module->outType == i);
-			outTypeItem->module = module;
-			outTypeItem->outType = i;
-			menu->addChild(outTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Output type", (OutTypeNames[module->outType]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
+				outTypeItem->rightText = CHECKMARK(module->outType == i);
+				outTypeItem->module = module;
+				outTypeItem->outType = i;
+				menu->addChild(outTypeItem);
+			}
+		}));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset on Run", "", &module->rstOnRun));
+
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
@@ -1660,19 +1682,6 @@ struct TrigSeqPlusWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("TURING MODE", "", &module->turingMode));
 		if (module->turingMode) {
-			/*
-			menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
-				menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
-				menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
-			}));
-
-			menu->addChild(createSubmenuItem("Voltage progression", (module->progressionName[module->progression]), [=](Menu * menu) {
-				menu->addChild(createMenuItem("2x (standard)", "", [=]() {module->progression = STD2x_PROGRESSION;}));
-				menu->addChild(createMenuItem("1.3x", "", [=]() {module->progression = P_1_3_PROGRESSION;}));
-				menu->addChild(createMenuItem("Fibonacci", "", [=]() {module->progression = FIBONACCI_PROGRESSION;}));
-			}));
-			*/
-
 			struct BitResTypeItem : MenuItem {
 				TrigSeqPlus* module;
 				int bitResType;
@@ -1681,7 +1690,6 @@ struct TrigSeqPlusWidget : ModuleWidget {
 				}
 			};
 			std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
-
 			menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
 				for (int i = 0; i < 2; i++) {
 					BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
@@ -1700,7 +1708,6 @@ struct TrigSeqPlusWidget : ModuleWidget {
 				}
 			};
 			std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
-
 			menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
 				for (int i = 0; i < 3; i++) {
 					ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
@@ -1718,7 +1725,6 @@ struct TrigSeqPlusWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Load Single Sequence", "", [=]() {module->menuLoadSequence();}));
 		menu->addChild(createMenuItem("Save Single Sequence", "", [=]() {module->menuSaveSequence();}));
-
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));
