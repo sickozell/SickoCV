@@ -48,14 +48,30 @@ struct Adder8 : Module {
 		configSwitch(ADDSUB_SWITCH+6, -1.f, 1.f, 0.f, "Operation", {"Subtract", "Off", "Add"});
 		configSwitch(ADDSUB_SWITCH+7, -1.f, 1.f, 0.f, "Operation", {"Subtract", "Off", "Add"});
 
-		configParam(VOLT_PARAMS+0, -10.f,10.f, 0.f, "Volt", "v");
-		configParam(VOLT_PARAMS+1, -10.f,10.f, 0.f, "Volt", "v");
-		configParam(VOLT_PARAMS+2, -10.f,10.f, 0.f, "Volt", "v");
-		configParam(VOLT_PARAMS+3, -10.f,10.f, 0.f, "Volt", "v");
-		configParam(VOLT_PARAMS+4, -10.f,10.f, 0.f, "Volt", "v");
-		configParam(VOLT_PARAMS+5, -10.f,10.f, 0.f, "Volt", "v");
-		configParam(VOLT_PARAMS+6, -10.f,10.f, 0.f, "Volt", "v");
-		configParam(VOLT_PARAMS+7, -10.f,10.f, 0.f, "Volt", "v");
+		struct RangeQuantity : ParamQuantity {
+			float getDisplayValue() override {
+				Adder8* module = reinterpret_cast<Adder8*>(this->module);
+
+				if (!module->attenuator) {
+					unit = "v";
+					displayMultiplier = 1.f;
+					displayOffset = 0.f;
+				} else {
+					unit = "%";
+					displayMultiplier = 5.f;
+					displayOffset = 50.f;
+				}
+				return ParamQuantity::getDisplayValue();
+			}
+		};
+		configParam<RangeQuantity>(VOLT_PARAMS+0, -10.f,10.f, 0.f, "Volt/Atn", "v");
+		configParam<RangeQuantity>(VOLT_PARAMS+1, -10.f,10.f, 0.f, "Volt/Atn", "v");
+		configParam<RangeQuantity>(VOLT_PARAMS+2, -10.f,10.f, 0.f, "Volt/Atn", "v");
+		configParam<RangeQuantity>(VOLT_PARAMS+3, -10.f,10.f, 0.f, "Volt/Atn", "v");
+		configParam<RangeQuantity>(VOLT_PARAMS+4, -10.f,10.f, 0.f, "Volt/Atn", "v");
+		configParam<RangeQuantity>(VOLT_PARAMS+5, -10.f,10.f, 0.f, "Volt/Atn", "v");
+		configParam<RangeQuantity>(VOLT_PARAMS+6, -10.f,10.f, 0.f, "Volt/Atn", "v");
+		configParam<RangeQuantity>(VOLT_PARAMS+7, -10.f,10.f, 0.f, "Volt/Atn", "v");
 
 		configSwitch(MODE_SWITCH+0, -1.f, 1.f, 0.f, "Mode", {"Subtract/Off", "Add/Off/Subtract", "Off/Add"});
 		configSwitch(MODE_SWITCH+1, -1.f, 1.f, 0.f, "Mode", {"Subtract/Off", "Add/Off/Subtract", "Off/Add"});

@@ -22,10 +22,11 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added RandLoops module
 - added RandLoops8 module
 - added Turing mode on trigSeq and TrigSeq+
-- added 4ms-MetaModule compatibility
 - trigSeq trigSeq+ added Turing mode, changed RST knob behavior according to Turing mode.
 - stepSeq stepSeq+ fixed bug on reverse direction 
 - stepSeq stepSeq+ changed range display on step knobs
+- adder8 changed range display on volt/atn knobs
+- added 4ms-MetaModule compatibility
 - improved samples memory management on sampler modules
 
 
