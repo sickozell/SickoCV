@@ -96,13 +96,13 @@ When an output is connected, the starting voltage of the next row is reset to 0v
 The MODE switches force the "-0+" switches to be as: "subtract/ignore", "subtract/ignore/add" or "ignore/add".  
 
 #### RIGHT-CLICK MENU
-- **Stop Adding on Out Cable** (ticked by default). As mentioned above, the starting voltage is reset to 0v in the next row only when an out cable is detected. Unticking this option the voltage won't be reset.
-- **Volt Knob Default**. With this option the default initialization value of the VLT/ATNV knob can be changed to 0v, +1v or +10v.  
+- **Stop Adding on Out Cable** (ticked by default): as mentioned above, the starting voltage is reset to 0v in the next row only when an out cable is detected. Unticking this option the voltage won't be reset
+- **Volt Knob Default**: with this option the default initialization value of the VLT/ATNV knob can be changed to 0v, +1v or +10v.  
 This unconventional feature lets the user to choose the default knob value depending on the main usage of Adder8:  
 if it's used as a fixed pitch adder (without input CV connection) maybe it's useful to have the default value set to +1v, so if the knob position has been changed to detune, it can be quickly restored to add (or subtract) exactly 1 octave in pitch;  
 otherwise, if the knob is used as attenuverter with a CV input connected, it can be set to 0v as usual or to +10v to quickly get the full CV voltage.
-- **Attenuator**. This converts attenuverter knobs into attenuators when CV inputs are connected.
-- **Reset All Knobs to Default**. This resets all knobs value to selected default setting.
+- **Attenuator**: this converts attenuverter knobs into attenuators when CV inputs are connected
+- **Reset All Knobs to Default**: this resets all knobs value to selected default setting
 
 [back to top](#table-of-contents)
 
@@ -127,8 +127,8 @@ Triggering RST input will immediately set the GATE out state to low and unarm it
 Pressing RSTALL button or triggering RESETALL input will immediately set all the 8 GATE outs to low and unarm them.
 
 #### **Right-click Menu**
-- Initialize On Start: discards previous module state on VCV restart
-- Disable Unarm: this disables unarm feature
+- **Initialize On Start**: discards previous module state on VCV restart
+- **Disable Unarm**: this disables unarm feature
 
 [back to top](#table-of-contents)
 
@@ -207,9 +207,9 @@ A trigger on RESET input will reset the toggle state.
 Polyphony on L/(R) inputs is replicated on outs.   
 
 #### Right-click Menu
-- Initialize On Start: discards previous module state on VCV restart
-- Disable Unarm: this disables unarm feature
-- Trigger on Gate Out: this option substitutes Gate Output with a 1ms trigger whenever a clock is detected when armed
+- **Initialize On Start**: discards previous module state on VCV restart
+- **Disable Unarm**: this disables unarm feature
+- **Trigger on Gate Out**: this option substitutes Gate Output with a 1ms trigger whenever a clock is detected when armed
 
 [back to top](#table-of-contents)
 
@@ -248,8 +248,8 @@ Triggering RESET input will immediately stop the routing.
 Triggering RESETALL input will immediately stop all the 8 routings.
 
 #### **Right-click Menu**
-- Initialize On Start: discards previous module state on VCV restart
-- Disable Unarm: this disables unarm feature
+- **Initialize On Start**: discards previous module state on VCV restart
+- **Disable Unarm**: this disables unarm feature
  
 Here below is one example of bToggler8 usage. When buttons are pressed on PULSES module, incoming triggers from the sequencer are routed to drum modules only when the first step of the sequencer is reached. If buttons are pressed again, the routing will stop on next first step of the sequencer.
 
@@ -284,9 +284,9 @@ As to say: if WA is set to 0 and WR is set to max(200), WRN output will act like
 Otherwise if WA is set to max(200) and WR is set to 0, WRN output will act as simple toggle switch with no buffer feature.
 
 #### Right-click Menu
-- Initialize On Start: discards previous module state on VCV restart
-- Disable Unarm: this disables unarm feature
-- WRN Inversion (trigs only): inverts WRN output behavior when used with triggers. It can be useful when INs are feeded by sequencers trigs and WRN Outs connected to a led midi controller. With this option enabled when there's no routing leds will stay off, when routing leds will stay on and whenn a trig is received led will be turned off for 100ms.
+- **Initialize On Start**: discards previous module state on VCV restart
+- **Disable Unarm**: this disables unarm feature
+- **WRN Inversion** (trigs only): inverts WRN output behavior when used with triggers. It can be useful when INs are feeded by sequencers trigs and WRN Outs connected to a led midi controller. With this option enabled when there's no routing leds will stay off, when routing leds will stay on and whenn a trig is received led will be turned off for 100ms.
 
 Here below is one example of bToggler+ usage. The MIDI>GATE module is connected to a programmable Led Midi controller and receives buttonpresses from it. The GATE>MIDI module send back triggers incoming from the sequencer to the controller, turning on and off the corresponding led buttons only when triggers are actually routed to drum modules. Routing rules are the same of previous example.
 
@@ -492,17 +492,17 @@ Please note that this could make the patch filesize very large.
 
 #### SLOT RIGHT-CLICK MENU
 Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) the slot right-click menu is open with following options:  
-- Load Sample (opens file dialog to load a sample in the slot)
-- Samples Browser (if a root sample folder is set on the general right-click menu, this submenu is enabled to navigate through directories)
-- Current sample (shows sample name when a sample is loaded)
-- Clear (clears slot)
-- Swap Slot with (swaps slot sample with the selected one)
-- Copy Slot to (duplicates slot sample to the selected one)  
+- **Load Sample**: opens file dialog to load a sample in the slot
+- **Samples Browser**: if a root sample folder is set on the general right-click menu, this submenu is enabled to navigate through directories
+- **Current sample**: shows sample name when a sample is loaded
+- **Clear**: clears slot
+- **Swap Slot with**:swaps slot sample with the selected one
+- **Copy Slot to**: duplicates slot sample to the selected one
 
 **drumPlayerXtra** further options:
-- Zoom Waveform (zooms the waveform from start to end (full), half, quarter, eighth of the sample length)
-- Light Box color (if Light Boxes option is enabled in the general right-click menu, a predefined color or a custom one can be set here)
-- Light Box Fade (Fade time of Light Boxes is set here: Slow (0.5s), Normal (0.25s), Fast (0.1s)
+- **Zoom Waveform**: zooms the waveform from start to end (full), half, quarter, eighth of the sample length
+- **Light Box color**: if Light Boxes option is enabled in the general right-click menu, a predefined color or a custom one can be set here
+- **Light Box Fade**: Fade time of Light Boxes is set here: Slow (0.5s), Normal (0.25s), Fast (0.1s)
 
 [back to top](#table-of-contents)
 
@@ -567,10 +567,10 @@ Comparison:
 
 **Track & Hold options**
 
-- Sample on HIGH Gate: this inverts standard track&hold usage, on LOW gate the signal passes and on HIGH gate the signal is held.
-- Trig on Start: sends a trigger on TRG out when the signal is sampled.
-- Trig on End: sends a trigger on TRG out when the signal stops being sampled.
-- Gate Out instead Trig: sends a HIGH gate on TRG out when the signal is sampled.
+- **Sample on HIGH Gate** : this inverts standard track&hold usage, on LOW gate the signal passes and on HIGH gate the signal is held
+- **Trig on Start** : sends a trigger on TRG out when the signal is sampled
+- **Trig on End**: sends a trigger on TRG out when the signal stops being sampled
+- **Gate Out instead Trig**: sends a HIGH gate on TRG out when the signal is sampled
 
 **Noise Generator preset**  
 This function sets the module to Track & Hold mode, sample on HIGH gate, scale on 100% and offset to 0v, just to output white noise if trig/gate input is not connected or not triggered.
@@ -645,8 +645,8 @@ PLY out is the polyphonic output of oscillators. PLY knob sets the number of cha
 If no sync cable is connected, pressing the SYNC button will act as a sample&hold, holding the last oscillators values. Another sync button press will restart the normal oscillators curves.
 
 #### Right-click Menu
-- **Wait full clock after reset**. When this option is enabled and sync is on, when a reset is detected it will reset the cycle of oscillators but will wait a full clock before restarting oscillators cycle. It can be mostly used in combination of PPC greater than 1, just to restart oscillators correctly.  
-- There are some selectable 'X' knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci.
+- **Wait full clock after reset**: when this option is enabled and sync is on, when a reset is detected it will reset the cycle of oscillators but will wait a full clock before restarting oscillators cycle. It can be mostly used in combination of PPC greater than 1, just to restart oscillators correctly
+- There are some selectable 'X' knob presets on the right-click menu. They refer to multiply or divide main rate by following series types: integer, even, odd, prime, fibonacci
 
 [back to top](#table-of-contents)
 
@@ -672,8 +672,8 @@ Please note that reset step can be outside of cycling steps of the INs/OUTs sele
 Right inputs and outputs are normalled, so if they are unconnected the signal is taken from the left ones.
 
 #### Right-click Menu
-- **Cycle**. With this option unticked when the sequence has reached the end, it won't restart from begin.
-- **RST input = reverse advance**. With this option ticked a trigger on the RST input will advance one step backward (if Random direction is set, a trigger will always return a random step).
+- **Cycle**: with this option unticked when the sequence has reached the end, it won't restart from begin
+- **RST input = reverse advance**: with this option ticked a trigger on the RST input will advance one step backward (if Random direction is set, a trigger will always return a random step)
 
 [back to top](#table-of-contents)
 
@@ -706,9 +706,9 @@ If an already muted channel is soloed the button becomes green and red, with a f
 By using the plus version of polyMuter the right-click menu of buttons is no longer available (that's why there are two versions of these modules), but the buttons are still midi mappable usually for the mute function only. Please note that the mute function is activated by exactly a +10v gate, and the solo function by a +3.4v/9.9v gate.
 
 #### Right-click menu
-- Show OUT channels. This options show the output channels in green, instead of input channels in red.
-- Shrink Channels. It deletes the muted channels from the output stream or let only the soloed channels to be on the output stream.
-- Exclude -10v channels too (on polyMuter8 and polyMuter16 only). When shrinking channels option is enabled, this will exclude from the output stream the channels with exactly -10v.
+- **Show OUT channels**: this options show the output channels in green, instead of input channels in red
+- **Shrink Channels**: it deletes the muted channels from the output stream or let only the soloed channels to be on the output stream
+- **Exclude -10v channels too** (on polyMuter8 and polyMuter16 only): when shrinking channels option is enabled, this will exclude from the output stream the channels with exactly -10v
 
 [back to top](#table-of-contents)
 
@@ -743,16 +743,16 @@ Double-click STOR button to store the current sequence and length in the selecte
 randLops8 is basically a 8-track randomLoops with limited functions, but with an offset knob added. CVs and triggers can be polyphonic summed in the last track outs, according to the setting selected in the right-menu.
 
 #### Right-click Menu
-- Buffered DEL/Add: if set to on the DEL and ADD buttons (or their trigs) will force the next first bit in the sequence to be off or on only once each press.  
-- Buffered Random: The same as previous, but acting with the RND button.  
-- Bit Resolution: the voltages can be calculated with the first 8 bits (default) or the all 16 bits of the shift-register.  
-- Voltage Progression: The standard voltage for each specific bit position voltage is doubled from the previous one. It can be changed to 1.3x, or even a Fibonacci progression, to achieve sligthly different cv sequences.  
-- Trig Output Type: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length od the incoming clock).  
-- 1st clock after reset Don't advance:  This ignores the first clock after a reset trigger, so the sequence won't advance.  
-- Load/Save PROG preset: This is used to save and reload all the 32 program sequences, lenghts, the 'don't advance' setting, bitResolution, voltage progression, Trigger output type and Buffer button settings in a ".rlp" file.  
-- Erase ALL progs: clears all the programs.  
-- Import/Export single sequence: this is used to load save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program. Sequence files can be shared also with trigSeq modules.  
-- Initialize on start: clear the sequence every rack startup. Note that it doesn't erase the programs.
+- **Buffered DEL/Add**: if set to on the DEL and ADD buttons (or their trigs) will force the next first bit in the sequence to be off or on only once each press.  
+- **Buffered Random**: The same as previous, but acting with the RND button
+- **Bit Resolution**: the voltages can be calculated with the first 8 bits (default) or the all 16 bits of the shift-register
+- **Voltage Progression**: The standard voltage for each specific bit position voltage is doubled from the previous one. It can be changed to 1.3x, or even a Fibonacci progression, to achieve sligthly different cv sequences
+- **Trig Output Type**: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length od the incoming clock)
+- **1st clock after reset Don't advance**:  This ignores the first clock after a reset trigger, so the sequence won't advance
+- **Load/Save PROG preset**: This is used to save and reload all the 32 program sequences, lenghts, the 'don't advance' setting, bitResolution, voltage progression, Trigger output type and Buffer button settings in a ".rlp" file
+- **Erase ALL progs**: clears all the programs
+- **Import/Export single sequence**: this is used to load/save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program. Sequence files can be shared also with trigSeq modules
+- **Initialize on start**: clears the sequence every rack startup. Note that it doesn't erase the programs
 
 [back to top](#table-of-contents)
 
@@ -772,7 +772,7 @@ Note that the Stage knob and StageCV are added together.
 The TRIG DELAY knob can be used to delay the TRIG INPUT up to 5 samples, because of the 1sample latency of VCV cables. This can be useful when triggering the sequencer with the same clock of Shifter module, TRIG DELAY avoids that the input is sampled before the sequencer advances.  
 
 #### Right-click Menu
-- Initialize On Start: discards previous module state on VCV restart
+- **Initialize On Start**: discards previous module state on VCV restart
 
 ![shifter example](https://user-images.githubusercontent.com/80784296/212531455-776e3110-78ef-4bec-a3f8-64180fe4ca53.JPG)  
 [Download example](./examples/shifter%20example.vcvs?raw=true) (right-click -> save link as)
@@ -795,7 +795,7 @@ When no CV input is connected, the module acts as attenuator/amplifier just usin
 If CV input is polyphonc, the output will be polyphonic reflecting CV polyphony channels. Otherwise if CV input is monophonic and signal inputs are polyphonic, every signal channel will be processed with the same amplification.
 
 #### Right-click Menu
-- Polyphonic OUTs. When this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out.
+- **Polyphonic OUTs**: when this option is enabled the outputs reflect input polyphony. Otherwise polyphonic inputs are mixed in one monophonic out
 
 [back to top](#table-of-contents)
 
@@ -1060,14 +1060,14 @@ In Trig Mode, when recording is stopped by a trig or blue button press and LOOP 
 
 #### RIGHT-CLICK MENU
 Please refer to sickoPlayer for the right-click menu, in sickoSampler following options are added:
-- Save FULL Sample: saves the entire sample in a wav file.
-- Save CUE Region: saves the wav file from Cue Start to Cue End
-- Save LOOP Region: saves the wav file from Loop Start to Loop End
-- Trim Sample after Save: If this option is enabled, the sample is trimmed and saved in the chosen saving mode, otherwise it will be saved trimmed, but the entire sample remains available in memory
-- Save Oversampled: If this option is enabled, samples will be saved at sickoSampler working samplerate (2x VCV samplerate). This can be useful when samples are recorded at different speeds than normal for further external editing.
-- UCE/ULE updates also Start: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor).
-- Crossfade while Rec Fading: If overdub is not activated this option crossfades between previous and current recording only during fading in/out recording time, accordingly to the FD knob.
-- Unlimited REC (risky). The maximum recording memory allocation is set to 200Mb, so the maximum recording time depends on the working sample rate and if the recording is mono or stereo. At 48khz Mono the maximum recording time is about 18mins. Ticking this option the limit is removed, but there can be a crash risk if recording time exceeds the computer abilities.
+- **Save FULL Sample**: saves the entire sample in a wav file
+- **Save CUE Region**: saves the wav file from Cue Start to Cue End
+- **Save LOOP Region**: saves the wav file from Loop Start to Loop End
+- **Trim Sample after Save**: If this option is enabled, the sample is trimmed and saved in the chosen saving mode, otherwise it will be saved trimmed, but the entire sample remains available in memory
+- **Save Oversampled**: If this option is enabled, samples will be saved at sickoSampler working samplerate (2x VCV samplerate). This can be useful when samples are recorded at different speeds than normal for further external editing
+- **UCE/ULE updates also Start**: if UCE and/or ULE button are on, when recording is stopped also Cue Start and/or Loop Start cursors are reset to the recording start position (if recording is reversed it updates Cue/Loop End cursor)
+- **Crossfade while Rec Fading**: If overdub is not activated this option crossfades between previous and current recording only during fading in/out recording time, accordingly to the FD knob
+- **Unlimited REC (risky)**. The maximum recording memory allocation is set to 200Mb, so the maximum recording time depends on the working sample rate and if the recording is mono or stereo. At 48khz Mono the maximum recording time is about 18mins. Ticking this option the limit is removed, but there can be a crash risk if recording time exceeds the computer abilities
 
 [back to top](#table-of-contents)
 
@@ -1107,7 +1107,7 @@ If it is used in combination with v/oct modulation some interesting results can 
 Please note that extreme settings can however alter pitch a little or obtain a bit of chorus/echo.
 
 **Right-click Menu**  
-'Auto Monitor Off' option is activated by default and it stops monitoring input after a recording is stopped.
+**Auto Monitor Off**: this option is activated by default and it stops monitoring input after a recording is stopped
 
 [back to top](#table-of-contents)
 
@@ -1119,8 +1119,8 @@ Please note that extreme settings can however alter pitch a little or obtain a b
 A tiny and simple 4 step sequencer. If a positive (greater than +1v) voltage is applied to REV input the sequencer will advance backwards.  
 
 **Right-click Menu**  
-- Various knob voltage ranges are available (default is -10/+10v).
-- 'Reverse Input Voltage': if 'Negative' is ticked the sequence will advance backwards only if a negative (less than -1v) gate is applied to REV input
+- Various knob voltage ranges are available (default is -10/+10v)
+- **Reverse Input Voltage**: if 'Negative' is ticked the sequence will advance backwards only if a negative (less than -1v) gate is applied to REV input
 
 
 [back to top](#table-of-contents)
@@ -1180,20 +1180,20 @@ In TURING mode the RST knob acts like a CV out attenuator.
 
 
 #### RIGHT-CLICK MENU
-Knob Range (stepSeq only): sets the range of the step knobs (default -10/+10v).  
-Run input: 'Gate' is the default setting as explained above, 'Trig' will toggle run on/off by triggers on run input.  
-Reverse Input Voltage: 'Positive' is the default setting as explained above, 'Negative' will advance backwards with -1v or less applied to REV input.  
-Output type (trigSeq only): 'Trig' (default) outputs a 1ms trigger, 'Gate' outputs a high gate for all step duration, 'Clock' outputs a gate of the same length of the clock input.  
-Reset on Run: A step reset is applied when the sequencer goes from OFF to RUN (default).  
-1st Clock after reset: if 'Don't Advance' is ticked, the first clock detected won't advance the sequencer (default).  
-TURING MODE (trigSeq trigSeq+ only): Enables the TURING mode as explained above, it activates 'Bit Resolution' and 'Voltage progression' options.  
-Load/Save Single Sequence  (trigSeq trigSeq+ only). This is used to save single sequences in a ".tss" file that can be used in randLoops modules too.  
-Initialize on start: doesn't remeber the last step reached when Rack is reloaded.
+- **Knob Range** (stepSeq only): sets the range of the step knobs (default -10/+10v)
+- **Run input**: 'Gate' is the default setting as explained above, 'Trig' will toggle run on/off by triggers on run input
+- **Reverse Input Voltage**: 'Positive' is the default setting as explained above, 'Negative' will advance backwards with -1v or less applied to REV input
+- **Output type** (trigSeq only): 'Trig' (default) outputs a 1ms trigger, 'Gate' outputs a high gate for all step duration, 'Clock' outputs a gate of the same length of the clock input
+- **Reset on Run**: A step reset is applied when the sequencer goes from OFF to RUN (default)
+- **1st Clock after reset**: if 'Don't Advance' is ticked, the first clock detected won't advance the sequencer (default)
+- **TURING MODE** (trigSeq trigSeq+ only): Enables the TURING mode as explained above, it activates 'Bit Resolution' and 'Voltage progression' options
+- **Load/Save Single Sequence** (trigSeq trigSeq+ only). This is used to save single sequences in a ".tss" file that can be used in randLoops modules too
+- **Initialize on start**: doesn't remeber the last step reached when Rack is reloaded
 
 Plus versions only:  
-Copy/paste seq: copy and paste the current sequence and the length/reset settings in the clipboard (does not work across multiple modules).  
-Load/Save PROG presets: load or save a 'ssp' or 'tsp' preset file with all programmed sequences, including lengths, reset settings, and right-click menu settings.  
-Erase ALL progs: resets all stored programs to default.
+- **Copy/paste seq**: copy and paste the current sequence and the length/reset settings in the clipboard (does not work across multiple modules)
+- **Load/Save PROG presets**: load or save a 'ssp' or 'tsp' preset file with all programmed sequences, including lengths, reset settings, and right-click menu settings
+- **Erase ALL progs**: resets all stored programs to default
 
 [back to top](#table-of-contents)
 
@@ -1249,8 +1249,8 @@ Fader knob sets the crossfade time (up to 10s) between the switched/routed/swapp
 CV input is added to Fade knob value and the sum will be clamped in the range of 0-10v.  
 
 #### Right-click Menu
-- Initialize On Start: discards previous module state on VCV restart
-- Route & Hold (switcher module only): when using the module in Toggle mode and Router function, the last achieved input is held (instead of going to 0v) to the unrouted output.
+- **Initialize On Start**: discards previous module state on VCV restart
+- **Route & Hold** (switcher module only): when using the module in Toggle mode and Router function, the last achieved input is held (instead of going to 0v) to the unrouted output
 
 **NOTES**  
 - If Fader knob is set to 1ms it won't do any fade
@@ -1301,7 +1301,7 @@ If Release is set to 1ms (and attack is set greater than 1ms) and a new GATE or 
 These behaviors are more understandable connecting a scope on the output.
 
 #### Right-click Menu
-- Initialize On Start: discards previous module state on VCV restart
+- **Initialize On Start**: discards previous module state on VCV restart
 
 [back to top](#table-of-contents)
 
