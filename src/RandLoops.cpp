@@ -264,7 +264,6 @@ struct RandLoops : Module {
 	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int cbSteps = 16;
 
-
 	RandLoops() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -1734,6 +1733,13 @@ struct RandLoopsWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
+		if (module->clipboard)
+			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+		else
+			menu->addChild(createMenuLabel("Paste Seq"));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));
