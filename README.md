@@ -1175,7 +1175,7 @@ If 'AUTO' button is on, the program is applied instantly when a program change i
 A double click on 'STOR' button saves the current sequence to the selected program.  
 'RECL' button reloads the stored selected program.  
 
-TrigSeq and TrigSeq+ have a TURING mode setting in the right-click menu. It activates the CV out calculation regarding the on steps as if it was a 'fixed' randLoops module where you can manually adjust the bits of the register. Please refer to randLoops instruction to see how it works.  
+TrigSeq and TrigSeq+ have a TURING mode setting in the right-click menu. It activates the CV out calculation regarding the on steps as if it was a 'fixed' randLoops module where you can manually set the bits of the register. Please refer to randLoops instruction to see how it works.  
 In TURING mode the RST knob acts like a CV out attenuator.  
 
 
