@@ -743,16 +743,16 @@ Double-click STOR button to store the current sequence and length in the selecte
 randLops8 is basically a 8-track randomLoops with limited functions, but with an offset knob added. CVs and triggers can be polyphonic summed in the last track outs, according to the setting selected in the right-menu.
 
 #### Right-click Menu
-Buffered DEL/Add: if set to on the DEL and ADD buttons (or their trigs) will force the next first bit in the sequence to be off or on only once each press.  
-Buffered Random: The same as previous, but acting with the RND button.  
-Bit Resolution: the voltages can be calculated with the first 8 bits (default) or the all 16 bits of the shift-register.  
-Voltage Progression: The standard voltage for each specific bit position voltage is doubled from the previous one. It can be change to 1.3x, or even a Fibonacci progression, to achieve sligthly different sequences.  
-Trig Output Type: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length od the incoming clock).  
-1st clock after reset Don't advance:  This ignores the first clock after a reset trigger, so the sequence won't advance.  
-Load/Save PROG preset: This is used to save and reload all the 32 program sequences, lenghts, the 'don't advance' setting, bitResolution, voltage progression, Trigger output type and Buffer button settings in a ".rlp" file.  
-Erase ALL progs: clears all the programs.  
-Import/Export single sequence: this is used to load save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program.  
-Initialize on start: clear the sequence every rack startup. Note that it doesn't erase the programs.
+- Buffered DEL/Add: if set to on the DEL and ADD buttons (or their trigs) will force the next first bit in the sequence to be off or on only once each press.  
+- Buffered Random: The same as previous, but acting with the RND button.  
+- Bit Resolution: the voltages can be calculated with the first 8 bits (default) or the all 16 bits of the shift-register.  
+- Voltage Progression: The standard voltage for each specific bit position voltage is doubled from the previous one. It can be change to 1.3x, or even a Fibonacci progression, to achieve sligthly different sequences.  
+- Trig Output Type: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length od the incoming clock).  
+- 1st clock after reset Don't advance:  This ignores the first clock after a reset trigger, so the sequence won't advance.  
+- Load/Save PROG preset: This is used to save and reload all the 32 program sequences, lenghts, the 'don't advance' setting, bitResolution, voltage progression, Trigger output type and Buffer button settings in a ".rlp" file.  
+- Erase ALL progs: clears all the programs.  
+- Import/Export single sequence: this is used to load save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program.  
+- Initialize on start: clear the sequence every rack startup. Note that it doesn't erase the programs.
 
 [back to top](#table-of-contents)
 
