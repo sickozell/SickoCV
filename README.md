@@ -735,10 +735,10 @@ DEL button (or a trigger on its input) forces the next first bit to be off.
 ADD button (or a trigger on its input) forces the next first bit to be on.  
 RND button (or a trigger on its input) instantly randomizes all the bits.  
 
-There are 32 programs to store sequences and their lengths.
+There are 32 programs to store sequences and their lengths.  
 Programs are selected by PROG knob that can be CV controlled. The selected program is effective by pushing the SET button or can be set automatically if AUTO button is on.  
-RECL button (or a trig on its input) recall the selected stored program, even if its changed by randomization.  
-Double click STOR button to store the current sequence and length in the selected program.  
+RECL button (or a trig on its input) recall the selected stored program, even if it's changed by randomization.  
+Double-click STOR button to store the current sequence and length in the selected program.  
 
 randLops8 is basically a 8-track randomLoops with limited functions, but with an offset knob added. CVs and triggers can be polyphonic summed in the last track outs, according to the setting selected in the right-menu.
 
