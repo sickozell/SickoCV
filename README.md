@@ -32,7 +32,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.7.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 0](https://github.com/user-attachments/assets/d837baac-3f27-4286-8e09-ad5c3f0a4a3c)
+![SickoCV modules 2 7 1](https://github.com/user-attachments/assets/59c9a91f-9e14-436b-bfc7-12caaa348bf7)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -55,6 +55,7 @@ VCV Rack plugin modules
 - [multiRouter / multiSwitcher](#multirouter--multiswitcher)
 - [parking](#parking)
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
+- [randLoops / randLoops8](#randLoops--randLoops8)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
 - [sickoCrosser / sickoCrosser4](#sickocrosser--sickocrosser4)
@@ -711,6 +712,50 @@ By using the plus version of polyMuter the right-click menu of buttons is no lon
 
 [back to top](#table-of-contents)
 
+## randLoops / randLoops8
+### random voltage/trigger sequencer inspired by Turing Machine
+
+![randloops](https://github.com/user-attachments/assets/7e15d953-2067-4d45-9d70-e4ac6956c4ef)
+
+#### - INSTRUCTIONS
+
+randLoops generates cv or trigger sequences up to 32 steps that can be randomized with the CTRL knob.  
+As in Turing Machine, the actual sequences are composed by a set of bits stored in a shift register, so when a clock trigger is detected, the register advances and the first bit can be random generated with a probability set by CTRL knob, or it will be the last bit of the register.
+The CTRL knob in center position means that the new register bits will be random and the knob full clockwise "locks" the sequence with no probability to generate new random bits. CTRL knob can be CV controlled with its input.
+Sequence length is set by the LENGTH knob up to 16 steps and can be doubled if the control knob is moved from center position to the left, with the same probability rules.  
+The CV at the OUT is calculated by the sum of first 8 bit set to on and every bit position has its specific voltage that is summed to achieve the final output.  
+If all bits are on the output is +10v and if all bits are off the output is 0v.  
+The output can be attenuated by the SCALE knob.  
+
+The TRIG out is a 1ms trigger fired when the first bit is on on sequence advancing.  
+
+A trig on RST input restarts the sequence from the beginning.  
+A trig on CLR input clears the sequence setting all bits to off.  
+DEL button (or a trigger on its input) forces the next first bit to be off.  
+ADD button (or a trigger on its input) forces the next first bit to be on.  
+RND button (or a trigger on its input) instantly randomizes all bits.  
+
+There are 32 programs to store sequences and their lengths.
+Programs are selected by PROG knob that can be CV controlled. The selected program is effective by pushing the SET button or can be set automatically if AUTO button is on.  
+RECL button (or a trig on its input) recall the selected stored program, even if its changed by randomization.  
+Double click STOR button to store the current sequence and length in the selected program.  
+
+randLops8 is basically a 8-track randomLoops with limited functions, but with an offset knob added. CVs and triggers can be polyphonic summed in the last track outs, according to the setting selected in the right-menu.
+
+#### Right-click Menu
+Buffered DEL/Add: if set to on the DEL and ADD buttons (or their trigs) will force the next first bit in the sequence to be off or on only once each press.  
+Buffered Random: The same as previous, but acting with the RND button.  
+Bit Resolution: the voltages can be calculated with the first 8 bits (default) or the all 16 bits of the shift-register.  
+Voltage Progression: The standard voltage for each specific bit position voltage is doubled from the previous one. It can be change to 1.3x, or even a Fibonacci progression, to achieve sligthly different sequences.  
+Trig Output Type: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length od the incoming clock).  
+1st clock after reset Don't advance:  This ignores the first clock after a reset trigger, so the sequence won't advance.  
+Load/Save PROG preset: This is used to save and reload all the 32 program sequences, lenghts, the 'don't advance' setting, bitResolution, voltage progression, Trigger output type and Buffer button settings in a ".rlp" file.  
+Erase ALL progs: clears all the programs.  
+Import/Export single sequence: this is used to load save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program.  
+Initialize on start: clear the sequence every rack startup. Note that it doesn't erase the programs.
+
+[back to top](#table-of-contents)
+
 ## shifter
 ### 64 selectable stages shift register
 #### - DESCRIPTION
@@ -1130,6 +1175,9 @@ If 'AUTO' button is on, the program is applied instantly when a program change i
 A double click on 'STOR' button saves the current sequence to the selected program.  
 'RECL' button reloads the stored selected program.  
 
+TrigSeq and TrigSeq+ have a TURING mode setting in the right-click menu. It activates the CV out calculation regarding the on steps as if it was a 'fixed' randLoops module where you can manually adjust the bits of the register. Please refer to randLoops instruction to see how it works.  
+In TURING mode the RST knob acts like a CV out attenuator.  
+
 
 #### RIGHT-CLICK MENU
 Knob Range (stepSeq only): sets the range of the step knobs (default -10/+10v).  
@@ -1138,6 +1186,8 @@ Reverse Input Voltage: 'Positive' is the default setting as explained above, 'Ne
 Output type (trigSeq only): 'Trig' (default) outputs a 1ms trigger, 'Gate' outputs a high gate for all step duration, 'Clock' outputs a gate of the same length of the clock input.  
 Reset on Run: A step reset is applied when the sequencer goes from OFF to RUN (default).  
 1st Clock after reset: if 'Don't Advance' is ticked, the first clock detected won't advance the sequencer (default).  
+TURING MODE (trigSeq trigSeq+ only): Enables the TURING mode as explained above, it activates 'Bit Resolution' and 'Voltage progression' options.  
+Load/Save Single Sequence  (trigSeq trigSeq+ only). This is used to save single sequences in a ".tss" file that can be used in randLoops modules too.  
 Initialize on start: doesn't remeber the last step reached when Rack is reloaded.
 
 Plus versions only:  
