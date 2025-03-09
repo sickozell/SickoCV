@@ -727,13 +727,13 @@ The CV at the OUT is calculated by the first 8 bit set to on, every bit position
 This means that if all the bits are on the output is +10v and if all the bits are off the output is 0v.  
 The output can be attenuated by the SCALE knob.  
 
-The TRIG out is a 1ms trigger fired when the first bit is on on sequence advancing.  
+The TRIG out is a 1ms trigger fired when the the sequence advances and the first bit is on.  
 
 A trig on RST input restarts the sequence from the beginning.  
-A trig on CLR input clears the sequence setting all bits to off.  
+A trig on CLR input clears the sequence puttinh all the bits to off.  
 DEL button (or a trigger on its input) forces the next first bit to be off.  
 ADD button (or a trigger on its input) forces the next first bit to be on.  
-RND button (or a trigger on its input) instantly randomizes all bits.  
+RND button (or a trigger on its input) instantly randomizes all the bits.  
 
 There are 32 programs to store sequences and their lengths.
 Programs are selected by PROG knob that can be CV controlled. The selected program is effective by pushing the SET button or can be set automatically if AUTO button is on.  
