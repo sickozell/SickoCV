@@ -723,8 +723,8 @@ randLoops generates cv or trigger sequences up to 32 steps that can be randomize
 The actual sequences are composed by a set of bits stored in a shift register, so when a clock trigger is detected, the register advances and the first bit can be random generated with a probability set by CTRL knob, or it is the last bit of the register that isn't discarded generating the loop.  
 The CTRL knob in the center position means that the new register bits will be random and the knob full clockwise "locks" the sequence with no probability to generate new random bits. CTRL knob can be CV controlled with its input.  
 Sequence length is set by the LENGTH knob up to 16 steps and can be doubled if the control knob is moved from the center position to the left, with the same probability rules.  
-The CV at the OUT is calculated by the sum of first 8 bit set to on and every bit position has its specific voltage that is summed to achieve the final output.  
-If all bits are on the output is +10v and if all bits are off the output is 0v.  
+The CV at the OUT is calculated by the first 8 bit set to on, every bit position has its specific voltage that is summed to achieve the final output.  
+This means that if all the bits are on the output is +10v and if all the bits are off the output is 0v.  
 The output can be attenuated by the SCALE knob.  
 
 The TRIG out is a 1ms trigger fired when the first bit is on on sequence advancing.  
