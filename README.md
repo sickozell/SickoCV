@@ -1,4 +1,4 @@
-# SickoCV v2.7.1-beta13
+# SickoCV v2.7.1-beta14
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -748,9 +748,11 @@ randLops8 is basically a 8-track randomLoops with limited functions, but with an
 - **Bit Resolution**: the voltages can be calculated with the first 8 bits (default) or the all 16 bits of the shift-register
 - **Voltage Progression**: The standard voltage for each specific bit position voltage is doubled from the previous one. It can be changed to 1.3x, or even a Fibonacci progression, to achieve sligthly different cv sequences
 - **Trig Output Type**: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length od the incoming clock)
+- **Ignore Prog Ctrl**: This ignores Ctrl knob setting when a program is recalled.
+- **Ignore Prog Scale**: This ignores Scale knob setting when a program is recalled.
 - **1st clock after reset Don't advance**:  This ignores the first clock after a reset trigger, so the sequence won't advance
 - **Copy/paste seq**: copy and paste the current sequence and the length settings in the clipboard (does not work across multiple modules)
-- **Load/Save PROG preset**: This is used to save and reload all the 32 program sequences, lenghts, the 'don't advance' setting, bitResolution, voltage progression, Trigger output type and Buffer button settings in a ".rlp" file
+- **Load/Save PROG preset**: This is used to save and reload all the 32 program sequences and module settings in a ".rlp" file
 - **Erase ALL progs**: clears all the programs
 - **Import/Export single sequence**: this is used to load/save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program. Sequence files can be shared also with trigSeq modules
 - **Initialize on start**: clears the sequence every rack startup. Note that it doesn't erase the programs

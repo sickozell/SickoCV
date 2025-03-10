@@ -164,7 +164,7 @@ struct RandLoops8 : Module {
 		json_object_set_new(rootJ, "outType", json_integer(outType));
 
 		for (int t = 0; t < 8; t++)
-			saveSequence(t);
+			sequence_to_saveRegister(t);
 
 		for (int t = 0; t < 8; t++) {
 			json_t *track_json_array = json_array();
@@ -246,7 +246,8 @@ struct RandLoops8 : Module {
 	}
 	*/
 
-	void inline saveSequence(int t) {
+	void inline sequence_to_saveRegister(int t) {
+		/*
 		int cursor = 0;
 		for (int i = startingStep[t]; i < int(params[LENGTH_PARAM+t].getValue()); i++) {
 			tempSaveRegister[cursor] = shiftRegister[t][i];
@@ -268,37 +269,74 @@ struct RandLoops8 : Module {
 
 		for (int i = 0; i < 16; i++)
 			saveRegister[t][i] = tempSaveRegister[i];
-
-	}
-
-	void inline resetSequence(int t) {
+		*/
 		int cursor = 0;
-		for (int i = startingStep[t]; i < int(params[LENGTH_PARAM+t].getValue()); i++) {
-			tempRegister[cursor] = shiftRegister[t][i];
+		int wSteps = int(params[LENGTH_PARAM+t].getValue());
+		for (int i = 0; i <= wSteps; i++) {
+			tempRegister[i] = shiftRegister[t][cursor];
 			cursor++;
-		}
-
-		for (int i = 0; i < startingStep[t]; i++) {
-			tempRegister[cursor] = shiftRegister[t][i];
-			cursor++;
+			if (cursor >= 16)
+				cursor = 0;
 		}
 
 		int fillCursor = 0;
-		for (int i = cursor; i < 16; i++) {
+		for (int i = wSteps; i < 16; i++) {
 			tempRegister[i] = tempRegister[fillCursor];
 			fillCursor++;
-			if (fillCursor >= int(params[LENGTH_PARAM+t].getValue()))
+			if (fillCursor >= wSteps)
 				fillCursor = 0;
 		}
 
 		for (int i = 0; i < 16; i++)
-			shiftRegister[t][i] = tempRegister[i];
+			saveRegister[t][i] = tempRegister[i];
+
 	}
 
 	void inline resetCheck(int t) {
 		if (rstValue[t] >= 1.f && prevRstValue[t] < 1.f) {
 			
-			resetSequence(t);
+			/*
+			int cursor = 0;
+			for (int i = startingStep[t]; i < int(params[LENGTH_PARAM+t].getValue()); i++) {
+				tempRegister[cursor] = shiftRegister[t][i];
+				cursor++;
+			}
+
+			for (int i = 0; i < startingStep[t]; i++) {
+				tempRegister[cursor] = shiftRegister[t][i];
+				cursor++;
+			}
+
+			int fillCursor = 0;
+			for (int i = cursor; i < 16; i++) {
+				tempRegister[i] = tempRegister[fillCursor];
+				fillCursor++;
+				if (fillCursor >= int(params[LENGTH_PARAM+t].getValue()))
+					fillCursor = 0;
+			}
+			*/
+			int cursor = startingStep[t];
+			int wSteps = params[LENGTH_PARAM+t].getValue();
+
+			for (int i = 0; i <= wSteps; i++) {
+				tempRegister[i] = shiftRegister[t][cursor];
+				cursor++;
+				if (cursor >= 16)
+					cursor = 0;
+			}
+
+			int fillCursor = 0;
+			for (int i = wSteps; i < 16; i++) {
+				tempRegister[i] = tempRegister[fillCursor];
+				fillCursor++;
+				if (fillCursor >= wSteps)
+					fillCursor = 0;
+			}
+
+			// -------------------------------
+
+			for (int i = 0; i < 16; i++)
+				shiftRegister[t][i] = tempRegister[i];
 
 			//debugResettt(t);
 
