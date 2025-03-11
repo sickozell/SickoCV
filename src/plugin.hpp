@@ -71,3 +71,17 @@ extern Model* modelTogglerCompact;
 extern Model* modelTrigSeq;
 extern Model* modelTrigSeqPlus;
 extern Model* modelWavetabler;
+
+
+extern bool randLoops_clipboard;
+extern int randLoops_cbSeq[16];
+extern int randLoops_cbStart;
+extern int randLoops_cbSteps;
+extern float randLoops_cbCtrl;
+extern float randLoops_cbScale;
+extern float randLoops_cbOffset;
+
+extern bool stepSeq_clipboard;
+extern float stepSeq_cbSeq[16];
+extern int stepSeq_cbSteps;
+extern int stepSeq_cbRst;

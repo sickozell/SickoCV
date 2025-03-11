@@ -114,7 +114,8 @@ struct RandLoops8 : Module {
 	bool stepPulse[8] = {false, false, false, false, false, false, false, false};
 	float stepPulseTime[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	bool outGate[8] = {false, false, false, false, false, false, false, false};
-
+	
+	/*
 	bool clipboard = false;
 	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int cbStart = 0;
@@ -122,6 +123,7 @@ struct RandLoops8 : Module {
 	float cbCtrl = 0.f;
 	float cbScale = 1.f;
 	float cbOffset = 0.f;
+	*/
 
 	RandLoops8() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -319,8 +321,9 @@ struct RandLoops8 : Module {
 		}
 	}
 
+	/*
 	void copyTrack(int t) {
-		//sequence_to_saveRegister(t);
+
 		for (int i = 0; i < 16; i++)
 			cbSeq[i] = shiftRegister[t][i];
 		
@@ -341,6 +344,31 @@ struct RandLoops8 : Module {
 		params[CTRL_PARAM+t].setValue(cbCtrl);
 		params[SCALE_PARAM+t].setValue(cbScale);
 		params[OFFSET_PARAM+t].setValue(cbOffset);
+	}
+	*/
+
+	void copyTrack(int t) {
+
+		for (int i = 0; i < 16; i++)
+			randLoops_cbSeq[i] = shiftRegister[t][i];
+		
+		randLoops_cbStart = startingStep[t];
+		randLoops_cbSteps = params[LENGTH_PARAM+t].getValue();
+		randLoops_cbCtrl = params[CTRL_PARAM+t].getValue();
+		randLoops_cbScale = params[SCALE_PARAM+t].getValue();
+		randLoops_cbOffset = params[OFFSET_PARAM+t].getValue();
+		randLoops_clipboard = true;
+	}
+
+	void pasteToTrack(int t) {
+		for (int i = 0; i < 16; i++)
+			shiftRegister[t][i] = randLoops_cbSeq[i];
+		
+		startingStep[t] = randLoops_cbStart;
+		params[LENGTH_PARAM+t].setValue(randLoops_cbSteps);
+		params[CTRL_PARAM+t].setValue(randLoops_cbCtrl);
+		params[SCALE_PARAM+t].setValue(randLoops_cbScale);
+		params[OFFSET_PARAM+t].setValue(randLoops_cbOffset);
 	}
 	
 	void process(const ProcessArgs& args) override {
@@ -636,7 +664,8 @@ struct RandLoops8Widget : ModuleWidget {
 			menu->addChild(createMenuItem("Track 7", "", [=]() {module->copyTrack(6);}));
 			menu->addChild(createMenuItem("Track 8", "", [=]() {module->copyTrack(7);}));
 		}));
-		if (module->clipboard) {
+		//if (module->clipboard) {
+		if (randLoops_clipboard) {
 			menu->addChild(createSubmenuItem("Paste to track", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("Track 1", "", [=]() {module->pasteToTrack(0);}));
 				menu->addChild(createMenuItem("Track 2", "", [=]() {module->pasteToTrack(1);}));

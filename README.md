@@ -1,4 +1,4 @@
-# SickoCV v2.7.1-beta15
+# SickoCV v2.7.1-beta16
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -751,7 +751,7 @@ randLoops8 is basically a 8-track randomLoops with limited functions, but with a
 - **Ignore Prog Ctrl**: This ignores Ctrl knob setting when a program is recalled.
 - **Ignore Prog Scale**: This ignores Scale knob setting when a program is recalled.
 - **1st clock after reset Don't advance**:  This ignores the first clock after a reset trigger, so the sequence won't advance
-- **Copy/paste seq**: copy and paste the current sequence and its settings in the clipboard (does not work across multiple modules)
+- **Copy/paste seq**: copy and paste the current sequence and its settings in the clipboard (it works across other randLoops and trigSeq modules)
 - **Load/Save PROG preset**: This is used to save and reload all the 32 program sequences and module settings in a ".rlp" file
 - **Erase ALL progs**: clears all the programs
 - **Import/Export single sequence**: this is used to load/save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program. Sequence files can be shared also with trigSeq modules
@@ -1190,6 +1190,7 @@ In TURING mode the RST knob acts like a CV out attenuator.
 - **Reset on Run**: A step reset is applied when the sequencer goes from OFF to RUN (default)
 - **1st Clock after reset**: if 'Don't Advance' is ticked, the first clock detected won't advance the sequencer (default)
 - **TURING MODE** (trigSeq trigSeq+ only): Enables the TURING mode as explained above, it activates 'Bit Resolution' and 'Voltage progression' options
+- **Copy/paste seq**: copy and paste the current sequence and its settings in the clipboard (trigSeq and trigSeq+ share clipboard also with randLoops modules, stepSeq and stepSeq+ share their own clipboard)
 - **Load/Save Single Sequence** (trigSeq trigSeq+ only). This is used to save single sequences in a ".tss" file that can be used in randLoops modules too
 - **Initialize on start**: doesn't remeber the last step reached when Rack is reloaded
 

@@ -879,25 +879,25 @@ struct RandLoops : Module {
 	void copyClipboard() {
 		sequence_to_saveRegister();
 		for (int i = 0; i < 16; i++)
-			cbSeq[i] = saveRegister[i];
+			randLoops_cbSeq[i] = saveRegister[i];
 		
-		cbSteps = wSteps;
-		cbCtrl = wCtrl;
-		cbScale = wScale;
-		clipboard = true;
+		randLoops_cbSteps = wSteps;
+		randLoops_cbCtrl = wCtrl;
+		randLoops_cbScale = wScale;
+		randLoops_clipboard = true;
 	}
 
 	void pasteClipboard() {
 		for (int i = 0; i < 16; i++)
-			wSeq[i] = cbSeq[i];
+			wSeq[i] = randLoops_cbSeq[i];
 		
-		wSteps = cbSteps;
-		wCtrl = cbCtrl;
-		wScale = cbScale;
+		wSteps = randLoops_cbSteps;
+		wCtrl = randLoops_cbCtrl;
+		wScale = randLoops_cbScale;
 
-		params[CTRL_PARAM].setValue(cbCtrl);
+		params[CTRL_PARAM].setValue(wCtrl);
 		params[LENGTH_PARAM].setValue(wSteps);
-		params[SCALE_PARAM].setValue(cbScale);
+		params[SCALE_PARAM].setValue(wScale);
 
 	}
 
@@ -1736,7 +1736,8 @@ struct RandLoopsWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
-		if (module->clipboard)
+		//if (module->clipboard)
+		if (randLoops_clipboard)
 			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
 		else
 			menu->addChild(createMenuLabel("Paste Seq"));

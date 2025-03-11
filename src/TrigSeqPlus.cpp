@@ -214,7 +214,6 @@ struct TrigSeqPlus : Module {
 	float setButLightDelta = 2 / APP->engine->getSampleRate();
 	float setButLightValue = 0.f;
 
-
 	bool clipboard = false;
 	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int cbSteps = 16;
@@ -855,22 +854,22 @@ struct TrigSeqPlus : Module {
 
 	void copyClipboard() {
 		for (int i = 0; i < 16; i++)
-			cbSeq[i] = wSeq[i];
+			randLoops_cbSeq[i] = wSeq[i];
 		
-		cbSteps = wSteps;
-		cbRst = wRst;
-		clipboard = true;
+		randLoops_cbSteps = wSteps;
+		randLoops_cbScale = wRst;
+		randLoops_clipboard = true;
 	}
 
 	void pasteClipboard() {
 		for (int i = 0; i < 16; i++) {
-			wSeq[i] = cbSeq[i];
+			wSeq[i] = randLoops_cbSeq[i];
 			params[STEP_PARAM+i].setValue(wSeq[i]);
 		}
 		
-		wSteps = cbSteps;
+		wSteps = randLoops_cbSteps;
 		params[LENGTH_PARAM].setValue(wSteps);
-		wRst = cbRst;
+		wRst = randLoops_cbScale;
 		params[RST_PARAM].setValue(wRst);
 	}
 
@@ -1653,7 +1652,8 @@ struct TrigSeqPlusWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
-		if (module->clipboard)
+		//if (module->clipboard)
+		if (randLoops_clipboard)
 			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
 		else
 			menu->addChild(createMenuLabel("Paste Seq"));

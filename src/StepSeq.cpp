@@ -266,6 +266,23 @@ struct StepSeq : Module {
 		if (mode == CLOCK_MODE && dontAdvanceSetting)
 			dontAdvance = true;
 	}
+
+	void copyClipboard() {
+		for (int i = 0; i < 16; i++)
+			stepSeq_cbSeq[i] = params[STEP_PARAM+i].getValue();
+		
+		stepSeq_cbSteps = params[LENGTH_PARAM].getValue();
+		stepSeq_cbRst = params[RST_PARAM].getValue();
+		stepSeq_clipboard = true;
+	}
+
+	void pasteClipboard() {
+		for (int i = 0; i < 16; i++)
+			params[STEP_PARAM+i].setValue(stepSeq_cbSeq[i]);
+		
+		params[LENGTH_PARAM].setValue(stepSeq_cbSteps);
+		params[RST_PARAM].setValue(stepSeq_cbRst);
+	}
 	
 	
 	void process(const ProcessArgs& args) override {
@@ -620,6 +637,14 @@ struct StepSeqWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
+		//if (module->clipboard)
+		if (stepSeq_clipboard)
+			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+		else
+			menu->addChild(createMenuLabel("Paste Seq"));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));

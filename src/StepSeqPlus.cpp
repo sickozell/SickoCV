@@ -195,12 +195,12 @@ struct StepSeqPlus : Module {
 	float setButLightDelta = 2 / APP->engine->getSampleRate();
 	float setButLightValue = 0.f;
 
-
+	/*
 	bool clipboard = false;
 	float cbSeq[16] = {0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f};
 	int cbSteps = 16;
 	int cbRst = 1;
-
+	*/
 
 	StepSeqPlus() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -667,22 +667,22 @@ struct StepSeqPlus : Module {
 
 	void copyClipboard() {
 		for (int i = 0; i < 16; i++)
-			cbSeq[i] = wSeq[i];
+			stepSeq_cbSeq[i] = wSeq[i];
 		
-		cbSteps = wSteps;
-		cbRst = wRst;
-		clipboard = true;
+		stepSeq_cbSteps = wSteps;
+		stepSeq_cbRst = wRst;
+		stepSeq_clipboard = true;
 	}
 
 	void pasteClipboard() {
 		for (int i = 0; i < 16; i++) {
-			wSeq[i] = cbSeq[i];
+			wSeq[i] = stepSeq_cbSeq[i];
 			params[STEP_PARAM+i].setValue(wSeq[i]);
 		}
 		
-		wSteps = cbSteps;
+		wSteps = stepSeq_cbSteps;
 		params[LENGTH_PARAM].setValue(wSteps);
-		wRst = cbRst;
+		wRst = stepSeq_cbRst;
 		params[RST_PARAM].setValue(wRst);
 	}
 
@@ -1368,7 +1368,8 @@ struct StepSeqPlusWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
-		if (module->clipboard)
+		//if (module->clipboard)
+		if (stepSeq_clipboard)
 			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
 		else
 			menu->addChild(createMenuLabel("Paste Seq"));

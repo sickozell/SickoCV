@@ -85,4 +85,19 @@ void init(rack::Plugin *p) {
 	p->addModel(modelTrigSeq);
 	p->addModel(modelTrigSeqPlus);
 	p->addModel(modelWavetabler);
+
+	
 }
+
+bool randLoops_clipboard = false;
+int randLoops_cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int randLoops_cbStart = 0;
+int randLoops_cbSteps = 16;
+float randLoops_cbCtrl = 0.f;
+float randLoops_cbScale = 1.f;
+float randLoops_cbOffset = 0.f;
+
+bool stepSeq_clipboard = false;
+float stepSeq_cbSeq[16] = {0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f};
+int stepSeq_cbSteps = 16;
+int stepSeq_cbRst = 1;

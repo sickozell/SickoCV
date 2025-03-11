@@ -421,6 +421,23 @@ struct TrigSeq : Module {
 		}
 	}
 
+	void copyClipboard() {
+		for (int i = 0; i < 16; i++)
+			randLoops_cbSeq[i] = params[STEPBUT_PARAM+i].getValue();
+		
+		randLoops_cbSteps = params[LENGTH_PARAM].getValue();
+		randLoops_cbScale = params[RST_PARAM].getValue();
+		randLoops_clipboard = true;
+	}
+
+	void pasteClipboard() {
+		for (int i = 0; i < 16; i++)
+			params[STEPBUT_PARAM+i].setValue(randLoops_cbSeq[i]);
+		
+		params[LENGTH_PARAM].setValue(randLoops_cbSteps);
+		params[RST_PARAM].setValue(randLoops_cbScale);
+	}
+
 	void inline resetStep() {
 		lights[STEP_LIGHT+step].setBrightness(0);
 
@@ -894,6 +911,14 @@ struct TrigSeqWidget : ModuleWidget {
 			menu->addChild(createMenuLabel("Bit Resolution"));
 			menu->addChild(createMenuLabel("Voltage progression"));
 		}
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
+		//if (module->clipboard)
+		if (randLoops_clipboard)
+			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+		else
+			menu->addChild(createMenuLabel("Paste Seq"));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Load Sequence", "", [=]() {module->menuLoadSequence();}));
