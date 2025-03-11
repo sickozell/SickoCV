@@ -33,7 +33,6 @@ struct RandLoops : Module {
 		DEL_BUTTON,
 		ADD_BUTTON,
 		RND_BUTTON,
-		//ENUMS(REGISTER_PARAM, 16),
 		PROG_PARAM,
 		RECALL_PARAM,
 		STORE_PARAM,
@@ -160,20 +159,10 @@ struct RandLoops : Module {
 	float nextScale = 1.f;
 	float nextCtrl = 0.f;
 
-	//int pendingSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	//int pendingSteps = 16;
-
-
-	// ---------- OLD shiftRegister randLoops
-
-	int shiftRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
 	int saveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	int tempRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	
-	//int tempSaveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
 	// ------------------------
 
 	float probCtrl = 0;
@@ -186,9 +175,6 @@ struct RandLoops : Module {
 
 	const int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
-
-	//std::string resolutionName[2] = {"8 bit", "16 bit"};
-	//std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
 
 	bool bufferedAddDel = true;
 	bool bufferedRandom = true;
@@ -207,13 +193,6 @@ struct RandLoops : Module {
 
 	float clrValue = 0;
 	float prevClrValue = 0;
-	
-	//bool pulse = false;
-	//float pulseTime = 0;
-
-	//int tableLength[8] = {1, 2, 3, 4, 5, 7, 11, 15};
-
-	//bool trigMode = false;
 
 	int outType = OUT_TRIG;
 
@@ -222,7 +201,7 @@ struct RandLoops : Module {
 	float stepPulseTime = 0;
 	bool outGate = false;
 
-		// --------------prog
+	// --------------prog
 	int progKnob = 0;
 	int prevProgKnob = 0;
 	int savedProgKnob = 0;
@@ -249,17 +228,11 @@ struct RandLoops : Module {
 
 	int workingProg = 0;
 
-	bool instantScaleChange = false;
+	bool instantProgChange = false;
 
-	bool butSetScale = false;
-	float scaleSetBut = 0;
-	float prevScaleSetBut = 0;
-
-	float resetScale = 0;
-	float prevResetScale = 0;
-
-	bool pendingUpdate = false;
-	bool seqChanged = false;
+	bool progToSet = false;
+	float progSetBut = 0;
+	float prevProgSetBut = 0;
 
 	// ------- set button light
 
@@ -321,13 +294,6 @@ struct RandLoops : Module {
 
 	void onReset(const ResetEvent &e) override {
 
-		/*
-		for (int i=0; i < 16; i++) {
-			shiftRegister[i] = false;
-			lights[REGISTER_LIGHT+i].setBrightness(0.f);
-		}
-		*/
-
 		rndWait = false;
 		addWait = false;
 		delWait = false;
@@ -340,15 +306,12 @@ struct RandLoops : Module {
 		setButLightDelta = 2 / APP->engine->getSampleRate();
 		setButLightValue = 0.f;
 
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 16; i++)
 			wSeq[i] = 0;
-			//params[STEP_PARAM+i].setValue(wSeq[i]);
-			//lights[REGISTER_LIGHT+i].setBrightness(wSeq[i]);
-		}
+
 		wSteps = 16;
+
 		params[LENGTH_PARAM].setValue(wSteps);
-		//wRst = 1;
-		//params[RST_PARAM].setValue(wRst);
 
 		Module::onReset(e);
 	}
@@ -392,12 +355,6 @@ struct RandLoops : Module {
 			}
 			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
 		}
-		
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_array();
-			json_array_append_new(progSteps_json_array, json_integer(progSteps[prog]));
-			json_object_set_new(rootJ, ("progSteps"+to_string(prog)).c_str(), progSteps_json_array);
-		}*/
 
 		json_t *steps_json_array = json_array();
 		for (int prog = 0; prog < 32; prog++) {
@@ -405,23 +362,11 @@ struct RandLoops : Module {
 		}
 		json_object_set_new(rootJ, "progSteps", steps_json_array);	
 
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_array();
-			json_array_append_new(progSteps_json_array, json_real(progCtrl[prog]));
-			json_object_set_new(rootJ, ("progCtrl"+to_string(prog)).c_str(), progSteps_json_array);
-		}*/
-
 		json_t *ctrl_json_array = json_array();
 		for (int prog = 0; prog < 32; prog++) {
 			json_array_append_new(ctrl_json_array, json_real(progCtrl[prog]));
 		}
 		json_object_set_new(rootJ, "progCtrl", ctrl_json_array);
-
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_array();
-			json_array_append_new(progSteps_json_array, json_real(progScale[prog]));
-			json_object_set_new(rootJ, ("progScale"+to_string(prog)).c_str(), progSteps_json_array);
-		}*/
 
 		json_t *scale_json_array = json_array();
 		for (int prog = 0; prog < 32; prog++) {
@@ -529,17 +474,6 @@ struct RandLoops : Module {
 			}
 		}
 
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_object_get(rootJ, ("progSteps"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
-			if (progSteps_json_array) {
-				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
-					progSteps[prog] = json_integer_value(json_value);
-				}
-			}
-		}*/
-
 		json_t *progSteps_json_array = json_object_get(rootJ, "progSteps");
 		size_t progStepsJ;
 		json_t *progSteps_json_value;
@@ -549,17 +483,6 @@ struct RandLoops : Module {
 			}
 		}
 
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_object_get(rootJ, ("progCtrl"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
-			if (progSteps_json_array) {
-				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
-					progCtrl[prog] = json_real_value(json_value);
-				}
-			}
-		}*/
-
 		json_t *progCtrl_json_array = json_object_get(rootJ, "progCtrl");
 		size_t progCtrlJ;
 		json_t *progCtrl_json_value;
@@ -568,17 +491,6 @@ struct RandLoops : Module {
 				progCtrl[progCtrlJ] = json_real_value(progCtrl_json_value);
 			}
 		}
-
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_object_get(rootJ, ("progScale"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
-			if (progSteps_json_array) {
-				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
-					progScale[prog] = json_real_value(json_value);
-				}
-			}
-		}*/
 
 		json_t *progScale_json_array = json_object_get(rootJ, "progScale");
 		size_t progScaleJ;
@@ -614,34 +526,17 @@ struct RandLoops : Module {
 			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
 		}
 
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_array();
-			json_array_append_new(progSteps_json_array, json_integer(progSteps[prog]));
-			json_object_set_new(rootJ, ("progSteps"+to_string(prog)).c_str(), progSteps_json_array);
-		}*/
 		json_t *steps_json_array = json_array();
 		for (int prog = 0; prog < 32; prog++) {
 			json_array_append_new(steps_json_array, json_integer(progSteps[prog]));
 		}
 		json_object_set_new(rootJ, "progSteps", steps_json_array);	
 
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_array();
-			json_array_append_new(progSteps_json_array, json_real(progCtrl[prog]));
-			json_object_set_new(rootJ, ("progCtrl"+to_string(prog)).c_str(), progSteps_json_array);
-		}*/
-
 		json_t *ctrl_json_array = json_array();
 		for (int prog = 0; prog < 32; prog++) {
 			json_array_append_new(ctrl_json_array, json_real(progCtrl[prog]));
 		}
 		json_object_set_new(rootJ, "progCtrl", ctrl_json_array);
-
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_array();
-			json_array_append_new(progSteps_json_array, json_real(progScale[prog]));
-			json_object_set_new(rootJ, ("progScale"+to_string(prog)).c_str(), progSteps_json_array);
-		}*/
 
 		json_t *scale_json_array = json_array();
 		for (int prog = 0; prog < 32; prog++) {
@@ -707,16 +602,6 @@ struct RandLoops : Module {
 			}
 		}
 
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_object_get(rootJ, ("progSteps"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
-			if (progSteps_json_array) {
-				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
-					progSteps[prog] = json_integer_value(json_value);
-				}
-			}
-		}*/
 		json_t *progSteps_json_array = json_object_get(rootJ, "progSteps");
 		size_t progStepsJ;
 		json_t *progSteps_json_value;
@@ -726,17 +611,6 @@ struct RandLoops : Module {
 			}
 		}
 
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_object_get(rootJ, ("progCtrl"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
-			if (progSteps_json_array) {
-				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
-					progCtrl[prog] = json_real_value(json_value);
-				}
-			}
-		}*/
-
 		json_t *progCtrl_json_array = json_object_get(rootJ, "progCtrl");
 		size_t progCtrlJ;
 		json_t *progCtrl_json_value;
@@ -745,17 +619,6 @@ struct RandLoops : Module {
 				progCtrl[progCtrlJ] = json_real_value(progCtrl_json_value);
 			}
 		}
-
-		/*for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_object_get(rootJ, ("progScale"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
-			if (progSteps_json_array) {
-				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
-					progScale[prog] = json_real_value(json_value);
-				}
-			}
-		}*/
 
 		json_t *progScale_json_array = json_object_get(rootJ, "progScale");
 		size_t progScaleJ;
@@ -992,29 +855,6 @@ struct RandLoops : Module {
 
 	void inline sequence_to_saveRegister() {
 
-		/*
-		int cursor = 0;
-		for (int i = startingStep; i < wSteps; i++) {
-			tempSaveRegister[cursor] = wSeq[i];
-			cursor++;
-		}
-
-		for (int i = 0; i < startingStep; i++) {
-			tempSaveRegister[cursor] = wSeq[i];
-			cursor++;
-		}
-
-		int fillCursor = 0;
-		for (int i = cursor; i < 16; i++) {
-			tempSaveRegister[i] = tempSaveRegister[fillCursor];
-			fillCursor++;
-			if (fillCursor >= wSteps)
-				fillCursor = 0;
-		}
-
-		for (int i = 0; i < 16; i++)
-			saveRegister[i] = tempSaveRegister[i];
-		*/
 		int cursor = 0;
 		for (int i = 0; i <= wSteps; i++) {
 			tempRegister[i] = wSeq[cursor];
@@ -1053,7 +893,7 @@ struct RandLoops : Module {
 		
 		wSteps = cbSteps;
 		wCtrl = cbCtrl;
-		wCtrl = cbScale;
+		wScale = cbScale;
 
 		params[CTRL_PARAM].setValue(cbCtrl);
 		params[LENGTH_PARAM].setValue(wSteps);
@@ -1162,19 +1002,12 @@ struct RandLoops : Module {
 
 		int fillCursor = 0;
 		for (int i = cursor; i < 16; i++) {
-			//shiftRegister[i] = shiftRegister[fillCursor];
 			wSeq[i] = wSeq[fillCursor];
 			fillCursor++;
-			//if (fillCursor >= int(params[LENGTH_PARAM].getValue()))
 			if (fillCursor >= wSteps)
 				fillCursor = 0;
 		}
 
-		/*
-		for (int i=0; i<16; i++)
-			//lights[REGISTER_LIGHT+i].setBrightness(shiftRegister[i]);
-			lights[REGISTER_LIGHT+i].setBrightness(wSeq[i]);
-		*/
 	}
 
 
@@ -1183,8 +1016,8 @@ struct RandLoops : Module {
 
 		// ----------- AUTO SWITCH
 
-		instantScaleChange = int(params[AUTO_PARAM].getValue());
-		lights[AUTO_LIGHT].setBrightness(instantScaleChange);
+		instantProgChange = int(params[AUTO_PARAM].getValue());
+		lights[AUTO_LIGHT].setBrightness(instantProgChange);
 
 		// ----------- PROGRAM MANAGEMENT
 
@@ -1208,7 +1041,6 @@ struct RandLoops : Module {
 				nextSteps = progSteps[selectedProg];
 				nextCtrl = progCtrl[selectedProg];
 				nextScale = progScale[selectedProg];
-				//params[LENGTH_PARAM].setValue(nextSteps);
 
 				setButLight = true;
 				setButLightValue = 0.f;
@@ -1216,7 +1048,6 @@ struct RandLoops : Module {
 				progChanged = false;
 				selectedProg = progKnob;
 				prevProgKnob = progKnob;
-				//params[LENGTH_PARAM].setValue(wSteps);
 				setButLight = false;
 				setButLightValue = 0.f;
 			}
@@ -1225,16 +1056,16 @@ struct RandLoops : Module {
 
 		// -------- CURRENT SEQ UPDATE
 
-		butSetScale = false;
+		progToSet = false;
 
-		scaleSetBut = params[SET_PARAM].getValue();
-		if (scaleSetBut >= 1.f && prevScaleSetBut < 1.f)
-			butSetScale = true;
+		progSetBut = params[SET_PARAM].getValue();
+		if (progSetBut >= 1.f && prevProgSetBut < 1.f)
+			progToSet = true;
 
-		prevScaleSetBut = scaleSetBut;
+		prevProgSetBut = progSetBut;
 
 		if (progChanged) {
-			if (instantScaleChange) {
+			if (instantProgChange) {
 
 				for (int i = 0; i < 16; i++)
 					wSeq[i] = nextSeq[i];
@@ -1264,8 +1095,8 @@ struct RandLoops : Module {
 
 			} else {
 				
-				if (butSetScale) {
-					butSetScale = false;
+				if (progToSet) {
+					progToSet = false;
 
 					for (int i = 0; i < 16; i++)
 						wSeq[i] = nextSeq[i];
@@ -1401,13 +1232,11 @@ struct RandLoops : Module {
 		// -------------------------------------------------
 		// -------------------------------------------------
 
-		// ----------- get working steps
+		// ----------- get working steps and controls
 
-		//if (!progChanged) {
-			wSteps = params[LENGTH_PARAM].getValue();
-			wCtrl = params[CTRL_PARAM].getValue();
-			wScale = params[SCALE_PARAM].getValue();
-		//}
+		wSteps = params[LENGTH_PARAM].getValue();
+		wCtrl = params[CTRL_PARAM].getValue();
+		wScale = params[SCALE_PARAM].getValue();
 
 		// -------------------------------- clear sequence
 
@@ -1526,7 +1355,6 @@ struct RandLoops : Module {
 
 				} else {
 
-					//controlValue = params[CTRL_PARAM].getValue() + (inputs[CTRL_INPUT].getVoltage() / 10.f);
 					controlValue = wCtrl + (inputs[CTRL_INPUT].getVoltage() / 10.f);
 					if (controlValue < -1.f)
 						controlValue = -1.f;
@@ -1615,7 +1443,6 @@ struct RandLoops : Module {
 			}
 		}
 
-		//cvOut = volt * params[SCALE_PARAM].getValue();
 		cvOut = volt * wScale;
 
 		if (cvOut > 10.f)
@@ -1665,7 +1492,6 @@ struct RandLoopsDisplay : TransparentWidget {
 
 				currentDisplay = to_string(module->workingProg);
 
-				//if (!module->pendingUpdate) {
 				if (!module->progChanged) {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
@@ -1705,7 +1531,6 @@ struct RandLoopsWidget : ModuleWidget {
 
 		{
 			RandLoopsDisplay *display = new RandLoopsDisplay();
-			//display->box.pos = mm2px(Vec(35.6, 7.8));
 			display->box.pos = mm2px(Vec(40.2, 7.8));
 			display->box.size = mm2px(Vec(8, 8));
 			display->module = module;
@@ -1797,7 +1622,6 @@ struct RandLoopsWidget : ModuleWidget {
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xClk, yClk)), module, RandLoops::CLK_INPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xClr, yClr)), module, RandLoops::CLEAR_INPUT));
 		
-		
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(xLgStart, yLgStart1)), module, RandLoops::REGISTER_LIGHT+0));
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(xLgStart + xLgShift, yLgStart1)), module, RandLoops::REGISTER_LIGHT+1));
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(xLgStart + (xLgShift * 2), yLgStart1)), module, RandLoops::REGISTER_LIGHT+2));
@@ -1862,13 +1686,6 @@ struct RandLoopsWidget : ModuleWidget {
 				menu->addChild(bitResTypeItem);
 			}
 		}));
-
-		/*
-		menu->addChild(createSubmenuItem("Out Reference", (module->resolutionName[module->bitResolution]), [=](Menu * menu) {
-			menu->addChild(createMenuItem("8 bit", "", [=]() {module->bitResolution = BIT_8;}));
-			menu->addChild(createMenuItem("16 bit", "", [=]() {module->bitResolution = BIT_16;}));
-		}));
-		*/
 
 		struct ProgressionTypeItem : MenuItem {
 			RandLoops* module;

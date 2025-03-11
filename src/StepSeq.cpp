@@ -421,8 +421,8 @@ struct StepSeq : Module {
 		out = params[STEP_PARAM+step].getValue();
 
 		switch (range) {
-			//case 0:
-			//break;
+			case 0:
+			break;
 
 			case 1:
 				out *= 2;
@@ -574,45 +574,6 @@ struct StepSeqWidget : ModuleWidget {
 			}
 		}));
 		
-		/*
-		struct RunTypeItem : MenuItem {
-			StepSeq* module;
-			int runType;
-			void onAction(const event::Action& e) override {
-				module->runType = runType;
-			}
-		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Run Input"));
-		std::string RunTypeNames[2] = {"Gate", "Trig"};
-		for (int i = 0; i < 2; i++) {
-			RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-			runTypeItem->rightText = CHECKMARK(module->runType == i);
-			runTypeItem->module = module;
-			runTypeItem->runType = i;
-			menu->addChild(runTypeItem);
-		}
-
-		struct RevTypeItem : MenuItem {
-			StepSeq* module;
-			int revType;
-			void onAction(const event::Action& e) override {
-				module->revType = revType;
-			}
-		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Reverse Input Voltage"));
-		std::string RevTypeNames[2] = {"Positive", "Negative"};
-		for (int i = 0; i < 2; i++) {
-			RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
-			revTypeItem->rightText = CHECKMARK(module->revType == i);
-			revTypeItem->module = module;
-			revTypeItem->revType = i;
-			menu->addChild(revTypeItem);
-		}
-		*/
 		menu->addChild(new MenuSeparator());
 		
 		struct RunTypeItem : MenuItem {

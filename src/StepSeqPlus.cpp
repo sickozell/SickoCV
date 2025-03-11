@@ -177,7 +177,7 @@ struct StepSeqPlus : Module {
 
 	int workingProg = 0;
 
-	bool instantScaleChange = false;
+	bool instantProgChange = false;
 
 	bool butSetScale = false;
 	float scaleSetBut = 0;
@@ -707,8 +707,8 @@ struct StepSeqPlus : Module {
 
 		// ----------- AUTO SWITCH
 
-		instantScaleChange = int(params[AUTO_PARAM].getValue());
-		lights[AUTO_LIGHT].setBrightness(instantScaleChange);
+		instantProgChange = int(params[AUTO_PARAM].getValue());
+		lights[AUTO_LIGHT].setBrightness(instantProgChange);
 
 		// ----------- PROGRAM MANAGEMENT
 
@@ -795,7 +795,7 @@ struct StepSeqPlus : Module {
 
 		if (seqChanged) {
 			if (pendingUpdate) {
-				if (instantScaleChange) {
+				if (instantProgChange) {
 
 					for (int i = 0; i < 16; i++)
 						wSeq[i] = nextSeq[i];

@@ -1,4 +1,4 @@
-# SickoCV v2.7.1-beta14
+# SickoCV v2.7.1-beta15
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -740,7 +740,7 @@ Programs are selected by PROG knob that can be CV controlled. The selected progr
 RECL button (or a trig on its input) recall the selected stored program, even if it's changed by randomization.  
 Double-click STOR button to store the current sequence and length in the selected program.  
 
-randLops8 is basically a 8-track randomLoops with limited functions, but with an offset knob added. CVs and triggers can be polyphonic summed in the last track outs, according to the setting selected in the right-menu.
+randLoops8 is basically a 8-track randomLoops with limited functions, but with an offset knob added. CVs and triggers can be polyphonic summed in the last track outs, according to the setting selected in the right-menu.
 
 #### Right-click Menu
 - **Buffered DEL/Add**: if set to on the DEL and ADD buttons (or their trigs) will force the next first bit in the sequence to be off or on only once each press.  
@@ -751,7 +751,7 @@ randLops8 is basically a 8-track randomLoops with limited functions, but with an
 - **Ignore Prog Ctrl**: This ignores Ctrl knob setting when a program is recalled.
 - **Ignore Prog Scale**: This ignores Scale knob setting when a program is recalled.
 - **1st clock after reset Don't advance**:  This ignores the first clock after a reset trigger, so the sequence won't advance
-- **Copy/paste seq**: copy and paste the current sequence and the length settings in the clipboard (does not work across multiple modules)
+- **Copy/paste seq**: copy and paste the current sequence and its settings in the clipboard (does not work across multiple modules)
 - **Load/Save PROG preset**: This is used to save and reload all the 32 program sequences and module settings in a ".rlp" file
 - **Erase ALL progs**: clears all the programs
 - **Import/Export single sequence**: this is used to load/save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program. Sequence files can be shared also with trigSeq modules

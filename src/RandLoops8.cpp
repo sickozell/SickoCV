@@ -49,21 +49,12 @@ struct RandLoops8 : Module {
 
 	float trgOut[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-	//int recStep[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
 	float controlValue = 0;
-
-	//float outSum = 0;
 
 	int polyChans = 0;
 
 	bool dontAdvance[8] = {false, false, false, false, false, false, false, false};
 	bool dontAdvanceSetting = true;
-
-	/*float tableVolts[2][16] = {
-		{0.039 , 0.078, 0.157, 0.314, 0.627, 1.255, 2.51, 5.02, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0.00015 , 0.00031, 0.00061, 0.00122, 0.00244, 0.00488, 0.00977, 0.01953, 0.03906, 0.07813, 0.15625, 0.3125, 0.062501, 1.25002, 2.50004, 5.00008}
-	};*/
 
 	int progression = STD2x_PROGRESSION;
 
@@ -117,9 +108,6 @@ struct RandLoops8 : Module {
 	int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
 
-	//std::string resolutionName[2] = {"8 bit", "16 bit"};
-	//std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
-
 	int outType = OUT_TRIG;
 
 	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
@@ -127,8 +115,13 @@ struct RandLoops8 : Module {
 	float stepPulseTime[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	bool outGate[8] = {false, false, false, false, false, false, false, false};
 
-	//bool pulse[8] = {false, false, false, false, false, false, false, false};
-	//float pulseTime[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+	bool clipboard = false;
+	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	int cbStart = 0;
+	int cbSteps = 16;
+	float cbCtrl = 0.f;
+	float cbScale = 1.f;
+	float cbOffset = 0.f;
 
 	RandLoops8() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -247,31 +240,10 @@ struct RandLoops8 : Module {
 	*/
 
 	void inline sequence_to_saveRegister(int t) {
-		/*
-		int cursor = 0;
-		for (int i = startingStep[t]; i < int(params[LENGTH_PARAM+t].getValue()); i++) {
-			tempSaveRegister[cursor] = shiftRegister[t][i];
-			cursor++;
-		}
 
-		for (int i = 0; i < startingStep[t]; i++) {
-			tempSaveRegister[cursor] = shiftRegister[t][i];
-			cursor++;
-		}
-
-		int fillCursor = 0;
-		for (int i = cursor; i < 16; i++) {
-			tempSaveRegister[i] = tempSaveRegister[fillCursor];
-			fillCursor++;
-			if (fillCursor >= int(params[LENGTH_PARAM+t].getValue()))
-				fillCursor = 0;
-		}
-
-		for (int i = 0; i < 16; i++)
-			saveRegister[t][i] = tempSaveRegister[i];
-		*/
 		int cursor = 0;
 		int wSteps = int(params[LENGTH_PARAM+t].getValue());
+		
 		for (int i = 0; i <= wSteps; i++) {
 			tempRegister[i] = shiftRegister[t][cursor];
 			cursor++;
@@ -295,26 +267,6 @@ struct RandLoops8 : Module {
 	void inline resetCheck(int t) {
 		if (rstValue[t] >= 1.f && prevRstValue[t] < 1.f) {
 			
-			/*
-			int cursor = 0;
-			for (int i = startingStep[t]; i < int(params[LENGTH_PARAM+t].getValue()); i++) {
-				tempRegister[cursor] = shiftRegister[t][i];
-				cursor++;
-			}
-
-			for (int i = 0; i < startingStep[t]; i++) {
-				tempRegister[cursor] = shiftRegister[t][i];
-				cursor++;
-			}
-
-			int fillCursor = 0;
-			for (int i = cursor; i < 16; i++) {
-				tempRegister[i] = tempRegister[fillCursor];
-				fillCursor++;
-				if (fillCursor >= int(params[LENGTH_PARAM+t].getValue()))
-					fillCursor = 0;
-			}
-			*/
 			int cursor = startingStep[t];
 			int wSteps = params[LENGTH_PARAM+t].getValue();
 
@@ -366,11 +318,33 @@ struct RandLoops8 : Module {
 			calcVoltage(t);
 		}
 	}
+
+	void copyTrack(int t) {
+		//sequence_to_saveRegister(t);
+		for (int i = 0; i < 16; i++)
+			cbSeq[i] = shiftRegister[t][i];
+		
+		cbStart = startingStep[t];
+		cbSteps = params[LENGTH_PARAM+t].getValue();
+		cbCtrl = params[CTRL_PARAM+t].getValue();
+		cbScale = params[SCALE_PARAM+t].getValue();
+		cbOffset = params[OFFSET_PARAM+t].getValue();
+		clipboard = true;
+	}
+
+	void pasteToTrack(int t) {
+		for (int i = 0; i < 16; i++)
+			shiftRegister[t][i] = cbSeq[i];
+		
+		startingStep[t] = cbStart;
+		params[LENGTH_PARAM+t].setValue(cbSteps);
+		params[CTRL_PARAM+t].setValue(cbCtrl);
+		params[SCALE_PARAM+t].setValue(cbScale);
+		params[OFFSET_PARAM+t].setValue(cbOffset);
+	}
 	
 	void process(const ProcessArgs& args) override {
 		
-		//outSum = 0.f;
-
 		for (int t = 0; t < 8; t++) {
 
 			if (!inputs[CLK_INPUT+t].isConnected() && t != 0) {
@@ -419,7 +393,6 @@ struct RandLoops8 : Module {
 							incomingRegister = true;
 						else
 							incomingRegister = false;
-						//DEBUG ("BIT CHANGED");
 
 					} else {
 
@@ -552,7 +525,6 @@ struct RandLoops8Widget : ModuleWidget {
 
 		const float xOut = 84.5f;
 
-
 		for (int track = 0; track < 8; track++) {
 
 			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xClk, yStart+(track*yDelta))), module, RandLoops8::CLK_INPUT+track));
@@ -569,7 +541,6 @@ struct RandLoops8Widget : ModuleWidget {
 
 			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xOfs, yStart+(track*yDelta))), module, RandLoops8::OFFSET_PARAM+track));
 
-			//addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xMode, yStart+(track*yDelta))), module, RandLoops8::MODE_PARAM+track, RandLoops8::MODE_LIGHT+track));
 			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xTrg, yStart+(track*yDelta))), module, RandLoops8::TRG_OUTPUT+track));
 			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart+(track*yDelta))), module, RandLoops8::CV_OUTPUT+track));
 
@@ -654,6 +625,31 @@ struct RandLoops8Widget : ModuleWidget {
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Copy track", "", [=](Menu * menu) {
+			menu->addChild(createMenuItem("Track 1", "", [=]() {module->copyTrack(0);}));
+			menu->addChild(createMenuItem("Track 2", "", [=]() {module->copyTrack(1);}));
+			menu->addChild(createMenuItem("Track 3", "", [=]() {module->copyTrack(2);}));
+			menu->addChild(createMenuItem("Track 4", "", [=]() {module->copyTrack(3);}));
+			menu->addChild(createMenuItem("Track 5", "", [=]() {module->copyTrack(4);}));
+			menu->addChild(createMenuItem("Track 6", "", [=]() {module->copyTrack(5);}));
+			menu->addChild(createMenuItem("Track 7", "", [=]() {module->copyTrack(6);}));
+			menu->addChild(createMenuItem("Track 8", "", [=]() {module->copyTrack(7);}));
+		}));
+		if (module->clipboard) {
+			menu->addChild(createSubmenuItem("Paste to track", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("Track 1", "", [=]() {module->pasteToTrack(0);}));
+				menu->addChild(createMenuItem("Track 2", "", [=]() {module->pasteToTrack(1);}));
+				menu->addChild(createMenuItem("Track 3", "", [=]() {module->pasteToTrack(2);}));
+				menu->addChild(createMenuItem("Track 4", "", [=]() {module->pasteToTrack(3);}));
+				menu->addChild(createMenuItem("Track 5", "", [=]() {module->pasteToTrack(4);}));
+				menu->addChild(createMenuItem("Track 6", "", [=]() {module->pasteToTrack(5);}));
+				menu->addChild(createMenuItem("Track 7", "", [=]() {module->pasteToTrack(6);}));
+				menu->addChild(createMenuItem("Track 8", "", [=]() {module->pasteToTrack(7);}));
+			}));
+		} else {
+			menu->addChild(createMenuLabel("Paste to track"));
+		}
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Clear ALL Sequences", "", [=]() {module->clearAll();}));
 

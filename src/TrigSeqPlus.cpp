@@ -153,24 +153,20 @@ struct TrigSeqPlus : Module {
 							};
 
 	int progSteps[32] = {16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16};
-	//int progRst[32] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 	float progRst[32] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 
 	// --------------workingSeq
 
 	int wSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int wSteps = 16;
-	//float wRst = 1;
 	float wRst = 0;
 
 	int nextSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int nextSteps = 16;
-	//int nextRst = 1;
 	float nextRst = 0;
 
 	int pendingSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int pendingSteps = 16;
-	//int pendingRst = 1;
 	float pendingRst = 0;
 
 	// --------------prog
@@ -200,7 +196,7 @@ struct TrigSeqPlus : Module {
 
 	int workingProg = 0;
 
-	bool instantScaleChange = false;
+	bool instantProgChange = false;
 
 	bool butSetScale = false;
 	float scaleSetBut = 0;
@@ -222,7 +218,6 @@ struct TrigSeqPlus : Module {
 	bool clipboard = false;
 	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int cbSteps = 16;
-	//int cbRst = 1;
 	float cbRst = 0;
 
 	float volt = 0.f;
@@ -247,11 +242,8 @@ struct TrigSeqPlus : Module {
 	int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
 
-	//std::string resolutionName[2] = {"8 bit", "16 bit"};
-	//std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
-
 	bool turingMode = false;
-	bool prevTuringMode = false;
+	//bool prevTuringMode = false;
 
 	TrigSeqPlus() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -350,11 +342,13 @@ struct TrigSeqPlus : Module {
 		}
 		wSteps = 16;
 		params[LENGTH_PARAM].setValue(wSteps);
-		//wRst = 1;
+		wRst = 0;
+		/*
 		if (!turingMode)
 			wRst = 0;
 		else
 			wRst = 1;
+		*/
 		params[RST_PARAM].setValue(wRst);
 
 		Module::onReset(e);
@@ -395,7 +389,6 @@ struct TrigSeqPlus : Module {
 		json_object_set_new(rootJ, "wSeq", seq_json_array);	
 
 		json_object_set_new(rootJ, "wSteps", json_integer(wSteps));
-		//json_object_set_new(rootJ, "wRst", json_integer(wRst));
 		json_object_set_new(rootJ, "wRst", json_real(wRst));
 			
 		for (int prog = 0; prog < 32; prog++) {
@@ -414,7 +407,6 @@ struct TrigSeqPlus : Module {
 
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *progRst_json_array = json_array();
-			//json_array_append_new(progRst_json_array, json_integer(progRst[prog]));
 			json_array_append_new(progRst_json_array, json_real(progRst[prog]));
 			json_object_set_new(rootJ, ("progRst"+to_string(prog)).c_str(), progRst_json_array);
 		}
@@ -535,7 +527,6 @@ struct TrigSeqPlus : Module {
 			json_t *json_value;
 			if (progRst_json_array) {
 				json_array_foreach(progRst_json_array, tempSeq, json_value) {
-					//progRst[prog] = json_integer_value(json_value);
 					progRst[prog] = json_real_value(json_value);
 				}
 			}
@@ -573,7 +564,6 @@ struct TrigSeqPlus : Module {
 
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *progRst_json_array = json_array();
-			//json_array_append_new(progRst_json_array, json_integer(progRst[prog]));
 			json_array_append_new(progRst_json_array, json_real(progRst[prog]));
 			json_object_set_new(rootJ, ("progRst"+to_string(prog)).c_str(), progRst_json_array);
 		}
@@ -661,7 +651,6 @@ struct TrigSeqPlus : Module {
 			json_t *json_value;
 			if (progRst_json_array) {
 				json_array_foreach(progRst_json_array, tempSeq, json_value) {
-					//progRst[prog] = json_integer_value(json_value);
 					progRst[prog] = json_real_value(json_value);
 				}
 			}
@@ -755,7 +744,6 @@ struct TrigSeqPlus : Module {
 
 		json_t *prog_json_array = json_array();
 		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			//json_array_append_new(prog_json_array, json_boolean((bool)params[STEPBUT_PARAM+tempStep].getValue()));
 			json_array_append_new(prog_json_array, json_integer(wSeq[tempStep]));
 		}
 		json_object_set_new(rootJ, "sr", prog_json_array);	
@@ -902,14 +890,7 @@ struct TrigSeqPlus : Module {
 	void inline resetStep() {
 		lights[STEP_LIGHT+step].setBrightness(0);
 
-		/* original
-		step = wRst - 1;
-		if (mode == CLOCK_MODE && dontAdvanceSetting)
-			dontAdvance = true;
-		*/
-
 		if (!turingMode) {
-			//step = wRst - 1;
 			step = int(wRst * 15);
 		} else {
 			step = 0;
@@ -941,7 +922,6 @@ struct TrigSeqPlus : Module {
 			if (tempCursor >= maxSteps)
 				tempCursor = 0;
 
-			//if (params[STEPBUT_PARAM+tempCursor].getValue())
 			if (wSeq[tempCursor])
 				volt += tableVolts[progression][bitResolution][i];
 
@@ -956,13 +936,10 @@ struct TrigSeqPlus : Module {
 
 	void process(const ProcessArgs& args) override {
 
-		//for (int i = 0; i < 16; i++)
-		//	lights[STEPBUT_LIGHT+i].setBrightness(params[STEP_PARAM+i].getValue());
-
 		// ----------- AUTO SWITCH
 
-		instantScaleChange = int(params[AUTO_PARAM].getValue());
-		lights[AUTO_LIGHT].setBrightness(instantScaleChange);
+		instantProgChange = int(params[AUTO_PARAM].getValue());
+		lights[AUTO_LIGHT].setBrightness(instantProgChange);
 
 		// ----------- PROGRAM MANAGEMENT
 
@@ -1051,7 +1028,7 @@ struct TrigSeqPlus : Module {
 
 		if (seqChanged) {
 			if (pendingUpdate) {
-				if (instantScaleChange) {
+				if (instantProgChange) {
 
 					for (int i = 0; i < 16; i++)
 						wSeq[i] = nextSeq[i];
@@ -1192,16 +1169,18 @@ struct TrigSeqPlus : Module {
 		// -------------------------------------------------
 		// -------------------------------------------------
 
+		/*
 		if (turingMode && !prevTuringMode) {
 			calcVoltage();
-			params[RST_PARAM].setValue(16.f);
-		}
-
-		if (!turingMode && prevTuringMode) {
 			params[RST_PARAM].setValue(1.f);
 		}
 
+		if (!turingMode && prevTuringMode) {
+			params[RST_PARAM].setValue(0.f);
+		}
+
 		prevTuringMode = turingMode;
+		*/
 
 		out = 0.f;
 
