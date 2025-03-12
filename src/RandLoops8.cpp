@@ -73,37 +73,36 @@ struct RandLoops8 : Module {
 		}
 	};
 
-	bool shiftRegister[8][16] = {{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
+	int shiftRegister[8][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 							};
 
-	bool saveRegister[8][16] = {{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-								{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
+	int saveRegister[8][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 							};
 
-	bool tempRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-	bool tempSaveRegister[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+	int tempRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int tempSaveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	float probCtrl = 0;
 	float probCtrlRnd = 0;
 	float probRegister = 0;
 
-	bool incomingRegister = false;
+	int incomingRegister = 0;
 
 	int startingStep[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	
 	
 	int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
@@ -115,22 +114,11 @@ struct RandLoops8 : Module {
 	float stepPulseTime[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	bool outGate[8] = {false, false, false, false, false, false, false, false};
 	
-	/*
-	bool clipboard = false;
-	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int cbStart = 0;
-	int cbSteps = 16;
-	float cbCtrl = 0.f;
-	float cbScale = 1.f;
-	float cbOffset = 0.f;
-	*/
-
 	RandLoops8() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		for (int i = 0; i < 8; i++) {
 			configInput(CLK_INPUT+i, "Clock #" + to_string(i+1));
 			configInput(RST_INPUT+i, "Reset #" + to_string(i+1));
-			//configParam(CTRL_PARAM+i, 0.f, 1.f, 1.f, "Control #" + to_string(i+1));
 			configParam(CTRL_PARAM+i, -1.f, 1.f, 0.f, "Control #" + to_string(i+1));
 			configInput(CTRL_INPUT+i, "CV Control #" + to_string(i+1));
 			configParam(LENGTH_PARAM+i, 1.f, 16.f, 16.f, "Length #" + to_string(i+1));
@@ -164,7 +152,7 @@ struct RandLoops8 : Module {
 		for (int t = 0; t < 8; t++) {
 			json_t *track_json_array = json_array();
 			for (int tempStep = 0; tempStep < 16; tempStep++) {
-				json_array_append_new(track_json_array, json_boolean(saveRegister[t][tempStep]));
+				json_array_append_new(track_json_array, json_integer(saveRegister[t][tempStep]));
 			}
 			json_object_set_new(rootJ, ("sr"+to_string(t)).c_str(), track_json_array);	
 		}
@@ -214,10 +202,11 @@ struct RandLoops8 : Module {
 				json_t *json_value;
 				if (track_json_array) {
 					json_array_foreach(track_json_array, tempSeq, json_value) {
-						shiftRegister[t][tempSeq] = json_boolean_value(json_value);
+						shiftRegister[t][tempSeq] = json_integer_value(json_value);
 					}
 				}
 			}
+
 		}
 
 	}
@@ -241,9 +230,37 @@ struct RandLoops8 : Module {
 	}
 	*/
 
+	/*
 	void inline sequence_to_saveRegister(int t) {
 
-		int cursor = 0;
+		int cursor = startingStep[t];
+		int wSteps = int(params[LENGTH_PARAM+t].getValue());
+		
+		for (int i = 0; i <= wSteps; i++) {
+			tempSaveRegister[i] = shiftRegister[t][cursor];
+			cursor++;
+			if (cursor >= 16)
+				cursor = 0;
+		}
+
+		int fillCursor = 0;
+		for (int i = wSteps; i < 16; i++) {
+			tempSaveRegister[i] = tempSaveRegister[fillCursor];
+			fillCursor++;
+			if (fillCursor >= wSteps)
+				fillCursor = 0;
+		}
+
+		for (int i = 0; i < 16; i++)
+			saveRegister[t][i] = tempSaveRegister[i];
+
+	}
+	*/
+	
+	
+	void inline sequence_to_saveRegister(int t) {
+
+		int cursor = startingStep[t];
 		int wSteps = int(params[LENGTH_PARAM+t].getValue());
 		
 		for (int i = 0; i <= wSteps; i++) {
@@ -265,6 +282,7 @@ struct RandLoops8 : Module {
 			saveRegister[t][i] = tempRegister[i];
 
 	}
+	
 
 	void inline resetCheck(int t) {
 		if (rstValue[t] >= 1.f && prevRstValue[t] < 1.f) {
@@ -292,8 +310,6 @@ struct RandLoops8 : Module {
 			for (int i = 0; i < 16; i++)
 				shiftRegister[t][i] = tempRegister[i];
 
-			//debugResettt(t);
-
 			startingStep[t] = 0;
 
 			if (dontAdvanceSetting)
@@ -316,43 +332,18 @@ struct RandLoops8 : Module {
 	void clearAll() {
 		for (int t = 0; t < 8; t++) {
 			for (int step = 0; step < 16; step++)
-				shiftRegister[t][step] = false;
+				shiftRegister[t][step] = 0;
 			calcVoltage(t);
 		}
 	}
 
-	/*
 	void copyTrack(int t) {
 
-		for (int i = 0; i < 16; i++)
-			cbSeq[i] = shiftRegister[t][i];
-		
-		cbStart = startingStep[t];
-		cbSteps = params[LENGTH_PARAM+t].getValue();
-		cbCtrl = params[CTRL_PARAM+t].getValue();
-		cbScale = params[SCALE_PARAM+t].getValue();
-		cbOffset = params[OFFSET_PARAM+t].getValue();
-		clipboard = true;
-	}
-
-	void pasteToTrack(int t) {
-		for (int i = 0; i < 16; i++)
-			shiftRegister[t][i] = cbSeq[i];
-		
-		startingStep[t] = cbStart;
-		params[LENGTH_PARAM+t].setValue(cbSteps);
-		params[CTRL_PARAM+t].setValue(cbCtrl);
-		params[SCALE_PARAM+t].setValue(cbScale);
-		params[OFFSET_PARAM+t].setValue(cbOffset);
-	}
-	*/
-
-	void copyTrack(int t) {
+		sequence_to_saveRegister(t);
 
 		for (int i = 0; i < 16; i++)
-			randLoops_cbSeq[i] = shiftRegister[t][i];
+			randLoops_cbSeq[i] = saveRegister[t][i];
 		
-		randLoops_cbStart = startingStep[t];
 		randLoops_cbSteps = params[LENGTH_PARAM+t].getValue();
 		randLoops_cbCtrl = params[CTRL_PARAM+t].getValue();
 		randLoops_cbScale = params[SCALE_PARAM+t].getValue();
@@ -364,9 +355,12 @@ struct RandLoops8 : Module {
 		for (int i = 0; i < 16; i++)
 			shiftRegister[t][i] = randLoops_cbSeq[i];
 		
-		startingStep[t] = randLoops_cbStart;
+		startingStep[t] = 0;
 		params[LENGTH_PARAM+t].setValue(randLoops_cbSteps);
-		params[CTRL_PARAM+t].setValue(randLoops_cbCtrl);
+		
+		if (randLoops_cbCtrl != -1)	// 	// this prevents to set ctrl paramer if pasting from trigSeq/trigSeq+
+			params[CTRL_PARAM+t].setValue(randLoops_cbCtrl);	
+		
 		params[SCALE_PARAM+t].setValue(randLoops_cbScale);
 		params[OFFSET_PARAM+t].setValue(randLoops_cbOffset);
 	}
@@ -418,9 +412,9 @@ struct RandLoops8 : Module {
 
 						probRegister = random::uniform();
 						if (probRegister > 0.5f)
-							incomingRegister = true;
+							incomingRegister = 1;
 						else
-							incomingRegister = false;
+							incomingRegister = 0;
 
 					} else {
 
@@ -468,8 +462,6 @@ struct RandLoops8 : Module {
 
 			}
 			prevClock[t] = clock[t];
-
-
 
 			cvOut[t] = (volt[t] * params[SCALE_PARAM+t].getValue()) + params[OFFSET_PARAM+t].getValue();
 

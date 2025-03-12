@@ -91,7 +91,7 @@ void init(rack::Plugin *p) {
 
 bool randLoops_clipboard = false;
 int randLoops_cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int randLoops_cbStart = 0;
+//int randLoops_cbStart = 0;
 int randLoops_cbSteps = 16;
 float randLoops_cbCtrl = 0.f;
 float randLoops_cbScale = 1.f;

@@ -144,10 +144,12 @@ struct TrigSeq : Module {
 			float getDisplayValue() override {
 				TrigSeq* module = reinterpret_cast<TrigSeq*>(this->module);
 				if (!module->turingMode) {
+					name = "Reset Step";
 					unit = "";
 					displayMultiplier = 15.f;
 					displayOffset = 1.f;
 				} else {
+					name = "Out Atten.";
 					unit = "%";
 					displayOffset = 0;
 					displayMultiplier = 100.f;
@@ -427,6 +429,7 @@ struct TrigSeq : Module {
 		
 		randLoops_cbSteps = params[LENGTH_PARAM].getValue();
 		randLoops_cbScale = params[RST_PARAM].getValue();
+		randLoops_cbCtrl = -1;	// this prevents to set ctrl paramer if pasting to randLoops/randLoops8
 		randLoops_clipboard = true;
 	}
 
@@ -442,7 +445,6 @@ struct TrigSeq : Module {
 		lights[STEP_LIGHT+step].setBrightness(0);
 
 		if (!turingMode) {
-			//step = int(params[RST_PARAM].getValue() - 1);
 			step = int(params[RST_PARAM].getValue() * 15);
 		} else {
 			step = 0;
@@ -488,24 +490,17 @@ struct TrigSeq : Module {
 
 	void process(const ProcessArgs& args) override {
 
-		if (turingMode && !prevTuringMode) {
+		if (turingMode && !prevTuringMode)
 			calcVoltage();
-			//params[RST_PARAM].setValue(16.f);
-			params[RST_PARAM].setValue(1.f);
-		}
 
-		if (!turingMode && prevTuringMode) {
-			//params[RST_PARAM].setValue(1.f);
-			params[RST_PARAM].setValue(0.f);
-		}
-			
 		prevTuringMode = turingMode;
+
 
 		for (int i = 0; i < 16; i++)
 			lights[STEPBUT_LIGHT+i].setBrightness(params[STEPBUT_PARAM+i].getValue());
 
-		if (!turingMode)
-			out = 0.f;
+		//if (!turingMode)
+		out = 0.f;
 
 		mode = params[MODE_SWITCH].getValue();
 

@@ -242,7 +242,7 @@ struct TrigSeqPlus : Module {
 	int bitResolution = BIT_8;
 
 	bool turingMode = false;
-	//bool prevTuringMode = false;
+	bool prevTuringMode = false;
 
 	TrigSeqPlus() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -257,10 +257,12 @@ struct TrigSeqPlus : Module {
 			float getDisplayValue() override {
 				TrigSeqPlus* module = reinterpret_cast<TrigSeqPlus*>(this->module);
 				if (!module->turingMode) {
+					name = "Reset Step";
 					unit = "";
 					displayMultiplier = 15.f;
 					displayOffset = 1.f;
 				} else {
+					name = "Out Atten.";
 					unit = "%";
 					displayOffset = 0;
 					displayMultiplier = 100.f;
@@ -336,19 +338,10 @@ struct TrigSeqPlus : Module {
 
 		for (int i = 0; i < 16; i++) {
 			wSeq[i] = 0;
-			params[STEP_PARAM+i].setValue(wSeq[i]);
 			lights[STEPBUT_LIGHT+i].setBrightness(wSeq[i]);
 		}
 		wSteps = 16;
-		params[LENGTH_PARAM].setValue(wSteps);
 		wRst = 0;
-		/*
-		if (!turingMode)
-			wRst = 0;
-		else
-			wRst = 1;
-		*/
-		params[RST_PARAM].setValue(wRst);
 
 		Module::onReset(e);
 	}
@@ -858,6 +851,7 @@ struct TrigSeqPlus : Module {
 		
 		randLoops_cbSteps = wSteps;
 		randLoops_cbScale = wRst;
+		randLoops_cbCtrl = -1;	// this prevents to set ctrl paramer if pasting to randLoops/randLoops8
 		randLoops_clipboard = true;
 	}
 
@@ -1168,18 +1162,10 @@ struct TrigSeqPlus : Module {
 		// -------------------------------------------------
 		// -------------------------------------------------
 
-		/*
-		if (turingMode && !prevTuringMode) {
+		if (turingMode && !prevTuringMode)
 			calcVoltage();
-			params[RST_PARAM].setValue(1.f);
-		}
-
-		if (!turingMode && prevTuringMode) {
-			params[RST_PARAM].setValue(0.f);
-		}
 
 		prevTuringMode = turingMode;
-		*/
 
 		out = 0.f;
 
@@ -1348,22 +1334,6 @@ struct TrigSeqPlus : Module {
 						if (currAddr != prevAddr) {
 							lights[STEP_LIGHT+step].setBrightness(0);
 							step = currAddr-1;
-
-							/* original with no turing mode
-							//if (params[STEP_PARAM+step].getValue()) {
-							if (wSeq[step]) {
-								stepPulse = true;
-								stepPulseTime = oneMsTime;
-								if (outType == OUT_GATE)
-									outGate = true;
-							} else {
-								if (outType == OUT_GATE) {
-									outGate = false;
-									out = 0.f;
-								}
-							}
-							prevAddr = currAddr;
-							*/
 
 							if (!turingMode) {
 								if (wSeq[step]) {

@@ -159,10 +159,11 @@ struct RandLoops : Module {
 	float nextScale = 1.f;
 	float nextCtrl = 0.f;
 
-	int saveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
 	int tempRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	
+
+	int saveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int tempSaveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 	// ------------------------
 
 	float probCtrl = 0;
@@ -286,9 +287,6 @@ struct RandLoops : Module {
 		configInput(RECALL_INPUT, "Recall");
 		configSwitch(STORE_PARAM, 0, 1.f, 0.f, "Store", {"OFF", "ON"});
 		configSwitch(AUTO_PARAM, 0, 1.f, 0.f, "Auto", {"OFF", "ON"});
-
-		//if (!trigMode)
-			calcVoltage();
 
 	}
 
@@ -446,6 +444,8 @@ struct RandLoops : Module {
 
 				params[LENGTH_PARAM].setValue(wSteps);
 			}
+
+			calcVoltage();
 		}
 
 		json_t* savedProgKnobJ = json_object_get(rootJ, "savedProgKnob");
@@ -855,9 +855,12 @@ struct RandLoops : Module {
 
 	void inline sequence_to_saveRegister() {
 
-		int cursor = 0;
+		// this rebuilds the sequence, shifting startingStep to position 0,
+		// and filling exceeding length steps with the same sequence as it would run for some time.
+
+		int cursor = startingStep;
 		for (int i = 0; i <= wSteps; i++) {
-			tempRegister[i] = wSeq[cursor];
+			tempSaveRegister[i] = wSeq[cursor];
 			cursor++;
 			if (cursor >= 16)
 				cursor = 0;
@@ -865,15 +868,19 @@ struct RandLoops : Module {
 
 		int fillCursor = 0;
 		for (int i = wSteps; i < 16; i++) {
-			tempRegister[i] = tempRegister[fillCursor];
+			tempSaveRegister[i] = tempSaveRegister[fillCursor];
 			fillCursor++;
 			if (fillCursor >= wSteps)
 				fillCursor = 0;
 		}
 
 		for (int i = 0; i < 16; i++)
-			saveRegister[i] = tempRegister[i];
+			saveRegister[i] = tempSaveRegister[i];
 
+	}
+
+		void inline rebuildSeq() {
+		
 	}
 
 	void copyClipboard() {
@@ -892,7 +899,8 @@ struct RandLoops : Module {
 			wSeq[i] = randLoops_cbSeq[i];
 		
 		wSteps = randLoops_cbSteps;
-		wCtrl = randLoops_cbCtrl;
+		if (randLoops_cbCtrl != -1)	// 	// this prevents to set ctrl paramer if pasting from trigSeq/trigSeq+
+			wCtrl = randLoops_cbCtrl;
 		wScale = randLoops_cbScale;
 
 		params[CTRL_PARAM].setValue(wCtrl);
@@ -954,12 +962,10 @@ struct RandLoops : Module {
 					fillCursor = 0;
 			}
 
-			// -----------
-
 			for (int i = 0; i < 16; i++)
 				wSeq[i] = tempRegister[i];
 
-			//debugCurrent();
+
 
 			startingStep = 0;
 

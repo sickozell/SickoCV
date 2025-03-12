@@ -262,7 +262,7 @@ struct StepSeq : Module {
 	
 	void inline resetStep() {
 		lights[STEP_LIGHT+step].setBrightness(0);
-		step = int(params[RST_PARAM].getValue() - 1);
+		step = int(params[RST_PARAM].getValue()) - 1;
 		if (mode == CLOCK_MODE && dontAdvanceSetting)
 			dontAdvance = true;
 	}
@@ -272,7 +272,7 @@ struct StepSeq : Module {
 			stepSeq_cbSeq[i] = params[STEP_PARAM+i].getValue();
 		
 		stepSeq_cbSteps = params[LENGTH_PARAM].getValue();
-		stepSeq_cbRst = params[RST_PARAM].getValue();
+		stepSeq_cbRst = int(params[RST_PARAM].getValue());
 		stepSeq_clipboard = true;
 	}
 
