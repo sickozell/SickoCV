@@ -908,6 +908,8 @@ struct RandLoops : Module {
 		params[LENGTH_PARAM].setValue(wSteps);
 		params[SCALE_PARAM].setValue(wScale);
 
+		startingStep = 0;
+
 	}
 
 	void eraseProgs() {
