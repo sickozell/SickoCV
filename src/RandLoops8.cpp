@@ -93,7 +93,7 @@ struct RandLoops8 : Module {
 								{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 							};
 
-	int tempRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int tempRegister[16] =     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int tempSaveRegister[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	float probCtrl = 0;
@@ -104,7 +104,7 @@ struct RandLoops8 : Module {
 
 	int startingStep[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	
-	int bitResTable[2] = {8, 16};
+	const int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
 
 	int outType = OUT_TRIG;
@@ -148,6 +148,8 @@ struct RandLoops8 : Module {
 
 		for (int t = 0; t < 8; t++)
 			sequence_to_saveRegister(t);
+
+		//------------------
 
 		for (int t = 0; t < 8; t++) {
 			json_t *track_json_array = json_array();
@@ -211,7 +213,7 @@ struct RandLoops8 : Module {
 
 	}
 
-	/*
+	
 	void inline debugCurrent(int t) {
 		if (t == 0) {
 			DEBUG ("%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i", shiftRegister[t][0], shiftRegister[t][1], shiftRegister[t][2], shiftRegister[t][3],
@@ -219,7 +221,7 @@ struct RandLoops8 : Module {
 					shiftRegister[t][10], shiftRegister[t][11], shiftRegister[t][12], shiftRegister[t][13], shiftRegister[t][14], shiftRegister[t][15]);
 		}
 	}
-
+	/*
 	void inline debugResettt(int t) {
 		if (t == 0) {
 			DEBUG ("%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i RESET %i", shiftRegister[t][0], shiftRegister[t][1], shiftRegister[t][2], shiftRegister[t][3],
@@ -230,19 +232,18 @@ struct RandLoops8 : Module {
 	}
 	*/
 
-	/*
+	
 	void inline sequence_to_saveRegister(int t) {
 
 		int cursor = startingStep[t];
 		int wSteps = int(params[LENGTH_PARAM+t].getValue());
-		
-		for (int i = 0; i <= wSteps; i++) {
+		//for (int i = 0; i <= wSteps; i++) {
+		for (int i = 0; i < wSteps; i++) {
 			tempSaveRegister[i] = shiftRegister[t][cursor];
 			cursor++;
-			if (cursor >= 16)
+			if (cursor > 15)
 				cursor = 0;
 		}
-
 		int fillCursor = 0;
 		for (int i = wSteps; i < 16; i++) {
 			tempSaveRegister[i] = tempSaveRegister[fillCursor];
@@ -250,39 +251,9 @@ struct RandLoops8 : Module {
 			if (fillCursor >= wSteps)
 				fillCursor = 0;
 		}
-
 		for (int i = 0; i < 16; i++)
 			saveRegister[t][i] = tempSaveRegister[i];
-
 	}
-	*/
-	
-	
-	void inline sequence_to_saveRegister(int t) {
-
-		int cursor = startingStep[t];
-		int wSteps = int(params[LENGTH_PARAM+t].getValue());
-		
-		for (int i = 0; i <= wSteps; i++) {
-			tempRegister[i] = shiftRegister[t][cursor];
-			cursor++;
-			if (cursor >= 16)
-				cursor = 0;
-		}
-
-		int fillCursor = 0;
-		for (int i = wSteps; i < 16; i++) {
-			tempRegister[i] = tempRegister[fillCursor];
-			fillCursor++;
-			if (fillCursor >= wSteps)
-				fillCursor = 0;
-		}
-
-		for (int i = 0; i < 16; i++)
-			saveRegister[t][i] = tempRegister[i];
-
-	}
-	
 
 	void inline resetCheck(int t) {
 		if (rstValue[t] >= 1.f && prevRstValue[t] < 1.f) {
@@ -290,10 +261,11 @@ struct RandLoops8 : Module {
 			int cursor = startingStep[t];
 			int wSteps = params[LENGTH_PARAM+t].getValue();
 
-			for (int i = 0; i <= wSteps; i++) {
+			//for (int i = 0; i <= wSteps; i++) {
+			for (int i = 0; i < wSteps; i++) {
 				tempRegister[i] = shiftRegister[t][cursor];
 				cursor++;
-				if (cursor >= 16)
+				if (cursor > 15)
 					cursor = 0;
 			}
 

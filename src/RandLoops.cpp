@@ -859,10 +859,11 @@ struct RandLoops : Module {
 		// and filling exceeding length steps with the same sequence as it would run for some time.
 
 		int cursor = startingStep;
-		for (int i = 0; i <= wSteps; i++) {
+		//for (int i = 0; i <= wSteps; i++) {
+		for (int i = 0; i < wSteps; i++) {
 			tempSaveRegister[i] = wSeq[cursor];
 			cursor++;
-			if (cursor >= 16)
+			if (cursor > 15)
 				cursor = 0;
 		}
 
@@ -947,10 +948,11 @@ struct RandLoops : Module {
 
 			int cursor = startingStep;
 
-			for (int i = 0; i <= wSteps; i++) {
+			//for (int i = 0; i <= wSteps; i++) {
+			for (int i = 0; i < wSteps; i++) {
 				tempRegister[i] = wSeq[cursor];
 				cursor++;
-				if (cursor >= 16)
+				if (cursor > 15)
 					cursor = 0;
 			}
 
@@ -1015,8 +1017,6 @@ struct RandLoops : Module {
 		}
 
 	}
-
-
 	
 	void process(const ProcessArgs& args) override {
 
