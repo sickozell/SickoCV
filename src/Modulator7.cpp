@@ -173,7 +173,6 @@ struct Modulator7 : Module {
 		waitingClockCount = 1;
 
 		sampleCount = 0;
-		//prevSampleCount = 0;
 
 		wait2ndClock = false;
 

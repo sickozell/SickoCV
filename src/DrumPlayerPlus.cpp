@@ -8,6 +8,9 @@
 
 #include "plugin.hpp"
 #include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
 //#define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 #include <vector>
@@ -191,8 +194,8 @@ struct DrumPlayerPlus : Module {
 		outsMode = NORMALLED_OUTS;
 		scrolling = 0;
 		sampleInPatch = true;
-		Module::onReset(e);
 		system::removeRecursively(getPatchStorageDirectory().c_str());
+		Module::onReset(e);
 	}
 
 	void onSampleRateChange() override {
@@ -327,7 +330,11 @@ struct DrumPlayerPlus : Module {
 
 	void selectRootFolder() {
 		const char* prevFolder = userFolder.c_str();
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL, [this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+#endif
 		if (path) {
 			folderTreeData.clear();
 			folderTreeDisplay.clear();
@@ -339,6 +346,9 @@ struct DrumPlayerPlus : Module {
 			}
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	};
 
 	void refreshRootFolder() {
@@ -501,7 +511,11 @@ struct DrumPlayerPlus : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
 		fileLoaded[slot] = false;
 		restoreLoadFromPatch[slot] = false;
 		if (path) {
@@ -516,6 +530,9 @@ struct DrumPlayerPlus : Module {
 			fileLoaded[slot] = false;
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadSample(std::string fromPath, int slot) {
@@ -533,6 +550,11 @@ struct DrumPlayerPlus : Module {
 			calcBiquadLpf(20000.0, sampleRate[slot], 1);
 			playBuffer[slot][0].clear();
 			playBuffer[slot][1].clear();
+
+			// metamodule change
+			vector<float>().swap(playBuffer[slot][0]);
+			vector<float>().swap(playBuffer[slot][1]);
+
 			for (unsigned int i = 0; i < tsc; i = i + c) {
 				playBuffer[slot][0].push_back(pSampleData[i]);
 				playBuffer[slot][0].push_back(0);
@@ -640,6 +662,11 @@ struct DrumPlayerPlus : Module {
 		currFileDisplay[slot] = "-----";
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
+
+		// metamodule change
+		vector<float>().swap(playBuffer[slot][0]);
+		vector<float>().swap(playBuffer[slot][1]);
+		
 		totalSampleC[slot] = 0;
 	}
 	
@@ -1506,7 +1533,6 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Interpolation"));
 		struct ModeItem : MenuItem {
 			DrumPlayerPlus* module;
 			int interpolationMode;
@@ -1515,19 +1541,19 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			}
 		};
 		std::string modeNames[4] = {"None", "Linear 1", "Linear 2", "Hermite"};
-		for (int i = 0; i < 4; i++) {
-			ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
-			modeItem->rightText = CHECKMARK(module->interpolationMode == i);
-			modeItem->module = module;
-			modeItem->interpolationMode = i;
-			menu->addChild(modeItem);
-		}
+		menu->addChild(createSubmenuItem("Interpolation", (modeNames[module->interpolationMode]), [=](Menu * menu) {
+			for (int i = 0; i < 4; i++) {
+				ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
+				modeItem->rightText = CHECKMARK(module->interpolationMode == i);
+				modeItem->module = module;
+				modeItem->interpolationMode = i;
+				menu->addChild(modeItem);
+			}
+		}));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Outs mode"));
 		struct OutsItem : MenuItem {
 			DrumPlayerPlus* module;
 			int outsMode;
@@ -1536,13 +1562,16 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			}
 		};
 		std::string outsNames[3] = {"Normalled", "Solo", "Unconnected on out #4"};
-		for (int i = 0; i < 3; i++) {
-			OutsItem* outsItem = createMenuItem<OutsItem>(outsNames[i]);
-			outsItem->rightText = CHECKMARK(module->outsMode == i);
-			outsItem->module = module;
-			outsItem->outsMode = i;
-			menu->addChild(outsItem);
-		}
+		menu->addChild(createSubmenuItem("Outs mode", (outsNames[module->outsMode]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutsItem* outsItem = createMenuItem<OutsItem>(outsNames[i]);
+				outsItem->rightText = CHECKMARK(module->outsMode == i);
+				outsItem->module = module;
+				outsItem->outsMode = i;
+				menu->addChild(outsItem);
+			}
+		}));
+
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
 		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));

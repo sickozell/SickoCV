@@ -10,9 +10,25 @@
 #define OUT_GATE 1
 #define OUT_CLOCK 2
 
+#define STD2x_PROGRESSION 0
+#define P_1_3_PROGRESSION 2 // 1.3x
+#define FIBONACCI_PROGRESSION 3
+
+#define BIT_8 0
+#define BIT_16 1
+
 #include "plugin.hpp"
 
-//using namespace std;
+#include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
+#include <dirent.h>
+#include <libgen.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+using namespace std;
 
 struct TrigSeq : Module {
 	enum ParamId {
@@ -87,6 +103,34 @@ struct TrigSeq : Module {
 
 	bool outGate = false;
 
+	float volt = 0.f;
+
+	int progression = STD2x_PROGRESSION;
+	
+	const float tableVolts[3][2][16] = {
+		{
+			{0.03922, 0.07844, 0.15688, 0.31376, 0.62752, 1.25504, 2.51008, 5.02016, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0.00015259, 0.000305181, 0.000610361, 0.001220722, 0.002441445, 0.00488289, 0.009765779, 0.019531558, 0.039063117, 0.078126234, 0.156252467, 0.312504934, 0.625009869, 1.250019738, 2.500039475, 5.00007895}
+		},
+		{
+			{0.4191521, 0.54489773, 0.708367049, 0.920877164, 1.197140313, 1.556282407, 2.023167129, 2.630117267, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0.04577242, 0.059504146, 0.07735539, 0.100562007, 0.130730609, 0.169949791, 0.220934729, 0.287215147, 0.373379692, 0.485393599, 0.631011679, 0.820315183, 1.066409737, 1.386332659, 1.802232456, 2.342902193}
+		},
+		{
+			{0.114942529, 0.229885058, 0.344827586, 0.574712644, 0.91954023, 1.494252874, 2.413793105, 3.908045979, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0.002392917, 0.004785834, 0.007178751, 0.011964585, 0.019143336, 0.031107921, 0.050251256, 0.081359177, 0.131610433, 0.21296961, 0.344580044, 0.557549654, 0.902129698, 1.459679352, 2.361809049, 3.821488401}
+		}
+	};
+	
+	const int bitResTable[2] = {8, 16};
+	int bitResolution = BIT_8;
+	
+	std::string resolutionName[2] = {"8 bit", "16 bit"};
+	std::string progressionName[3] = {"2x (std)", "1.3x", "Fibonacci"};
+
+	bool turingMode = false;
+	bool prevTuringMode = false;
+
 	TrigSeq() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configSwitch(MODE_SWITCH, 0.f, 1.f, 1.f, "Mode", {"Cv", "Clock"});
@@ -96,8 +140,26 @@ struct TrigSeq : Module {
 		configSwitch(RUNBUT_PARAM, 0.f, 1.f, 1.f, "Run", {"OFF", "ON"});
 		configInput(RUN_INPUT, "Run");
 		
-		configParam(RST_PARAM, 1.f,16.f, 1.f, "Reset Input");
-		paramQuantities[RST_PARAM]->snapEnabled = true;
+		struct ResetQuantity : ParamQuantity {
+			float getDisplayValue() override {
+				TrigSeq* module = reinterpret_cast<TrigSeq*>(this->module);
+				if (!module->turingMode) {
+					name = "Reset Step";
+					unit = "";
+					displayMultiplier = 15.f;
+					displayOffset = 1.f;
+				} else {
+					name = "Out Atten.";
+					unit = "%";
+					displayOffset = 0;
+					displayMultiplier = 100.f;
+				}
+				return ParamQuantity::getDisplayValue();
+			}
+		};
+		//configParam(RST_PARAM, 1.f,16.f, 1.f, "Rst Step / Atten.");
+		configParam<ResetQuantity>(RST_PARAM, 0.f,1.f, 0.f, "Rst Step / Atten.");
+		//paramQuantities[RST_PARAM]->snapEnabled = true;
 		configInput(RST_INPUT, "Reset");
 
 		configOutput(OUT_OUTPUT, "Output");
@@ -127,6 +189,8 @@ struct TrigSeq : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
+
+		initStart = false;
 
 		step = 0;
 
@@ -168,6 +232,9 @@ struct TrigSeq : Module {
 		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
 		json_object_set_new(rootJ, "step", json_integer(recStep));
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
+		json_object_set_new(rootJ, "turingMode", json_boolean(turingMode));
+		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
+		json_object_set_new(rootJ, "progression", json_integer(progression));
 
 		return rootJ;
 	}
@@ -221,20 +288,218 @@ struct TrigSeq : Module {
 				step = 0;
 		}
 
+		json_t* turingModeJ = json_object_get(rootJ, "turingMode");
+		if (turingModeJ) {
+			turingMode = json_boolean_value(turingModeJ);
+		}
+
+		json_t* bitResolutionJ = json_object_get(rootJ, "bitResolution");
+		if (bitResolutionJ) {
+			bitResolution = json_integer_value(bitResolutionJ);
+			if (bitResolution < 0 && bitResolution > 1)
+				bitResolution = BIT_8;
+		}
+
+		json_t* progressionJ = json_object_get(rootJ, "progression");
+		if (progressionJ) {
+			progression = json_integer_value(progressionJ);
+			if (progression < 0 && progression > 2)
+				progression = STD2x_PROGRESSION;
+		}
+
+	}
+
+	json_t *sequenceToJson() {
+
+		json_t *rootJ = json_object();
+
+		json_t *prog_json_array = json_array();
+		for (int tempStep = 0; tempStep < 16; tempStep++) {
+			json_array_append_new(prog_json_array, json_integer((int)params[STEPBUT_PARAM+tempStep].getValue()));
+		}
+		json_object_set_new(rootJ, "sr", prog_json_array);	
+
+		json_object_set_new(rootJ, "length", json_integer((int)params[LENGTH_PARAM].getValue()));
+
+		return rootJ;
+	}
+
+	void sequenceFromJson(json_t *rootJ) {
+
+		json_t *prog_json_array = json_object_get(rootJ, "sr");
+		size_t tempSeq;
+		json_t *json_value;
+		if (prog_json_array) {
+			json_array_foreach(prog_json_array, tempSeq, json_value) {
+				params[STEPBUT_PARAM+tempSeq].setValue(json_integer_value(json_value));
+			}
+		}
+
+		json_t* lengthJ = json_object_get(rootJ, "length");
+		if (lengthJ) {
+			if (json_integer_value(lengthJ) < 1 || json_integer_value(lengthJ) > 16)
+				params[LENGTH_PARAM].setValue(16);
+			else
+				params[LENGTH_PARAM].setValue(int(json_integer_value(lengthJ)));
+		}
+	}
+
+	void menuLoadSequence() {
+		static const char FILE_FILTERS[] = "trigSeq preset (.tss):tss,TSS";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
+		if (path)
+			loadSequence(path);
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void loadSequence(std::string path) {
+
+		FILE *file = fopen(path.c_str(), "r");
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (rootJ == NULL) {
+			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		}
+
+		fclose(file);
+
+		if (rootJ) {
+
+			sequenceFromJson(rootJ);
+
+		} else {
+			WARN("problem loading preset json file");
+			//return;
+		}
+		
+	}
+
+	void menuSaveSequence() {
+
+		static const char FILE_FILTERS[] = "trigSeq Sequence (.tss):tss,TSS";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
+		if (path) {
+			std::string strPath = path;
+			if (strPath.substr(strPath.size() - 4) != ".tss" and strPath.substr(strPath.size() - 4) != ".TSS")
+				strPath += ".tss";
+			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
+			saveSequence(path, sequenceToJson());
+		}
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void saveSequence(std::string path, json_t *rootJ) {
+
+		if (rootJ) {
+			FILE *file = fopen(path.c_str(), "w");
+			if (!file) {
+				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
+				//return;
+			} else {
+				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+				json_decref(rootJ);
+				fclose(file);
+			}
+		}
+	}
+
+	void copyClipboard() {
+		for (int i = 0; i < 16; i++)
+			randLoops_cbSeq[i] = params[STEPBUT_PARAM+i].getValue();
+		
+		randLoops_cbSteps = params[LENGTH_PARAM].getValue();
+		randLoops_cbScale = params[RST_PARAM].getValue();
+		randLoops_cbCtrl = -1;	// this prevents to set ctrl paramer if pasting to randLoops/randLoops8
+		randLoops_clipboard = true;
+	}
+
+	void pasteClipboard() {
+		for (int i = 0; i < 16; i++)
+			params[STEPBUT_PARAM+i].setValue(randLoops_cbSeq[i]);
+		
+		params[LENGTH_PARAM].setValue(randLoops_cbSteps);
+		params[RST_PARAM].setValue(randLoops_cbScale);
 	}
 
 	void inline resetStep() {
 		lights[STEP_LIGHT+step].setBrightness(0);
-		step = int(params[RST_PARAM].getValue() - 1);
+
+		if (!turingMode) {
+			step = int(params[RST_PARAM].getValue() * 15);
+		} else {
+			step = 0;
+			calcVoltage();
+		}
+
 		if (mode == CLOCK_MODE && dontAdvanceSetting)
 			dontAdvance = true;
 	}
 
+	void inline calcVoltage() {
+
+		int startCursor = maxSteps - step;
+		int lengthCursor = 0;
+
+		if (startCursor >= maxSteps)
+			startCursor = 0;
+
+		int tempCursor = startCursor;
+
+		volt = 0.f;
+
+		for (int i=0; i < 16; i++) {
+			if (lengthCursor >= maxSteps) {
+				lengthCursor = 0;
+				tempCursor = startCursor;
+			}
+			
+			if (tempCursor >= maxSteps)
+				tempCursor = 0;
+
+			if (params[STEPBUT_PARAM+tempCursor].getValue())
+				volt += tableVolts[progression][bitResolution][i];
+
+			tempCursor++;
+			lengthCursor++;
+		}
+		
+		if (volt > 10.f)
+			volt = 10.f;
+
+	}
+
 	void process(const ProcessArgs& args) override {
+
+		if (turingMode && !prevTuringMode)
+			calcVoltage();
+
+		prevTuringMode = turingMode;
+
 
 		for (int i = 0; i < 16; i++)
 			lights[STEPBUT_LIGHT+i].setBrightness(params[STEPBUT_PARAM+i].getValue());
 
+		//if (!turingMode)
 		out = 0.f;
 
 		mode = params[MODE_SWITCH].getValue();
@@ -353,16 +618,20 @@ struct TrigSeq : Module {
 								step = maxSteps - 1;
 						}
 
-						if (params[STEPBUT_PARAM+step].getValue()) {
-							stepPulse = true;
-							stepPulseTime = oneMsTime;
-							if (outType == OUT_GATE)
-								outGate = true;
-						} else {
-							if (outType == OUT_GATE) {
-								outGate = false;
-								out = 0.f;
+						if (!turingMode) {
+							if (params[STEPBUT_PARAM+step].getValue()) {
+								stepPulse = true;
+								stepPulseTime = oneMsTime;
+								if (outType == OUT_GATE)
+									outGate = true;
+							} else {
+								if (outType == OUT_GATE) {
+									outGate = false;
+									out = 0.f;
+								}
 							}
+						} else {
+							calcVoltage();
 						}
 					}
 					prevClkValue = clkValue;
@@ -383,16 +652,21 @@ struct TrigSeq : Module {
 						if (currAddr != prevAddr) {
 							lights[STEP_LIGHT+step].setBrightness(0);
 							step = currAddr-1;
-							if (params[STEPBUT_PARAM+step].getValue()) {
-								stepPulse = true;
-								stepPulseTime = oneMsTime;
-								if (outType == OUT_GATE)
-									outGate = true;
-							} else {
-								if (outType == OUT_GATE) {
-									outGate = false;
-									out = 0.f;
+
+							if (!turingMode) {
+								if (params[STEPBUT_PARAM+step].getValue()) {
+									stepPulse = true;
+									stepPulseTime = oneMsTime;
+									if (outType == OUT_GATE)
+										outGate = true;
+								} else {
+									if (outType == OUT_GATE) {
+										outGate = false;
+										out = 0.f;
+									}
 								}
+							} else {
+								calcVoltage();
 							}
 							prevAddr = currAddr;
 
@@ -404,30 +678,35 @@ struct TrigSeq : Module {
 			}
 		}
 			
+		if (!turingMode) {
+			if (stepPulse) {
 
-		if (stepPulse) {
-
-			if ( (mode == CLOCK_MODE && outType == OUT_TRIG) || (mode == CV_MODE && (outType == OUT_TRIG || outType == OUT_CLOCK) ) ) {
-				stepPulseTime--;
-				if (stepPulseTime < 0) {
-					stepPulse = false;
-					out = 0.f;
-				} else {
-					out = 10.f;
+				if ( (mode == CLOCK_MODE && outType == OUT_TRIG) || (mode == CV_MODE && (outType == OUT_TRIG || outType == OUT_CLOCK) ) ) {
+					stepPulseTime--;
+					if (stepPulseTime < 0) {
+						stepPulse = false;
+						out = 0.f;
+					} else {
+						out = 10.f;
+					}
+				} else if (mode == CLOCK_MODE && outType == OUT_CLOCK) {
+					out = inputs[CLK_INPUT].getVoltage();
+					if (out < 1.f) {
+						out = 0.f;
+						stepPulse = false;
+					}
+				} else if (outType == OUT_GATE) {
+					if (outGate)
+						out = 10.f;
+					else
+						out = 0.f;
 				}
-			} else if (mode == CLOCK_MODE && outType == OUT_CLOCK) {
-				out = inputs[CLK_INPUT].getVoltage();
-				if (out < 1.f) {
-					out = 0.f;
-					stepPulse = false;
-				}
-			} else if (outType == OUT_GATE) {
-				if (outGate)
-					out = 10.f;
-				else
-					out = 0.f;
 			}
+		} else {
+			//out = volt * (params[RST_PARAM].getValue() - 1) / 15;
+			out = volt * params[RST_PARAM].getValue();
 		}
+
 		outputs[OUT_OUTPUT].setVoltage(out);
 		
 		lights[STEP_LIGHT+step].setBrightness(1);
@@ -520,6 +799,8 @@ struct TrigSeqWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		TrigSeq* module = dynamic_cast<TrigSeq*>(this->module);
 
+		menu->addChild(new MenuSeparator());
+		
 		struct RunTypeItem : MenuItem {
 			TrigSeq* module;
 			int runType;
@@ -528,16 +809,16 @@ struct TrigSeqWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Run Input"));
 		std::string RunTypeNames[2] = {"Gate", "Trig"};
-		for (int i = 0; i < 2; i++) {
-			RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-			runTypeItem->rightText = CHECKMARK(module->runType == i);
-			runTypeItem->module = module;
-			runTypeItem->runType = i;
-			menu->addChild(runTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+				runTypeItem->rightText = CHECKMARK(module->runType == i);
+				runTypeItem->module = module;
+				runTypeItem->runType = i;
+				menu->addChild(runTypeItem);
+			}
+		}));
 
 		struct RevTypeItem : MenuItem {
 			TrigSeq* module;
@@ -546,18 +827,17 @@ struct TrigSeqWidget : ModuleWidget {
 				module->revType = revType;
 			}
 		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Reverse Input Voltage"));
 		std::string RevTypeNames[2] = {"Positive", "Negative"};
-		for (int i = 0; i < 2; i++) {
-			RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
-			revTypeItem->rightText = CHECKMARK(module->revType == i);
-			revTypeItem->module = module;
-			revTypeItem->revType = i;
-			menu->addChild(revTypeItem);
-		}
-
+		menu->addChild(createSubmenuItem("Reverse Input Voltage", (RevTypeNames[module->revType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
+				revTypeItem->rightText = CHECKMARK(module->revType == i);
+				revTypeItem->module = module;
+				revTypeItem->revType = i;
+				menu->addChild(revTypeItem);
+			}
+		}));
+		
 		struct OutTypeItem : MenuItem {
 			TrigSeq* module;
 			int outType;
@@ -565,26 +845,88 @@ struct TrigSeqWidget : ModuleWidget {
 				module->outType = outType;
 			}
 		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Output type"));
 		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
-		for (int i = 0; i < 3; i++) {
-			OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
-			outTypeItem->rightText = CHECKMARK(module->outType == i);
-			outTypeItem->module = module;
-			outTypeItem->outType = i;
-			menu->addChild(outTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Output type", (OutTypeNames[module->outType]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
+				outTypeItem->rightText = CHECKMARK(module->outType == i);
+				outTypeItem->module = module;
+				outTypeItem->outType = i;
+				menu->addChild(outTypeItem);
+			}
+		}));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset on Run", "", &module->rstOnRun));
+
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("TURING MODE", "", &module->turingMode));
+		if (module->turingMode) {
+			struct BitResTypeItem : MenuItem {
+				TrigSeq* module;
+				int bitResType;
+				void onAction(const event::Action& e) override {
+					module->bitResolution = bitResType;
+				}
+			};
+			std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
+
+			menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
+				for (int i = 0; i < 2; i++) {
+					BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
+					bitResTypeItem->rightText = CHECKMARK(module->bitResolution == i);
+					bitResTypeItem->module = module;
+					bitResTypeItem->bitResType = i;
+					menu->addChild(bitResTypeItem);
+				}
+			}));
+
+			struct ProgressionTypeItem : MenuItem {
+				TrigSeq* module;
+				int progressionType;
+				void onAction(const event::Action& e) override {
+					module->progression = progressionType;
+				}
+			};
+			std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
+
+			menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
+				for (int i = 0; i < 3; i++) {
+					ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
+					progressionTypeItem->rightText = CHECKMARK(module->progression == i);
+					progressionTypeItem->module = module;
+					progressionTypeItem->progressionType = i;
+					menu->addChild(progressionTypeItem);
+				}
+			}));
+		} else {
+			menu->addChild(createMenuLabel("Bit Resolution"));
+			menu->addChild(createMenuLabel("Voltage progression"));
+		}
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
+		//if (module->clipboard)
+		if (randLoops_clipboard)
+			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+		else
+			menu->addChild(createMenuLabel("Paste Seq"));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Load Sequence", "", [=]() {module->menuLoadSequence();}));
+		menu->addChild(createMenuItem("Save Sequence", "", [=]() {module->menuSaveSequence();}));
+
+		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("When switching to TURING mode Reset Knob becomes"));
+			menu->addChild(createMenuLabel("output attenuator, so it has to be adjusted"));
+		}));
 	}
 
 };

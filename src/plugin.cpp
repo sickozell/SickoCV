@@ -1,8 +1,22 @@
 #include "plugin.hpp"
 
-Plugin* pluginInstance;
+//Plugin* pluginInstance;
+//extern Plugin *pluginInstance;
 
-void init(Plugin* p) {
+#if defined(METAMODULE_BUILTIN)
+extern Plugin *pluginInstance;
+#else
+Plugin *pluginInstance;
+#endif
+
+//void init(Plugin* p) {
+//void init_SickoCV(rack::Plugin *p) {
+
+#if defined(METAMODULE_BUILTIN)
+void init_SickoCV(rack::Plugin *p) {
+#else 
+void init(rack::Plugin *p) {
+#endif
 	pluginInstance = p;
 
 	// Add modules here
@@ -44,6 +58,8 @@ void init(Plugin* p) {
 	p->addModel(modelPolyMuter8Plus);
 	p->addModel(modelPolyMuter16);
 	p->addModel(modelPolyMuter16Plus);
+	p->addModel(modelRandLoops);
+	p->addModel(modelRandLoops8);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
 	p->addModel(modelSickoCrosser);
@@ -69,4 +85,19 @@ void init(Plugin* p) {
 	p->addModel(modelTrigSeq);
 	p->addModel(modelTrigSeqPlus);
 	p->addModel(modelWavetabler);
+
+	
 }
+
+bool randLoops_clipboard = false;
+int randLoops_cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+//int randLoops_cbStart = 0;
+int randLoops_cbSteps = 16;
+float randLoops_cbCtrl = 0.f;
+float randLoops_cbScale = 1.f;
+float randLoops_cbOffset = 0.f;
+
+bool stepSeq_clipboard = false;
+float stepSeq_cbSeq[16] = {0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f};
+int stepSeq_cbSteps = 16;
+int stepSeq_cbRst = 1;

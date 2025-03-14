@@ -59,6 +59,9 @@
 
 #include "plugin.hpp"
 #include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
 //#define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 #include <vector>
@@ -146,7 +149,9 @@ struct KeySampler : Module {
 	const unsigned int minSamplesToLoad = 124;
 
 	vector<float> playBuffer[8][2][2];
-	vector<float> tempBuffer[2];
+	
+	//metamodule change
+	//vector<float> tempBuffer[2];
 
 	vector<double> displayBuff[8];
 	int currentDisplay = 0;
@@ -559,8 +564,13 @@ struct KeySampler : Module {
 	bool prevPrevSample = false;
 
 	bool unlimitedRecording = false;
+
+#if defined(METAMODULE)
+	const drwav_uint64 recordingLimit = 48000 * 2 * 60; // 60 sec limit on MM = 5.5MB
+#else
 	const drwav_uint64 recordingLimit = 52428800 * 2;
-	//const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+	// const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+#endif
 	
 	drwav_uint64 currentRecordingLimit = recordingLimit;
 
@@ -786,8 +796,9 @@ struct KeySampler : Module {
 		playBuffer[7][1][0].resize(0);
 		playBuffer[7][1][1].resize(0);
 
-		tempBuffer[0].resize(0);
-		tempBuffer[1].resize(0);
+		// metamodule change
+		//tempBuffer[0].resize(0);
+		//tempBuffer[1].resize(0);
 
 	}
 
@@ -1172,7 +1183,11 @@ struct KeySampler : Module {
 
 	void selectRootFolder() {
 		const char* prevFolder = userFolder.c_str();
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL, [this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+#endif
 		if (path) {
 			folderTreeData.clear();
 			folderTreeDisplay.clear();
@@ -1184,6 +1199,9 @@ struct KeySampler : Module {
 			}
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	};
 
 	void refreshRootFolder() {
@@ -1349,8 +1367,10 @@ struct KeySampler : Module {
 
 					z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
-					tempBuffer[0].clear();
-					tempBuffer[1].clear();
+					// metamodule change
+					//tempBuffer[0].clear();
+					//tempBuffer[1].clear();
+					vector<float> tempBuffer[2];
 
 					for (unsigned int i=0; i < totalSampleC[slot]; i++) {
 						tempBuffer[LEFT].push_back(playBuffer[slot][LEFT][0][i]);
@@ -1363,6 +1383,12 @@ struct KeySampler : Module {
 					playBuffer[slot][LEFT][1].clear();
 					playBuffer[slot][RIGHT][0].clear();
 					playBuffer[slot][RIGHT][1].clear();
+
+					// metamodule change
+					vector<float>().swap(playBuffer[slot][LEFT][0]);
+					vector<float>().swap(playBuffer[slot][RIGHT][0]);
+					vector<float>().swap(playBuffer[slot][LEFT][1]);
+					vector<float>().swap(playBuffer[slot][RIGHT][1]);
 
 					drwav_uint64 tempSampleC = totalSampleC[slot];
 					drwav_uint64 tempSamples = totalSamples[slot];
@@ -1424,8 +1450,9 @@ struct KeySampler : Module {
 						floorCurrResamplePos = floor(currResamplePos);
 					}
 
-					tempBuffer[LEFT].clear();
-					tempBuffer[RIGHT].clear();
+					// metamodule change
+					//tempBuffer[LEFT].clear();
+					//tempBuffer[RIGHT].clear();
 
 					// ***************************************************************************
 					totalSampleC[slot] = playBuffer[slot][LEFT][0].size();
@@ -1472,7 +1499,11 @@ struct KeySampler : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
 		if (path) {
 			saveMode = mode;
 			saveSample(path, slot);
@@ -1484,6 +1515,9 @@ struct KeySampler : Module {
 		channels[slot] = fileChannels[slot];
 		fileLoaded[slot] = true;
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	};
 
 	void saveSample(std::string path, int slot) {
@@ -1652,7 +1686,11 @@ struct KeySampler : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
 		fileLoaded[slot] = false;
 		restoreLoadFromPatch[slot] = false;
 		if (path) {
@@ -1667,14 +1705,20 @@ struct KeySampler : Module {
 			fileLoaded[slot] = false;
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadSample(std::string fromPath, int slot) {
 		std::string path = fromPath;
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
-		tempBuffer[0].clear();
-		tempBuffer[1].clear();
+		// metamodule change
+		//tempBuffer[0].clear();
+		//tempBuffer[1].clear();
+		vector<float> tempBuffer[2];
+
 		double tempSampleRate;
 
 		unsigned int c;
@@ -1700,6 +1744,12 @@ struct KeySampler : Module {
 			tempBuffer[LEFT].clear();
 			tempBuffer[RIGHT].clear();
 			displayBuff[slot].clear();
+
+			// metamodule change
+			vector<float>().swap(playBuffer[slot][LEFT][0]);
+			vector<float>().swap(playBuffer[slot][RIGHT][0]);
+			vector<float>().swap(playBuffer[slot][LEFT][1]);
+			vector<float>().swap(playBuffer[slot][RIGHT][1]);
 
 			if (!unlimitedRecording) {
 				if (tsc > recordingLimit / 2)
@@ -1830,8 +1880,10 @@ struct KeySampler : Module {
 					floorCurrResamplePos = floor(currResamplePos);
 				}
 
-				tempBuffer[LEFT].clear();
-				tempBuffer[RIGHT].clear();
+				// metamodule change
+				//tempBuffer[LEFT].clear();
+				//tempBuffer[RIGHT].clear();
+
 				// ***************************************************************************
 
 				totalSampleC[slot] = playBuffer[slot][LEFT][0].size();
@@ -2012,6 +2064,13 @@ struct KeySampler : Module {
 		playBuffer[slot][LEFT][1].clear();
 		playBuffer[slot][RIGHT][1].clear();
 		displayBuff[slot].clear();
+
+		// metamodule change
+		vector<float>().swap(playBuffer[slot][LEFT][0]);
+		vector<float>().swap(playBuffer[slot][RIGHT][0]);
+		vector<float>().swap(playBuffer[slot][LEFT][1]);
+		vector<float>().swap(playBuffer[slot][RIGHT][1]);
+
 		totalSampleC[slot] = 0;
 		totalSamples[slot] = 0;
 		resampled[slot] = false;
@@ -3457,6 +3516,12 @@ struct KeySampler : Module {
 						playBuffer[recSlot][RIGHT][1].clear();
 					}
 
+					// metamodule change
+					vector<float>().swap(playBuffer[recSlot][LEFT][0]);
+					vector<float>().swap(playBuffer[recSlot][RIGHT][0]);
+					vector<float>().swap(playBuffer[recSlot][LEFT][1]);
+					vector<float>().swap(playBuffer[recSlot][RIGHT][1]);
+
 					currRecPosition = 1;
 
 					// set position knob to 0 and 1
@@ -4481,7 +4546,9 @@ struct KeySamplerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
+#if !defined(METAMODULE)
 		menu->addChild(createBoolPtrMenuItem("Unlimited REC (risky)", "", &module->unlimitedRecording));
+#endif
 	}
 };
 

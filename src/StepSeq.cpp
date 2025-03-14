@@ -96,26 +96,77 @@ struct StepSeq : Module {
 
 		configInput(LENGTH_INPUT, "Length");
 
-		configParam(STEP_PARAM+0, 0, 1.f, 0.5f, "Step 1");
-		configParam(STEP_PARAM+1, 0, 1.f, 0.5f, "Step 2");
-		configParam(STEP_PARAM+2, 0, 1.f, 0.5f, "Step 3");
-		configParam(STEP_PARAM+3, 0, 1.f, 0.5f, "Step 4");
-		configParam(STEP_PARAM+4, 0, 1.f, 0.5f, "Step 5");
-		configParam(STEP_PARAM+5, 0, 1.f, 0.5f, "Step 6");
-		configParam(STEP_PARAM+6, 0, 1.f, 0.5f, "Step 7");
-		configParam(STEP_PARAM+7, 0, 1.f, 0.5f, "Step 8");
-		configParam(STEP_PARAM+8, 0, 1.f, 0.5f, "Step 9");
-		configParam(STEP_PARAM+9, 0, 1.f, 0.5f, "Step 10");
-		configParam(STEP_PARAM+10, 0, 1.f, 0.5f, "Step 11");
-		configParam(STEP_PARAM+11, 0, 1.f, 0.5f, "Step 12");
-		configParam(STEP_PARAM+12, 0, 1.f, 0.5f, "Step 13");
-		configParam(STEP_PARAM+13, 0, 1.f, 0.5f, "Step 14");
-		configParam(STEP_PARAM+14, 0, 1.f, 0.5f, "Step 15");
-		configParam(STEP_PARAM+15, 0, 1.f, 0.5f, "Step 16");
+		struct RangeQuantity : ParamQuantity {
+			float getDisplayValue() override {
+				StepSeq* module = reinterpret_cast<StepSeq*>(this->module);
+
+				switch (module->range) {
+					case 0:	// 0/1v
+						displayMultiplier = 1.f;
+						displayOffset = 0.f;
+					break;
+					case 1:	// 0/2v
+						displayMultiplier = 2.f;
+						displayOffset = 0.f;
+					break;
+					case 2:	// 0/3v
+						displayMultiplier = 3.f;
+						displayOffset = 0.f;
+					break;
+					case 3:	// 0/5v
+						displayMultiplier = 5.f;
+						displayOffset = 0.f;
+					break;
+					case 4:	// 0/10v
+						displayMultiplier = 10.f;
+						displayOffset = 0.f;
+					break;
+					case 5:	// -1/+1v
+						displayMultiplier = 2.f;
+						displayOffset = -1.f;
+					break;
+					case 6:	// -2/+2v
+						displayMultiplier = 4.f;
+						displayOffset = -2.f;
+					break;
+					case 7:	// -3/+3v
+						displayMultiplier = 6.f;
+						displayOffset = -3.f;
+					break;
+					case 8:	// -5/+5v
+						displayMultiplier = 10.f;
+						displayOffset = -5.f;
+					break;
+					case 9:	// -10/+10v
+						displayMultiplier = 20.f;
+						displayOffset = -10.f;
+					break;
+				}
+				return ParamQuantity::getDisplayValue();
+			}
+		};
+		configParam<RangeQuantity>(STEP_PARAM+0, 0, 1.f, 0.5f, "Step 1");
+		configParam<RangeQuantity>(STEP_PARAM+1, 0, 1.f, 0.5f, "Step 2");
+		configParam<RangeQuantity>(STEP_PARAM+2, 0, 1.f, 0.5f, "Step 3");
+		configParam<RangeQuantity>(STEP_PARAM+3, 0, 1.f, 0.5f, "Step 4");
+		configParam<RangeQuantity>(STEP_PARAM+4, 0, 1.f, 0.5f, "Step 5");
+		configParam<RangeQuantity>(STEP_PARAM+5, 0, 1.f, 0.5f, "Step 6");
+		configParam<RangeQuantity>(STEP_PARAM+6, 0, 1.f, 0.5f, "Step 7");
+		configParam<RangeQuantity>(STEP_PARAM+7, 0, 1.f, 0.5f, "Step 8");
+		configParam<RangeQuantity>(STEP_PARAM+8, 0, 1.f, 0.5f, "Step 9");
+		configParam<RangeQuantity>(STEP_PARAM+9, 0, 1.f, 0.5f, "Step 10");
+		configParam<RangeQuantity>(STEP_PARAM+10, 0, 1.f, 0.5f, "Step 11");
+		configParam<RangeQuantity>(STEP_PARAM+11, 0, 1.f, 0.5f, "Step 12");
+		configParam<RangeQuantity>(STEP_PARAM+12, 0, 1.f, 0.5f, "Step 13");
+		configParam<RangeQuantity>(STEP_PARAM+13, 0, 1.f, 0.5f, "Step 14");
+		configParam<RangeQuantity>(STEP_PARAM+14, 0, 1.f, 0.5f, "Step 15");
+		configParam<RangeQuantity>(STEP_PARAM+15, 0, 1.f, 0.5f, "Step 16");
 
 	}
 
 	void onReset(const ResetEvent &e) override {
+
+		initStart = false;
 
 		step = 0;
 
@@ -211,9 +262,26 @@ struct StepSeq : Module {
 	
 	void inline resetStep() {
 		lights[STEP_LIGHT+step].setBrightness(0);
-		step = int(params[RST_PARAM].getValue() - 1);
+		step = int(params[RST_PARAM].getValue()) - 1;
 		if (mode == CLOCK_MODE && dontAdvanceSetting)
 			dontAdvance = true;
+	}
+
+	void copyClipboard() {
+		for (int i = 0; i < 16; i++)
+			stepSeq_cbSeq[i] = params[STEP_PARAM+i].getValue();
+		
+		stepSeq_cbSteps = params[LENGTH_PARAM].getValue();
+		stepSeq_cbRst = int(params[RST_PARAM].getValue());
+		stepSeq_clipboard = true;
+	}
+
+	void pasteClipboard() {
+		for (int i = 0; i < 16; i++)
+			params[STEP_PARAM+i].setValue(stepSeq_cbSeq[i]);
+		
+		params[LENGTH_PARAM].setValue(stepSeq_cbSteps);
+		params[RST_PARAM].setValue(stepSeq_cbRst);
 	}
 	
 	
@@ -333,8 +401,6 @@ struct StepSeq : Module {
 							else
 								dontAdvance = false;
 
-							step--;
-
 							if (step < 0)
 								step = maxSteps - 1;
 						}
@@ -372,8 +438,8 @@ struct StepSeq : Module {
 		out = params[STEP_PARAM+step].getValue();
 
 		switch (range) {
-			//case 0:
-			//break;
+			case 0:
+			break;
 
 			case 1:
 				out *= 2;
@@ -504,7 +570,8 @@ struct StepSeqWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		StepSeq* module = dynamic_cast<StepSeq*>(this->module);
 
-		
+		menu->addChild(new MenuSeparator());
+
 		struct RangeItem : MenuItem {
 			StepSeq* module;
 			int range;
@@ -513,7 +580,6 @@ struct StepSeqWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuSeparator());
 		std::string rangeNames[10] = {"0/1v", "0/2v", "0/3v", "0/5v", "0/10v", "-1/+1v", "-2/+2v", "-3/+3v", "-5/+5v", "-10/+10v"};
 		menu->addChild(createSubmenuItem("Knobs Range", rangeNames[module->range], [=](Menu * menu) {
 			for (int i = 0; i < 10; i++) {
@@ -525,6 +591,8 @@ struct StepSeqWidget : ModuleWidget {
 			}
 		}));
 		
+		menu->addChild(new MenuSeparator());
+		
 		struct RunTypeItem : MenuItem {
 			StepSeq* module;
 			int runType;
@@ -533,16 +601,16 @@ struct StepSeqWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Run Input"));
 		std::string RunTypeNames[2] = {"Gate", "Trig"};
-		for (int i = 0; i < 2; i++) {
-			RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-			runTypeItem->rightText = CHECKMARK(module->runType == i);
-			runTypeItem->module = module;
-			runTypeItem->runType = i;
-			menu->addChild(runTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+				runTypeItem->rightText = CHECKMARK(module->runType == i);
+				runTypeItem->module = module;
+				runTypeItem->runType = i;
+				menu->addChild(runTypeItem);
+			}
+		}));
 
 		struct RevTypeItem : MenuItem {
 			StepSeq* module;
@@ -551,17 +619,17 @@ struct StepSeqWidget : ModuleWidget {
 				module->revType = revType;
 			}
 		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Reverse Input Voltage"));
 		std::string RevTypeNames[2] = {"Positive", "Negative"};
-		for (int i = 0; i < 2; i++) {
-			RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
-			revTypeItem->rightText = CHECKMARK(module->revType == i);
-			revTypeItem->module = module;
-			revTypeItem->revType = i;
-			menu->addChild(revTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Reverse Input Voltage", (RevTypeNames[module->revType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
+				revTypeItem->rightText = CHECKMARK(module->revType == i);
+				revTypeItem->module = module;
+				revTypeItem->revType = i;
+				menu->addChild(revTypeItem);
+			}
+		}));
+		
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset on Run", "", &module->rstOnRun));
@@ -569,6 +637,14 @@ struct StepSeqWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
+		//if (module->clipboard)
+		if (stepSeq_clipboard)
+			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+		else
+			menu->addChild(createMenuLabel("Paste Seq"));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));

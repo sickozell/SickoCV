@@ -44,6 +44,8 @@ extern Model* modelPolyMuter8;
 extern Model* modelPolyMuter8Plus;
 extern Model* modelPolyMuter16;
 extern Model* modelPolyMuter16Plus;
+extern Model* modelRandLoops;
+extern Model* modelRandLoops8;
 extern Model* modelShifter;
 extern Model* modelSickoAmp;
 extern Model* modelSickoCrosser;
@@ -69,3 +71,17 @@ extern Model* modelTogglerCompact;
 extern Model* modelTrigSeq;
 extern Model* modelTrigSeqPlus;
 extern Model* modelWavetabler;
+
+
+extern bool randLoops_clipboard;
+extern int randLoops_cbSeq[16];
+//extern int randLoops_cbStart;
+extern int randLoops_cbSteps;
+extern float randLoops_cbCtrl;
+extern float randLoops_cbScale;
+extern float randLoops_cbOffset;
+
+extern bool stepSeq_clipboard;
+extern float stepSeq_cbSeq[16];
+extern int stepSeq_cbSteps;
+extern int stepSeq_cbRst;

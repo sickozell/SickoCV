@@ -12,6 +12,9 @@
 
 #include "plugin.hpp"
 #include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
 #include <dirent.h>
 #include <libgen.h>
 #include <sys/types.h>
@@ -174,7 +177,7 @@ struct StepSeqPlus : Module {
 
 	int workingProg = 0;
 
-	bool instantScaleChange = false;
+	bool instantProgChange = false;
 
 	bool butSetScale = false;
 	float scaleSetBut = 0;
@@ -192,12 +195,12 @@ struct StepSeqPlus : Module {
 	float setButLightDelta = 2 / APP->engine->getSampleRate();
 	float setButLightValue = 0.f;
 
-
+	/*
 	bool clipboard = false;
 	float cbSeq[16] = {0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f};
 	int cbSteps = 16;
 	int cbRst = 1;
-
+	*/
 
 	StepSeqPlus() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -219,22 +222,71 @@ struct StepSeqPlus : Module {
 
 		configInput(LENGTH_INPUT, "Length");
 
-		configParam(STEP_PARAM+0, 0, 1.f, 0.5f, "Step 1");
-		configParam(STEP_PARAM+1, 0, 1.f, 0.5f, "Step 2");
-		configParam(STEP_PARAM+2, 0, 1.f, 0.5f, "Step 3");
-		configParam(STEP_PARAM+3, 0, 1.f, 0.5f, "Step 4");
-		configParam(STEP_PARAM+4, 0, 1.f, 0.5f, "Step 5");
-		configParam(STEP_PARAM+5, 0, 1.f, 0.5f, "Step 6");
-		configParam(STEP_PARAM+6, 0, 1.f, 0.5f, "Step 7");
-		configParam(STEP_PARAM+7, 0, 1.f, 0.5f, "Step 8");
-		configParam(STEP_PARAM+8, 0, 1.f, 0.5f, "Step 9");
-		configParam(STEP_PARAM+9, 0, 1.f, 0.5f, "Step 10");
-		configParam(STEP_PARAM+10, 0, 1.f, 0.5f, "Step 11");
-		configParam(STEP_PARAM+11, 0, 1.f, 0.5f, "Step 12");
-		configParam(STEP_PARAM+12, 0, 1.f, 0.5f, "Step 13");
-		configParam(STEP_PARAM+13, 0, 1.f, 0.5f, "Step 14");
-		configParam(STEP_PARAM+14, 0, 1.f, 0.5f, "Step 15");
-		configParam(STEP_PARAM+15, 0, 1.f, 0.5f, "Step 16");
+		struct RangeQuantity : ParamQuantity {
+			float getDisplayValue() override {
+				StepSeqPlus* module = reinterpret_cast<StepSeqPlus*>(this->module);
+
+				switch (module->range) {
+					case 0:	// 0/1v
+						displayMultiplier = 1.f;
+						displayOffset = 0.f;
+					break;
+					case 1:	// 0/2v
+						displayMultiplier = 2.f;
+						displayOffset = 0.f;
+					break;
+					case 2:	// 0/3v
+						displayMultiplier = 3.f;
+						displayOffset = 0.f;
+					break;
+					case 3:	// 0/5v
+						displayMultiplier = 5.f;
+						displayOffset = 0.f;
+					break;
+					case 4:	// 0/10v
+						displayMultiplier = 10.f;
+						displayOffset = 0.f;
+					break;
+					case 5:	// -1/+1v
+						displayMultiplier = 2.f;
+						displayOffset = -1.f;
+					break;
+					case 6:	// -2/+2v
+						displayMultiplier = 4.f;
+						displayOffset = -2.f;
+					break;
+					case 7:	// -3/+3v
+						displayMultiplier = 6.f;
+						displayOffset = -3.f;
+					break;
+					case 8:	// -5/+5v
+						displayMultiplier = 10.f;
+						displayOffset = -5.f;
+					break;
+					case 9:	// -10/+10v
+						displayMultiplier = 20.f;
+						displayOffset = -10.f;
+					break;
+				}
+				return ParamQuantity::getDisplayValue();
+			}
+		};
+		configParam<RangeQuantity>(STEP_PARAM+0, 0, 1.f, 0.5f, "Step 1");
+		configParam<RangeQuantity>(STEP_PARAM+1, 0, 1.f, 0.5f, "Step 2");
+		configParam<RangeQuantity>(STEP_PARAM+2, 0, 1.f, 0.5f, "Step 3");
+		configParam<RangeQuantity>(STEP_PARAM+3, 0, 1.f, 0.5f, "Step 4");
+		configParam<RangeQuantity>(STEP_PARAM+4, 0, 1.f, 0.5f, "Step 5");
+		configParam<RangeQuantity>(STEP_PARAM+5, 0, 1.f, 0.5f, "Step 6");
+		configParam<RangeQuantity>(STEP_PARAM+6, 0, 1.f, 0.5f, "Step 7");
+		configParam<RangeQuantity>(STEP_PARAM+7, 0, 1.f, 0.5f, "Step 8");
+		configParam<RangeQuantity>(STEP_PARAM+8, 0, 1.f, 0.5f, "Step 9");
+		configParam<RangeQuantity>(STEP_PARAM+9, 0, 1.f, 0.5f, "Step 10");
+		configParam<RangeQuantity>(STEP_PARAM+10, 0, 1.f, 0.5f, "Step 11");
+		configParam<RangeQuantity>(STEP_PARAM+11, 0, 1.f, 0.5f, "Step 12");
+		configParam<RangeQuantity>(STEP_PARAM+12, 0, 1.f, 0.5f, "Step 13");
+		configParam<RangeQuantity>(STEP_PARAM+13, 0, 1.f, 0.5f, "Step 14");
+		configParam<RangeQuantity>(STEP_PARAM+14, 0, 1.f, 0.5f, "Step 15");
+		configParam<RangeQuantity>(STEP_PARAM+15, 0, 1.f, 0.5f, "Step 16");
 
 		configParam(PROG_PARAM, 0.f, 31.f, 0.f, "Prog");
 		configInput(PROG_INPUT, "Prog");
@@ -248,6 +300,8 @@ struct StepSeqPlus : Module {
 
 	void onReset(const ResetEvent &e) override {
 
+		initStart = false;
+		
 		step = 0;
 
 		lights[STEP_LIGHT].setBrightness(1);
@@ -536,13 +590,18 @@ struct StepSeqPlus : Module {
 		static const char FILE_FILTERS[] = "stepSeq preset (.ssp):ssp,SSP";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
-
+#endif
 		if (path)
 			loadPreset(path);
 
 		free(path);
-
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadPreset(std::string path) {
@@ -572,7 +631,11 @@ struct StepSeqPlus : Module {
 		static const char FILE_FILTERS[] = "stepSeq preset (.ssp):ssp,SSP";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
 		if (path) {
 			std::string strPath = path;
 			if (strPath.substr(strPath.size() - 4) != ".ssp" and strPath.substr(strPath.size() - 4) != ".SSP")
@@ -582,6 +645,9 @@ struct StepSeqPlus : Module {
 		}
 
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void savePreset(std::string path, json_t *rootJ) {
@@ -601,33 +667,32 @@ struct StepSeqPlus : Module {
 
 	void copyClipboard() {
 		for (int i = 0; i < 16; i++)
-			cbSeq[i] = wSeq[i];
+			stepSeq_cbSeq[i] = wSeq[i];
 		
-		cbSteps = wSteps;
-		cbRst = wRst;
-		clipboard = true;
+		stepSeq_cbSteps = wSteps;
+		stepSeq_cbRst = wRst;
+		stepSeq_clipboard = true;
 	}
 
 	void pasteClipboard() {
 		for (int i = 0; i < 16; i++) {
-			wSeq[i] = cbSeq[i];
+			wSeq[i] = stepSeq_cbSeq[i];
 			params[STEP_PARAM+i].setValue(wSeq[i]);
 		}
 		
-		wSteps = cbSteps;
+		wSteps = stepSeq_cbSteps;
 		params[LENGTH_PARAM].setValue(wSteps);
-		wRst = cbRst;
+		wRst = stepSeq_cbRst;
 		params[RST_PARAM].setValue(wRst);
 	}
 
 	void eraseProgs() {
-		for (int i = 0; i < 16; i++)
-			for (int j = 0; j < 32; j++)
-				progSeq[j][i] = 0.5;
-		
 		for (int i = 0; i < 32; i++) {
 			progSteps[i] = 16;
 			progRst[i] = 1;
+
+			for (int j = 0; j < 16; j++)
+				progSeq[i][j] = 0;
 		}
 	}
 
@@ -638,13 +703,12 @@ struct StepSeqPlus : Module {
 			dontAdvance = true;
 	}
 	
-	
 	void process(const ProcessArgs& args) override {
 
 		// ----------- AUTO SWITCH
 
-		instantScaleChange = int(params[AUTO_PARAM].getValue());
-		lights[AUTO_LIGHT].setBrightness(instantScaleChange);
+		instantProgChange = int(params[AUTO_PARAM].getValue());
+		lights[AUTO_LIGHT].setBrightness(instantProgChange);
 
 		// ----------- PROGRAM MANAGEMENT
 
@@ -731,7 +795,7 @@ struct StepSeqPlus : Module {
 
 		if (seqChanged) {
 			if (pendingUpdate) {
-				if (instantScaleChange) {
+				if (instantProgChange) {
 
 					for (int i = 0; i < 16; i++)
 						wSeq[i] = nextSeq[i];
@@ -986,8 +1050,6 @@ struct StepSeqPlus : Module {
 							else
 								dontAdvance = false;
 
-							step--;
-
 							if (step < 0)
 								step = maxSteps - 1;
 						}
@@ -1237,7 +1299,8 @@ struct StepSeqPlusWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		StepSeqPlus* module = dynamic_cast<StepSeqPlus*>(this->module);
 
-		
+		menu->addChild(new MenuSeparator());
+
 		struct RangeItem : MenuItem {
 			StepSeqPlus* module;
 			int range;
@@ -1246,7 +1309,6 @@ struct StepSeqPlusWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuSeparator());
 		std::string rangeNames[10] = {"0/1v", "0/2v", "0/3v", "0/5v", "0/10v", "-1/+1v", "-2/+2v", "-3/+3v", "-5/+5v", "-10/+10v"};
 		menu->addChild(createSubmenuItem("Knobs Range", rangeNames[module->range], [=](Menu * menu) {
 			for (int i = 0; i < 10; i++) {
@@ -1258,6 +1320,8 @@ struct StepSeqPlusWidget : ModuleWidget {
 			}
 		}));
 		
+		menu->addChild(new MenuSeparator());
+		
 		struct RunTypeItem : MenuItem {
 			StepSeqPlus* module;
 			int runType;
@@ -1266,16 +1330,16 @@ struct StepSeqPlusWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Run Input"));
 		std::string RunTypeNames[2] = {"Gate", "Trig"};
-		for (int i = 0; i < 2; i++) {
-			RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-			runTypeItem->rightText = CHECKMARK(module->runType == i);
-			runTypeItem->module = module;
-			runTypeItem->runType = i;
-			menu->addChild(runTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+				runTypeItem->rightText = CHECKMARK(module->runType == i);
+				runTypeItem->module = module;
+				runTypeItem->runType = i;
+				menu->addChild(runTypeItem);
+			}
+		}));
 
 		struct RevTypeItem : MenuItem {
 			StepSeqPlus* module;
@@ -1284,17 +1348,16 @@ struct StepSeqPlusWidget : ModuleWidget {
 				module->revType = revType;
 			}
 		};
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Reverse Input Voltage"));
 		std::string RevTypeNames[2] = {"Positive", "Negative"};
-		for (int i = 0; i < 2; i++) {
-			RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
-			revTypeItem->rightText = CHECKMARK(module->revType == i);
-			revTypeItem->module = module;
-			revTypeItem->revType = i;
-			menu->addChild(revTypeItem);
-		}
+		menu->addChild(createSubmenuItem("Reverse Input Voltage", (RevTypeNames[module->revType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RevTypeItem* revTypeItem = createMenuItem<RevTypeItem>(RevTypeNames[i]);
+				revTypeItem->rightText = CHECKMARK(module->revType == i);
+				revTypeItem->module = module;
+				revTypeItem->revType = i;
+				menu->addChild(revTypeItem);
+			}
+		}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset on Run", "", &module->rstOnRun));
@@ -1305,7 +1368,8 @@ struct StepSeqPlusWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
-		if (module->clipboard)
+		//if (module->clipboard)
+		if (stepSeq_clipboard)
 			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
 		else
 			menu->addChild(createMenuLabel("Paste Seq"));
@@ -1313,10 +1377,6 @@ struct StepSeqPlusWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));
 		menu->addChild(createMenuItem("Save PROG preset", "", [=]() {module->menuSavePreset();}));
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Store Programs"));
-		menu->addChild(createMenuLabel("with double-click"));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
@@ -1327,6 +1387,11 @@ struct StepSeqPlusWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("Store Programs with double-click"));
+		}));
 	}
 
 };

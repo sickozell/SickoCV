@@ -12,6 +12,9 @@
 
 #include "plugin.hpp"
 #include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
 #include <dirent.h>
 #include <libgen.h>
 #include <sys/types.h>
@@ -544,13 +547,18 @@ struct SickoQuant : Module {
 		static const char FILE_FILTERS[] = "sickoQuant preset (.sqn):sqn,SQN";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
-
+#endif
 		if (path)
 			loadPreset(path);
 
 		free(path);
-
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadPreset(std::string path) {
@@ -580,7 +588,11 @@ struct SickoQuant : Module {
 		static const char FILE_FILTERS[] = "sickoQuant preset (.sqn):sqn,SQN";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
 		if (path) {
 			std::string strPath = path;
 			if (strPath.substr(strPath.size() - 4) != ".sqn" and strPath.substr(strPath.size() - 4) != ".SQN")
@@ -590,6 +602,9 @@ struct SickoQuant : Module {
 		}
 
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void savePreset(std::string path, json_t *rootJ) {
@@ -1218,14 +1233,16 @@ struct SickoQuantWidget : ModuleWidget {
 		menu->addChild(createMenuItem("Save PROG preset", "", [=]() {module->menuSavePreset();}));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Store Programs"));
-		menu->addChild(createMenuLabel("with double-click"));
-
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
 			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
 			}));
+		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("Store Programs with"));
+			menu->addChild(createMenuLabel("double-click on STOR button"));
 		}));
 	}
 

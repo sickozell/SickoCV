@@ -26,6 +26,9 @@
 
 #include "plugin.hpp"
 #include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
 //#define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 #include <vector>
@@ -100,7 +103,9 @@ struct SickoSampler2 : Module {
 	const unsigned int minSamplesToLoad = 124;
 
 	vector<float> playBuffer[2][2];
-	vector<float> tempBuffer[2];
+	
+	//metamodule change
+	//vector<float> tempBuffer[2];
 
 	vector<double> displayBuff;
 	int currentDisplay = 0;
@@ -294,8 +299,13 @@ struct SickoSampler2 : Module {
 	bool prevPrevSample = false;
 
 	bool unlimitedRecording = false;
+
+#if defined(METAMODULE)
+	const drwav_uint64 recordingLimit = 48000 * 2 * 60; // 60 sec limit on MM = 5.5MB
+#else
 	const drwav_uint64 recordingLimit = 52428800 * 2;
-	//const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+	// const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+#endif
 	
 	drwav_uint64 currentRecordingLimit = recordingLimit;
 
@@ -381,8 +391,9 @@ struct SickoSampler2 : Module {
 		playBuffer[0][1].resize(0);
 		playBuffer[1][0].resize(0);
 		playBuffer[1][1].resize(0);
-		tempBuffer[0].resize(0);
-		tempBuffer[1].resize(0);
+		// metamodule change
+		//tempBuffer[0].resize(0);
+		//tempBuffer[1].resize(0);
 
 	}
 
@@ -595,7 +606,11 @@ struct SickoSampler2 : Module {
 
 	void selectRootFolder() {
 		const char* prevFolder = userFolder.c_str();
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL, [this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+#endif
 		if (path) {
 			folderTreeData.clear();
 			folderTreeDisplay.clear();
@@ -607,6 +622,9 @@ struct SickoSampler2 : Module {
 			}
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	};
 
 	void refreshRootFolder() {
@@ -744,8 +762,10 @@ struct SickoSampler2 : Module {
 
 			z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
-			tempBuffer[0].clear();
-			tempBuffer[1].clear();
+			// metamodule change
+			//tempBuffer[0].clear();
+			//tempBuffer[1].clear();
+			vector<float> tempBuffer[2];
 
 			for (unsigned int i=0; i < totalSampleC; i++) {
 				tempBuffer[LEFT].push_back(playBuffer[LEFT][0][i]);
@@ -758,6 +778,12 @@ struct SickoSampler2 : Module {
 			playBuffer[LEFT][1].clear();
 			playBuffer[RIGHT][0].clear();
 			playBuffer[RIGHT][1].clear();
+
+			// metamodule change
+			vector<float>().swap(playBuffer[LEFT][0]);
+			vector<float>().swap(playBuffer[RIGHT][0]);
+			vector<float>().swap(playBuffer[LEFT][1]);
+			vector<float>().swap(playBuffer[RIGHT][1]);
 
 			drwav_uint64 tempSampleC = totalSampleC;
 			drwav_uint64 tempSamples = totalSamples;
@@ -819,8 +845,9 @@ struct SickoSampler2 : Module {
 				floorCurrResamplePos = floor(currResamplePos);
 			}
 
-			tempBuffer[LEFT].clear();
-			tempBuffer[RIGHT].clear();
+			// metamodule change
+			//tempBuffer[LEFT].clear();
+			//tempBuffer[RIGHT].clear();
 
 			// ***************************************************************************
 			totalSampleC = playBuffer[LEFT][0].size();
@@ -864,7 +891,11 @@ struct SickoSampler2 : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
 		if (path) {
 			saveMode = mode;
 			fileDescription = basename(path);
@@ -879,6 +910,9 @@ struct SickoSampler2 : Module {
 		channels = fileChannels;
 		fileLoaded = true;
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	};
 
 	void saveSample(std::string path) {
@@ -1040,7 +1074,11 @@ struct SickoSampler2 : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
 		fileLoaded = false;
 		restoreLoadFromPatch = false;
 		if (path) {
@@ -1054,14 +1092,19 @@ struct SickoSampler2 : Module {
 			fileLoaded = false;
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadSample(std::string fromPath) {
 		std::string path = fromPath;
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
-		tempBuffer[0].clear();
-		tempBuffer[1].clear();
+		// metamodule change
+		//tempBuffer[0].clear();
+		//tempBuffer[1].clear();
+		vector<float> tempBuffer[2];
 
 		unsigned int c;
 		unsigned int sr;
@@ -1086,6 +1129,12 @@ struct SickoSampler2 : Module {
 			tempBuffer[LEFT].clear();
 			tempBuffer[RIGHT].clear();
 			displayBuff.clear();
+
+			// metamodule change
+			vector<float>().swap(playBuffer[LEFT][0]);
+			vector<float>().swap(playBuffer[RIGHT][0]);
+			vector<float>().swap(playBuffer[LEFT][1]);
+			vector<float>().swap(playBuffer[RIGHT][1]);
 
 			if (!unlimitedRecording) {
 				if (tsc > recordingLimit / 2)
@@ -1216,8 +1265,10 @@ struct SickoSampler2 : Module {
 					floorCurrResamplePos = floor(currResamplePos);
 				}
 
-				tempBuffer[LEFT].clear();
-				tempBuffer[RIGHT].clear();
+				// metamodule change
+				//tempBuffer[LEFT].clear();
+				//tempBuffer[RIGHT].clear();
+
 				// ***************************************************************************
 
 				totalSampleC = playBuffer[LEFT][0].size();
@@ -1380,6 +1431,13 @@ struct SickoSampler2 : Module {
 		playBuffer[LEFT][1].clear();
 		playBuffer[RIGHT][1].clear();
 		displayBuff.clear();
+
+		// metamodule change
+		vector<float>().swap(playBuffer[LEFT][0]);
+		vector<float>().swap(playBuffer[RIGHT][0]);
+		vector<float>().swap(playBuffer[LEFT][1]);
+		vector<float>().swap(playBuffer[RIGHT][1]);
+
 		totalSampleC = 0;
 		totalSamples = 0;
 		resampled = false;
@@ -2810,6 +2868,12 @@ struct SickoSampler2 : Module {
 						playBuffer[RIGHT][1].clear();
 					}
 
+					// metamodule change
+					vector<float>().swap(playBuffer[LEFT][0]);
+					vector<float>().swap(playBuffer[RIGHT][0]);
+					vector<float>().swap(playBuffer[LEFT][1]);
+					vector<float>().swap(playBuffer[RIGHT][1]);
+
 					currRecPosition = 1;
 
 					// set position knob to 0 and 1
@@ -3764,7 +3828,9 @@ struct SickoSampler2Widget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
+#if !defined(METAMODULE)
 		menu->addChild(createBoolPtrMenuItem("Unlimited REC (risky)", "", &module->unlimitedRecording));
+#endif
 	}
 };
 

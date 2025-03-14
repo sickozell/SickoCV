@@ -64,6 +64,8 @@ struct SimpleSeq4 : Module {
 
 	void onReset(const ResetEvent &e) override {
 
+		initStart = false;
+
 		step = 0;
 
 		lights[KNOB_LIGHT].setBrightness(1);

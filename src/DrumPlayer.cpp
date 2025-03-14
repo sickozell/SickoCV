@@ -8,6 +8,9 @@
 
 #include "plugin.hpp"
 #include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
 #define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 #include <vector>
@@ -286,7 +289,11 @@ struct DrumPlayer : Module {
 
 	void selectRootFolder() {
 		const char* prevFolder = userFolder.c_str();
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL, [this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN_DIR, prevFolder, NULL, NULL);
+#endif
 		if (path) {
 			folderTreeData.clear();
 			folderTreeDisplay.clear();
@@ -298,6 +305,9 @@ struct DrumPlayer : Module {
 			}
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	};
 
 	void refreshRootFolder() {
@@ -449,7 +459,11 @@ struct DrumPlayer : Module {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
 		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
 		fileLoaded[slot] = false;
 		restoreLoadFromPatch[slot] = false;
 		if (path) {
@@ -464,6 +478,9 @@ struct DrumPlayer : Module {
 			fileLoaded[slot] = false;
 		}
 		free(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void loadSample(std::string fromPath, int slot) {
@@ -481,6 +498,11 @@ struct DrumPlayer : Module {
 			calcBiquadLpf(20000.0, sampleRate[slot], 1);
 			playBuffer[slot][0].clear();
 			playBuffer[slot][1].clear();
+
+			// metamodule change
+			vector<float>().swap(playBuffer[slot][0]);
+			vector<float>().swap(playBuffer[slot][1]);
+
 			for (unsigned int i = 0; i < tsc; i = i + c) {
 				playBuffer[slot][0].push_back(pSampleData[i]);
 				playBuffer[slot][0].push_back(0);
@@ -569,6 +591,11 @@ struct DrumPlayer : Module {
 		fileFound[slot] = false;
 		playBuffer[slot][0].clear();
 		playBuffer[slot][1].clear();
+
+		// metamodule change
+		vector<float>().swap(playBuffer[slot][0]);
+		vector<float>().swap(playBuffer[slot][1]);
+
 		totalSampleC[slot] = 0;
 	}
 
@@ -1255,14 +1282,8 @@ struct DrumPlayerWidget : ModuleWidget {
 		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Slots"));
-		/*
-		menu->addChild(createMenuItem("1: " + module->fileDescription[0], "", [=]() {module->menuLoadSample(0);}));
-		menu->addChild(createMenuItem("2: " + module->fileDescription[1], "", [=]() {module->menuLoadSample(1);}));
-		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {module->menuLoadSample(2);}));
-		menu->addChild(createMenuItem("4: " + module->fileDescription[3], "", [=]() {module->menuLoadSample(3);}));
-		*/
+
 		menu->addChild(createMenuItem("1: " + module->fileDescription[0], "", [=]() {
-			//module->menuLoadSample(0);
 			bool temploadFromPatch = module->loadFromPatch[0];
 			module->loadFromPatch[0] = false;
 			module->menuLoadSample(0);
@@ -1270,7 +1291,6 @@ struct DrumPlayerWidget : ModuleWidget {
 				module->loadFromPatch[0] = temploadFromPatch;
 		}));
 		menu->addChild(createMenuItem("2: " + module->fileDescription[1], "", [=]() {
-			//module->menuLoadSample(1);
 			bool temploadFromPatch = module->loadFromPatch[1];
 			module->loadFromPatch[1] = false;
 			module->menuLoadSample(1);
@@ -1278,7 +1298,6 @@ struct DrumPlayerWidget : ModuleWidget {
 				module->loadFromPatch[1] = temploadFromPatch;
 		}));
 		menu->addChild(createMenuItem("3: " + module->fileDescription[2], "", [=]() {
-			//module->menuLoadSample(2);
 			bool temploadFromPatch = module->loadFromPatch[0];
 			module->loadFromPatch[2] = false;
 			module->menuLoadSample(2);
@@ -1286,7 +1305,6 @@ struct DrumPlayerWidget : ModuleWidget {
 				module->loadFromPatch[2] = temploadFromPatch;
 		}));
 		menu->addChild(createMenuItem("4: " + module->fileDescription[3], "", [=]() {
-			//module->menuLoadSample(3);
 			bool temploadFromPatch = module->loadFromPatch[3];
 			module->loadFromPatch[3] = false;
 			module->menuLoadSample(3);
@@ -1305,14 +1323,13 @@ struct DrumPlayerWidget : ModuleWidget {
 		if (module->userFolder != "") {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));
-				//menu->addChild(createMenuItem("", "Refresh", [=]() {module->refreshRootFolder();}));
 			} else {
 				menu->addChild(createMenuLabel("(!)"+module->userFolder));
 			}
 		}
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Interpolation"));
+		
 		struct ModeItem : MenuItem {
 			DrumPlayer* module;
 			int interpolationMode;
@@ -1321,19 +1338,20 @@ struct DrumPlayerWidget : ModuleWidget {
 			}
 		};
 		std::string modeNames[4] = {"None", "Linear 1", "Linear 2", "Hermite"};
-		for (int i = 0; i < 4; i++) {
-			ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
-			modeItem->rightText = CHECKMARK(module->interpolationMode == i);
-			modeItem->module = module;
-			modeItem->interpolationMode = i;
-			menu->addChild(modeItem);
-		}
+		menu->addChild(createSubmenuItem("Interpolation", (modeNames[module->interpolationMode]), [=](Menu * menu) {
+			for (int i = 0; i < 4; i++) {
+				ModeItem* modeItem = createMenuItem<ModeItem>(modeNames[i]);
+				modeItem->rightText = CHECKMARK(module->interpolationMode == i);
+				modeItem->module = module;
+				modeItem->interpolationMode = i;
+				menu->addChild(modeItem);
+			}
+		}));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Outs mode"));
+
 		struct OutsItem : MenuItem {
 			DrumPlayer* module;
 			int outsMode;
@@ -1342,13 +1360,16 @@ struct DrumPlayerWidget : ModuleWidget {
 			}
 		};
 		std::string outsNames[3] = {"Normalled", "Solo", "Unconnected on out #4"};
-		for (int i = 0; i < 3; i++) {
-			OutsItem* outsItem = createMenuItem<OutsItem>(outsNames[i]);
-			outsItem->rightText = CHECKMARK(module->outsMode == i);
-			outsItem->module = module;
-			outsItem->outsMode = i;
-			menu->addChild(outsItem);
-		}
+		menu->addChild(createSubmenuItem("Outs mode", (outsNames[module->outsMode]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutsItem* outsItem = createMenuItem<OutsItem>(outsNames[i]);
+				outsItem->rightText = CHECKMARK(module->outsMode == i);
+				outsItem->module = module;
+				outsItem->outsMode = i;
+				menu->addChild(outsItem);
+			}
+		}));
+
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));
 	}

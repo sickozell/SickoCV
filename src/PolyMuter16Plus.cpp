@@ -843,14 +843,17 @@ struct PolyMuter16PlusWidget : ModuleWidget {
 		PolyMuter16Plus* module = dynamic_cast<PolyMuter16Plus*>(this->module);
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuLabel("Right-click on buttons"));
-		menu->addChild(createMenuLabel("to SOLO channel"));
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Show OUT channels", "", &module->showOut));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Shrink channels", "", &module->shrink));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("Right-click on buttons"));
+			menu->addChild(createMenuLabel("to SOLO channel"));
+		}));
 	}
 };
 
