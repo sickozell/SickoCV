@@ -238,7 +238,7 @@ struct TrigSeqPlus : Module {
 		}
 	};
 	
-	int bitResTable[2] = {8, 16};
+	const int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
 
 	bool turingMode = false;

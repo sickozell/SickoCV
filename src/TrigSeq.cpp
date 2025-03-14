@@ -122,7 +122,7 @@ struct TrigSeq : Module {
 		}
 	};
 	
-	int bitResTable[2] = {8, 16};
+	const int bitResTable[2] = {8, 16};
 	int bitResolution = BIT_8;
 	
 	std::string resolutionName[2] = {"8 bit", "16 bit"};
