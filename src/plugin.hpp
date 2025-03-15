@@ -75,7 +75,6 @@ extern Model* modelWavetabler;
 
 extern bool randLoops_clipboard;
 extern int randLoops_cbSeq[16];
-//extern int randLoops_cbStart;
 extern int randLoops_cbSteps;
 extern float randLoops_cbCtrl;
 extern float randLoops_cbScale;
