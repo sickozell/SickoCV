@@ -716,7 +716,7 @@ randLoops8 is basically a 8-track randomLoops with limited functions, but with a
 - **Buffered Random**: The same as previous, but acting with the RND button
 - **Bit Resolution**: the voltages can be calculated with the first 8 bits (default) or the all 16 bits of the shift-register
 - **Voltage Progression**: The standard voltage for each specific bit position voltage is doubled from the previous one. It can be changed to 1.3x, or even a Fibonacci progression, to achieve sligthly different cv sequences
-- **Trig Output Type**: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length od the incoming clock)
+- **Trig Output Type**: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length of the incoming clock)
 - **Ignore Prog Ctrl**: This ignores Ctrl knob setting when a program is recalled
 - **Ignore Prog Scale**: This ignores Scale knob setting when a program is recalled
 - **1st clock after reset Don't advance**:  This ignores the first clock after a reset trigger, so the sequence won't advance
