@@ -153,7 +153,7 @@ struct TrigSeqPlus : Module {
 							};
 
 	int progSteps[32] = {16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16};
-	float progRst[32] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+	float progRst[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	// --------------workingSeq
 
@@ -213,11 +213,6 @@ struct TrigSeqPlus : Module {
 	bool setButLight = false;
 	float setButLightDelta = 2 / APP->engine->getSampleRate();
 	float setButLightValue = 0.f;
-
-	bool clipboard = false;
-	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int cbSteps = 16;
-	float cbRst = 0;
 
 	float volt = 0.f;
 
@@ -374,33 +369,24 @@ struct TrigSeqPlus : Module {
 
 		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
 
-		json_t *seq_json_array = json_array();
-		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			json_array_append_new(seq_json_array, json_integer(wSeq[tempStep]));
-		}
-		json_object_set_new(rootJ, "wSeq", seq_json_array);	
-
-		json_object_set_new(rootJ, "wSteps", json_integer(wSteps));
-		json_object_set_new(rootJ, "wRst", json_real(wRst));
-			
-		for (int prog = 0; prog < 32; prog++) {
+		for (int p = 0; p < 32; p++) {
 			json_t *prog_json_array = json_array();
-			for (int tempStep = 0; tempStep < 16; tempStep++) {
-				json_array_append_new(prog_json_array, json_integer(progSeq[prog][tempStep]));
+			for (int st = 0; st < 16; st++) {
+				json_array_append_new(prog_json_array, json_integer(progSeq[p][st]));
 			}
-			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
+			json_object_set_new(rootJ, ("prog"+to_string(p)).c_str(), prog_json_array);	
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
+		for (int p = 0; p < 32; p++) {
 			json_t *progSteps_json_array = json_array();
-			json_array_append_new(progSteps_json_array, json_integer(progSteps[prog]));
-			json_object_set_new(rootJ, ("progSteps"+to_string(prog)).c_str(), progSteps_json_array);
+			json_array_append_new(progSteps_json_array, json_integer(progSteps[p]));
+			json_object_set_new(rootJ, ("progSteps"+to_string(p)).c_str(), progSteps_json_array);
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
+		for (int p = 0; p < 32; p++) {
 			json_t *progRst_json_array = json_array();
-			json_array_append_new(progRst_json_array, json_real(progRst[prog]));
-			json_object_set_new(rootJ, ("progRst"+to_string(prog)).c_str(), progRst_json_array);
+			json_array_append_new(progRst_json_array, json_real(progRst[p]));
+			json_object_set_new(rootJ, ("progRst"+to_string(p)).c_str(), progRst_json_array);
 		}
 
 		return rootJ;
@@ -491,35 +477,35 @@ struct TrigSeqPlus : Module {
 		prevProgKnob = selectedProg;
 		params[PROG_PARAM].setValue(selectedProg);
 		
-		for (int prog = 0; prog < 32; prog++) {
-			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(prog)).c_str());
-			size_t tempSeq;
+		for (int p = 0; p < 32; p++) {
+			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(p)).c_str());
+			size_t st;
 			json_t *json_value;
 			if (prog_json_array) {
-				json_array_foreach(prog_json_array, tempSeq, json_value) {
-					progSeq[prog][tempSeq] = json_integer_value(json_value);
+				json_array_foreach(prog_json_array, st, json_value) {
+					progSeq[p][st] = json_integer_value(json_value);
 				}
 			}
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_object_get(rootJ, ("progSteps"+to_string(prog)).c_str());
-			size_t tempSeq;
+		for (int p = 0; p < 32; p++) {
+			json_t *progSteps_json_array = json_object_get(rootJ, ("progSteps"+to_string(p)).c_str());
+			size_t st;
 			json_t *json_value;
 			if (progSteps_json_array) {
-				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
-					progSteps[prog] = json_integer_value(json_value);
+				json_array_foreach(progSteps_json_array, st, json_value) {
+					progSteps[p] = json_integer_value(json_value);
 				}
 			}
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
-			json_t *progRst_json_array = json_object_get(rootJ, ("progRst"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
+		for (int p = 0; p < 32; p++) {
+			json_t *progRst_json_array = json_object_get(rootJ, ("progRst"+to_string(p)).c_str());
+			size_t st;
+			json_t *progRst_json_value;
 			if (progRst_json_array) {
-				json_array_foreach(progRst_json_array, tempSeq, json_value) {
-					progRst[prog] = json_real_value(json_value);
+				json_array_foreach(progRst_json_array, st, progRst_json_value) {
+					progRst[p] = json_real_value(progRst_json_value);
 				}
 			}
 		}
@@ -540,24 +526,24 @@ struct TrigSeqPlus : Module {
 		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
 		json_object_set_new(rootJ, "progression", json_integer(progression));
 
-		for (int prog = 0; prog < 32; prog++) {
+		for (int p = 0; p < 32; p++) {
 			json_t *prog_json_array = json_array();
-			for (int tempSeq = 0; tempSeq < 16; tempSeq++) {
-				json_array_append_new(prog_json_array, json_integer(progSeq[prog][tempSeq]));
+			for (int st = 0; st < 16; st++) {
+				json_array_append_new(prog_json_array, json_integer(progSeq[p][st]));
 			}
-			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
+			json_object_set_new(rootJ, ("prog"+to_string(p)).c_str(), prog_json_array);	
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
+		for (int p = 0; p < 32; p++) {
 			json_t *progSteps_json_array = json_array();
-			json_array_append_new(progSteps_json_array, json_integer(progSteps[prog]));
-			json_object_set_new(rootJ, ("progSteps"+to_string(prog)).c_str(), progSteps_json_array);
+			json_array_append_new(progSteps_json_array, json_integer(progSteps[p]));
+			json_object_set_new(rootJ, ("progSteps"+to_string(p)).c_str(), progSteps_json_array);
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
+		for (int p = 0; p < 32; p++) {
 			json_t *progRst_json_array = json_array();
-			json_array_append_new(progRst_json_array, json_real(progRst[prog]));
-			json_object_set_new(rootJ, ("progRst"+to_string(prog)).c_str(), progRst_json_array);
+			json_array_append_new(progRst_json_array, json_real(progRst[p]));
+			json_object_set_new(rootJ, ("progRst"+to_string(p)).c_str(), progRst_json_array);
 		}
 
 		return rootJ;
@@ -615,35 +601,35 @@ struct TrigSeqPlus : Module {
 				progression = STD2x_PROGRESSION;
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
-			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
+		for (int p = 0; p < 32; p++) {
+			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(p)).c_str());
+			size_t st;
+			json_t *prog_json_value;
 			if (prog_json_array) {
-				json_array_foreach(prog_json_array, tempSeq, json_value) {
-					progSeq[prog][tempSeq] = json_integer_value(json_value);
+				json_array_foreach(prog_json_array, st, prog_json_value) {
+					progSeq[p][st] = json_integer_value(prog_json_value);
 				}
 			}
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
-			json_t *progSteps_json_array = json_object_get(rootJ, ("progSteps"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
+		for (int p = 0; p < 32; p++) {
+			json_t *progSteps_json_array = json_object_get(rootJ, ("progSteps"+to_string(p)).c_str());
+			size_t st;
+			json_t *progSteps_json_value;
 			if (progSteps_json_array) {
-				json_array_foreach(progSteps_json_array, tempSeq, json_value) {
-					progSteps[prog] = json_integer_value(json_value);
+				json_array_foreach(progSteps_json_array, st, progSteps_json_value) {
+					progSteps[p] = json_integer_value(progSteps_json_value);
 				}
 			}
 		}
 
-		for (int prog = 0; prog < 32; prog++) {
-			json_t *progRst_json_array = json_object_get(rootJ, ("progRst"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
+		for (int p = 0; p < 32; p++) {
+			json_t *progRst_json_array = json_object_get(rootJ, ("progRst"+to_string(p)).c_str());
+			size_t st;
+			json_t *progRst_json_value;
 			if (progRst_json_array) {
-				json_array_foreach(progRst_json_array, tempSeq, json_value) {
-					progRst[prog] = json_real_value(json_value);
+				json_array_foreach(progRst_json_array, st, progRst_json_value) {
+					progRst[p] = json_real_value(progRst_json_value);
 				}
 			}
 		}
@@ -734,25 +720,26 @@ struct TrigSeqPlus : Module {
 
 		json_t *rootJ = json_object();
 
-		json_t *prog_json_array = json_array();
-		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			json_array_append_new(prog_json_array, json_integer(wSeq[tempStep]));
+		json_t *wSeq_json_array = json_array();
+		for (int st = 0; st < 16; st++) {
+			json_array_append_new(wSeq_json_array, json_integer(wSeq[st]));
 		}
-		json_object_set_new(rootJ, "sr", prog_json_array);	
-
+		json_object_set_new(rootJ, "sr", wSeq_json_array);	
 		json_object_set_new(rootJ, "length", json_integer((int)params[LENGTH_PARAM].getValue()));
+		json_object_set_new(rootJ, "reset", json_real(params[RST_PARAM].getValue()));
+		json_object_set_new(rootJ, "offset", json_real(0));
 
 		return rootJ;
 	}
 
 	void sequenceFromJson(json_t *rootJ) {
 
-		json_t *prog_json_array = json_object_get(rootJ, "sr");
-		size_t tempSeq;
-		json_t *json_value;
-		if (prog_json_array) {
-			json_array_foreach(prog_json_array, tempSeq, json_value) {
-				params[STEP_PARAM+tempSeq].setValue(json_integer_value(json_value));
+		json_t *wSeq_json_array = json_object_get(rootJ, "sr");
+		size_t st;
+		json_t *wSeq_json_value;
+		if (wSeq_json_array) {
+			json_array_foreach(wSeq_json_array, st, wSeq_json_value) {
+				params[STEP_PARAM+st].setValue(json_integer_value(wSeq_json_value));
 			}
 		}
 
@@ -764,10 +751,18 @@ struct TrigSeqPlus : Module {
 				params[LENGTH_PARAM].setValue(int(json_integer_value(lengthJ)));
 		}
 
+		json_t* rstJ = json_object_get(rootJ, "reset");
+		if (rstJ) {
+			if (json_real_value(rstJ) < 0 || json_real_value(rstJ) > 1)
+				params[RST_PARAM].setValue(0);
+			else
+				params[RST_PARAM].setValue(json_real_value(rstJ));
+		}
+
 	}
 
 	void menuLoadSequence() {
-		static const char FILE_FILTERS[] = "trigSeq preset (.tss):tss,TSS";
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -808,7 +803,7 @@ struct TrigSeqPlus : Module {
 
 	void menuSaveSequence() {
 
-		static const char FILE_FILTERS[] = "trigSeq Sequence (.tss):tss,TSS";
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -851,7 +846,7 @@ struct TrigSeqPlus : Module {
 		
 		randLoops_cbSteps = wSteps;
 		randLoops_cbScale = wRst;
-		randLoops_cbCtrl = -1;	// this prevents to set ctrl paramer if pasting to randLoops/randLoops8
+		randLoops_cbCtrl = 1;	// this locks ctrl paramer if pasting to randLoops/randLoops8
 		randLoops_clipboard = true;
 	}
 
@@ -870,10 +865,7 @@ struct TrigSeqPlus : Module {
 	void eraseProgs() {
 		for (int i = 0; i < 32; i++) {
 			progSteps[i] = 16;
-			if (!turingMode) 
-				progRst[i] = 1;
-			else
-				progRst[i] = 16;
+			progRst[i] = 0;
 
 			for (int j = 0; j < 16; j++)
 				progSeq[i][j] = 0;
@@ -1558,22 +1550,21 @@ struct TrigSeqPlusWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 
-		struct RunTypeItem : MenuItem {
+		struct OutTypeItem : MenuItem {
 			TrigSeqPlus* module;
-			int runType;
+			int outType;
 			void onAction(const event::Action& e) override {
-				module->runType = runType;
+				module->outType = outType;
 			}
 		};
-
-		std::string RunTypeNames[2] = {"Gate", "Trig"};
-		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
-			for (int i = 0; i < 2; i++) {
-				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-				runTypeItem->rightText = CHECKMARK(module->runType == i);
-				runTypeItem->module = module;
-				runTypeItem->runType = i;
-				menu->addChild(runTypeItem);
+		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
+		menu->addChild(createSubmenuItem("Output type", (OutTypeNames[module->outType]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
+				outTypeItem->rightText = CHECKMARK(module->outType == i);
+				outTypeItem->module = module;
+				outTypeItem->outType = i;
+				menu->addChild(outTypeItem);
 			}
 		}));
 
@@ -1595,21 +1586,22 @@ struct TrigSeqPlusWidget : ModuleWidget {
 			}
 		}));
 		
-		struct OutTypeItem : MenuItem {
+		struct RunTypeItem : MenuItem {
 			TrigSeqPlus* module;
-			int outType;
+			int runType;
 			void onAction(const event::Action& e) override {
-				module->outType = outType;
+				module->runType = runType;
 			}
 		};
-		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
-		menu->addChild(createSubmenuItem("Output type", (OutTypeNames[module->outType]), [=](Menu * menu) {
-			for (int i = 0; i < 3; i++) {
-				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
-				outTypeItem->rightText = CHECKMARK(module->outType == i);
-				outTypeItem->module = module;
-				outTypeItem->outType = i;
-				menu->addChild(outTypeItem);
+
+		std::string RunTypeNames[2] = {"Gate", "Trig"};
+		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+				runTypeItem->rightText = CHECKMARK(module->runType == i);
+				runTypeItem->module = module;
+				runTypeItem->runType = i;
+				menu->addChild(runTypeItem);
 			}
 		}));
 
@@ -1621,12 +1613,11 @@ struct TrigSeqPlusWidget : ModuleWidget {
 
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
-		//if (module->clipboard)
+		menu->addChild(createMenuItem("Copy Sequence", "", [=]() {module->copyClipboard();}));
 		if (randLoops_clipboard)
-			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+			menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteClipboard();}));
 		else
-			menu->addChild(createMenuLabel("Paste Seq"));
+			menu->addChild(createMenuLabel("Paste Sequence"));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("TURING MODE", "", &module->turingMode));
@@ -1672,14 +1663,17 @@ struct TrigSeqPlusWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load Single Sequence", "", [=]() {module->menuLoadSequence();}));
-		menu->addChild(createMenuItem("Save Single Sequence", "", [=]() {module->menuSaveSequence();}));
+		menu->addChild(createSubmenuItem("DISK operations", "", [=](Menu * menu) {
 
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));
-		menu->addChild(createMenuItem("Save PROG preset", "", [=]() {module->menuSavePreset();}));
+			menu->addChild(createMenuItem("Load trigSeq PRESET", "", [=]() {module->menuLoadPreset();}));
+			menu->addChild(createMenuItem("Save trigSeq PRESET", "", [=]() {module->menuSavePreset();}));
 
-		menu->addChild(new MenuSeparator());
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Import trigSeq seq.", "", [=]() {module->menuLoadSequence();}));
+			menu->addChild(createMenuItem("Export trigSeq seq.", "", [=]() {module->menuSaveSequence();}));
+
+		}));
+
 		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
 			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
@@ -1690,11 +1684,15 @@ struct TrigSeqPlusWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Store Programs with double-click"));
-			menu->addChild(createMenuLabel("------------------------------------------------"));
-			menu->addChild(createMenuLabel("When switching to TURING mode Reset Knob becomes"));
-			menu->addChild(createMenuLabel("output attenuator, so it has to be adjusted"));
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("Remember to store programs"));
+			menu->addChild(createMenuLabel("when pasting sequences"));
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("When switching to TURING mode Reset Knob"));
+			menu->addChild(createMenuLabel("becomes the output attenuator,"));
+			menu->addChild(createMenuLabel("so it has to be adjusted"));
 		}));
 
 	}

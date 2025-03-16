@@ -1240,7 +1240,7 @@ struct SickoQuantWidget : ModuleWidget {
 		}));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Store Programs with"));
 			menu->addChild(createMenuLabel("double-click on STOR button"));
 		}));

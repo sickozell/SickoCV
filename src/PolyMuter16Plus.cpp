@@ -850,7 +850,7 @@ struct PolyMuter16PlusWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Right-click on buttons"));
 			menu->addChild(createMenuLabel("to SOLO channel"));
 		}));

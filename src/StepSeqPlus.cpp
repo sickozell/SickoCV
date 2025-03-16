@@ -1367,18 +1367,18 @@ struct StepSeqPlusWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
-		//if (module->clipboard)
+		menu->addChild(createMenuItem("Copy Sequence", "", [=]() {module->copyClipboard();}));
 		if (stepSeq_clipboard)
-			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+			menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteClipboard();}));
 		else
-			menu->addChild(createMenuLabel("Paste Seq"));
+			menu->addChild(createMenuLabel("Paste Sequence"));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));
-		menu->addChild(createMenuItem("Save PROG preset", "", [=]() {module->menuSavePreset();}));
+		menu->addChild(createSubmenuItem("DISK operations", "", [=](Menu * menu) {
+			menu->addChild(createMenuItem("Load preset", "", [=]() {module->menuLoadPreset();}));
+			menu->addChild(createMenuItem("Save preset", "", [=]() {module->menuSavePreset();}));
+		}));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
 			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
@@ -1389,8 +1389,11 @@ struct StepSeqPlusWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Store Programs with double-click"));
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("Remember to store programs"));
+			menu->addChild(createMenuLabel("when importing or pasting"));
 		}));
 	}
 
