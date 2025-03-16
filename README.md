@@ -33,7 +33,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.7.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 1](https://github.com/user-attachments/assets/59c9a91f-9e14-436b-bfc7-12caaa348bf7)
+![SickoCV modules 2 7 1](https://github.com/user-attachments/assets/43c0f3a9-c347-4f46-948f-9d2b0805ac84)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -67,7 +67,7 @@ VCV Rack plugin modules
 - [sickoSampler2](#sickosampler2)
 - [simpleSeq4](#simpleseq4)
 - [slewer](#slewer)
-- [stepSeq / stepSeq+ / trigSeq / trigSeq+](#stepSeq--stepSeq--trigSeq--trigSeq)
+- [stepSeq / stepSeq+ / trigSeq / trigSeq+ / trigSeq8x](#stepSeq--stepSeq--trigSeq--trigSeq--trigSeq8x)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
@@ -1158,10 +1158,10 @@ When ticked, the ATT control sets both the attack and decay durations and the DE
 
 [back to top](#table-of-contents)
 
-## stepSeq / stepSeq+ / trigSeq / trigSeq+
+## stepSeq / stepSeq+ / trigSeq / trigSeq+ / trigSeq8x
 ### 16 step/trigger sequencer with direction and presets
 
-![stepseqtrigseq](https://github.com/user-attachments/assets/6852b2d5-dc64-421a-9955-5c97f4a86103)
+![stepseqtrigseq](https://github.com/user-attachments/assets/5dc2ab69-c1fb-4346-8062-db88fab621a1)
 
 #### - INSTRUCTIONS
 stepSeq and trigSeq can respectively output a voltage or a trig/gate/clock up to 16 steps.  
