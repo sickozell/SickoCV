@@ -1003,6 +1003,12 @@ struct TrigSeqPlus : Module {
 
 		} else {
 
+			progKnob = params[PROG_PARAM].getValue();
+			if (progKnob < 0)
+				progKnob = 0;
+			else if (progKnob > 31)
+				progKnob = 31;
+
 			progTrig = inputs[PROG_INPUT].getVoltage();
 			if (progTrig >= 1.f && prevProgTrig < 1.f) {
 				progKnob++;
@@ -1067,7 +1073,10 @@ struct TrigSeqPlus : Module {
 				params[RST_PARAM].setValue(wRst);
 
 				workingProg = selectedProg;
-				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				if (progInType == CV_TYPE)
+					savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				else
+					savedProgKnob = progKnob;
 
 				progChanged = false;
 				progToSet = false;
@@ -1108,7 +1117,10 @@ struct TrigSeqPlus : Module {
 				params[RST_PARAM].setValue(wRst);
 
 				workingProg = selectedProg;
-				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				if (progInType == CV_TYPE)
+					savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				else
+					savedProgKnob = progKnob;
 
 			} else {
 
