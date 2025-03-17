@@ -1,4 +1,4 @@
-# SickoCV v2.7.1-beta20
+# SickoCV v2.7.1-beta21
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -22,13 +22,11 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - added RandLoops module
 - added RandLoops8 module
 - added trigSeq8x module
-- trigSeq trigSeq+ added Turing mode, changed RST knob behavior according to Turing mode.
-- stepSeq stepSeq+ fixed bug on reverse direction 
-- stepSeq stepSeq+ changed range display on step knobs
-- adder8 changed range display on volt/atn knobs
-- added 4ms-MetaModule compatibility
+- trigSeq trigSeq+: added Turing mode, changed RST knob behavior according to Turing mode, added Prog Input Trig Mode
+- stepSeq stepSeq+: changed range tooltips display on step knobs, fixed bug on reverse direction, added Prog Input Trig Mode
+- stepSeq+ trigSeq+: added RECL button functionality to cancel on pending program change. Fixed bug on Rack reload if it was closed during pending prog change. Improved CPU usage
 - improved samples memory management on sampler modules
-
+- added global 4ms-MetaModule compatibility
 
 # SickoCV v2.7.1
 VCV Rack plugin modules

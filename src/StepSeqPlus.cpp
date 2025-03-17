@@ -6,6 +6,7 @@
 #define NEGATIVE_V 1
 #define RUN_GATE 0
 #define RUN_TRIG 1
+#define CV_TYPE 0
 
 #define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
 #define COLOR_LCD_GREEN 0x33, 0xdd, 0x33, 0xff
@@ -146,14 +147,13 @@ struct StepSeqPlus : Module {
 	int nextSteps = 16;
 	int nextRst = 1;
 
-	float pendingSeq[16] = {0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f};
-	int pendingSteps = 16;
-	int pendingRst = 1;
-
 	// --------------prog
 	int progKnob = 0;
 	int prevProgKnob = 0;
 	int savedProgKnob = 0;
+
+	float progTrig = 0;
+	float prevProgTrig = 0;
 
 	int selectedProg = 0;
 	bool progChanged = false;
@@ -179,15 +179,9 @@ struct StepSeqPlus : Module {
 
 	bool instantProgChange = false;
 
-	bool butSetScale = false;
-	float scaleSetBut = 0;
-	float prevScaleSetBut = 0;
-
-	float resetScale = 0;
-	float prevResetScale = 0;
-
-	bool pendingUpdate = false;
-	bool seqChanged = false;
+	bool progToSet = false;
+	float progSetBut = 0;
+	float prevProgSetBut = 0;
 
 	// ------- set button light
 
@@ -195,12 +189,8 @@ struct StepSeqPlus : Module {
 	float setButLightDelta = 2 / APP->engine->getSampleRate();
 	float setButLightValue = 0.f;
 
-	/*
-	bool clipboard = false;
-	float cbSeq[16] = {0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f};
-	int cbSteps = 16;
-	int cbRst = 1;
-	*/
+	int progInType = CV_TYPE;
+	int lastProg = 0;
 
 	StepSeqPlus() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -362,6 +352,15 @@ struct StepSeqPlus : Module {
 
 		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
 
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
+
+		json_t *wSeq_json_array = json_array();
+		for (int st = 0; st < 16; st++) {
+			json_array_append_new(wSeq_json_array, json_real(wSeq[st]));
+		}
+		json_object_set_new(rootJ, "wSeq", wSeq_json_array);
+
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *prog_json_array = json_array();
 			for (int tempStep = 0; tempStep < 16; tempStep++) {
@@ -436,14 +435,33 @@ struct StepSeqPlus : Module {
 
 		// ----------------
 
+		json_t *wSeq_json_array = json_object_get(rootJ, "wSeq");
+		size_t wSeq_st;
+		json_t *wSeq_json_value;
+		if (wSeq_json_array) {
+			json_array_foreach(wSeq_json_array, wSeq_st, wSeq_json_value) {
+				params[STEP_PARAM+wSeq_st].setValue(json_real_value(wSeq_json_value));
+			}
+		}
+
 		json_t* savedProgKnobJ = json_object_get(rootJ, "savedProgKnob");
 		if (savedProgKnobJ) {
 			savedProgKnob = json_integer_value(savedProgKnobJ);
 			if (savedProgKnob < 0 || savedProgKnob > 31)
 				savedProgKnob = 0;
 			
-		} else {
-			savedProgKnob = 0;
+		}
+
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
 		}
 
 		selectedProg = savedProgKnob;
@@ -495,6 +513,9 @@ struct StepSeqPlus : Module {
 		json_object_set_new(rootJ, "revType", json_integer(revType));
 		json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
 		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
+
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
 
 		for (int prog = 0; prog < 32; prog++) {
 			json_t *prog_json_array = json_array();
@@ -550,6 +571,18 @@ struct StepSeqPlus : Module {
 		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
 		if (dontAdvanceSettingJ) {
 			dontAdvanceSetting = json_boolean_value(dontAdvanceSettingJ);
+		}
+
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
 		}
 
 		for (int prog = 0; prog < 32; prog++) {
@@ -689,7 +722,7 @@ struct StepSeqPlus : Module {
 	void eraseProgs() {
 		for (int i = 0; i < 32; i++) {
 			progSteps[i] = 16;
-			progRst[i] = 1;
+			progRst[i] = 0;
 
 			for (int j = 0; j < 16; j++)
 				progSeq[i][j] = 0;
@@ -699,8 +732,34 @@ struct StepSeqPlus : Module {
 	void inline resetStep() {
 		lights[STEP_LIGHT+step].setBrightness(0);
 		step = wRst - 1;
+
 		if (mode == CLOCK_MODE && dontAdvanceSetting)
 			dontAdvance = true;
+
+		if (progInType != CV_TYPE)
+				progKnob = 0;
+	}
+
+	void scanLastProg() {
+		lastProg = 31;
+		bool exitFunc = false;
+
+		for (int p = 31; p >= 0; p--) {
+			for (int st = 0; st < 16; st++) {
+				if (progSeq[p][st] != 0) {
+					lastProg = p;
+					st = 16;
+					exitFunc = true;
+				}
+			}
+			if (progSteps[p] != 16 || progRst[p] != 0) {
+				lastProg = p;
+				exitFunc = true;
+			}
+
+			if (exitFunc)
+				p = 0;
+		}
 	}
 	
 	void process(const ProcessArgs& args) override {
@@ -712,134 +771,68 @@ struct StepSeqPlus : Module {
 
 		// ----------- PROGRAM MANAGEMENT
 
-		progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
-		if (progKnob < 0)
-			progKnob = 0;
-		else if (progKnob > 31)
-			progKnob = 31;
+		if (progInType == CV_TYPE) {
+
+			progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
+			if (progKnob < 0)
+				progKnob = 0;
+			else if (progKnob > 31)
+				progKnob = 31;
+
+		} else {
+
+			progTrig = inputs[PROG_INPUT].getVoltage();
+			if (progTrig >= 1.f && prevProgTrig < 1.f) {
+				progKnob++;
+				if (progKnob > lastProg)
+					progKnob = 0;
+
+				params[PROG_PARAM].setValue(progKnob);
+			}
+			prevProgTrig = progTrig;
+
+		}
 
 		if (progKnob != prevProgKnob) {
 
-			pendingUpdate = true;
 			progChanged = true;
 			selectedProg = progKnob;
 			prevProgKnob = progKnob;
 
 			for (int i = 0; i < 16; i++) {
 				nextSeq[i] = progSeq[selectedProg][i];
-				pendingSeq[i] = nextSeq[i];
-
 				params[STEP_PARAM+i].setValue(nextSeq[i]);
 			}
 			nextSteps = progSteps[selectedProg];
-			pendingSteps = nextSteps;
-			params[LENGTH_PARAM].setValue(nextSteps);
-
 			nextRst = progRst[selectedProg];
-			pendingRst = nextRst;
-			params[RST_PARAM].setValue(nextRst);
 
-			seqChanged = true;
+			params[LENGTH_PARAM].setValue(nextSteps);
+			params[RST_PARAM].setValue(nextRst);
 
 			setButLight = true;
 			setButLightValue = 0.f;
 		}
 
-		// -------- populate next seq array and show it
-
-		if (pendingUpdate) {
-			for (int i = 0; i < 16; i++) {
-				nextSeq[i] = params[STEP_PARAM+i].getValue();
-				if (nextSeq[i] != pendingSeq[i])
-					seqChanged = true;
-
-				//lights[NOTE_LIGHT+i].setBrightness(nextNote[i]);
-				params[STEP_PARAM+i].setValue(nextSeq[i]);
-			}
-			if (nextSteps != pendingSteps)
-				seqChanged = true;
-			params[LENGTH_PARAM].setValue(nextSteps);
-			if (nextRst != pendingRst)
-				seqChanged = true;
-			params[RST_PARAM].setValue(nextRst);
-
-		} else {
-			for (int i = 0; i < 16; i++) {
-				nextSeq[i] = params[STEP_PARAM+i].getValue();
-				if (nextSeq[i] != wSeq[i])
-					seqChanged = true;
-
-				//lights[NOTE_LIGHT+i].setBrightness(nextNote[i]);
-				params[STEP_PARAM+i].setValue(nextSeq[i]);
-			}
-			nextSteps = params[LENGTH_PARAM].getValue();
-			if (nextSteps != wSteps)
-				seqChanged = true;
-			params[LENGTH_PARAM].setValue(nextSteps);
-			nextRst = params[RST_PARAM].getValue();
-			if (nextRst != wRst)
-				seqChanged = true;
-			params[RST_PARAM].setValue(nextRst);
-
-		}
-		
 		// -------- CURRENT SEQ UPDATE
 
-		butSetScale = false;
+		progToSet = false;
 
-		scaleSetBut = params[SET_PARAM].getValue();
-		if (scaleSetBut >= 1.f && prevScaleSetBut < 1.f)
-			butSetScale = true;
+		progSetBut = params[SET_PARAM].getValue();
+		if (progSetBut >= 1.f && prevProgSetBut < 1.f)
+			progToSet = true;
 
-		prevScaleSetBut = scaleSetBut;
+		prevProgSetBut = progSetBut;
 
-		if (seqChanged) {
-			if (pendingUpdate) {
-				if (instantProgChange) {
+		if (!progChanged) {
 
-					for (int i = 0; i < 16; i++)
-						wSeq[i] = nextSeq[i];
+			for (int i = 0; i < 16; i++)
+				wSeq[i] = params[STEP_PARAM+i].getValue();
 
-					wSteps = nextSteps;
-					wRst = nextRst;
+			wSteps = params[LENGTH_PARAM].getValue();
+			wRst = params[RST_PARAM].getValue();
 
-					pendingUpdate = false;
-
-					if (progChanged) {
-						workingProg = selectedProg;
-						savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-					}
-					seqChanged = false;
-
-					setButLight = false;
-					setButLightValue = 0.f;
-
-				} else {
-					
-					if (butSetScale) {
-						butSetScale = false;
-
-						for (int i = 0; i < 16; i++)
-							wSeq[i] = nextSeq[i];
-
-						wSteps = nextSteps;
-						wRst = nextRst;
-
-						pendingUpdate = false;
-
-						if (progChanged) {
-							workingProg = selectedProg;
-							savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-						}
-						seqChanged = false;
-
-						setButLight = false;
-						setButLightValue = 0.f;
-					}
-
-				}
-		
-			} else {	// if there are NOT pending prog updates (only manual steps are changed)
+		} else {
+			if (instantProgChange || progToSet) {
 
 				for (int i = 0; i < 16; i++)
 					wSeq[i] = nextSeq[i];
@@ -847,8 +840,27 @@ struct StepSeqPlus : Module {
 				wSteps = nextSteps;
 				wRst = nextRst;
 
-				seqChanged = false;
+				params[LENGTH_PARAM].setValue(wSteps);
+				params[RST_PARAM].setValue(wRst);
+
+				workingProg = selectedProg;
+				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+
+				progChanged = false;
+				progToSet = false;
+				setButLight = false;
+				setButLightValue = 0.f;
+
+			} else {	// IF SET IS PENDING -> GET NEW SETTINGS
+					
+				for (int i = 0; i < 16; i++)
+					nextSeq[i] = params[STEP_PARAM+i].getValue();
+
+				nextSteps = params[LENGTH_PARAM].getValue();
+				nextRst = params[RST_PARAM].getValue();
+
 			}
+		
 		}
 
 		// -------------------------- RECALL PROG
@@ -858,24 +870,44 @@ struct StepSeqPlus : Module {
 
 		if (recallBut >= 1.f && prevRecallBut < 1.f) {
 
-			for (int i = 0; i < 16; i++) {
-				wSeq[i] = progSeq[selectedProg][i];
-				nextSeq[i] = wSeq[i];
-				params[STEP_PARAM+i].setValue(wSeq[i]);
+			if (!progChanged) {
+
+				for (int i = 0; i < 16; i++) {
+					wSeq[i] = progSeq[selectedProg][i];
+					params[STEP_PARAM+i].setValue(wSeq[i]);
+				}
+				wSteps = progSteps[selectedProg];
+				wRst = progRst[selectedProg];
+
+				params[LENGTH_PARAM].setValue(wSteps);
+				params[RST_PARAM].setValue(wRst);
+
+				workingProg = selectedProg;
+				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+
+			} else {
+
+				for (int i = 0; i < 16; i++)
+					params[STEP_PARAM+i].setValue(wSeq[i]);
+
+				//wSteps = progSteps[selectedProg];
+				//wRst = progRst[selectedProg];
+
+				params[LENGTH_PARAM].setValue(wSteps);
+				params[RST_PARAM].setValue(wRst);
+
+				params[PROG_PARAM].setValue(workingProg);
+				
+				//savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				savedProgKnob = workingProg;
+				selectedProg = workingProg;
+				prevProgKnob = workingProg;
 			}
-			wSteps = progSteps[selectedProg];
-			params[LENGTH_PARAM].setValue(wSteps);
-			wRst = progRst[selectedProg];
-			params[RST_PARAM].setValue(wRst);
 
-			workingProg = selectedProg;
-			savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-			seqChanged = false;
-			pendingUpdate = false;
 			progChanged = false;
-
 			setButLight = false;
 			setButLightValue = 0.f;
+
 		}
 		prevRecallBut = recallBut;
 
@@ -893,9 +925,13 @@ struct StepSeqPlus : Module {
 			} else {
 				storeWait = false;
 				for (int i = 0; i < 16; i++)
-					progSeq[progKnob][i] = nextSeq[i];
-				progSteps[progKnob] = nextSteps;
-				progRst[progKnob] = nextRst;
+					progSeq[progKnob][i] = wSeq[i];
+
+				progSteps[progKnob] = wSteps;
+				progRst[progKnob] = wRst;
+
+				if (progKnob > lastProg)
+					lastProg = progKnob;
 
 				storedProgram = true;
 				storedProgramTime = maxStoredProgramTime;
@@ -1088,8 +1124,8 @@ struct StepSeqPlus : Module {
 		out = wSeq[step];
 
 		switch (range) {
-			//case 0:
-			//break;
+			case 0:
+			break;
 
 			case 1:
 				out *= 2;
@@ -1153,7 +1189,8 @@ struct StepSeqPlusDisplay : TransparentWidget {
 
 				currentDisplay = to_string(module->workingProg);
 
-				if (!module->pendingUpdate) {
+				//if (!module->pendingUpdate) {
+				if (!module->progChanged) {	// NEW
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 2)
@@ -1365,6 +1402,27 @@ struct StepSeqPlusWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
+
+		menu->addChild(new MenuSeparator());
+		struct ProgInTypeItem : MenuItem {
+			StepSeqPlus* module;
+			int progInType;
+			void onAction(const event::Action& e) override {
+				module->progInType = progInType;
+			}
+		};
+
+		std::string ProgInTypeNames[2] = {"CV", "Trig"};
+		menu->addChild(createSubmenuItem("Prog Input type", (ProgInTypeNames[module->progInType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				ProgInTypeItem* progInTypeItem = createMenuItem<ProgInTypeItem>(ProgInTypeNames[i]);
+				progInTypeItem->rightText = CHECKMARK(module->progInType == i);
+				progInTypeItem->module = module;
+				progInTypeItem->progInType = i;
+				menu->addChild(progInTypeItem);
+			}
+		}));
+		menu->addChild(createMenuItem("Scan Last Prog", "current:" + to_string(module->lastProg), [=]() {module->scanLastProg();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy Sequence", "", [=]() {module->copyClipboard();}));

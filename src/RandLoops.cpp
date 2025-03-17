@@ -9,6 +9,8 @@
 #define OUT_GATE 1
 #define OUT_CLOCK 2
 
+#define CV_TYPE 0
+
 #define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
 #define COLOR_LCD_GREEN 0x33, 0xdd, 0x33, 0xff
 
@@ -207,6 +209,9 @@ struct RandLoops : Module {
 	int prevProgKnob = 0;
 	int savedProgKnob = 0;
 
+	float progTrig = 0;
+	float prevProgTrig = 0;
+
 	int selectedProg = 0;
 	bool progChanged = false;
 
@@ -241,16 +246,11 @@ struct RandLoops : Module {
 	float setButLightDelta = 2 / APP->engine->getSampleRate();
 	float setButLightValue = 0.f;
 
-	// ------- clipboard
-
-	bool clipboard = false;
-	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int cbSteps = 16;
-	float cbCtrl = 0.f;
-	float cbScale = 1.f;
-
 	bool ignoreCtrl = false;
 	bool ignoreScale = false;
+
+	int progInType = CV_TYPE;
+	int lastProg = 0;
 
 	RandLoops() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -335,6 +335,9 @@ struct RandLoops : Module {
 		json_object_set_new(rootJ, "ignoreScale", json_boolean(ignoreScale));
 		
 		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
+
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
 
 		sequence_to_saveRegister();
 
@@ -454,8 +457,18 @@ struct RandLoops : Module {
 			if (savedProgKnob < 0 || savedProgKnob > 31)
 				savedProgKnob = 0;
 			
-		} else {
-			savedProgKnob = 0;
+		}
+
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
 		}
 
 		selectedProg = savedProgKnob;
@@ -517,6 +530,9 @@ struct RandLoops : Module {
 		json_object_set_new(rootJ, "outType", json_integer(outType));
 		json_object_set_new(rootJ, "ignoreCtrl", json_boolean(ignoreCtrl));
 		json_object_set_new(rootJ, "ignoreScale", json_boolean(ignoreScale));
+
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
 
 		for (int p = 0; p < 32; p++) {
 			json_t *prog_json_array = json_array();
@@ -590,6 +606,18 @@ struct RandLoops : Module {
 		json_t* ignoreScaleJ = json_object_get(rootJ, "ignoreScale");
 		if (ignoreScaleJ)
 			ignoreScale = json_boolean_value(ignoreScaleJ);
+
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
+		}
 
 		for (int p = 0; p < 32; p++) {
 			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(p)).c_str());
@@ -915,7 +943,7 @@ struct RandLoops : Module {
 		for (int i = 0; i < 32; i++) {
 			progSteps[i] = 16;
 			progCtrl[i] = 0.f;
-			progScale[i] = 0.f;
+			progScale[i] = 1.f;
 			for (int j = 0; j < 16; j++)
 				progSeq[i][j] = 0;
 		}
@@ -968,14 +996,15 @@ struct RandLoops : Module {
 			for (int i = 0; i < 16; i++)
 				wSeq[i] = tempRegister[i];
 
-
-
 			startingStep = 0;
 
 			if (dontAdvanceSetting)
 				dontAdvance = true;
 		
 			calcVoltage();
+
+			if (progInType != CV_TYPE)
+				progKnob = 0;
 
 		}
 		prevRstValue = rstValue;
@@ -1018,6 +1047,28 @@ struct RandLoops : Module {
 		}
 
 	}
+
+	void scanLastProg() {
+		lastProg = 31;
+		bool exitFunc = false;
+
+		for (int p = 31; p >= 0; p--) {
+			for (int st = 0; st < 16; st++) {
+				if (progSeq[p][st] != 0) {
+					lastProg = p;
+					st = 16;
+					exitFunc = true;
+				}
+			}
+			if (progSteps[p] != 16 || progScale[p] != 1) {
+				lastProg = p;
+				exitFunc = true;
+			}
+
+			if (exitFunc)
+				p = 0;
+		}
+	}
 	
 	void process(const ProcessArgs& args) override {
 
@@ -1028,11 +1079,27 @@ struct RandLoops : Module {
 
 		// ----------- PROGRAM MANAGEMENT
 
-		progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
-		if (progKnob < 0)
-			progKnob = 0;
-		else if (progKnob > 31)
-			progKnob = 31;
+		if (progInType == CV_TYPE) {
+
+			progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
+			if (progKnob < 0)
+				progKnob = 0;
+			else if (progKnob > 31)
+				progKnob = 31;
+
+		} else {
+
+			progTrig = inputs[PROG_INPUT].getVoltage();
+			if (progTrig >= 1.f && prevProgTrig < 1.f) {
+				progKnob++;
+				if (progKnob > lastProg)
+					progKnob = 0;
+
+				params[PROG_PARAM].setValue(progKnob);
+			}
+			prevProgTrig = progTrig;
+
+		}
 
 		if (progKnob != prevProgKnob) {
 
@@ -1200,6 +1267,9 @@ struct RandLoops : Module {
 				progSteps[progKnob] = wSteps;
 				progCtrl[progKnob] = wCtrl;
 				progScale[progKnob] = wScale;
+
+				if (progKnob > lastProg)
+					lastProg = progKnob;
 
 				storedProgram = true;
 				storedProgramTime = maxStoredProgramTime;
@@ -1740,6 +1810,27 @@ struct RandLoopsWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
+
+		menu->addChild(new MenuSeparator());
+		struct ProgInTypeItem : MenuItem {
+			RandLoops* module;
+			int progInType;
+			void onAction(const event::Action& e) override {
+				module->progInType = progInType;
+			}
+		};
+
+		std::string ProgInTypeNames[2] = {"CV", "Trig"};
+		menu->addChild(createSubmenuItem("Prog Input type", (ProgInTypeNames[module->progInType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				ProgInTypeItem* progInTypeItem = createMenuItem<ProgInTypeItem>(ProgInTypeNames[i]);
+				progInTypeItem->rightText = CHECKMARK(module->progInType == i);
+				progInTypeItem->module = module;
+				progInTypeItem->progInType = i;
+				menu->addChild(progInTypeItem);
+			}
+		}));
+		menu->addChild(createMenuItem("Scan Last Prog", "current:" + to_string(module->lastProg), [=]() {module->scanLastProg();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy Sequence", "", [=]() {module->copyClipboard();}));

@@ -9,6 +9,7 @@
 #define OUT_TRIG 0
 #define OUT_GATE 1
 #define OUT_CLOCK 2
+#define CV_TYPE 0
 
 #define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
 #define COLOR_LCD_GREEN 0x33, 0xdd, 0x33, 0xff
@@ -53,7 +54,6 @@ struct TrigSeq8x : Module {
 		RST_INPUT,
 		LENGTH_INPUT,
 		PROG_INPUT,
-		RECALL_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
@@ -62,7 +62,7 @@ struct TrigSeq8x : Module {
 	};
 	enum LightId {
 		ENUMS(STEPBUT_LIGHT, 128),
-		ENUMS(STEP_LIGHT, 128),
+		ENUMS(STEP_LIGHT, 16),
 		RUNBUT_LIGHT,
 		RECALL_LIGHT,
 		STORE_LIGHT,
@@ -435,7 +435,7 @@ struct TrigSeq8x : Module {
 						};
 	int nextSteps = 16;
 	float nextRst = 0;
-
+	/*
 	int pendingSeq[8][16] = { {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 							{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 							{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -448,11 +448,14 @@ struct TrigSeq8x : Module {
 	
 	int pendingSteps = 16;
 	float pendingRst = 0;
-
+	*/
 	// --------------prog
 	int progKnob = 0;
 	int prevProgKnob = 0;
 	int savedProgKnob = 0;
+
+	float progTrig = 0;
+	float prevProgTrig = 0;
 
 	int selectedProg = 0;
 	bool progChanged = false;
@@ -478,15 +481,9 @@ struct TrigSeq8x : Module {
 
 	bool instantProgChange = false;
 
-	bool butSetScale = false;
-	float scaleSetBut = 0;
-	float prevScaleSetBut = 0;
-
-	float resetScale = 0;
-	float prevResetScale = 0;
-
-	bool pendingUpdate = false;
-	bool seqChanged = false;
+	bool progToSet = false;
+	float progSetBut = 0;
+	float prevProgSetBut = 0;
 
 	// ------- set button light
 
@@ -519,7 +516,8 @@ struct TrigSeq8x : Module {
 	bool turingMode = false;
 	bool prevTuringMode = false;
 
-	int tempSaveTrack = 0;
+	int progInType = CV_TYPE;
+	int lastProg = 0;
 
 	TrigSeq8x() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -552,8 +550,6 @@ struct TrigSeq8x : Module {
 		//paramQuantities[RST_PARAM]->snapEnabled = true;
 		configInput(RST_INPUT, "Reset");
 
-		//configOutput(OUT_OUTPUT, "Output");
-
 		configParam(LENGTH_PARAM, 1.f,16.f, 16.f, "Length");
 		paramQuantities[LENGTH_PARAM]->snapEnabled = true;
 
@@ -570,7 +566,7 @@ struct TrigSeq8x : Module {
 		paramQuantities[PROG_PARAM]->snapEnabled = true;
 		configSwitch(SET_PARAM, 0, 1.f, 0.f, "Set", {"OFF", "ON"});
 		configSwitch(RECALL_PARAM, 0, 1.f, 0.f, "Recall", {"OFF", "ON"});
-		configInput(RECALL_INPUT, "Recall");
+		//configInput(RECALL_INPUT, "Recall");
 		configSwitch(STORE_PARAM, 0, 1.f, 0.f, "Store", {"OFF", "ON"});
 		configSwitch(AUTO_PARAM, 0, 1.f, 0.f, "Auto", {"OFF", "ON"});
 
@@ -642,6 +638,17 @@ struct TrigSeq8x : Module {
 		json_object_set_new(rootJ, "progression", json_integer(progression));
 
 		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
+
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wSeq_json_array = json_array();
+			for (int st = 0; st < 16; st++) {
+				json_array_append_new(wSeq_json_array, json_integer(wSeq[t][st]));
+			}
+			json_object_set_new(rootJ, ("wSeq_t"+to_string(t)).c_str(), wSeq_json_array);
+		}
 
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < 8; t++) {
@@ -744,14 +751,35 @@ struct TrigSeq8x : Module {
 			if (savedProgKnob < 0 || savedProgKnob > 31)
 				savedProgKnob = 0;
 			
-		} else {
-			savedProgKnob = 0;
+		}
+
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
 		}
 
 		selectedProg = savedProgKnob;
 		workingProg = selectedProg;
 		prevProgKnob = selectedProg;
 		params[PROG_PARAM].setValue(selectedProg);
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wSeq_json_array = json_object_get(rootJ, ("wSeq_t"+to_string(t)).c_str());
+			size_t st;
+			json_t *wSeq_json_value;
+			if (wSeq_json_array) {
+				json_array_foreach(wSeq_json_array, st, wSeq_json_value) {
+					params[STEP_PARAM+(t*16)+st].setValue(json_integer_value(wSeq_json_value));
+				}
+			}
+		}
 		
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < 8; t++) {
@@ -803,6 +831,9 @@ struct TrigSeq8x : Module {
 		json_object_set_new(rootJ, "turingMode", json_boolean(turingMode));
 		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
 		json_object_set_new(rootJ, "progression", json_integer(progression));
+
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
 
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < 8; t++) {
@@ -879,6 +910,18 @@ struct TrigSeq8x : Module {
 			progression = json_integer_value(progressionJ);
 			if (progression < 0 && progression > 2)
 				progression = STD2x_PROGRESSION;
+		}
+
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
 		}
 
 		for (int p = 0; p < 32; p++) {
@@ -1351,9 +1394,7 @@ struct TrigSeq8x : Module {
 			for (int st = 0; st < 16; st++)
 				params[STEP_PARAM+(t*16)+st].setValue(randLoops8_cbSeq[t][st]);
 
-		//wSteps = randLoops8_cbSteps;
 		params[LENGTH_PARAM].setValue(randLoops8_cbSteps[0]);
-		//wRst = randLoops8_cbScale;
 		params[RST_PARAM].setValue(randLoops8_cbScale[0]);
 	
 	}
@@ -1404,6 +1445,9 @@ struct TrigSeq8x : Module {
 
 		if (mode == CLOCK_MODE && dontAdvanceSetting)
 			dontAdvance = true;
+
+		if (progInType != CV_TYPE)
+			progKnob = 0;
 	}
 
 	void inline calcVoltage(int t) {
@@ -1439,6 +1483,34 @@ struct TrigSeq8x : Module {
 
 	}
 
+	void scanLastProg() {
+		lastProg = 31;
+		bool exitFunc = false;
+
+		for (int p = 31; p >= 0; p--) {
+			for (int t = 0; t < 8; t++) {
+				for (int st = 0; st < 16; st++) {
+					if (progSeq[p][t][st] != 0) {
+						lastProg = p;
+						st = 16;
+						t = 8;
+						exitFunc = true;
+					}
+				}
+				if (exitFunc)
+					t = 8;
+			}
+
+			if (progSteps[p] != 16 || progRst[p] != 0) {
+				lastProg = p;
+				exitFunc = true;
+			}
+
+			if (exitFunc)
+				p = 0;
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
 
 		// ----------- AUTO SWITCH
@@ -1448,15 +1520,30 @@ struct TrigSeq8x : Module {
 
 		// ----------- PROGRAM MANAGEMENT
 
-		progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
-		if (progKnob < 0)
-			progKnob = 0;
-		else if (progKnob > 31)
-			progKnob = 31;
+		if (progInType == CV_TYPE) {
+
+			progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
+			if (progKnob < 0)
+				progKnob = 0;
+			else if (progKnob > 31)
+				progKnob = 31;
+
+		} else {
+
+			progTrig = inputs[PROG_INPUT].getVoltage();
+			if (progTrig >= 1.f && prevProgTrig < 1.f) {
+				progKnob++;
+				if (progKnob > lastProg)
+					progKnob = 0;
+
+				params[PROG_PARAM].setValue(progKnob);
+			}
+			prevProgTrig = progTrig;
+
+		}
 
 		if (progKnob != prevProgKnob) {
 
-			pendingUpdate = true;
 			progChanged = true;
 			selectedProg = progKnob;
 			prevProgKnob = progKnob;
@@ -1464,128 +1551,43 @@ struct TrigSeq8x : Module {
 			for (int t = 0; t < 8; t++) {
 				for (int i = 0; i < 16; i++) {
 					nextSeq[t][i] = progSeq[selectedProg][t][i];
-					pendingSeq[t][i] = nextSeq[t][i];
-
 					params[STEP_PARAM+(t*16)+i].setValue(nextSeq[t][i]);
+					lights[STEPBUT_LIGHT+(t*16)+i].setBrightness(nextSeq[t][i]);
 				}
 			}
 			nextSteps = progSteps[selectedProg];
-			pendingSteps = nextSteps;
-			params[LENGTH_PARAM].setValue(nextSteps);
-
 			nextRst = progRst[selectedProg];
-			pendingRst = nextRst;
-			params[RST_PARAM].setValue(nextRst);
 
-			seqChanged = true;
+			params[LENGTH_PARAM].setValue(nextSteps);
+			params[RST_PARAM].setValue(nextRst);
 
 			setButLight = true;
 			setButLightValue = 0.f;
-		}
-
-		// -------- populate next seq array and show it
-
-		if (pendingUpdate) {
-			for (int t = 0; t < 8; t++) {
-				for (int i = 0; i < 16; i++) {
-					nextSeq[t][i] = params[STEP_PARAM+(t*16)+i].getValue();
-					if (nextSeq[t][i] != pendingSeq[t][i])
-						seqChanged = true;
-
-					params[STEP_PARAM+(t*16)+i].setValue(nextSeq[t][i]);
-					lights[STEPBUT_LIGHT+(t*16)+i].setBrightness(nextSeq[t][i]);
-				}
-			}
-			if (nextSteps != pendingSteps)
-				seqChanged = true;
-			params[LENGTH_PARAM].setValue(nextSteps);
-			if (nextRst != pendingRst)
-				seqChanged = true;
-			params[RST_PARAM].setValue(nextRst);
-
-		} else {
-			for (int t = 0; t < 8; t++) {
-				for (int i = 0; i < 16; i++) {
-					nextSeq[t][i] = params[STEP_PARAM+(t*16)+i].getValue();
-					if (nextSeq[t][i] != wSeq[t][i])
-						seqChanged = true;
-
-					params[STEP_PARAM+(t*16)+i].setValue(nextSeq[t][i]);
-					lights[STEPBUT_LIGHT+(t*16)+i].setBrightness(nextSeq[t][i]);
-				}
-			}
-			nextSteps = params[LENGTH_PARAM].getValue();
-			if (nextSteps != wSteps)
-				seqChanged = true;
-			params[LENGTH_PARAM].setValue(nextSteps);
-			nextRst = params[RST_PARAM].getValue();
-			if (nextRst != wRst)
-				seqChanged = true;
-			params[RST_PARAM].setValue(nextRst);
 
 		}
-		
+
 		// -------- CURRENT SEQ UPDATE
 
-		butSetScale = false;
+		progToSet = false;
 
-		scaleSetBut = params[SET_PARAM].getValue();
-		if (scaleSetBut >= 1.f && prevScaleSetBut < 1.f)
-			butSetScale = true;
+		progSetBut = params[SET_PARAM].getValue();
+		if (progSetBut >= 1.f && prevProgSetBut < 1.f)
+			progToSet = true;
 
-		prevScaleSetBut = scaleSetBut;
+		prevProgSetBut = progSetBut;
 
-		if (seqChanged) {
-			if (pendingUpdate) {
-				if (instantProgChange) {
-
-					for (int t = 0; t < 8; t++) {
-						for (int i = 0; i < 16; i++)
-							wSeq[t][i] = nextSeq[t][i];
-					}
-
-					wSteps = nextSteps;
-					wRst = nextRst;
-
-					pendingUpdate = false;
-
-					if (progChanged) {
-						workingProg = selectedProg;
-						savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-					}
-					seqChanged = false;
-
-					setButLight = false;
-					setButLightValue = 0.f;
-
-				} else {
-					
-					if (butSetScale) {
-						butSetScale = false;
-
-						for (int t = 0; t < 8; t++) {
-							for (int i = 0; i < 16; i++)
-								wSeq[t][i] = nextSeq[t][i];
-						}
-
-						wSteps = nextSteps;
-						wRst = nextRst;
-
-						pendingUpdate = false;
-
-						if (progChanged) {
-							workingProg = selectedProg;
-							savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-						}
-						seqChanged = false;
-
-						setButLight = false;
-						setButLightValue = 0.f;
-					}
-
+		if (!progChanged) {
+			for (int t = 0; t < 8; t++) {
+				for (int i = 0; i < 16; i++) {
+					wSeq[t][i] = params[STEP_PARAM+(t*16)+i].getValue();
+					lights[STEPBUT_LIGHT+(t*16)+i].setBrightness(wSeq[t][i]);
 				}
-		
-			} else {	// if there are NOT pending prog updates (only manual steps are changed)
+			}
+			wSteps = params[LENGTH_PARAM].getValue();
+			wRst = params[RST_PARAM].getValue();
+
+		} else {
+			if (instantProgChange || progToSet) {
 
 				for (int t = 0; t < 8; t++) {
 					for (int i = 0; i < 16; i++)
@@ -1594,9 +1596,30 @@ struct TrigSeq8x : Module {
 
 				wSteps = nextSteps;
 				wRst = nextRst;
+				params[LENGTH_PARAM].setValue(wSteps);
+				params[RST_PARAM].setValue(wRst);
 
-				seqChanged = false;
+				workingProg = selectedProg;
+				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				
+				progChanged = false;
+				progToSet = false;
+				setButLight = false;
+				setButLightValue = 0.f;
+
+			} else { 	// IF SET IS PENDING -> GET NEW SETTINGS
+				
+				for (int t = 0; t < 8; t++) {
+					for (int i = 0; i < 16; i++) {
+						nextSeq[t][i] = params[STEP_PARAM+(t*16)+i].getValue();
+						lights[STEPBUT_LIGHT+(t*16)+i].setBrightness(nextSeq[t][i]);
+					}
+				}
+				nextSteps = params[LENGTH_PARAM].getValue();
+				nextRst = params[RST_PARAM].getValue();
+
 			}
+		
 		}
 
 		// -------------------------- RECALL PROG
@@ -1606,25 +1629,42 @@ struct TrigSeq8x : Module {
 
 		if (recallBut >= 1.f && prevRecallBut < 1.f) {
 
-			for (int t = 0; t < 8; t++) {
-				for (int i = 0; i < 16; i++) {
-					wSeq[t][i] = progSeq[selectedProg][t][i];
-					nextSeq[t][i] = wSeq[t][i];
-					params[STEP_PARAM+(t*16)+i].setValue(wSeq[t][i]);
-					lights[STEPBUT_LIGHT+(t*16)+i].setBrightness(wSeq[t][i]);
+			if (!progChanged) {
+
+				for (int t = 0; t < 8; t++) {
+					for (int i = 0; i < 16; i++) {
+						wSeq[t][i] = progSeq[selectedProg][t][i];
+						params[STEP_PARAM+(t*16)+i].setValue(wSeq[t][i]);
+						lights[STEPBUT_LIGHT+(t*16)+i].setBrightness(wSeq[t][i]);
+					}
 				}
+				wSteps = progSteps[selectedProg];
+				params[LENGTH_PARAM].setValue(wSteps);
+				wRst = progRst[selectedProg];
+				params[RST_PARAM].setValue(wRst);
+
+				workingProg = selectedProg;
+				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+
+			} else {
+
+				for (int t = 0; t < 8; t++) {
+					for (int i = 0; i < 16; i++) {
+						params[STEP_PARAM+(t*16)+i].setValue(wSeq[t][i]);
+						lights[STEPBUT_LIGHT+(t*16)+i].setBrightness(wSeq[t][i]);
+					}
+				}
+				params[LENGTH_PARAM].setValue(wSteps);
+				params[RST_PARAM].setValue(wRst);
+
+				params[PROG_PARAM].setValue(workingProg);
+				//savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				savedProgKnob = workingProg;
+				selectedProg = workingProg;
+				prevProgKnob = workingProg;
+
 			}
-			wSteps = progSteps[selectedProg];
-			params[LENGTH_PARAM].setValue(wSteps);
-			wRst = progRst[selectedProg];
-			params[RST_PARAM].setValue(wRst);
-
-			workingProg = selectedProg;
-			savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-			seqChanged = false;
-			pendingUpdate = false;
 			progChanged = false;
-
 			setButLight = false;
 			setButLightValue = 0.f;
 		}
@@ -1645,10 +1685,14 @@ struct TrigSeq8x : Module {
 				storeWait = false;
 				for (int t = 0; t < 8; t++) {
 					for (int i = 0; i < 16; i++)
-						progSeq[progKnob][t][i] = nextSeq[t][i];
+						progSeq[progKnob][t][i] = wSeq[t][i];
 				}
-				progSteps[progKnob] = nextSteps;
-				progRst[progKnob] = nextRst;
+
+				progSteps[progKnob] = wSteps;
+				progRst[progKnob] = wRst;
+
+				if (progKnob > lastProg)
+					lastProg = progKnob;
 
 				storedProgram = true;
 				storedProgramTime = maxStoredProgramTime;
@@ -1699,11 +1743,15 @@ struct TrigSeq8x : Module {
 
 		mode = params[MODE_SWITCH].getValue();
 
+		// ---------- reset check
+
 		rstValue = inputs[RST_INPUT].getVoltage();
 		if (mode == CLOCK_MODE && rstValue >= 1.f && prevRstValue < 1.f)
 			resetStep();
 
 		prevRstValue = rstValue;
+
+		// -----------------------
 
 		if (inputs[RUN_INPUT].isConnected()) {
 
@@ -1910,11 +1958,10 @@ struct TrigSeq8x : Module {
 				out[t] = volt[t] * wRst;
 		}
 
-		for (int t = 0; t < 8; t++) {
+		for (int t = 0; t < 8; t++)
 			outputs[OUT_OUTPUT+t].setVoltage(out[t]);
-			lights[STEP_LIGHT+(t*16)+step].setBrightness(1);
-		}
 
+		lights[STEP_LIGHT+step].setBrightness(1);
 	}
 };
 
@@ -1936,7 +1983,8 @@ struct TrigSeq8xDisplay : TransparentWidget {
 
 				currentDisplay = to_string(module->workingProg);
 
-				if (!module->pendingUpdate) {
+				//if (!module->pendingUpdate) {
+				if (!module->progChanged) {	// NEW
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 2)
@@ -2016,8 +2064,8 @@ struct TrigSeq8xWidget : ModuleWidget {
 		const float xSet = 97.5f;
 		const float xAuto = 109.7f;
 
-		const float xRecallBut = 124.5f;
-		const float xRecallIn = 133.5f;
+		const float xRecallBut = 129.f;
+		//const float xRecallIn = 133.5f;
 
 		const float xStore = 144.4f;
 
@@ -2051,7 +2099,7 @@ struct TrigSeq8xWidget : ModuleWidget {
 		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xSet, yProgLine)), module, TrigSeq8x::SET_PARAM, TrigSeq8x::SET_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<YellowLight>>>(mm2px(Vec(xAuto, yProgLine)), module, TrigSeq8x::AUTO_PARAM, TrigSeq8x::AUTO_LIGHT));
 		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xRecallBut, yProgLine)), module, TrigSeq8x::RECALL_PARAM, TrigSeq8x::RECALL_LIGHT));
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRecallIn, yProgLine)), module, TrigSeq8x::RECALL_INPUT));
+		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRecallIn, yProgLine)), module, TrigSeq8x::RECALL_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xStore, yProgLine)), module, TrigSeq8x::STORE_PARAM, TrigSeq8x::STORE_LIGHT));
 		
 		int shiftCont = 0;
@@ -2187,6 +2235,27 @@ struct TrigSeq8xWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("1st clock after reset:"));
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
+
+		menu->addChild(new MenuSeparator());
+		struct ProgInTypeItem : MenuItem {
+			TrigSeq8x* module;
+			int progInType;
+			void onAction(const event::Action& e) override {
+				module->progInType = progInType;
+			}
+		};
+
+		std::string ProgInTypeNames[2] = {"CV", "Trig"};
+		menu->addChild(createSubmenuItem("Prog Input type", (ProgInTypeNames[module->progInType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				ProgInTypeItem* progInTypeItem = createMenuItem<ProgInTypeItem>(ProgInTypeNames[i]);
+				progInTypeItem->rightText = CHECKMARK(module->progInType == i);
+				progInTypeItem->module = module;
+				progInTypeItem->progInType = i;
+				menu->addChild(progInTypeItem);
+			}
+		}));
+		menu->addChild(createMenuItem("Scan Last Prog", "current:" + to_string(module->lastProg), [=]() {module->scanLastProg();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy All Tracks", "", [=]() {module->copyAllTracks();}));
