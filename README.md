@@ -32,7 +32,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.7.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 1](https://github.com/user-attachments/assets/43c0f3a9-c347-4f46-948f-9d2b0805ac84)
+![SickoCV modules 2 7 1](https://github.com/user-attachments/assets/11fec174-10a2-4982-ad85-f62c1d0f1897)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -995,6 +995,10 @@ All 32 programs can be saved in a preset file (.SQN) with the 'Save PROG preset'
 
 To erase all programs in memory in the right-click menu there is a function 'Erase ALL progs'. For safety, it has to be clicked 'ERASE!' in the sub menu 'Are You Sure?' to proceed.
 
+CV is standard program input control, In the right-click menu there is "Prog Input Type" option that can be set to 'Trig'.  
+It advances to the next program with a trigger on Prog Input. When reached the last stored program it restarts from program 0.
+In the right-click menu there is also the 'Scan Last Prog' option that shows the last stored program and by clicking this option a full rescan of all programs is done.
+
 ##### sickoQuant4
 
 sickoQuant4 module works like sickoQuant but provides 4 normalled polyphonic channels.  
@@ -1160,7 +1164,7 @@ When ticked, the ATT control sets both the attack and decay durations and the DE
 ## stepSeq / stepSeq+ / trigSeq / trigSeq+ / trigSeq8x
 ### 16 step/trigger sequencer with direction and presets
 
-![stepseqtrigseq](https://github.com/user-attachments/assets/5dc2ab69-c1fb-4346-8062-db88fab621a1)
+![stepseqtrigseq](https://github.com/user-attachments/assets/fbb46ecd-aa22-4f18-a2c5-1be4721e2bc7)
 
 #### - INSTRUCTIONS
 stepSeq and trigSeq can respectively output a voltage or a trig/gate/clock up to 16 steps.  
@@ -1195,6 +1199,8 @@ In TURING mode the RST knob acts like a CV out attenuator.
 - **Initialize on start**: doesn't remeber the last step reached when Rack is reloaded
 
 Plus versions only:  
+- **Prog Input Type**: CV is standard program input control, when 'Trig' option is ticket the modules advance to the next program with a trigger on Prog Input. When reached the last stored program it restarts from program 0. A trigger on Reset input set also the program to 0
+- **Scan Last Prog**: The last stored program is shown in the menu, by clicking this option a full rescan of all programs is done.
 - **Copy/paste seq**: copy and paste the current sequence and the length/reset settings in the clipboard (does not work across multiple modules)
 - **Load/Save PRESET**: load or save a 'ssp' or 'tsp' preset file with all programmed sequences, including lengths, reset settings, and right-click menu settings
 - **Erase ALL progs**: resets all stored programs to default
