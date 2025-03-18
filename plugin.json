@@ -556,6 +556,14 @@
       ]
     },
     {
+      "slug": "TrigSeq8x",
+      "name": "trigSeq8x",
+      "description": "8 track / 16 step trig sequencer with direction and presets (ts8x)",
+      "tags": [
+        "Sequencer"
+      ]
+    },
+    {
       "slug": "Wavetabler",
       "name": "wavetabler",
       "description": "Wavetable Sample Player",

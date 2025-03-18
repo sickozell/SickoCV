@@ -1,7 +1,7 @@
 # SickoCV v2.7.1
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 1](https://github.com/user-attachments/assets/59c9a91f-9e14-436b-bfc7-12caaa348bf7)
+![SickoCV modules 2 7 1](https://github.com/user-attachments/assets/11fec174-10a2-4982-ad85-f62c1d0f1897)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -35,7 +35,7 @@ VCV Rack plugin modules
 - [sickoSampler2](#sickosampler2)
 - [simpleSeq4](#simpleseq4)
 - [slewer](#slewer)
-- [stepSeq / stepSeq+ / trigSeq / trigSeq+](#stepSeq--stepSeq--trigSeq--trigSeq)
+- [stepSeq / stepSeq+ / trigSeq / trigSeq+ / trigSeq8x](#stepSeq--stepSeq--trigSeq--trigSeq--trigSeq8x)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
@@ -566,7 +566,7 @@ This function sets the module to Track & Hold mode, sample on HIGH gate, scale o
 
 COMING SOON  
 
-Some hints:  
+Some tips:  
 
 Every sample is stored in one of the 8 available slots and can be individually routed to one of the 8 outputs.  
 Multiple slots can be routed to the same output.  
@@ -712,18 +712,18 @@ Double-click STOR button to store the current sequence and length in the selecte
 randLoops8 is basically a 8-track randomLoops with limited functions, but with an offset knob added. CVs and triggers can be polyphonic summed in the last track outs, according to the setting selected in the right-click menu.
 
 #### Right-click Menu
-- **Buffered DEL/ADD**: if set to on the DEL and ADD buttons (or their trigs) will force the next first bit in the sequence to be off or on only once each press  
-- **Buffered Random**: The same as previous, but acting with the RND button
+- **Buffered DEL/ADD**: if set to on the DEL and ADD buttons (or their trigs) will force the next first bit in the sequence to be off or on only once each press
+- **Buffered Random**: the same as previous, but acting with the RND button
 - **Bit Resolution**: the voltages can be calculated with the first 8 bits (default) or the all 16 bits of the shift-register
-- **Voltage Progression**: The standard voltage for each specific bit position voltage is doubled from the previous one. It can be changed to 1.3x, or even a Fibonacci progression, to achieve sligthly different cv sequences
-- **Trig Output Type**: This affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length of the incoming clock)
-- **Ignore Prog Ctrl**: This ignores Ctrl knob setting when a program is recalled
-- **Ignore Prog Scale**: This ignores Scale knob setting when a program is recalled
+- **Voltage Progression**: the standard voltage for each specific bit position voltage is doubled from the previous one. It can be changed to 1.3x, or even a Fibonacci progression, to achieve sligthly different cv sequences
+- **Trig Output Type**: this affects the TRIG output behavior and can be set to Trig (1ms), Gate (HIGH until an off bit is reached), Clock Width (a gate based on the length of the incoming clock)
+- **Ignore Prog Ctrl**: this ignores Ctrl knob setting when a program is recalled
+- **Ignore Prog Scale**: this ignores Scale knob setting when a program is recalled
 - **1st clock after reset Don't advance**:  This ignores the first clock after a reset trigger, so the sequence won't advance
 - **Copy/paste seq**: copy and paste the current sequence and its settings in the clipboard (it works across other randLoops and trigSeq modules). It's safer to copy/paste sequences when module it's not running
-- **Load/Save PROG preset**: This is used to save and reload all the 32 program sequences and module settings in a ".rlp" file
-- **Erase ALL progs**: clears all the programs
-- **Import/Export single sequence**: this is used to load/save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program. Sequence files can be shared also with trigSeq modules
+- **Load/Save Preset**: this is used to load/save all the 32 program sequences and module settings in a ".rlp" file
+- **Import/Export trigSeq seq**: this is used to load/save the current working sequence. Note that after importing a sequence you must double-click the STOR button to store it in the selected program. Sequence files can be shared also with trigSeq modules
+- **Erase ALL progs**: clears all the programs 
 - **Initialize on start**: clears the sequence every rack startup. Note that it doesn't erase the programs
 
 [back to top](#table-of-contents)
@@ -964,6 +964,10 @@ All 32 programs can be saved in a preset file (.SQN) with the 'Save PROG preset'
 
 To erase all programs in memory in the right-click menu there is a function 'Erase ALL progs'. For safety, it has to be clicked 'ERASE!' in the sub menu 'Are You Sure?' to proceed.
 
+CV is the standard program input control. In the right-click menu there is the "Prog Input Type" option that can be set to 'Trig'.  
+It advances to the next program with a trigger on Prog Input. When reached the last stored program it restarts from program 0.  
+In the right-click menu there is also the 'Scan Last Prog' option that shows the last stored program and by clicking this option a full rescan of all programs is done.
+
 ##### sickoQuant4
 
 sickoQuant4 module works like sickoQuant but provides 4 normalled polyphonic channels.  
@@ -1024,7 +1028,7 @@ As recording is not polyphonic, polyphony is disabled when the REC button is swi
 
 "Sample Clear" input: if this input is triggered, it erases the recorded sample.
 
-**HINT**: If it's planned to record a sample to play it polyphonically with a master keyboard, please connect gate and v/oct to a MIDI>CV module with 'Reset' polyphony mode selected. Clear any previous sample in memory, select GATE mode, switch the LOOP button on, arm recording and consider adjusting envelope knobs. On key press (C4 for example) sickoSampler will start recording until key is unpressed, then the sample can be played immediately.
+**TIP**: If it's planned to record a sample to play it polyphonically with a master keyboard, please connect gate and v/oct to a MIDI>CV module with 'Reset' polyphony mode selected. Clear any previous sample in memory, select GATE mode, switch the LOOP button on, arm recording and consider adjusting envelope knobs. On key press (C4 for example) sickoSampler will start recording until key is unpressed, then the sample can be played immediately.
 
 **New sample recording**  
 In Trig Mode, when recording is stopped by a trig or blue button press and LOOP button is switched on, the sample will be played back immediately in loop mode, and if Rec Re-Arm is on it will keep recording.
@@ -1126,10 +1130,10 @@ When ticked, the ATT control sets both the attack and decay durations and the DE
 
 [back to top](#table-of-contents)
 
-## stepSeq / stepSeq+ / trigSeq / trigSeq+
+## stepSeq / stepSeq+ / trigSeq / trigSeq+ / trigSeq8x
 ### 16 step/trigger sequencer with direction and presets
 
-![stepseqtrigseq](https://github.com/user-attachments/assets/6852b2d5-dc64-421a-9955-5c97f4a86103)
+![stepseqtrigseq](https://github.com/user-attachments/assets/fbb46ecd-aa22-4f18-a2c5-1be4721e2bc7)
 
 #### - INSTRUCTIONS
 stepSeq and trigSeq can respectively output a voltage or a trig/gate/clock up to 16 steps.  
@@ -1160,12 +1164,14 @@ In TURING mode the RST knob acts like a CV out attenuator.
 - **1st Clock after reset**: if 'Don't Advance' is ticked, the first clock detected won't advance the sequencer (default)
 - **TURING MODE** (trigSeq trigSeq+ only): Enables the TURING mode as explained above, it activates 'Bit Resolution' and 'Voltage progression' options
 - **Copy/paste seq**: copy and paste the current sequence and its settings in the clipboard (trigSeq and trigSeq+ share clipboard also with randLoops modules, stepSeq and stepSeq+ share their own clipboard)
-- **Load/Save Single Sequence** (trigSeq trigSeq+ only). This is used to save single sequences in a ".tss" file that can be used in randLoops modules too
+- **Import/Export trigSeq seq** (trigSeq trigSeq+ only). This is used to load/save single sequences in a ".tss" file that can be used also in randLoops modules
 - **Initialize on start**: doesn't remeber the last step reached when Rack is reloaded
 
 Plus versions only:  
+- **Prog Input Type**: CV is the standard program input control. When 'Trig' option is ticked, the modules advance to the next program with a trigger on Prog Input. When the last stored program is reached, it restarts from program 0. A trigger on Reset input set also the program to 0
+- **Scan Last Prog**: The last stored program is shown in the menu, by clicking this option a full rescan of all programs is done.
 - **Copy/paste seq**: copy and paste the current sequence and the length/reset settings in the clipboard (does not work across multiple modules)
-- **Load/Save PROG presets**: load or save a 'ssp' or 'tsp' preset file with all programmed sequences, including lengths, reset settings, and right-click menu settings
+- **Load/Save PRESET**: load or save a 'ssp' or 'tsp' preset file with all programmed sequences, including lengths, reset settings, and right-click menu settings
 - **Erase ALL progs**: resets all stored programs to default
 
 [back to top](#table-of-contents)

@@ -11,6 +11,15 @@
 
 #include "plugin.hpp"
 
+#include "osdialog.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#endif
+#include <dirent.h>
+#include <libgen.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 using namespace std;
 
 struct RandLoops8 : Module {
@@ -152,11 +161,11 @@ struct RandLoops8 : Module {
 		//------------------
 
 		for (int t = 0; t < 8; t++) {
-			json_t *track_json_array = json_array();
-			for (int tempStep = 0; tempStep < 16; tempStep++) {
-				json_array_append_new(track_json_array, json_integer(saveRegister[t][tempStep]));
+			json_t *wSeq_json_array = json_array();
+			for (int st = 0; st < 16; st++) {
+				json_array_append_new(wSeq_json_array, json_integer(saveRegister[t][st]));
 			}
-			json_object_set_new(rootJ, ("sr"+to_string(t)).c_str(), track_json_array);	
+			json_object_set_new(rootJ, ("sr"+to_string(t)).c_str(), wSeq_json_array);	
 		}
 
 		return rootJ;
@@ -199,12 +208,12 @@ struct RandLoops8 : Module {
 
 		if (!initStart) {
 			for (int t = 0; t < 8; t++) {
-				json_t *track_json_array = json_object_get(rootJ, ("sr"+to_string(t)).c_str());
-				size_t tempSeq;
-				json_t *json_value;
-				if (track_json_array) {
-					json_array_foreach(track_json_array, tempSeq, json_value) {
-						shiftRegister[t][tempSeq] = json_integer_value(json_value);
+				json_t *wSeq_json_array = json_object_get(rootJ, ("sr"+to_string(t)).c_str());
+				size_t st;
+				json_t *wSeq_json_value;
+				if (wSeq_json_array) {
+					json_array_foreach(wSeq_json_array, st, wSeq_json_value) {
+						shiftRegister[t][st] = json_integer_value(wSeq_json_value);
 					}
 				}
 			}
@@ -213,7 +222,373 @@ struct RandLoops8 : Module {
 
 	}
 
+	// ------------------------ LOAD / SAVE   RANDLOOPS8 SINGLE PROGRAM
+
+	json_t *singleToJson() {
+
+		json_t *rootJ = json_object();
+
+		//json_object_set_new(rootJ, "runType", json_integer(runType));
+		//json_object_set_new(rootJ, "revType", json_integer(revType));
+		json_object_set_new(rootJ, "outType", json_integer(outType));
+		//json_object_set_new(rootJ, "rstOnRun", json_boolean(rstOnRun));
+		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
+
+		//json_object_set_new(rootJ, "turingMode", json_boolean(turingMode));
+		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
+		json_object_set_new(rootJ, "progression", json_integer(progression));
+
+
+		for (int t = 0; t < 8; t++) {
+
+			sequence_to_saveRegister(t);
+
+			json_t *wSeq_json_array = json_array();
+			for (int st = 0; st < 16; st++) {
+				json_array_append_new(wSeq_json_array, json_integer(shiftRegister[t][st]));
+			}
+			json_object_set_new(rootJ, ("t"+to_string(t)).c_str(), wSeq_json_array);
+		}
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wSteps_json_array = json_array();
+			json_array_append_new(wSteps_json_array, json_integer(params[LENGTH_PARAM+t].getValue()));
+			json_object_set_new(rootJ, ("wSteps"+to_string(t)).c_str(), wSteps_json_array);
+		}
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wRst_json_array = json_array();
+			json_array_append_new(wRst_json_array, json_real(params[SCALE_PARAM+t].getValue()));
+			json_object_set_new(rootJ, ("wRst"+to_string(t)).c_str(), wRst_json_array);
+		}
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wOfs_json_array = json_array();
+			json_array_append_new(wOfs_json_array, json_real(params[OFFSET_PARAM+t].getValue()));
+			json_object_set_new(rootJ, ("wOfs"+to_string(t)).c_str(), wOfs_json_array);
+		}
+
+		return rootJ;
+
+	}
+
+	void singleFromJson(json_t *rootJ) {
+
+		/*json_t* runTypeJ = json_object_get(rootJ, "runType");
+		if (runTypeJ) {
+			runType = json_integer_value(runTypeJ);
+			if (runType < 0 || runType > 1)
+				runType = 0;
+		}*/
+
+		/*json_t* revTypeJ = json_object_get(rootJ, "revType");
+		if (revTypeJ) {
+			revType = json_integer_value(revTypeJ);
+			if (revType < 0 || revType > 1)
+				revType = 0;
+		}*/
+
+		json_t* outTypeJ = json_object_get(rootJ, "outType");
+		if (outTypeJ) {
+			outType = json_integer_value(outTypeJ);
+			if (outType < 0 || outType > 2)
+				outType = 0;
+		}
+
+		/*json_t* rstOnRunJ = json_object_get(rootJ, "rstOnRun");
+		if (rstOnRunJ) {
+			rstOnRun = json_boolean_value(rstOnRunJ);
+		}*/
+
+		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
+		if (dontAdvanceSettingJ) {
+			dontAdvanceSetting = json_boolean_value(dontAdvanceSettingJ);
+		}
+
+		/*json_t* turingModeJ = json_object_get(rootJ, "turingMode");
+		if (turingModeJ) {
+			turingMode = json_boolean_value(turingModeJ);
+		}*/
+
+		json_t* bitResolutionJ = json_object_get(rootJ, "bitResolution");
+		if (bitResolutionJ) {
+			bitResolution = json_integer_value(bitResolutionJ);
+			if (bitResolution < 0 && bitResolution > 1)
+				bitResolution = BIT_8;
+		}
+
+		json_t* progressionJ = json_object_get(rootJ, "progression");
+		if (progressionJ) {
+			progression = json_integer_value(progressionJ);
+			if (progression < 0 && progression > 2)
+				progression = STD2x_PROGRESSION;
+		}
+
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wSeq_json_array = json_object_get(rootJ, ("t"+to_string(t)).c_str());
+			size_t st;
+			json_t *wSeq_json_value;
+			if (wSeq_json_array) {
+				json_array_foreach(wSeq_json_array, st, wSeq_json_value) {
+					shiftRegister[t][st] = json_integer_value(wSeq_json_value);
+				}
+			}
+		}
+
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wSteps_json_array = json_object_get(rootJ, ("wSteps"+to_string(t)).c_str());
+			size_t jSteps;
+			json_t *wSteps_json_value;
+			if (wSteps_json_array) {
+				json_array_foreach(wSteps_json_array, jSteps, wSteps_json_value) {
+					params[LENGTH_PARAM+t].setValue(json_integer_value(wSteps_json_value));
+				}
+			}
+		}
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wRst_json_array = json_object_get(rootJ, ("wRst"+to_string(t)).c_str());
+			size_t jRst;
+			json_t *wRst_json_value;
+			if (wRst_json_array) {
+				json_array_foreach(wRst_json_array, jRst, wRst_json_value) {
+					params[SCALE_PARAM+t].setValue(json_real_value(wRst_json_value));
+				}
+			}
+		}
+
+		for (int t = 0; t < 8; t++) {
+			json_t *wOfs_json_array = json_object_get(rootJ, ("wOfs"+to_string(t)).c_str());
+			size_t jOfs;
+			json_t *wOfs_json_value;
+			if (wOfs_json_array) {
+				json_array_foreach(wOfs_json_array, jOfs, wOfs_json_value) {
+					params[OFFSET_PARAM+t].setValue(json_real_value(wOfs_json_value));
+				}
+			}
+		}
+
+	}
+
+	void menuLoadSingle() {
+		static const char FILE_FILTERS[] = "randLoops8 preset (.r8p):r8sp,R8P";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
+		if (path)
+			loadSingle(path);
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void loadSingle(std::string path) {
+
+		FILE *file = fopen(path.c_str(), "r");
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (rootJ == NULL) {
+			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		}
+
+		fclose(file);
+
+		if (rootJ) {
+
+			singleFromJson(rootJ);
+
+		} else {
+			WARN("problem loading preset json file");
+			//return;
+		}
+		
+	}
+
+	void menuSaveSingle() {
+
+		static const char FILE_FILTERS[] = "randLoops8 preset (.r8p):r8p,R8P";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
+		if (path) {
+			std::string strPath = path;
+			if (strPath.substr(strPath.size() - 4) != ".r8p" and strPath.substr(strPath.size() - 4) != ".R8P")
+				strPath += ".r8p";
+			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
+			saveSingle(path, singleToJson());
+		}
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void saveSingle(std::string path, json_t *rootJ) {
+
+		if (rootJ) {
+			FILE *file = fopen(path.c_str(), "w");
+			if (!file) {
+				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
+				//return;
+			} else {
+				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+				json_decref(rootJ);
+				fclose(file);
+			}
+		}
+	}
+
+	// ------------------------ LOAD / SAVE   SINGLE SEQUENCE
+
+	json_t *sequenceToJson(int t) {
+
+		sequence_to_saveRegister(t);
+
+		json_t *rootJ = json_object();
+
+		json_t *wSeq_json_array = json_array();
+		for (int st = 0; st < 16; st++) {
+			json_array_append_new(wSeq_json_array, json_integer(saveRegister[t][st]));
+		}
+		json_object_set_new(rootJ, "sr", wSeq_json_array);	
+		json_object_set_new(rootJ, "length", json_integer((int)params[LENGTH_PARAM+t].getValue()));
+		json_object_set_new(rootJ, "reset", json_real(params[SCALE_PARAM+t].getValue()));
+		json_object_set_new(rootJ, "offset", json_real(params[OFFSET_PARAM+t].getValue()));
+
+		return rootJ;
+
+	}
+
+	void sequenceFromJson(int t, json_t *rootJ) {
+
+		json_t *wSeq_json_array = json_object_get(rootJ, "sr");
+		size_t st;
+		json_t *wSeq_json_value;
+		if (wSeq_json_array) {
+			json_array_foreach(wSeq_json_array, st, wSeq_json_value) {
+				shiftRegister[t][st] = json_integer_value(wSeq_json_value);
+			}
+		}
+		startingStep[t] = 0;
+
+		json_t* lengthJ = json_object_get(rootJ, "length");
+		if (lengthJ) {
+			if (json_integer_value(lengthJ) < 1 || json_integer_value(lengthJ) > 16)
+				params[LENGTH_PARAM+t].setValue(16);
+			else
+				params[LENGTH_PARAM+t].setValue(int(json_integer_value(lengthJ)));
+		}
+
+		json_t* rstJ = json_object_get(rootJ, "reset");
+		if (rstJ) {
+			if (json_real_value(rstJ) < 0 || json_real_value(rstJ) > 1)
+				params[SCALE_PARAM+t].setValue(0);
+			else
+				params[SCALE_PARAM+t].setValue(json_real_value(rstJ));
+		}
+
+		json_t* ofsJ = json_object_get(rootJ, "offset");
+		if (ofsJ) {
+			if (json_real_value(ofsJ) < -10 || json_real_value(ofsJ) > 10)
+				params[OFFSET_PARAM+t].setValue(0);
+			else
+				params[OFFSET_PARAM+t].setValue(json_real_value(ofsJ));
+		}
+	}
+
+	void menuLoadSequence(int track) {
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
+		if (path)
+			loadSequence(track, path);
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void loadSequence(int track, std::string path) {
+
+		FILE *file = fopen(path.c_str(), "r");
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (rootJ == NULL) {
+			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		}
+
+		fclose(file);
+
+		if (rootJ) {
+
+			sequenceFromJson(track, rootJ);
+
+		} else {
+			WARN("problem loading preset json file");
+			//return;
+		}
+		
+	}
+
+	void menuSaveSequence(int track) {
+
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
+		if (path) {
+			std::string strPath = path;
+			if (strPath.substr(strPath.size() - 4) != ".tss" and strPath.substr(strPath.size() - 4) != ".TSS")
+				strPath += ".tss";
+			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
+			saveSequence(path, sequenceToJson(track));
+		}
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void saveSequence(std::string path, json_t *rootJ) {
+
+		if (rootJ) {
+			FILE *file = fopen(path.c_str(), "w");
+			if (!file) {
+				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
+				//return;
+			} else {
+				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+				json_decref(rootJ);
+				fclose(file);
+			}
+		}
+	}
 	
+	/*
 	void inline debugCurrent(int t) {
 		if (t == 0) {
 			DEBUG ("%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i%i", shiftRegister[t][0], shiftRegister[t][1], shiftRegister[t][2], shiftRegister[t][3],
@@ -221,6 +596,7 @@ struct RandLoops8 : Module {
 					shiftRegister[t][10], shiftRegister[t][11], shiftRegister[t][12], shiftRegister[t][13], shiftRegister[t][14], shiftRegister[t][15]);
 		}
 	}
+	*/
 	/*
 	void inline debugResettt(int t) {
 		if (t == 0) {
@@ -309,6 +685,34 @@ struct RandLoops8 : Module {
 		}
 	}
 
+	void copyAllTracks() {
+		for (int t = 0; t < 8; t++) {
+			sequence_to_saveRegister(t);
+
+			for (int st = 0; st < 16; st++)
+				randLoops8_cbSeq[t][st] = saveRegister[t][st];
+
+			randLoops8_cbSteps[t] = params[LENGTH_PARAM+t].getValue();
+			randLoops8_cbCtrl[t] = params[CTRL_PARAM+t].getValue();
+			randLoops8_cbScale[t] = params[SCALE_PARAM+t].getValue();
+			randLoops8_cbOffset[t] = params[OFFSET_PARAM+t].getValue();
+		}
+		
+		randLoops8_clipboard = true;
+	}
+
+	void pasteAllTracks() {
+		for (int t = 0; t < 8; t++) {
+			for (int st = 0; st < 16; st++)
+				shiftRegister[t][st] = randLoops8_cbSeq[t][st];
+
+			params[LENGTH_PARAM+t].setValue(randLoops8_cbSteps[t]);
+			params[CTRL_PARAM+t].setValue(randLoops8_cbCtrl[t]);
+			params[SCALE_PARAM+t].setValue(randLoops8_cbScale[t]);
+			params[OFFSET_PARAM+t].setValue(randLoops8_cbOffset[t]);
+		}
+	}
+
 	void copyTrack(int t) {
 
 		sequence_to_saveRegister(t);
@@ -329,13 +733,12 @@ struct RandLoops8 : Module {
 		
 		startingStep[t] = 0;
 		params[LENGTH_PARAM+t].setValue(randLoops_cbSteps);
-		
-		if (randLoops_cbCtrl != -1)	// 	// this prevents to set ctrl paramer if pasting from trigSeq/trigSeq+
-			params[CTRL_PARAM+t].setValue(randLoops_cbCtrl);	
-		
+		params[CTRL_PARAM+t].setValue(randLoops_cbCtrl);
 		params[SCALE_PARAM+t].setValue(randLoops_cbScale);
 		params[OFFSET_PARAM+t].setValue(randLoops_cbOffset);
 	}
+
+
 	
 	void process(const ProcessArgs& args) override {
 		
@@ -618,32 +1021,69 @@ struct RandLoops8Widget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Copy All Tracks", "", [=]() {module->copyAllTracks();}));
+		if (randLoops8_clipboard) {
+			menu->addChild(createMenuItem("Paste All Tracks", "", [=]() {module->pasteAllTracks();}));
+		} else {
+			menu->addChild(createMenuLabel("Paste All Tracks"));
+		}
+
+		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Copy track", "", [=](Menu * menu) {
-			menu->addChild(createMenuItem("Track 1", "", [=]() {module->copyTrack(0);}));
-			menu->addChild(createMenuItem("Track 2", "", [=]() {module->copyTrack(1);}));
-			menu->addChild(createMenuItem("Track 3", "", [=]() {module->copyTrack(2);}));
-			menu->addChild(createMenuItem("Track 4", "", [=]() {module->copyTrack(3);}));
-			menu->addChild(createMenuItem("Track 5", "", [=]() {module->copyTrack(4);}));
-			menu->addChild(createMenuItem("Track 6", "", [=]() {module->copyTrack(5);}));
-			menu->addChild(createMenuItem("Track 7", "", [=]() {module->copyTrack(6);}));
-			menu->addChild(createMenuItem("Track 8", "", [=]() {module->copyTrack(7);}));
+			menu->addChild(createMenuItem("Copy Track 1", "", [=]() {module->copyTrack(0);}));
+			menu->addChild(createMenuItem("Copy Track 2", "", [=]() {module->copyTrack(1);}));
+			menu->addChild(createMenuItem("Copy Track 3", "", [=]() {module->copyTrack(2);}));
+			menu->addChild(createMenuItem("Copy Track 4", "", [=]() {module->copyTrack(3);}));
+			menu->addChild(createMenuItem("Copy Track 5", "", [=]() {module->copyTrack(4);}));
+			menu->addChild(createMenuItem("Copy Track 6", "", [=]() {module->copyTrack(5);}));
+			menu->addChild(createMenuItem("Copy Track 7", "", [=]() {module->copyTrack(6);}));
+			menu->addChild(createMenuItem("Copy Track 8", "", [=]() {module->copyTrack(7);}));
 		}));
-		//if (module->clipboard) {
+
 		if (randLoops_clipboard) {
 			menu->addChild(createSubmenuItem("Paste to track", "", [=](Menu * menu) {
-				menu->addChild(createMenuItem("Track 1", "", [=]() {module->pasteToTrack(0);}));
-				menu->addChild(createMenuItem("Track 2", "", [=]() {module->pasteToTrack(1);}));
-				menu->addChild(createMenuItem("Track 3", "", [=]() {module->pasteToTrack(2);}));
-				menu->addChild(createMenuItem("Track 4", "", [=]() {module->pasteToTrack(3);}));
-				menu->addChild(createMenuItem("Track 5", "", [=]() {module->pasteToTrack(4);}));
-				menu->addChild(createMenuItem("Track 6", "", [=]() {module->pasteToTrack(5);}));
-				menu->addChild(createMenuItem("Track 7", "", [=]() {module->pasteToTrack(6);}));
-				menu->addChild(createMenuItem("Track 8", "", [=]() {module->pasteToTrack(7);}));
+				menu->addChild(createMenuItem("Paste Track 1", "", [=]() {module->pasteToTrack(0);}));
+				menu->addChild(createMenuItem("Paste Track 2", "", [=]() {module->pasteToTrack(1);}));
+				menu->addChild(createMenuItem("Paste Track 3", "", [=]() {module->pasteToTrack(2);}));
+				menu->addChild(createMenuItem("Paste Track 4", "", [=]() {module->pasteToTrack(3);}));
+				menu->addChild(createMenuItem("Paste Track 5", "", [=]() {module->pasteToTrack(4);}));
+				menu->addChild(createMenuItem("Paste Track 6", "", [=]() {module->pasteToTrack(5);}));
+				menu->addChild(createMenuItem("Paste Track 7", "", [=]() {module->pasteToTrack(6);}));
+				menu->addChild(createMenuItem("Paste Track 8", "", [=]() {module->pasteToTrack(7);}));
 			}));
 		} else {
 			menu->addChild(createMenuLabel("Paste to track"));
 		}
+
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("DISK operations", "", [=](Menu * menu) {
+			
+			menu->addChild(createMenuItem("Load Preset", "", [=]() {module->menuLoadSingle();}));
+			menu->addChild(createMenuItem("Save Preset", "", [=]() {module->menuSaveSingle();}));
+
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createSubmenuItem("Import trigSeq seq. to:", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("Track 1", "", [=]() {module->menuLoadSequence(0);}));
+				menu->addChild(createMenuItem("Track 2", "", [=]() {module->menuLoadSequence(1);}));
+				menu->addChild(createMenuItem("Track 3", "", [=]() {module->menuLoadSequence(2);}));
+				menu->addChild(createMenuItem("Track 4", "", [=]() {module->menuLoadSequence(3);}));
+				menu->addChild(createMenuItem("Track 5", "", [=]() {module->menuLoadSequence(4);}));
+				menu->addChild(createMenuItem("Track 6", "", [=]() {module->menuLoadSequence(5);}));
+				menu->addChild(createMenuItem("Track 7", "", [=]() {module->menuLoadSequence(6);}));
+				menu->addChild(createMenuItem("Track 8", "", [=]() {module->menuLoadSequence(7);}));
+			}));
+			menu->addChild(createSubmenuItem("Export trigSeq seq. from:", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("Track 1", "", [=]() {module->menuSaveSequence(0);}));
+				menu->addChild(createMenuItem("Track 2", "", [=]() {module->menuSaveSequence(1);}));
+				menu->addChild(createMenuItem("Track 3", "", [=]() {module->menuSaveSequence(2);}));
+				menu->addChild(createMenuItem("Track 4", "", [=]() {module->menuSaveSequence(3);}));
+				menu->addChild(createMenuItem("Track 5", "", [=]() {module->menuSaveSequence(4);}));
+				menu->addChild(createMenuItem("Track 6", "", [=]() {module->menuSaveSequence(5);}));
+				menu->addChild(createMenuItem("Track 7", "", [=]() {module->menuSaveSequence(6);}));
+				menu->addChild(createMenuItem("Track 8", "", [=]() {module->menuSaveSequence(7);}));
+			}));
+		}));
 		menu->addChild(createMenuItem("Clear ALL Sequences", "", [=]() {module->clearAll();}));
 
 		menu->addChild(new MenuSeparator());

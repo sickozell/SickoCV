@@ -313,25 +313,26 @@ struct TrigSeq : Module {
 
 		json_t *rootJ = json_object();
 
-		json_t *prog_json_array = json_array();
-		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			json_array_append_new(prog_json_array, json_integer((int)params[STEPBUT_PARAM+tempStep].getValue()));
+		json_t *wSeq_json_array = json_array();
+		for (int st = 0; st < 16; st++) {
+			json_array_append_new(wSeq_json_array, json_integer((int)params[STEPBUT_PARAM+st].getValue()));
 		}
-		json_object_set_new(rootJ, "sr", prog_json_array);	
-
+		json_object_set_new(rootJ, "sr", wSeq_json_array);	
 		json_object_set_new(rootJ, "length", json_integer((int)params[LENGTH_PARAM].getValue()));
+		json_object_set_new(rootJ, "reset", json_real(params[RST_PARAM].getValue()));
+		json_object_set_new(rootJ, "offset", json_real(0));
 
 		return rootJ;
 	}
 
 	void sequenceFromJson(json_t *rootJ) {
 
-		json_t *prog_json_array = json_object_get(rootJ, "sr");
-		size_t tempSeq;
-		json_t *json_value;
-		if (prog_json_array) {
-			json_array_foreach(prog_json_array, tempSeq, json_value) {
-				params[STEPBUT_PARAM+tempSeq].setValue(json_integer_value(json_value));
+		json_t *wSeq_json_array = json_object_get(rootJ, "sr");
+		size_t st;
+		json_t *wSeq_json_value;
+		if (wSeq_json_array) {
+			json_array_foreach(wSeq_json_array, st, wSeq_json_value) {
+				params[STEPBUT_PARAM+st].setValue(json_integer_value(wSeq_json_value));
 			}
 		}
 
@@ -342,10 +343,18 @@ struct TrigSeq : Module {
 			else
 				params[LENGTH_PARAM].setValue(int(json_integer_value(lengthJ)));
 		}
+
+		json_t* rstJ = json_object_get(rootJ, "reset");
+		if (rstJ) {
+			if (json_real_value(rstJ) < 0 || json_real_value(rstJ) > 1)
+				params[RST_PARAM].setValue(0);
+			else
+				params[RST_PARAM].setValue(json_real_value(rstJ));
+		}
 	}
 
 	void menuLoadSequence() {
-		static const char FILE_FILTERS[] = "trigSeq preset (.tss):tss,TSS";
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -386,7 +395,7 @@ struct TrigSeq : Module {
 
 	void menuSaveSequence() {
 
-		static const char FILE_FILTERS[] = "trigSeq Sequence (.tss):tss,TSS";
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -429,7 +438,7 @@ struct TrigSeq : Module {
 		
 		randLoops_cbSteps = params[LENGTH_PARAM].getValue();
 		randLoops_cbScale = params[RST_PARAM].getValue();
-		randLoops_cbCtrl = -1;	// this prevents to set ctrl paramer if pasting to randLoops/randLoops8
+		randLoops_cbCtrl = 1;	// this locks ctrl paramer if pasting to randLoops/randLoops8
 		randLoops_clipboard = true;
 	}
 
@@ -800,26 +809,25 @@ struct TrigSeqWidget : ModuleWidget {
 		TrigSeq* module = dynamic_cast<TrigSeq*>(this->module);
 
 		menu->addChild(new MenuSeparator());
-		
-		struct RunTypeItem : MenuItem {
+
+		struct OutTypeItem : MenuItem {
 			TrigSeq* module;
-			int runType;
+			int outType;
 			void onAction(const event::Action& e) override {
-				module->runType = runType;
+				module->outType = outType;
 			}
 		};
-
-		std::string RunTypeNames[2] = {"Gate", "Trig"};
-		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
-			for (int i = 0; i < 2; i++) {
-				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-				runTypeItem->rightText = CHECKMARK(module->runType == i);
-				runTypeItem->module = module;
-				runTypeItem->runType = i;
-				menu->addChild(runTypeItem);
+		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
+		menu->addChild(createSubmenuItem("Output type", (OutTypeNames[module->outType]), [=](Menu * menu) {
+			for (int i = 0; i < 3; i++) {
+				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
+				outTypeItem->rightText = CHECKMARK(module->outType == i);
+				outTypeItem->module = module;
+				outTypeItem->outType = i;
+				menu->addChild(outTypeItem);
 			}
 		}));
-
+		
 		struct RevTypeItem : MenuItem {
 			TrigSeq* module;
 			int revType;
@@ -838,21 +846,22 @@ struct TrigSeqWidget : ModuleWidget {
 			}
 		}));
 		
-		struct OutTypeItem : MenuItem {
+		struct RunTypeItem : MenuItem {
 			TrigSeq* module;
-			int outType;
+			int runType;
 			void onAction(const event::Action& e) override {
-				module->outType = outType;
+				module->runType = runType;
 			}
 		};
-		std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
-		menu->addChild(createSubmenuItem("Output type", (OutTypeNames[module->outType]), [=](Menu * menu) {
-			for (int i = 0; i < 3; i++) {
-				OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
-				outTypeItem->rightText = CHECKMARK(module->outType == i);
-				outTypeItem->module = module;
-				outTypeItem->outType = i;
-				menu->addChild(outTypeItem);
+
+		std::string RunTypeNames[2] = {"Gate", "Trig"};
+		menu->addChild(createSubmenuItem("Run Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+				runTypeItem->rightText = CHECKMARK(module->runType == i);
+				runTypeItem->module = module;
+				runTypeItem->runType = i;
+				menu->addChild(runTypeItem);
 			}
 		}));
 
@@ -908,24 +917,27 @@ struct TrigSeqWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
-		//if (module->clipboard)
+		menu->addChild(createMenuItem("Copy Sequence", "", [=]() {module->copyClipboard();}));
+
 		if (randLoops_clipboard)
-			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+			menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteClipboard();}));
 		else
-			menu->addChild(createMenuLabel("Paste Seq"));
+			menu->addChild(createMenuLabel("Paste Sequence"));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load Sequence", "", [=]() {module->menuLoadSequence();}));
-		menu->addChild(createMenuItem("Save Sequence", "", [=]() {module->menuSaveSequence();}));
-
+		menu->addChild(createSubmenuItem("DISK operations", "", [=](Menu * menu) {
+			menu->addChild(createMenuItem("Import trigSeq seq.", "", [=]() {module->menuLoadSequence();}));
+			menu->addChild(createMenuItem("Export trigSeq seq.", "", [=]() {module->menuSaveSequence();}));
+		}));
+		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
-			menu->addChild(createMenuLabel("When switching to TURING mode Reset Knob becomes"));
-			menu->addChild(createMenuLabel("output attenuator, so it has to be adjusted"));
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("When switching to TURING mode Reset Knob"));
+			menu->addChild(createMenuLabel("becomes the output attenuator,"));
+			menu->addChild(createMenuLabel("so it has to be adjusted"));
 		}));
 	}
 

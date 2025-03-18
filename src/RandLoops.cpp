@@ -9,6 +9,8 @@
 #define OUT_GATE 1
 #define OUT_CLOCK 2
 
+#define CV_TYPE 0
+
 #define COLOR_LCD_RED 0xdd, 0x33, 0x33, 0xff
 #define COLOR_LCD_GREEN 0x33, 0xdd, 0x33, 0xff
 
@@ -207,6 +209,9 @@ struct RandLoops : Module {
 	int prevProgKnob = 0;
 	int savedProgKnob = 0;
 
+	float progTrig = 0;
+	float prevProgTrig = 0;
+
 	int selectedProg = 0;
 	bool progChanged = false;
 
@@ -241,16 +246,11 @@ struct RandLoops : Module {
 	float setButLightDelta = 2 / APP->engine->getSampleRate();
 	float setButLightValue = 0.f;
 
-	// ------- clipboard
-
-	bool clipboard = false;
-	int cbSeq[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int cbSteps = 16;
-	float cbCtrl = 0.f;
-	float cbScale = 1.f;
-
 	bool ignoreCtrl = false;
 	bool ignoreScale = false;
+
+	int progInType = CV_TYPE;
+	int lastProg = 0;
 
 	RandLoops() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -336,39 +336,42 @@ struct RandLoops : Module {
 		
 		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
 
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
+
 		sequence_to_saveRegister();
 
 		json_t *wSeq_json_array = json_array();
-		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			json_array_append_new(wSeq_json_array, json_integer(saveRegister[tempStep]));
+		for (int st = 0; st < 16; st++) {
+			json_array_append_new(wSeq_json_array, json_integer(saveRegister[st]));
 		}
 		json_object_set_new(rootJ, "wSeq", wSeq_json_array);	
 
 		json_object_set_new(rootJ, "wSteps", json_integer(wSteps));
 
-		for (int prog = 0; prog < 32; prog++) {
+		for (int p = 0; p < 32; p++) {
 			json_t *prog_json_array = json_array();
-			for (int tempStep = 0; tempStep < 16; tempStep++) {
-				json_array_append_new(prog_json_array, json_integer(progSeq[prog][tempStep]));
+			for (int st = 0; st < 16; st++) {
+				json_array_append_new(prog_json_array, json_integer(progSeq[p][st]));
 			}
-			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
+			json_object_set_new(rootJ, ("prog"+to_string(p)).c_str(), prog_json_array);	
 		}
 
 		json_t *steps_json_array = json_array();
-		for (int prog = 0; prog < 32; prog++) {
-			json_array_append_new(steps_json_array, json_integer(progSteps[prog]));
+		for (int p = 0; p < 32; p++) {
+			json_array_append_new(steps_json_array, json_integer(progSteps[p]));
 		}
 		json_object_set_new(rootJ, "progSteps", steps_json_array);	
 
 		json_t *ctrl_json_array = json_array();
-		for (int prog = 0; prog < 32; prog++) {
-			json_array_append_new(ctrl_json_array, json_real(progCtrl[prog]));
+		for (int p = 0; p < 32; p++) {
+			json_array_append_new(ctrl_json_array, json_real(progCtrl[p]));
 		}
 		json_object_set_new(rootJ, "progCtrl", ctrl_json_array);
 
 		json_t *scale_json_array = json_array();
-		for (int prog = 0; prog < 32; prog++) {
-			json_array_append_new(scale_json_array, json_real(progScale[prog]));
+		for (int p = 0; p < 32; p++) {
+			json_array_append_new(scale_json_array, json_real(progScale[p]));
 		}
 		json_object_set_new(rootJ, "progScale", scale_json_array);
 
@@ -426,27 +429,27 @@ struct RandLoops : Module {
 		if (!initStart) {
 
 			json_t *prog_json_array = json_object_get(rootJ, "wSeq");
-			size_t tempSeq;
-			json_t *json_value;
+			size_t st;
+			json_t *prog_json_value;
 			if (prog_json_array) {
-				json_array_foreach(prog_json_array, tempSeq, json_value) {
-					wSeq[tempSeq] = json_integer_value(json_value);
+				json_array_foreach(prog_json_array, st, prog_json_value) {
+					wSeq[st] = json_integer_value(prog_json_value);
 				}
 			}
 			startingStep = 0;
-
-			json_t* lengthJ = json_object_get(rootJ, "wSteps");
-			if (lengthJ) {
-				if (json_integer_value(lengthJ) < 1 || json_integer_value(lengthJ) > 16)
-					wSteps = 16;				
-				else
-					wSteps = json_integer_value(lengthJ);
-
-				params[LENGTH_PARAM].setValue(wSteps);
-			}
-
-			calcVoltage();
 		}
+
+		json_t* lengthJ = json_object_get(rootJ, "wSteps");
+		if (lengthJ) {
+			if (json_integer_value(lengthJ) < 1 || json_integer_value(lengthJ) > 16)
+				wSteps = 16;				
+			else
+				wSteps = json_integer_value(lengthJ);
+
+			params[LENGTH_PARAM].setValue(wSteps);
+		}
+
+		calcVoltage();
 
 		json_t* savedProgKnobJ = json_object_get(rootJ, "savedProgKnob");
 		if (savedProgKnobJ) {
@@ -454,8 +457,18 @@ struct RandLoops : Module {
 			if (savedProgKnob < 0 || savedProgKnob > 31)
 				savedProgKnob = 0;
 			
-		} else {
-			savedProgKnob = 0;
+		}
+
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
 		}
 
 		selectedProg = savedProgKnob;
@@ -463,41 +476,41 @@ struct RandLoops : Module {
 		prevProgKnob = selectedProg;
 		params[PROG_PARAM].setValue(selectedProg);
 
-		for (int prog = 0; prog < 32; prog++) {
-			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(prog)).c_str());
-			size_t progSeqJ;
-			json_t *json_value;
+		for (int p = 0; p < 32; p++) {
+			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(p)).c_str());
+			size_t st;
+			json_t *prog_json_value;
 			if (prog_json_array) {
-				json_array_foreach(prog_json_array, progSeqJ, json_value) {
-					progSeq[prog][progSeqJ] = json_integer_value(json_value);
+				json_array_foreach(prog_json_array, st, prog_json_value) {
+					progSeq[p][st] = json_integer_value(prog_json_value);
 				}
 			}
 		}
 
 		json_t *progSteps_json_array = json_object_get(rootJ, "progSteps");
-		size_t progStepsJ;
+		size_t pSteps;
 		json_t *progSteps_json_value;
 		if (progSteps_json_array) {
-			json_array_foreach(progSteps_json_array, progStepsJ, progSteps_json_value) {
-				progSteps[progStepsJ] = json_integer_value(progSteps_json_value);
+			json_array_foreach(progSteps_json_array, pSteps, progSteps_json_value) {
+				progSteps[pSteps] = json_integer_value(progSteps_json_value);
 			}
 		}
 
 		json_t *progCtrl_json_array = json_object_get(rootJ, "progCtrl");
-		size_t progCtrlJ;
+		size_t pCtrl;
 		json_t *progCtrl_json_value;
 		if (progCtrl_json_array) {
-			json_array_foreach(progCtrl_json_array, progCtrlJ, progCtrl_json_value) {
-				progCtrl[progCtrlJ] = json_real_value(progCtrl_json_value);
+			json_array_foreach(progCtrl_json_array, pCtrl, progCtrl_json_value) {
+				progCtrl[pCtrl] = json_real_value(progCtrl_json_value);
 			}
 		}
 
 		json_t *progScale_json_array = json_object_get(rootJ, "progScale");
-		size_t progScaleJ;
+		size_t pScale;
 		json_t *progScale_json_value;
 		if (progScale_json_array) {
-			json_array_foreach(progScale_json_array, progScaleJ, progScale_json_value) {
-				progScale[progScaleJ] = json_real_value(progScale_json_value);
+			json_array_foreach(progScale_json_array, pScale, progScale_json_value) {
+				progScale[pScale] = json_real_value(progScale_json_value);
 			}
 		}
 
@@ -518,29 +531,32 @@ struct RandLoops : Module {
 		json_object_set_new(rootJ, "ignoreCtrl", json_boolean(ignoreCtrl));
 		json_object_set_new(rootJ, "ignoreScale", json_boolean(ignoreScale));
 
-		for (int prog = 0; prog < 32; prog++) {
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
+
+		for (int p = 0; p < 32; p++) {
 			json_t *prog_json_array = json_array();
-			for (int tempStep = 0; tempStep < 16; tempStep++) {
-				json_array_append_new(prog_json_array, json_integer(progSeq[prog][tempStep]));
+			for (int st = 0; st < 16; st++) {
+				json_array_append_new(prog_json_array, json_integer(progSeq[p][st]));
 			}
-			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
+			json_object_set_new(rootJ, ("prog"+to_string(p)).c_str(), prog_json_array);	
 		}
 
 		json_t *steps_json_array = json_array();
-		for (int prog = 0; prog < 32; prog++) {
-			json_array_append_new(steps_json_array, json_integer(progSteps[prog]));
+		for (int p = 0; p < 32; p++) {
+			json_array_append_new(steps_json_array, json_integer(progSteps[p]));
 		}
 		json_object_set_new(rootJ, "progSteps", steps_json_array);	
 
 		json_t *ctrl_json_array = json_array();
-		for (int prog = 0; prog < 32; prog++) {
-			json_array_append_new(ctrl_json_array, json_real(progCtrl[prog]));
+		for (int p = 0; p < 32; p++) {
+			json_array_append_new(ctrl_json_array, json_real(progCtrl[p]));
 		}
 		json_object_set_new(rootJ, "progCtrl", ctrl_json_array);
 
 		json_t *scale_json_array = json_array();
-		for (int prog = 0; prog < 32; prog++) {
-			json_array_append_new(scale_json_array, json_real(progScale[prog]));
+		for (int p = 0; p < 32; p++) {
+			json_array_append_new(scale_json_array, json_real(progScale[p]));
 		}
 		json_object_set_new(rootJ, "progScale", scale_json_array);
 
@@ -591,41 +607,53 @@ struct RandLoops : Module {
 		if (ignoreScaleJ)
 			ignoreScale = json_boolean_value(ignoreScaleJ);
 
-		for (int prog = 0; prog < 32; prog++) {
-			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(prog)).c_str());
-			size_t tempSeq;
-			json_t *json_value;
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
+		}
+
+		for (int p = 0; p < 32; p++) {
+			json_t *prog_json_array = json_object_get(rootJ, ("prog"+to_string(p)).c_str());
+			size_t st;
+			json_t *prog_json_value;
 			if (prog_json_array) {
-				json_array_foreach(prog_json_array, tempSeq, json_value) {
-					progSeq[prog][tempSeq] = json_integer_value(json_value);
+				json_array_foreach(prog_json_array, st, prog_json_value) {
+					progSeq[p][st] = json_integer_value(prog_json_value);
 				}
 			}
 		}
 
 		json_t *progSteps_json_array = json_object_get(rootJ, "progSteps");
-		size_t progStepsJ;
+		size_t pSteps;
 		json_t *progSteps_json_value;
 		if (progSteps_json_array) {
-			json_array_foreach(progSteps_json_array, progStepsJ, progSteps_json_value) {
-				progSteps[progStepsJ] = json_integer_value(progSteps_json_value);
+			json_array_foreach(progSteps_json_array, pSteps, progSteps_json_value) {
+				progSteps[pSteps] = json_integer_value(progSteps_json_value);
 			}
 		}
 
 		json_t *progCtrl_json_array = json_object_get(rootJ, "progCtrl");
-		size_t progCtrlJ;
+		size_t pCtrl;
 		json_t *progCtrl_json_value;
 		if (progCtrl_json_array) {
-			json_array_foreach(progCtrl_json_array, progCtrlJ, progCtrl_json_value) {
-				progCtrl[progCtrlJ] = json_real_value(progCtrl_json_value);
+			json_array_foreach(progCtrl_json_array, pCtrl, progCtrl_json_value) {
+				progCtrl[pCtrl] = json_real_value(progCtrl_json_value);
 			}
 		}
 
 		json_t *progScale_json_array = json_object_get(rootJ, "progScale");
-		size_t progScaleJ;
+		size_t pScale;
 		json_t *progScale_json_value;
 		if (progScale_json_array) {
-			json_array_foreach(progScale_json_array, progScaleJ, progScale_json_value) {
-				progScale[progScaleJ] = json_real_value(progScale_json_value);
+			json_array_foreach(progScale_json_array, pScale, progScale_json_value) {
+				progScale[pScale] = json_real_value(progScale_json_value);
 			}
 		}
 
@@ -713,30 +741,33 @@ struct RandLoops : Module {
 	// ------------------------ LOAD / SAVE   SINGLE SEQUENCE
 
 	json_t *sequenceToJson() {
+
 		sequence_to_saveRegister();
 
 		json_t *rootJ = json_object();
 		
-		json_t *prog_json_array = json_array();
-		for (int tempStep = 0; tempStep < 16; tempStep++) {
-			json_array_append_new(prog_json_array, json_integer(saveRegister[tempStep]));
+		json_t *wSeq_json_array = json_array();
+		for (int st = 0; st < 16; st++) {
+			json_array_append_new(wSeq_json_array, json_integer(saveRegister[st]));
 		}
-		json_object_set_new(rootJ, "sr", prog_json_array);	
+		json_object_set_new(rootJ, "sr", wSeq_json_array);	
 	
 		json_object_set_new(rootJ, "length", json_integer(wSteps));
+		json_object_set_new(rootJ, "reset", json_real(wScale));
 		json_object_set_new(rootJ, "ctrl", json_real(wCtrl));
-		json_object_set_new(rootJ, "scale", json_real(wScale));
+		json_object_set_new(rootJ, "offset", json_real(0));
+
 		return rootJ;
 	}
 
 	void sequenceFromJson(json_t *rootJ) {
 
-		json_t *prog_json_array = json_object_get(rootJ, "sr");
-		size_t tempSeq;
-		json_t *json_value;
-		if (prog_json_array) {
-			json_array_foreach(prog_json_array, tempSeq, json_value) {
-				wSeq[tempSeq] = json_integer_value(json_value);
+		json_t *wSeq_json_array = json_object_get(rootJ, "sr");
+		size_t st;
+		json_t *wSeq_json_value;
+		if (wSeq_json_array) {
+			json_array_foreach(wSeq_json_array, st, wSeq_json_value) {
+				wSeq[st] = json_integer_value(wSeq_json_value);
 			}
 		}
 		startingStep = 0;
@@ -751,6 +782,16 @@ struct RandLoops : Module {
 			params[LENGTH_PARAM].setValue(wSteps);
 		}
 
+		json_t* scaleJ = json_object_get(rootJ, "reset");
+		if (scaleJ) {
+			if (json_real_value(scaleJ) < 0 || json_real_value(scaleJ) > 1)
+				wScale = 1;				
+			else
+				wScale = json_real_value(scaleJ);
+
+			params[SCALE_PARAM].setValue(wScale);
+		}
+
 		json_t* ctrlJ = json_object_get(rootJ, "ctrl");
 		if (ctrlJ) {
 			if (json_real_value(ctrlJ) < -1 || json_real_value(ctrlJ) > 1)
@@ -761,20 +802,10 @@ struct RandLoops : Module {
 			params[CTRL_PARAM].setValue(wCtrl);
 		}
 
-		json_t* scaleJ = json_object_get(rootJ, "scale");
-		if (scaleJ) {
-			if (json_real_value(lengthJ) < 0 || json_real_value(lengthJ) > 1)
-				wScale = 1;				
-			else
-				wScale = json_real_value(scaleJ);
-
-			params[SCALE_PARAM].setValue(wScale);
-		}
-
 	}
 
 	void menuLoadSequence() {
-		static const char FILE_FILTERS[] = "trigSeq preset (.tss):tss,TSS";
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -880,10 +911,6 @@ struct RandLoops : Module {
 
 	}
 
-		void inline rebuildSeq() {
-		
-	}
-
 	void copyClipboard() {
 		sequence_to_saveRegister();
 		for (int i = 0; i < 16; i++)
@@ -892,6 +919,7 @@ struct RandLoops : Module {
 		randLoops_cbSteps = wSteps;
 		randLoops_cbCtrl = wCtrl;
 		randLoops_cbScale = wScale;
+		randLoops_cbOffset = 0;
 		randLoops_clipboard = true;
 	}
 
@@ -900,8 +928,7 @@ struct RandLoops : Module {
 			wSeq[i] = randLoops_cbSeq[i];
 		
 		wSteps = randLoops_cbSteps;
-		if (randLoops_cbCtrl != -1)	// 	// this prevents to set ctrl paramer if pasting from trigSeq/trigSeq+
-			wCtrl = randLoops_cbCtrl;
+		wCtrl = randLoops_cbCtrl;
 		wScale = randLoops_cbScale;
 
 		params[CTRL_PARAM].setValue(wCtrl);
@@ -913,13 +940,14 @@ struct RandLoops : Module {
 	}
 
 	void eraseProgs() {
-		for (int i = 0; i < 32; i++) {
-			progSteps[i] = 16;
-			progCtrl[i] = 0.f;
-			progScale[i] = 0.f;
-			for (int j = 0; j < 16; j++)
-				progSeq[i][j] = 0;
+		for (int p = 0; p < 32; p++) {
+			progSteps[p] = 16;
+			progCtrl[p] = 0.f;
+			progScale[p] = 1.f;
+			for (int s = 0; s < 16; s++)
+				progSeq[p][s] = 0;
 		}
+		lastProg = 0;
 	}
 
 	/*
@@ -969,14 +997,15 @@ struct RandLoops : Module {
 			for (int i = 0; i < 16; i++)
 				wSeq[i] = tempRegister[i];
 
-
-
 			startingStep = 0;
 
 			if (dontAdvanceSetting)
 				dontAdvance = true;
 		
 			calcVoltage();
+
+			if (progInType != CV_TYPE)
+				progKnob = 0;
 
 		}
 		prevRstValue = rstValue;
@@ -1019,6 +1048,31 @@ struct RandLoops : Module {
 		}
 
 	}
+
+	void scanLastProg() {
+		lastProg = 31;
+		bool exitFunc = false;
+
+		for (int p = 31; p >= 0; p--) {
+			for (int st = 0; st < 16; st++) {
+				if (progSeq[p][st] != 0) {
+					st = 16;
+					exitFunc = true;
+				}
+			}
+			if (progSteps[p] != 16 || progScale[p] != 1)
+				exitFunc = true;
+
+			lastProg = p;
+
+			if (exitFunc)
+				p = 0;
+		}
+
+		if (!exitFunc)
+			lastProg = 0;
+
+	}
 	
 	void process(const ProcessArgs& args) override {
 
@@ -1029,11 +1083,33 @@ struct RandLoops : Module {
 
 		// ----------- PROGRAM MANAGEMENT
 
-		progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
-		if (progKnob < 0)
-			progKnob = 0;
-		else if (progKnob > 31)
-			progKnob = 31;
+		if (progInType == CV_TYPE) {
+
+			progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
+			if (progKnob < 0)
+				progKnob = 0;
+			else if (progKnob > 31)
+				progKnob = 31;
+
+		} else {
+
+			progKnob = params[PROG_PARAM].getValue();
+			if (progKnob < 0)
+				progKnob = 0;
+			else if (progKnob > 31)
+				progKnob = 31;
+
+			progTrig = inputs[PROG_INPUT].getVoltage();
+			if (progTrig >= 1.f && prevProgTrig < 1.f) {
+				progKnob++;
+				if (progKnob > lastProg)
+					progKnob = 0;
+
+				params[PROG_PARAM].setValue(progKnob);
+			}
+			prevProgTrig = progTrig;
+
+		}
 
 		if (progKnob != prevProgKnob) {
 
@@ -1096,7 +1172,10 @@ struct RandLoops : Module {
 				progChanged = false;
 
 				workingProg = selectedProg;
-				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				if (progInType == CV_TYPE)
+					savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				else
+					savedProgKnob = progKnob;
 
 				setButLight = false;
 				setButLightValue = 0.f;
@@ -1127,7 +1206,10 @@ struct RandLoops : Module {
 					progChanged = false;
 
 					workingProg = selectedProg;
-					savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+					if (progInType == CV_TYPE)
+						savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+					else
+						savedProgKnob = progKnob;
 
 					setButLight = false;
 					setButLightValue = 0.f;
@@ -1163,7 +1245,10 @@ struct RandLoops : Module {
 			startingStep = 0;
 
 			workingProg = selectedProg;
-			savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+			if (progInType == CV_TYPE)
+				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+			else
+				savedProgKnob = progKnob;
 
 			progChanged = false;
 
@@ -1201,6 +1286,9 @@ struct RandLoops : Module {
 				progSteps[progKnob] = wSteps;
 				progCtrl[progKnob] = wCtrl;
 				progScale[progKnob] = wScale;
+
+				if (progKnob > lastProg)
+					lastProg = progKnob;
 
 				storedProgram = true;
 				storedProgramTime = maxStoredProgramTime;
@@ -1743,34 +1831,57 @@ struct RandLoopsWidget : ModuleWidget {
 		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Copy Seq", "", [=]() {module->copyClipboard();}));
-		//if (module->clipboard)
+		struct ProgInTypeItem : MenuItem {
+			RandLoops* module;
+			int progInType;
+			void onAction(const event::Action& e) override {
+				module->progInType = progInType;
+			}
+		};
+
+		std::string ProgInTypeNames[2] = {"CV", "Trig"};
+		menu->addChild(createSubmenuItem("Prog Input type", (ProgInTypeNames[module->progInType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				ProgInTypeItem* progInTypeItem = createMenuItem<ProgInTypeItem>(ProgInTypeNames[i]);
+				progInTypeItem->rightText = CHECKMARK(module->progInType == i);
+				progInTypeItem->module = module;
+				progInTypeItem->progInType = i;
+				menu->addChild(progInTypeItem);
+			}
+		}));
+		menu->addChild(createMenuItem("Scan Last Prog", "current: " + to_string(module->lastProg), [=]() {module->scanLastProg();}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Copy Sequence", "", [=]() {module->copyClipboard();}));
 		if (randLoops_clipboard)
-			menu->addChild(createMenuItem("Paste Seq", "", [=]() {module->pasteClipboard();}));
+			menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteClipboard();}));
 		else
-			menu->addChild(createMenuLabel("Paste Seq"));
+			menu->addChild(createMenuLabel("Paste Sequence"));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Load PROG preset", "", [=]() {module->menuLoadPreset();}));
-		menu->addChild(createMenuItem("Save PROG preset", "", [=]() {module->menuSavePreset();}));
+		menu->addChild(createSubmenuItem("DISK operations", "", [=](Menu * menu) {
+			menu->addChild(createMenuItem("Load Preset", "", [=]() {module->menuLoadPreset();}));
+			menu->addChild(createMenuItem("Save Preset", "", [=]() {module->menuSavePreset();}));
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuItem("Import trigSeq seq.", "", [=]() {module->menuLoadSequence();}));
+			menu->addChild(createMenuItem("Export trigSeq seq.", "", [=]() {module->menuSaveSequence();}));
+		}));
 
-		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
 			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
 			}));
 		}));
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createMenuItem("Import Single Sequence", "", [=]() {module->menuLoadSequence();}));
-		menu->addChild(createMenuItem("Export Single Sequence", "", [=]() {module->menuSaveSequence();}));
-
+		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Hints", "", [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Store Programs with double-click"));
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("Remember to store programs when"));
+			menu->addChild(createMenuLabel("importing or pasting sequences"));
 		}));
 	}
 	
