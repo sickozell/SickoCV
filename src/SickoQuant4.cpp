@@ -10,6 +10,8 @@
 #define SUM_123 2
 #define SUM_1234 3
 
+#define CV_TYPE 0
+
 #include "plugin.hpp"
 #include "osdialog.h"
 #if defined(METAMODULE)
@@ -174,15 +176,14 @@ struct SickoQuant4 : Module {
 							};
 
 	int note[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
-	int pendingNote[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 	int nextNote[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	int changeNote[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 	float voltageScale[12] = {0, 0.08333f, 0.16667f, 0.25f, 0.33333f, 0.41667, 0.5f, 0.58333f, 0.66667f, 0.75f, 0.83333f, 0.91667f};
 	int notesInVoltageScale = 0;
 	int lastNoteInVoltageScale = -1;
 	float noteDelta = 0.f;
 	float noteDeltaMin = 5.f;
 	int chosenNote = 0;
-	bool notesChanged = false;
 
 	// --------------scale
 	int scaleKnob = 0;
@@ -197,6 +198,9 @@ struct SickoQuant4 : Module {
 	int progKnob = 0;
 	int prevProgKnob = 0;
 	int savedProgKnob = 0;
+
+	float progTrig = 0;
+	float prevProgTrig = 0;
 
 	int selectedProg = 0;
 	bool progChanged = false;
@@ -230,7 +234,7 @@ struct SickoQuant4 : Module {
 	float resetScale = 0;
 	float prevResetScale = 0;
 
-	bool pendingUpdate = false;
+	//bool pendingUpdate = false;
 
 	int displayWorking = CUSTOMSCALE;
 	int displayLastSelected = CUSTOMSCALE;
@@ -273,6 +277,9 @@ struct SickoQuant4 : Module {
 	bool setButLight = false;
 	float setButLightDelta = 2 / APP->engine->getSampleRate();
 	float setButLightValue = 0.f;
+
+	int progInType = CV_TYPE;
+	int lastProg = 0;
 
 	//**************************************************************
 	//  DEBUG 
@@ -370,14 +377,14 @@ struct SickoQuant4 : Module {
 	void onReset(const ResetEvent &e) override {
 		for (int i = 0; i < 12; i++) {
 			note[i] = 0;
-			pendingNote[i] = 0;
+			//pendingNote[i] = 0;
 			nextNote[i] = 0;
+			changeNote[i] = 0;
 			voltageScale[i] = noteVtable[i];
 		}
 
 		notesInVoltageScale = 0;
 		lastNoteInVoltageScale = -1;
-		notesChanged = false;
 
 		scaleKnob = 0;
 		prevScaleKnob = 0;
@@ -397,8 +404,6 @@ struct SickoQuant4 : Module {
 		workingScale = 0;
 		workingMinMaj = 0;
 		workingProg = 0;
-
-		pendingUpdate = false;
 
 		displayWorking = CUSTOMSCALE;
 		displayLastSelected = CUSTOMSCALE;
@@ -422,30 +427,46 @@ struct SickoQuant4 : Module {
 
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
-			json_object_set_new(rootJ, "outSumMode", json_integer(outSumMode));
 
-			json_object_set_new(rootJ, "displayWorking", json_integer(displayWorking));
-			
-			json_object_set_new(rootJ, "savedScaleKnob", json_integer(savedScaleKnob));
-			json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
+		json_object_set_new(rootJ, "progInType", json_boolean(progInType));
+		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
 
-			json_t *note_json_array = json_array();
+		json_object_set_new(rootJ, "outSumMode", json_integer(outSumMode));
+
+		json_object_set_new(rootJ, "displayWorking", json_integer(displayWorking));
+		
+		json_object_set_new(rootJ, "savedScaleKnob", json_integer(savedScaleKnob));
+		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
+
+		json_t *note_json_array = json_array();
+		for (int notes = 0; notes < 12; notes++) {
+			json_array_append_new(note_json_array, json_integer(note[notes]));
+		}
+		json_object_set_new(rootJ, "note", note_json_array);	
+		
+		for (int prog = 0; prog < 32; prog++) {
+			json_t *prog_json_array = json_array();
 			for (int notes = 0; notes < 12; notes++) {
-				json_array_append_new(note_json_array, json_integer(note[notes]));
+				json_array_append_new(prog_json_array, json_integer(progNotes[prog][notes]));
 			}
-			json_object_set_new(rootJ, "note", note_json_array);	
-			
-			for (int prog = 0; prog < 32; prog++) {
-				json_t *prog_json_array = json_array();
-				for (int notes = 0; notes < 12; notes++) {
-					json_array_append_new(prog_json_array, json_integer(progNotes[prog][notes]));
-				}
-				json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
-			}
+			json_object_set_new(rootJ, ("prog"+to_string(prog)).c_str(), prog_json_array);	
+		}
 		return rootJ;
 	}
 	
 	void dataFromJson(json_t* rootJ) override {
+
+		json_t* progInTypeJ = json_object_get(rootJ, "progInType");
+		if (progInTypeJ) {
+			progInType = json_boolean_value(progInTypeJ);
+		}
+
+		json_t* lastProgJ = json_object_get(rootJ, "lastProg");
+		if (lastProgJ) {
+			lastProg = json_integer_value(lastProgJ);
+			if (lastProg < 0 || lastProg > 31)
+				lastProg = 0;
+		}
 
 		json_t* outSumModeJ = json_object_get(rootJ, "outSumMode");
 		if (outSumModeJ) {
@@ -518,6 +539,7 @@ struct SickoQuant4 : Module {
 			for (int i = 0; i < 12; i++) {
 				note[i] = scalesNotes[selectedMinMaj][selectedScale][i];
 				nextNote[i] = note[i];
+				changeNote[i] = note[i];
 				if (note[i]) {
 					voltageScale[notesInVoltageScale] = noteVtable[i];
 					notesInVoltageScale++;
@@ -533,6 +555,7 @@ struct SickoQuant4 : Module {
 			for (int i = 0; i < 12; i++) {
 				note[i] = progNotes[selectedProg][i];
 				nextNote[i] = note[i];
+				changeNote[i] = note[i];
 				if (note[i]) {
 					voltageScale[notesInVoltageScale] = noteVtable[i];
 					notesInVoltageScale++;
@@ -556,6 +579,7 @@ struct SickoQuant4 : Module {
 			notesInVoltageScale = 0;
 			for (int i = 0; i < 12; i++) {
 				nextNote[i] = note[i];
+				changeNote[i] = note[i];
 				if (note[i]) {
 					voltageScale[notesInVoltageScale] = noteVtable[i];
 					notesInVoltageScale++;
@@ -672,9 +696,30 @@ struct SickoQuant4 : Module {
 	}
 
 	void eraseProgs() {
-		for (int i = 0; i < 12; i++)
-			for (int j = 0; j < 32; j++)
-				progNotes[j][i] = 0;
+		for (int p = 0; p < 32; p++)
+			for (int n = 0; n < 12; n++)
+				progNotes[p][n] = 0;
+
+		lastProg = 0;
+	}
+
+	void scanLastProg() {
+		lastProg = 31;
+		bool exitFunc = false;
+
+		for (int p = 31; p >= 0; p--) {
+			for (int n = 0; n < 12; n++) {
+				if (progNotes[p][n] != 0) {
+					n = 12;
+					exitFunc = true;
+				}
+			}
+
+			lastProg = p;
+			
+			if (exitFunc)
+				p = 0;
+		}
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -686,14 +731,35 @@ struct SickoQuant4 : Module {
 
 		// ----------- PROGRAM MANAGEMENT
 
-		progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
-		if (progKnob < 0)
-			progKnob = 0;
-		else if (progKnob > 31)
-			progKnob = 31;
+		if (progInType == CV_TYPE) {
+
+			progKnob = int(params[PROG_PARAM].getValue() + (inputs[PROG_INPUT].getVoltage() * 3.2));
+			if (progKnob < 0)
+				progKnob = 0;
+			else if (progKnob > 31)
+				progKnob = 31;
+
+		} else {
+
+			progKnob = params[PROG_PARAM].getValue();
+			if (progKnob < 0)
+				progKnob = 0;
+			else if (progKnob > 31)
+				progKnob = 31;
+
+			progTrig = inputs[PROG_INPUT].getVoltage();
+			if (progTrig >= 1.f && prevProgTrig < 1.f) {
+				progKnob++;
+				if (progKnob > lastProg)
+					progKnob = 0;
+
+				params[PROG_PARAM].setValue(progKnob);
+			}
+			prevProgTrig = progTrig;
+
+		}
 
 		if (progKnob != prevProgKnob) {
-			pendingUpdate = true;
 			progChanged = true;
 			displayLastSelected = DISPLAYPROG;
 			if (scaleChanged)
@@ -703,10 +769,9 @@ struct SickoQuant4 : Module {
 
 			for (int i = 0; i < 12; i++) {
 				nextNote[i] = progNotes[selectedProg][i];
-				pendingNote[i] = nextNote[i];
+				changeNote[i] = nextNote[i];
 				params[NOTE_PARAM+i].setValue(nextNote[i]);
 			}
-			notesChanged = true;
 
 			setButLight = true;
 			setButLightValue = 0.f;
@@ -727,17 +792,14 @@ struct SickoQuant4 : Module {
 				selectedMinMaj = 0;
 			else
 				selectedMinMaj = 1;
-
 			prevScaleKnob = scaleKnob;
 
 			for (int i = 0; i < 12; i++) {
 				nextNote[i] = scalesNotes[selectedMinMaj][selectedScale][i];
-				pendingNote[i] = nextNote[i];
+				changeNote[i] = nextNote[i];
 				params[NOTE_PARAM+i].setValue(nextNote[i]);
 			}
-			notesChanged = true;
 
-			pendingUpdate = true;
 			scaleChanged = true;
 			if (progChanged)
 				progChanged = false;
@@ -747,118 +809,94 @@ struct SickoQuant4 : Module {
 			setButLight = true;
 			setButLightValue = 0.f;
 		}
-		
-		// -------- populate next notes array and show them
-
-		if (pendingUpdate) {
-			for (int i = 0; i < 12; i++) {
-				nextNote[i] = int(params[NOTE_PARAM+i].getValue());
-				if (nextNote[i] != pendingNote[i]) {
-					displayLastSelected = CUSTOMSCALE;
-					notesChanged = true;
-				}
-				lights[NOTE_LIGHT+i].setBrightness(nextNote[i]);
-			}
-
-		} else {
-			for (int i = 0; i < 12; i++) {
-				nextNote[i] = int(params[NOTE_PARAM+i].getValue());
-				if (nextNote[i] != note[i])
-					notesChanged = true;
-
-				lights[NOTE_LIGHT+i].setBrightness(nextNote[i]);
-			}
-		}
 
 		// -------- CURRENT SCALE UPDATE
 
 		butSetScale = false;
 
 		scaleSetBut = params[MANUALSET_PARAM].getValue();
-		//lights[MANUALSET_LIGHT].setBrightness(scaleSetBut);
+
 		if (scaleSetBut >= 1.f && prevScaleSetBut < 1.f)
 			butSetScale = true;
 
 		prevScaleSetBut = scaleSetBut;
 
-		if (notesChanged) {
-			if (pendingUpdate) {
-				if (instantScaleChange) {
-					notesInVoltageScale = 0;
-					for (int i = 0; i < 12; i++) {
-						note[i] = nextNote[i];
-						if (nextNote[i]) {
-							voltageScale[notesInVoltageScale] = noteVtable[i];
-							notesInVoltageScale++;
-						}
-					}
-					lastNoteInVoltageScale = notesInVoltageScale - 1;
-					pendingUpdate = false;
-					displayWorking = displayLastSelected;
-					if (scaleChanged) {
-						workingScale = selectedScale;
-						workingMinMaj = selectedMinMaj;
-						savedScaleKnob = scaleKnob - (inputs[SCALE_INPUT].getVoltage() * 1.2);
-					}
-					if (progChanged) {
-						workingProg = selectedProg;
-						savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-					}
-					notesChanged = false;
+		if (!progChanged && !scaleChanged) {
 
-					setButLight = false;
-					setButLightValue = 0.f;
+			notesInVoltageScale = 0;
+			for (int i = 0; i < 12; i++) {
+				note[i] = params[NOTE_PARAM+i].getValue();
+				lights[NOTE_LIGHT+i].setBrightness(note[i]);
 
-				} else {
-					
-					if (butSetScale) {
-						butSetScale = false;
-						notesInVoltageScale = 0;
-						for (int i = 0; i < 12; i++) {
-							note[i] = nextNote[i];
-							if (nextNote[i]) {
-								voltageScale[notesInVoltageScale] = noteVtable[i];
-								notesInVoltageScale++;
-							}
-						}
-						lastNoteInVoltageScale = notesInVoltageScale - 1;
-						pendingUpdate = false;
-						displayWorking = displayLastSelected;
-						if (scaleChanged) {
-							workingScale = selectedScale;
-							workingMinMaj = selectedMinMaj;
-							savedScaleKnob = scaleKnob - (inputs[SCALE_INPUT].getVoltage() * 1.2);
-						}
-						if (progChanged) {
-							workingProg = selectedProg;
-							savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-						}
-						notesChanged = false;
-
-						setButLight = false;
-						setButLightValue = 0.f;
-					}
-
+				if (note[i]) {
+					voltageScale[notesInVoltageScale] = noteVtable[i];
+					notesInVoltageScale++;
 				}
-		
-			} else {	// if there are NOT pending scale or prog updates (only manual notes are changed)
 
+				nextNote[i] = note[i];
+
+				if (note[i] != changeNote[i]) {		/// CHANGE NOTE
+					changeNote[i] = note[i];
+					displayWorking = CUSTOMSCALE;
+					displayLastSelected = CUSTOMSCALE;
+				}
+			}
+			lastNoteInVoltageScale = notesInVoltageScale - 1;
+
+		} else {
+			
+			if (instantScaleChange || butSetScale) {
 				notesInVoltageScale = 0;
 				for (int i = 0; i < 12; i++) {
 					note[i] = nextNote[i];
+					changeNote[i] = note[i];	/// CHANGE NOTE
 					if (nextNote[i]) {
 						voltageScale[notesInVoltageScale] = noteVtable[i];
 						notesInVoltageScale++;
 					}
 				}
 				lastNoteInVoltageScale = notesInVoltageScale - 1;
-				displayWorking = CUSTOMSCALE;
-				displayLastSelected = CUSTOMSCALE;
-				notesChanged = false;
+
+				displayWorking = displayLastSelected;
+				if (scaleChanged) {
+					workingScale = selectedScale;
+					workingMinMaj = selectedMinMaj;
+					if (progInType == CV_TYPE)
+						savedScaleKnob = scaleKnob - (inputs[SCALE_INPUT].getVoltage() * 1.2);
+					else
+						savedScaleKnob = scaleKnob;
+				}
+				if (progChanged) {
+					workingProg = selectedProg;
+					if (progInType == CV_TYPE)
+						savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+					else
+						savedProgKnob = progKnob;
+				}
+				scaleChanged = false;
+				progChanged = false;
+
+				setButLight = false;
+				setButLightValue = 0.f;
+
+			} else {	// IF SET IS PENDING -> GET NEW SETTINGS
+
+				for (int i = 0; i < 12; i++) {
+					nextNote[i] = params[NOTE_PARAM+i].getValue();
+					lights[NOTE_LIGHT+i].setBrightness(nextNote[i]);
+
+					if (nextNote[i] != changeNote[i]) {
+						displayWorking = CUSTOMSCALE;
+						displayLastSelected = CUSTOMSCALE;
+					}
+				}
+
 			}
 		}
 
+		// --------------------------------------
 		// -------------------------- RESET SCALE
+		// --------------------------------------
 
 		resetScale = params[RESETSCALE_PARAM].getValue();
 		lights[RESETSCALE_LIGHT].setBrightness(resetScale);
@@ -868,6 +906,7 @@ struct SickoQuant4 : Module {
 			for (int i = 0; i < 12; i++) {
 				note[i] = scalesNotes[selectedMinMaj][selectedScale][i];
 				nextNote[i] = note[i];
+				changeNote[i] = note[i];
 				if (note[i]) {
 					voltageScale[notesInVoltageScale] = noteVtable[i];
 					notesInVoltageScale++;
@@ -879,9 +918,11 @@ struct SickoQuant4 : Module {
 			workingScale = selectedScale;
 			workingMinMaj = selectedMinMaj;
 			displayWorking = DISPLAYSCALE;
-			savedScaleKnob = scaleKnob - (inputs[SCALE_INPUT].getVoltage() * 1.2);
-			notesChanged = false;
-			pendingUpdate = false;
+			if (progInType == CV_TYPE)
+				savedScaleKnob = scaleKnob - (inputs[SCALE_INPUT].getVoltage() * 1.2);
+			else
+				savedScaleKnob = scaleKnob;
+
 			progChanged = false;
 			scaleChanged = false;
 
@@ -890,31 +931,40 @@ struct SickoQuant4 : Module {
 		}
 		prevResetScale = resetScale;
 
+		// --------------------------------------
 		// -------------------------- RECALL PROG
+		// --------------------------------------
 
 		recallBut = params[RECALL_PARAM].getValue();
 		lights[RECALL_LIGHT].setBrightness(recallBut);
 
 		if (recallBut >= 1.f && prevRecallBut < 1.f) {
 
-			notesInVoltageScale = 0;
-			for (int i = 0; i < 12; i++) {
-				note[i] = progNotes[selectedProg][i];
-				nextNote[i] = note[i];
-				if (note[i]) {
-					voltageScale[notesInVoltageScale] = noteVtable[i];
-					notesInVoltageScale++;
-				}
-				params[NOTE_PARAM+i].setValue(note[i]);
-				lights[NOTE_LIGHT+i].setBrightness(note[i]);
-			}
-			lastNoteInVoltageScale = notesInVoltageScale - 1;
+			//if (!progChanged) {
 
-			workingProg = selectedProg;
-			displayWorking = DISPLAYPROG;
-			savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-			notesChanged = false;
-			pendingUpdate = false;
+			//} else {
+				notesInVoltageScale = 0;
+				for (int i = 0; i < 12; i++) {
+					note[i] = progNotes[selectedProg][i];
+					nextNote[i] = note[i];
+					changeNote[i] = note[i];
+					if (note[i]) {
+						voltageScale[notesInVoltageScale] = noteVtable[i];
+						notesInVoltageScale++;
+					}
+					params[NOTE_PARAM+i].setValue(note[i]);
+					lights[NOTE_LIGHT+i].setBrightness(note[i]);
+				}
+				lastNoteInVoltageScale = notesInVoltageScale - 1;
+
+				workingProg = selectedProg;
+				displayWorking = DISPLAYPROG;
+				if (progInType == CV_TYPE)
+					savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+				else
+					savedProgKnob = progKnob;
+			//}
+
 			progChanged = false;
 			scaleChanged = false;
 
@@ -937,7 +987,12 @@ struct SickoQuant4 : Module {
 			} else {
 				storeWait = false;
 				for (int i = 0; i < 12; i++)
+					//progNotes[progKnob][i] = note[i];
 					progNotes[progKnob][i] = nextNote[i];
+
+				if (progKnob > lastProg)
+					lastProg = progKnob;
+
 				storedProgram = true;
 				storedProgramTime = maxStoredProgramTime;
 			}
@@ -1383,7 +1438,7 @@ struct SickoQuant4DisplayScale : TransparentWidget {
 					currentDisplay = "CST";
 				}
 
-				if (!module->pendingUpdate) {
+				if (!module->progChanged && !module->scaleChanged) {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 3)
@@ -1582,6 +1637,27 @@ struct SickoQuant4Widget : ModuleWidget {
 
 	void appendContextMenu(Menu* menu) override {
 		SickoQuant4* module = dynamic_cast<SickoQuant4*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		struct ProgInTypeItem : MenuItem {
+			SickoQuant4* module;
+			int progInType;
+			void onAction(const event::Action& e) override {
+				module->progInType = progInType;
+			}
+		};
+
+		std::string ProgInTypeNames[2] = {"CV", "Trig"};
+		menu->addChild(createSubmenuItem("Prog Input type", (ProgInTypeNames[module->progInType]), [=](Menu * menu) {
+			for (int i = 0; i < 2; i++) {
+				ProgInTypeItem* progInTypeItem = createMenuItem<ProgInTypeItem>(ProgInTypeNames[i]);
+				progInTypeItem->rightText = CHECKMARK(module->progInType == i);
+				progInTypeItem->module = module;
+				progInTypeItem->progInType = i;
+				menu->addChild(progInTypeItem);
+			}
+		}));
+		menu->addChild(createMenuItem("Scan Last Prog", "current: " + to_string(module->lastProg), [=]() {module->scanLastProg();}));
 
 		menu->addChild(new MenuSeparator());
 

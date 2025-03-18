@@ -1426,10 +1426,11 @@ struct TrigSeq8x : Module {
 			progSteps[p] = 16;
 			progRst[p] = 0;
 			for (int t = 0; t < 8; t++) {
-				for (int st = 0; st < 16; st++)
-					progSeq[p][t][st] = 0;
+				for (int s = 0; s < 16; s++)
+					progSeq[p][t][s] = 0;
 			}
 		}
+		lastProg = 0;
 	}
 	
 	void inline resetStep() {
@@ -1491,20 +1492,17 @@ struct TrigSeq8x : Module {
 			for (int t = 0; t < 8; t++) {
 				for (int st = 0; st < 16; st++) {
 					if (progSeq[p][t][st] != 0) {
-						lastProg = p;
 						st = 16;
 						t = 8;
 						exitFunc = true;
 					}
 				}
-				if (exitFunc)
-					t = 8;
 			}
 
-			if (progSteps[p] != 16 || progRst[p] != 0) {
-				lastProg = p;
+			if (progSteps[p] != 16 || progRst[p] != 0)
 				exitFunc = true;
-			}
+
+			lastProg = p;
 
 			if (exitFunc)
 				p = 0;
@@ -2267,7 +2265,7 @@ struct TrigSeq8xWidget : ModuleWidget {
 				menu->addChild(progInTypeItem);
 			}
 		}));
-		menu->addChild(createMenuItem("Scan Last Prog", "current:" + to_string(module->lastProg), [=]() {module->scanLastProg();}));
+		menu->addChild(createMenuItem("Scan Last Prog", "current: " + to_string(module->lastProg), [=]() {module->scanLastProg();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy All Tracks", "", [=]() {module->copyAllTracks();}));

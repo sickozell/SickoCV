@@ -940,13 +940,14 @@ struct RandLoops : Module {
 	}
 
 	void eraseProgs() {
-		for (int i = 0; i < 32; i++) {
-			progSteps[i] = 16;
-			progCtrl[i] = 0.f;
-			progScale[i] = 1.f;
-			for (int j = 0; j < 16; j++)
-				progSeq[i][j] = 0;
+		for (int p = 0; p < 32; p++) {
+			progSteps[p] = 16;
+			progCtrl[p] = 0.f;
+			progScale[p] = 1.f;
+			for (int s = 0; s < 16; s++)
+				progSeq[p][s] = 0;
 		}
+		lastProg = 0;
 	}
 
 	/*
@@ -1055,21 +1056,22 @@ struct RandLoops : Module {
 		for (int p = 31; p >= 0; p--) {
 			for (int st = 0; st < 16; st++) {
 				if (progSeq[p][st] != 0) {
-					lastProg = p;
 					st = 16;
 					exitFunc = true;
 				}
 			}
-			if (progSteps[p] != 16 || progScale[p] != 1) {
-				lastProg = p;
+			if (progSteps[p] != 16 || progScale[p] != 1)
 				exitFunc = true;
-			}
+
+			lastProg = p;
 
 			if (exitFunc)
 				p = 0;
 		}
+
 		if (!exitFunc)
 			lastProg = 0;
+
 	}
 	
 	void process(const ProcessArgs& args) override {
@@ -1244,9 +1246,9 @@ struct RandLoops : Module {
 
 			workingProg = selectedProg;
 			if (progInType == CV_TYPE)
-					savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
-				else
-					savedProgKnob = progKnob;
+				savedProgKnob = progKnob - (inputs[PROG_INPUT].getVoltage() * 3.2);
+			else
+				savedProgKnob = progKnob;
 
 			progChanged = false;
 
@@ -1847,7 +1849,7 @@ struct RandLoopsWidget : ModuleWidget {
 				menu->addChild(progInTypeItem);
 			}
 		}));
-		menu->addChild(createMenuItem("Scan Last Prog", "current:" + to_string(module->lastProg), [=]() {module->scanLastProg();}));
+		menu->addChild(createMenuItem("Scan Last Prog", "current: " + to_string(module->lastProg), [=]() {module->scanLastProg();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy Sequence", "", [=]() {module->copyClipboard();}));

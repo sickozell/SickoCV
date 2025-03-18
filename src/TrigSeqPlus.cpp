@@ -903,13 +903,14 @@ struct TrigSeqPlus : Module {
 	}
 
 	void eraseProgs() {
-		for (int i = 0; i < 32; i++) {
-			progSteps[i] = 16;
-			progRst[i] = 0;
+		for (int p = 0; p < 32; p++) {
+			progSteps[p] = 16;
+			progRst[p] = 0;
 
-			for (int j = 0; j < 16; j++)
-				progSeq[i][j] = 0;
+			for (int s = 0; s < 16; s++)
+				progSeq[p][s] = 0;
 		}
+		lastProg = 0;
 	}
 
 	void inline resetStep() {
@@ -969,18 +970,18 @@ struct TrigSeqPlus : Module {
 		for (int p = 31; p >= 0; p--) {
 			for (int st = 0; st < 16; st++) {
 				if (progSeq[p][st] != 0) {
-					lastProg = p;
 					st = 16;
 					exitFunc = true;
 				}
 			}
-			if (progSteps[p] != 16 || progRst[p] != 0) {
-				lastProg = p;
+			if (progSteps[p] != 16 || progRst[p] != 0)
 				exitFunc = true;
-			}
+
+			lastProg = p;
 
 			if (exitFunc)
 				p = 0;
+
 		}
 	}
 
@@ -1671,7 +1672,7 @@ struct TrigSeqPlusWidget : ModuleWidget {
 				menu->addChild(progInTypeItem);
 			}
 		}));
-		menu->addChild(createMenuItem("Scan Last Prog", "current:" + to_string(module->lastProg), [=]() {module->scanLastProg();}));
+		menu->addChild(createMenuItem("Scan Last Prog", "current: " + to_string(module->lastProg), [=]() {module->scanLastProg();}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Copy Sequence", "", [=]() {module->copyClipboard();}));
