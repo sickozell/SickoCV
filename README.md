@@ -995,8 +995,8 @@ All 32 programs can be saved in a preset file (.SQN) with the 'Save PROG preset'
 
 To erase all programs in memory in the right-click menu there is a function 'Erase ALL progs'. For safety, it has to be clicked 'ERASE!' in the sub menu 'Are You Sure?' to proceed.
 
-CV is standard program input control, In the right-click menu there is "Prog Input Type" option that can be set to 'Trig'.  
-It advances to the next program with a trigger on Prog Input. When reached the last stored program it restarts from program 0.
+CV is the standard program input control. In the right-click menu there is the "Prog Input Type" option that can be set to 'Trig'.  
+It advances to the next program with a trigger on Prog Input. When reached the last stored program it restarts from program 0.  
 In the right-click menu there is also the 'Scan Last Prog' option that shows the last stored program and by clicking this option a full rescan of all programs is done.
 
 ##### sickoQuant4
@@ -1199,7 +1199,7 @@ In TURING mode the RST knob acts like a CV out attenuator.
 - **Initialize on start**: doesn't remeber the last step reached when Rack is reloaded
 
 Plus versions only:  
-- **Prog Input Type**: CV is standard program input control, when 'Trig' option is ticket the modules advance to the next program with a trigger on Prog Input. When reached the last stored program it restarts from program 0. A trigger on Reset input set also the program to 0
+- **Prog Input Type**: CV is the standard program input control. When 'Trig' option is ticked, the modules advance to the next program with a trigger on Prog Input. When the last stored program is reached, it restarts from program 0. A trigger on Reset input set also the program to 0
 - **Scan Last Prog**: The last stored program is shown in the menu, by clicking this option a full rescan of all programs is done.
 - **Copy/paste seq**: copy and paste the current sequence and the length/reset settings in the clipboard (does not work across multiple modules)
 - **Load/Save PRESET**: load or save a 'ssp' or 'tsp' preset file with all programmed sequences, including lengths, reset settings, and right-click menu settings
