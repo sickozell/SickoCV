@@ -1,3 +1,6 @@
+### 2.7.2 (2025-03-18)
+- added drumPlayerMk2 module
+
 ### 2.7.1 (2025-03-18)
 - added randLoops module
 - added randLoops8 module

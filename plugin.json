@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.7.1-beta22",
+  "version": "2.7.2-beta1",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -163,6 +163,16 @@
     {
       "slug": "DrumPlayer",
       "name": "drumPlayer",
+      "description": "Drum Sample Player",
+      "tags": [
+        "Sampler",
+        "Drum",
+        "Quad"
+      ]
+    },
+    {
+      "slug": "DrumPlayerMk2",
+      "name": "drumPlayer mk2",
       "description": "Drum Sample Player",
       "tags": [
         "Sampler",

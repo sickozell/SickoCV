@@ -41,6 +41,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelDrummer4);
 	p->addModel(modelDrummer4Plus);
 	p->addModel(modelDrumPlayer);
+	p->addModel(modelDrumPlayerMk2);
 	p->addModel(modelDrumPlayerPlus);
 	p->addModel(modelDrumPlayerXtra);
 	p->addModel(modelEnver);
