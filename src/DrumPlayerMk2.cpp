@@ -135,6 +135,8 @@ struct DrumPlayerMk2 : Module {
 
 	bool dontDecay[4] = {true, true, true, true};
 
+	bool logDecay = false;
+
 	static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	
@@ -227,6 +229,7 @@ struct DrumPlayerMk2 : Module {
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "logDecay", json_boolean(logDecay));
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "OutsMode", json_integer(outsMode));
@@ -240,6 +243,9 @@ struct DrumPlayerMk2 : Module {
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+		json_t* logDecayJ = json_object_get(rootJ, "logDecay");
+		if (logDecayJ)
+			logDecay = json_boolean_value(logDecayJ);
 		json_t* interpolationJ = json_object_get(rootJ, "Interpolation");
 		if (interpolationJ)
 			interpolationMode = json_integer_value(interpolationJ);
@@ -786,7 +792,7 @@ struct DrumPlayerMk2 : Module {
 						play[slot] = false;
 					}
 
-					currentOutput *= expTable[0][int(expTableCoeff * stageLevel[slot])];
+					currentOutput *= expTable[logDecay][int(expTableCoeff * stageLevel[slot])];
 				}
 
 				if (slot > 0 && choking[slot]) {
@@ -1430,6 +1436,8 @@ struct DrumPlayerMk2Widget : ModuleWidget {
 	   	DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2*>(this->module);
 			assert(module);
 		
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Logarithmic Decay", "", &module->logDecay));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Slots"));
 
