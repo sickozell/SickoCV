@@ -1,5 +1,6 @@
-### 2.7.2 (2025-03-18)
+### 2.7.2 (2025-03-27)
 - added drumPlayerMk2 module
+- trigSeq8x: added "randomize steps" menu option
 
 ### 2.7.1 (2025-03-18)
 - added randLoops module

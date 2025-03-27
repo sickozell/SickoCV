@@ -1,4 +1,4 @@
-# SickoCV v2.7.2-beta1
+# SickoCV v2.7.2-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -20,6 +20,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog** 
 - added drumPlayerMk2 module
+- trigSeq8x: added "randomize steps" menu option
 
 # SickoCV v2.7.1
 VCV Rack plugin modules

@@ -1509,6 +1509,22 @@ struct TrigSeq8x : Module {
 		}
 	}
 
+	void randomizeTrack(int t) {
+		float tempRand;
+		for (int st = 0; st < 16; st++) {
+			tempRand = random::uniform();
+			if (tempRand > .5f)
+				params[STEP_PARAM+(t*16)+st].setValue(1.f);
+			else
+				params[STEP_PARAM+(t*16)+st].setValue(0.f);
+		}
+	}
+
+	void randomizeAll() {
+		for (int t = 0; t < 8; t++)
+			randomizeTrack(t);
+	}
+
 	void process(const ProcessArgs& args) override {
 
 		// ----------- AUTO SWITCH
@@ -2182,6 +2198,20 @@ struct TrigSeq8xWidget : ModuleWidget {
 
 	void appendContextMenu(Menu* menu) override {
 		TrigSeq8x* module = dynamic_cast<TrigSeq8x*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+
+		menu->addChild(createSubmenuItem("Randomize Steps", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("All tracks", "", [=]() {module->randomizeAll();}));
+				menu->addChild(createMenuItem("Track 1", "", [=]() {module->randomizeTrack(0);}));
+				menu->addChild(createMenuItem("Track 2", "", [=]() {module->randomizeTrack(1);}));
+				menu->addChild(createMenuItem("Track 3", "", [=]() {module->randomizeTrack(2);}));
+				menu->addChild(createMenuItem("Track 4", "", [=]() {module->randomizeTrack(3);}));
+				menu->addChild(createMenuItem("Track 5", "", [=]() {module->randomizeTrack(4);}));
+				menu->addChild(createMenuItem("Track 6", "", [=]() {module->randomizeTrack(5);}));
+				menu->addChild(createMenuItem("Track 7", "", [=]() {module->randomizeTrack(6);}));
+				menu->addChild(createMenuItem("Track 8", "", [=]() {module->randomizeTrack(7);}));
+		}));
 
 		menu->addChild(new MenuSeparator());
 
