@@ -985,6 +985,21 @@ struct TrigSeqPlus : Module {
 		}
 	}
 
+	void randomizeTrack() {
+		float tempRand;
+		for (int st = 0; st < 16; st++) {
+
+			tempRand = random::uniform();
+
+			if (tempRand > .5f)
+				wSeq[st] = 1.f;
+			else
+				wSeq[st] = 0.f;
+
+			params[STEP_PARAM+st].setValue(wSeq[st]);
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
 
 		// ----------- AUTO SWITCH
@@ -1589,6 +1604,9 @@ struct TrigSeqPlusWidget : ModuleWidget {
 
 	void appendContextMenu(Menu* menu) override {
 		TrigSeqPlus* module = dynamic_cast<TrigSeqPlus*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Randomize Steps", "", [=]() {module->randomizeTrack();}));
 
 		menu->addChild(new MenuSeparator());
 

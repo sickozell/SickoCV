@@ -764,6 +764,13 @@ struct StepSeqPlus : Module {
 
 	}
 	
+	void randomizeTrack() {
+		for (int st = 0; st < 16; st++) {
+			wSeq[st] = random::uniform();
+			params[STEP_PARAM+st].setValue(wSeq[st]);
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
 
 		// ----------- AUTO SWITCH
@@ -1346,6 +1353,9 @@ struct StepSeqPlusWidget : ModuleWidget {
 
 	void appendContextMenu(Menu* menu) override {
 		StepSeqPlus* module = dynamic_cast<StepSeqPlus*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Randomize Steps", "", [=]() {module->randomizeTrack();}));
 
 		menu->addChild(new MenuSeparator());
 
