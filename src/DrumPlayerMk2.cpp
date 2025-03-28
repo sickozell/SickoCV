@@ -27,7 +27,6 @@ struct DrumPlayerMk2 : Module {
 	#include "shapes.hpp"
 
 	enum ParamIds {
-		ENUMS(TRIGVOL_PARAM,4),
 		ENUMS(ACCVOL_PARAM,4),
 		ENUMS(DECAY_PARAM,4),
 		ENUMS(TUNE_PARAM,4),
@@ -151,7 +150,7 @@ struct DrumPlayerMk2 : Module {
 
 		for (int i = 0; i < 4; i++) {
 			configInput(TRIG_INPUT+i,("Trig #"+to_string(i+1)).c_str());
-			configParam(TRIGVOL_PARAM+i, 0.f, 2.0f, 1.0f, ("Standard Level #"+to_string(i+1)).c_str(), "%", 0, 100);
+			//configParam(TRIGVOL_PARAM+i, 0.f, 2.0f, 1.0f, ("Standard Level #"+to_string(i+1)).c_str(), "%", 0, 100);
 			configInput(ACC_INPUT+i,("Accent #"+to_string(i+1)).c_str());
 			configParam(ACCVOL_PARAM+i, 1.f, 2.0f, 1.0f, ("Accent Level #"+to_string(i+1)).c_str(), "%", 0, 100);
 			//configParam(DECAY_PARAM+i, 0.01f, 2.0f, 2.0f, ("Decay #"+to_string(i+1)).c_str(), "s", 0, 1);
@@ -667,7 +666,7 @@ struct DrumPlayerMk2 : Module {
 				if (inputs[ACC_INPUT+slot].getVoltage() > 1)
 					level[slot] = params[ACCVOL_PARAM+slot].getValue();
 				else
-					level[slot] = params[TRIGVOL_PARAM+slot].getValue();
+					level[slot] = 1;
 				
 				if (functionButton) {
 					if (slot == 0 || slot == 2) {
