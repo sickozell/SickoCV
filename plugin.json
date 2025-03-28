@@ -201,6 +201,15 @@
       ]
     },
     {
+      "slug": "DrumPlayer1",
+      "name": "drumPlayer1",
+      "description": "Drum Sample Player",
+      "tags": [
+        "Sampler",
+        "Drum"
+      ]
+    },
+    {
       "slug": "Enver",
       "name": "enver",
       "description": "Envelope generator with stereo VCA",

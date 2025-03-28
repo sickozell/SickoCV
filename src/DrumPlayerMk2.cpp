@@ -542,7 +542,7 @@ struct DrumPlayerMk2 : Module {
 			vector<float>().swap(playBuffer[slot][1]);
 
 			for (unsigned int i = 0; i < tsc; i = i + c) {
-				playBuffer[slot][0].push_back(pSampleData[i]);
+				playBuffer[slot][0].push_back(pSampleData[i] * 5);
 				playBuffer[slot][0].push_back(0);
 			}
 			totalSampleC[slot] = playBuffer[slot][0].size();
@@ -593,8 +593,8 @@ struct DrumPlayerMk2 : Module {
 		std::vector<float> data;
 
 		for (unsigned int i = 0; i <= playBuffer[slot][0].size(); i = i + 2)
-			//data.push_back(playBuffer[slot][0][i] / 5);
-			data.push_back(playBuffer[slot][0][i]);
+			data.push_back(playBuffer[slot][0][i] / 5);
+			//data.push_back(playBuffer[slot][0][i]);
 
 		drwav_data_format format;
 		format.container = drwav_container_riff;
@@ -636,22 +636,6 @@ struct DrumPlayerMk2 : Module {
 
 		totalSampleC[slot] = 0;
 	}
-
-	/*
-	float shapeResponse2(float value) {
-		
-		if (shape < 0.25f) {
-			return (expTable[2][int(expTableCoeff * value)] * (1 - shape * 4.f)) + (expTable[1][int(expTableCoeff * value)] * (shape * 4.f));
-		} else if (shape < 0.5f) {
-			return (expTable[1][int(expTableCoeff * value)] * (1 - ((shape - 0.25f) * 4.f))) + (value * ((shape - 0.25f) * 4.f));
-		} else if (shape < 0.75f) {
-			return (value * (1 - ((shape - 0.5f) * 4.f))) + (expTable[0][int(expTableCoeff * value)] * ((shape - 0.5f) * 4.f));
-		} else {
-			return (expTable[0][int(expTableCoeff * value)] * (1 - ((shape - 0.75f) * 4.f))) + (expTable[3][int(expTableCoeff * value)] * ((shape - 0.75f) * 4.f));
-		}		
-
-	}
-	*/
 
 	static float convertCVToSec(float cv) {		
 		return minStageTimeSec * std::pow(maxStageTimeSec / minStageTimeSec, cv);
@@ -709,14 +693,14 @@ struct DrumPlayerMk2 : Module {
 				 (reversePlay[slot] && floor(samplePos[slot]) >= 0))) {
 				switch (interpolationMode) {
 					case NO_INTERP:
-						currentOutput = 5 * level[slot] * playBuffer[slot][antiAlias][floor(samplePos[slot])];
+						currentOutput = level[slot] * playBuffer[slot][antiAlias][floor(samplePos[slot])];
 					break;
 
 					case LINEAR1_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[slot] * float(
+							currentOutput = level[slot] * float(
 												(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
 												(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
 											);
@@ -725,9 +709,9 @@ struct DrumPlayerMk2 : Module {
 
 					case LINEAR2_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[slot] * float(
+							currentOutput = level[slot] * float(
 												(
 													(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])] * (1-prevSampleWeight[slot])) +
 													(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])+1] * prevSampleWeight[slot]) +
@@ -740,7 +724,7 @@ struct DrumPlayerMk2 : Module {
 
 					case HERMITE_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
 							if (floor(samplePos[slot]) > 1 && floor(samplePos[slot]) < totalSamples[slot] - 1) {
 								/*
@@ -758,7 +742,7 @@ struct DrumPlayerMk2 : Module {
 									(((((a3 * currSampleWeight[slot]) + a2) * currSampleWeight[slot]) + a1) * currSampleWeight[slot]) + playBuffer[slot][antiAlias][floor(samplePos[slot])]
 								);
 							} else {
-								currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+								currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 							}
 						}
 					break;
@@ -774,7 +758,7 @@ struct DrumPlayerMk2 : Module {
 				}
 				prevDecayKnob[slot] = decayKnob[slot];
 
-				if (!inputs[DECAY_INPUT].isConnected()) {
+				if (!inputs[DECAY_INPUT+slot].isConnected()) {
 					stageCoeff[slot] = srCoeff / decayValue[slot];
 				} else {
 
@@ -842,7 +826,7 @@ struct DrumPlayerMk2 : Module {
 				if (fading[slot]) {
 					if (fadingValue[slot] > 0) {
 						fadingValue[slot] -= fadeDecrement;
-						currentOutput += (playBuffer[slot][antiAlias][floor(fadedPosition[slot])] * fadingValue[slot] * level[slot] * 5);
+						currentOutput += (playBuffer[slot][antiAlias][floor(fadedPosition[slot])] * fadingValue[slot] * level[slot]);
 
 						if (!reversePlay[slot]) {
 							fadedPosition[slot] += distancePos[slot];
