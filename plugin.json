@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.7.2-beta3",
+  "version": "2.7.2-beta4",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -501,6 +501,14 @@
       "slug": "StepSeqPlus",
       "name": "stepSeq+",
       "description": "16 step sequencer with direction and presets (ss16+)",
+      "tags": [
+        "Sequencer"
+      ]
+    },
+        {
+      "slug": "StepSeq8x",
+      "name": "stepSeq8x",
+      "description": "8 track / 16 step sequencer with direction and presets (ss8x)",
       "tags": [
         "Sequencer"
       ]

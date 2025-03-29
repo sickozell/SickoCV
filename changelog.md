@@ -1,4 +1,5 @@
 ### 2.7.2 (2025-03-28)
+- added stepSeq8x module
 - added drumPlayer1 module
 - added drumPlayerMk2 module
 - trigSeq8x trigSeq trigSeq+ stepSeq stepSeq+: added "randomize steps" menu option

@@ -79,6 +79,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelSlewer);
 	p->addModel(modelStepSeq);
 	p->addModel(modelStepSeqPlus);
+	p->addModel(modelStepSeq8x);
 	p->addModel(modelSwitcher);
 	p->addModel(modelSwitcherSt);
 	p->addModel(modelSwitcher8);
@@ -118,3 +119,15 @@ bool stepSeq_clipboard = false;
 float stepSeq_cbSeq[16] = {0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f,0.5f};
 int stepSeq_cbSteps = 16;
 int stepSeq_cbRst = 1;
+
+bool stepSeq8_clipboard = false;
+float stepSeq8_cbSeq[8][16] = {{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5},
+								{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5},
+								{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5},
+								{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5},
+								{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5},
+								{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5},
+								{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5},
+								{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5}};
+int stepSeq8_cbSteps = 16;
+int stepSeq8_cbRst = 1;

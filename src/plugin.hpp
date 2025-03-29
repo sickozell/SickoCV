@@ -65,6 +65,7 @@ extern Model* modelSimpleSeq4;
 extern Model* modelSlewer;
 extern Model* modelStepSeq;
 extern Model* modelStepSeqPlus;
+extern Model* modelStepSeq8x;
 extern Model* modelSwitcher;
 extern Model* modelSwitcherSt;
 extern Model* modelSwitcher8;
@@ -96,4 +97,7 @@ extern float stepSeq_cbSeq[16];
 extern int stepSeq_cbSteps;
 extern int stepSeq_cbRst;
 
-
+extern bool stepSeq8_clipboard;
+extern float stepSeq8_cbSeq[8][16];
+extern int stepSeq8_cbSteps;
+extern int stepSeq8_cbRst;
