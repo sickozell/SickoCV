@@ -164,9 +164,9 @@ struct SickoLooper1 : Module {
 	bool sendReset = false;
 
 	Sl1ExpMsg expInputMessage[2][1];
-    Sl1ExpMsg expOutputMessage[2][1];
+	Sl1ExpMsg expOutputMessage[2][1];
 
-    bool waitingExpResp = false;
+	bool waitingExpResp = false;
 
 
 	//**************************************************************
@@ -1868,6 +1868,18 @@ struct SickoLooper1 : Module {
 		else
 			setIdleLed();
 		nextStatus = NOTHING;
+	}
+
+	void addExpander( Model* model, ModuleWidget* parentModWidget, bool left = false ) {
+		Module* module = model->createModule();
+		APP->engine->addModule(module);
+		ModuleWidget* modWidget = model->createModuleWidget(module);
+		APP->scene->rack->setModulePosForce( modWidget, Vec( parentModWidget->box.pos.x + (left ? -modWidget->box.size.x : parentModWidget->box.size.x), parentModWidget->box.pos.y));
+		APP->scene->rack->addModule(modWidget);
+		history::ModuleAdd* h = new history::ModuleAdd;
+		h->name = "create "+model->name;
+		h->setModule(modWidget);
+		APP->history->push(h);
 	}
 
 /*
@@ -4941,6 +4953,9 @@ struct SickoLooper1Widget : ModuleWidget {
 			menu->addChild(createMenuItem("File: " + module->clickFileDescription[1], "", [=]() {module->clickMenuLoadSample(1);}));
 			menu->addChild(createMenuItem("", "Clear", [=]() {module->clickClearSlot(1);}));
 		}));	
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Add Expander", "", [=]() {module->addExpander(modelSickoLooper1Exp, this);}));
 
 	}
 };

@@ -1,8 +1,14 @@
-### 2.7.2 (2025-03-28)
+### 2.7.2 (2025-04-01)
 - added stepSeq8x module
-- added drumPlayer1 module
 - added drumPlayerMk2 module
+- added drumPlayer mini module
+- added ad mini module
+- added enver mini module
+- added enver mini expander module
+- added randLoops mini module
+- added slewer mini module
 - trigSeq8x trigSeq trigSeq+ stepSeq stepSeq+: added "randomize steps" menu option
+- slewer: fixed a bug on attack/decay CV inputs
 
 ### 2.7.1 (2025-03-18)
 - added randLoops module

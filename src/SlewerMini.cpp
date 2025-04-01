@@ -14,15 +14,15 @@
 
 //using namespace std;
 
-struct Slewer : Module {
+struct SlewerMini : Module {
 
 	enum ParamIds {
 		ATTACK_PARAM,
-		ATTACK_ATNV_PARAM,
+		//ATTACK_ATNV_PARAM,
 		DECAY_PARAM,
-		DECAY_ATNV_PARAM,
+		//DECAY_ATNV_PARAM,
 		SHAPE_PARAM,
-		SHAPE_ATNV_PARAM,
+		//SHAPE_ATNV_PARAM,
 		SYMM_PARAM,
 		NUM_PARAMS 
 	};
@@ -35,14 +35,14 @@ struct Slewer : Module {
 	};
 	enum OutputIds {
 		SIGNAL_OUTPUT,
-		EOA_OUTPUT,
-		EOD_OUTPUT,
+		//EOA_OUTPUT,
+		//EOD_OUTPUT,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
 		SYMM_LIGHT,
-		EOA_LIGHT,
-		EOD_LIGHT,
+		//EOA_LIGHT,
+		//EOD_LIGHT,
 		NUM_LIGHTS
 	};
   
@@ -115,28 +115,28 @@ struct Slewer : Module {
 	bool debugBool = false;
 	*/
 
-	Slewer() {
+	SlewerMini() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
 		configParam(ATTACK_PARAM, 0.f, 1.f, 0.5f, "Attack", " ms", maxStageTime / minStageTime, minStageTime);
-		configParam(ATTACK_ATNV_PARAM, -1.f, 1.f, 0.f, "Attack CV", "%", 0, 100);
-		configInput(ATTACK_INPUT,"Attack");
+		//configParam(ATTACK_ATNV_PARAM, -1.f, 1.f, 0.f, "Attack CV", "%", 0, 100);
+		configInput(ATTACK_INPUT,"Attack CV");
 
 		configParam(DECAY_PARAM, 0.f, 1.f, 0.5f, "Decay", " ms", maxStageTime / minStageTime, minStageTime);
-		configParam(DECAY_ATNV_PARAM, -1.f, 1.f, 0.f, "Decay CV", "%", 0, 100);
-		configInput(DECAY_INPUT,"Decay");
+		//configParam(DECAY_ATNV_PARAM, -1.f, 1.f, 0.f, "Decay CV", "%", 0, 100);
+		configInput(DECAY_INPUT,"Decay CV");
 
 		configParam(SHAPE_PARAM, 0.f, 1.f, 0.5f, "Curve","", 0, 100);
-		configParam(SHAPE_ATNV_PARAM, -1.f, 1.f, 0.f, "Curve CV", "%", 0, 100);
-		configInput(SHAPE_INPUT,"Curve");
+		//configParam(SHAPE_ATNV_PARAM, -1.f, 1.f, 0.f, "Curve CV", "%", 0, 100);
+		configInput(SHAPE_INPUT,"Curve CV");
 
 		configSwitch(SYMM_PARAM, 0.f, 1.f, 0.f, "Symmetric", {"OFF", "ON"});
 
 		configInput(SIGNAL_INPUT,"Signal");
 		configOutput(SIGNAL_OUTPUT,"Signal");
 
-		configOutput(EOA_OUTPUT,"EoA");
-		configOutput(EOD_OUTPUT,"EoD");
+		//configOutput(EOA_OUTPUT,"EoA");
+		//configOutput(EOD_OUTPUT,"EoD");
 
 	}
 
@@ -183,7 +183,8 @@ struct Slewer : Module {
 
 	void process(const ProcessArgs &args) override {
 
-		shape = params[SHAPE_PARAM].getValue() + (inputs[SHAPE_INPUT].getVoltage() * params[SHAPE_ATNV_PARAM].getValue() * 0.1);
+		//shape = params[SHAPE_PARAM].getValue() + (inputs[SHAPE_INPUT].getVoltage() * params[SHAPE_ATNV_PARAM].getValue() * 0.1);
+		shape = params[SHAPE_PARAM].getValue() + (inputs[SHAPE_INPUT].getVoltage() * 0.1);
 
 		if (shape < 0)
 			shape = 0;
@@ -206,8 +207,7 @@ struct Slewer : Module {
 
 			} else {
 
-				//attackInValue = attackValue + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACK_ATNV_PARAM].getValue() * 0.1);
-				attackInValue = attackValue + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACK_ATNV_PARAM].getValue());
+				attackInValue = attackValue + inputs[ATTACK_INPUT].getVoltage();
 
 				if (attackInValue < minAdsrTime)
 					attackInValue = minAdsrTime;
@@ -227,7 +227,7 @@ struct Slewer : Module {
 			} else {
 
 				//decayInValue = decayValue + (inputs[DECAY_INPUT].getVoltage() * params[DECAY_ATNV_PARAM].getValue() * 0.1);
-				decayInValue = decayValue + (inputs[DECAY_INPUT].getVoltage() * params[DECAY_ATNV_PARAM].getValue());
+				decayInValue = decayValue + inputs[DECAY_INPUT].getVoltage();
 
 				if (decayInValue < minAdsrTime)
 					decayInValue = minAdsrTime;
@@ -250,7 +250,7 @@ struct Slewer : Module {
 			} else {
 
 				//attackInValue = attackValue + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACK_ATNV_PARAM].getValue() * 0.1);
-				attackInValue = attackValue + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACK_ATNV_PARAM].getValue());
+				attackInValue = attackValue + inputs[ATTACK_INPUT].getVoltage();
 
 				if (attackInValue < minAdsrTime)
 					attackInValue = minAdsrTime;
@@ -261,7 +261,7 @@ struct Slewer : Module {
 			}
 			
 			//decayKnob = params[DECAY_PARAM].getValue() + (inputs[DECAY_INPUT].getVoltage() * params[DECAY_ATNV_PARAM].getValue() * 0.1);
-			decayKnob = params[DECAY_PARAM].getValue() + (inputs[DECAY_INPUT].getVoltage() * params[DECAY_ATNV_PARAM].getValue());
+			decayKnob = params[DECAY_PARAM].getValue() + inputs[DECAY_INPUT].getVoltage();
 			
 			if (decayKnob < 0.001)
 				decayKnob = 0.001;
@@ -339,19 +339,21 @@ struct Slewer : Module {
 				switch (stage[c]) {
 
 					case STOP_STAGE:
+/*
 						outputs[EOA_OUTPUT].setVoltage(0.f, c);
 						lights[EOA_LIGHT].setBrightness(0.f);
 						outputs[EOD_OUTPUT].setVoltage(0.f, c);
 						lights[EOD_LIGHT].setBrightness(0.f);
+*/
 					break;
 
 					case ATTACK_STAGE:
-
+/*
 						outputs[EOA_OUTPUT].setVoltage(10.f, c);
 						lights[EOA_LIGHT].setBrightness(1.f);
 						outputs[EOD_OUTPUT].setVoltage(0.f, c);
 						lights[EOD_LIGHT].setBrightness(0.f);
-
+*/
 						normalCoeff = stageCoeff * 2.06;
 						normalRange = slewEnd[c] - slewStart[c];
 						normalCoeff2 = stageCoeff * normalRange;
@@ -389,11 +391,12 @@ struct Slewer : Module {
 					break;
 
 					case DECAY_STAGE:
+/*
 						outputs[EOA_OUTPUT].setVoltage(0.f, c);
 						lights[EOA_LIGHT].setBrightness(0.f);
 						outputs[EOD_OUTPUT].setVoltage(10.f, c);
 						lights[EOD_LIGHT].setBrightness(1.f);
-
+*/
 						normalCoeff = stageCoeff_D * 2.06;
 						normalRange = slewStart[c] - slewEnd[c];
 						normalCoeff2 = stageCoeff_D * normalRange;
@@ -479,11 +482,12 @@ struct Slewer : Module {
 				switch (stage[0]) {
 
 					case STOP_STAGE:
+/*
 						outputs[EOA_OUTPUT].setVoltage(0.f);
 						lights[EOA_LIGHT].setBrightness(0.f);
 						outputs[EOD_OUTPUT].setVoltage(0.f);
 						lights[EOD_LIGHT].setBrightness(0.f);
-
+*/
 						stageSample[0] = 1;
 						slewLogCoeff[0] = SLEW_START;
 						slewExpCoeff[0] = 0;
@@ -495,12 +499,12 @@ struct Slewer : Module {
 					break;
 
 					case ATTACK_STAGE:
-
+/*
 						outputs[EOA_OUTPUT].setVoltage(10.f);
 						lights[EOA_LIGHT].setBrightness(1.f);
 						outputs[EOD_OUTPUT].setVoltage(0.f);
 						lights[EOD_LIGHT].setBrightness(0.f);
-
+*/
 						normalCoeff = stageCoeff * 2.06;
 						normalRange = slewEnd[0] - slewStart[0];
 						normalCoeff2 = stageCoeff * normalRange;
@@ -543,11 +547,12 @@ struct Slewer : Module {
 					break;
 
 					case DECAY_STAGE:
+/*
 						outputs[EOA_OUTPUT].setVoltage(0.f);
 						lights[EOA_LIGHT].setBrightness(0.f);
 						outputs[EOD_OUTPUT].setVoltage(10.f);
 						lights[EOD_LIGHT].setBrightness(1.f);
-
+*/
 						normalCoeff = stageCoeff_D * 2.06;
 						normalRange = slewStart[0] - slewEnd[0];
 						normalCoeff2 = stageCoeff_D * normalRange;
@@ -635,15 +640,15 @@ struct Slewer : Module {
 					prevIn[c] = 0;
 				}
 				outputs[SIGNAL_OUTPUT].clearVoltages();
-				outputs[EOA_OUTPUT].clearVoltages();
-				outputs[EOD_OUTPUT].clearVoltages();
+//				outputs[EOA_OUTPUT].clearVoltages();
+//				outputs[EOD_OUTPUT].clearVoltages();
 
 				outputs[SIGNAL_OUTPUT].setChannels(1);
-				outputs[EOA_OUTPUT].setChannels(1);
-				outputs[EOD_OUTPUT].setChannels(1);
+//				outputs[EOA_OUTPUT].setChannels(1);
+//				outputs[EOD_OUTPUT].setChannels(1);
 
-				lights[EOA_LIGHT].setBrightness(0);
-				lights[EOD_LIGHT].setBrightness(0);
+//				lights[EOA_LIGHT].setBrightness(0);
+//				lights[EOD_LIGHT].setBrightness(0);
 			}
 
 		}
@@ -652,10 +657,10 @@ struct Slewer : Module {
 };
 
 /*
-struct SlewerDebugDisplay : TransparentWidget {
-	Slewer *module;
+struct SlewerMiniDebugDisplay : TransparentWidget {
+	SlewerMini *module;
 	int frame = 0;
-	SlewerDebugDisplay() {
+	SlewerMiniDebugDisplay() {
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -679,19 +684,19 @@ struct SlewerDebugDisplay : TransparentWidget {
 };
 */
 
-struct SlewerWidget : ModuleWidget {
-	SlewerWidget(Slewer *module) {
+struct SlewerMiniWidget : ModuleWidget {
+	SlewerMiniWidget(SlewerMini *module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Slewer.svg")));
-
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SlewerMini.svg")));
+/*
 		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
-
+*/
 		/*
 		{
-			SlewerDebugDisplay *display = new SlewerDebugDisplay();
+			SlewerMiniDebugDisplay *display = new SlewerMiniDebugDisplay();
 			display->box.pos = Vec(70, 20);
 			display->box.size = Vec(307, 100);
 			display->module = module;
@@ -699,81 +704,35 @@ struct SlewerWidget : ModuleWidget {
 		}
 		*/
 
-		const float xAttKn = 12.9;
-		const float yAttKn = 20.15;
-
-		const float xAttIn = 7;
-		const float yAttIn = 30.5;
-
-		const float xAttAtn = 18;
-		const float yAttAtn = 30.652;
-
-		const float xDecIn = 7;
-		const float yDecIn = 47.2;
-
-		const float xDecAtn = 18;
-		const float yDecAtn = 47.352;
-
-		const float xDecKn = 12.9;
-		const float yDecKn = 57.65;
-
-		const float xShpKn = 8.85;
-		const float yShpKn = 75.9;
-
-		const float xSym = 19;
-		const float ySym = 75.9;
-
-		const float xShpIn = 7;
-		const float yShpIn = 88.5;
-
-		const float xShpAtn = 18;
-		const float yShpAtn = 88.352;
-
-		const float xEoa = 6.5 - 0.3;
-		const float yEoa = 103.5;
-
-		const float xEoaL = 6.5 + 4;
-		const float yEoaL = 103.5 - 3;
-
-		const float xEod = 18.8 - 0.3;
-		const float yEod = 103.5;
-
-		const float xEodL = 18.8 + 4;
-		const float yEodL = 103.5 - 3;
-
-		const float xIn = 6.5;
-		const float yIn = 117.5;
-
-		const float xOut = 18.8;
+		const float xCenter = 5.08f;
+		const float yAttKn = 15.7;
+		const float yAttIn = 25;
+		const float yDecKn = 38.7;
+		const float yDecIn = 48;
+		const float yShpKn = 64.7;
+		const float yShpIn = 74;
+		const float ySym = 87.5;
+		const float yIn = 102;
 		const float yOut = 117.5;
 
-		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xAttKn, yAttKn)), module, Slewer::ATTACK_PARAM));
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xAttIn, yAttIn)), module, Slewer::ATTACK_INPUT));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xAttAtn, yAttAtn)), module, Slewer::ATTACK_ATNV_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yAttKn)), module, SlewerMini::ATTACK_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yAttIn)), module, SlewerMini::ATTACK_INPUT));
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xDecIn, yDecIn)), module, Slewer::DECAY_INPUT));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xDecAtn, yDecAtn)), module, Slewer::DECAY_ATNV_PARAM));
-		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xDecKn, yDecKn)), module, Slewer::DECAY_PARAM));
-		
-		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xShpKn, yShpKn)), module, Slewer::SHAPE_PARAM));
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xShpIn, yShpIn)), module, Slewer::SHAPE_INPUT));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xShpAtn, yShpAtn)), module, Slewer::SHAPE_ATNV_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yDecKn)), module, SlewerMini::DECAY_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yDecIn)), module, SlewerMini::DECAY_INPUT));
 
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xSym, ySym)), module, Slewer::SYMM_PARAM, Slewer::SYMM_LIGHT));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yShpKn)), module, SlewerMini::SHAPE_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yShpIn)), module, SlewerMini::SHAPE_INPUT));
 
-		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xEoa, yEoa)), module, Slewer::EOA_OUTPUT));
-		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xEod, yEod)), module, Slewer::EOD_OUTPUT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<BlueLight>>>(mm2px(Vec(xCenter, ySym)), module, SlewerMini::SYMM_PARAM, SlewerMini::SYMM_LIGHT));
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xIn, yIn)), module, Slewer::SIGNAL_INPUT));
-		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yOut)), module, Slewer::SIGNAL_OUTPUT));
-
-		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xEoaL, yEoaL)), module, Slewer::EOA_LIGHT));
-		addChild(createLightCentered<SmallLight<YellowLight>>(mm2px(Vec(xEodL, yEodL)), module, Slewer::EOD_LIGHT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yIn)), module, SlewerMini::SIGNAL_INPUT));
+		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut)), module, SlewerMini::SIGNAL_OUTPUT));
 
 	}
 
 	void appendContextMenu(Menu* menu) override {
-		Slewer* module = dynamic_cast<Slewer*>(this->module);
+		SlewerMini* module = dynamic_cast<SlewerMini*>(this->module);
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Duration/Slew knobs", "", &module->slewKnobs));
@@ -781,4 +740,4 @@ struct SlewerWidget : ModuleWidget {
 	}
 };
 
-Model *modelSlewer = createModel<Slewer, SlewerWidget>("Slewer");
+Model *modelSlewerMini = createModel<SlewerMini, SlewerMiniWidget>("SlewerMini");

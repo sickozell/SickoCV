@@ -1513,6 +1513,12 @@ struct DrumPlayerMk2Widget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("Decay knob full clockwise"));
+			menu->addChild(createMenuLabel("disables decay setting"));
+		}));
 	}
 };
 

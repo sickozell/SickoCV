@@ -11,7 +11,7 @@
 #if defined(METAMODULE)
 #include "async_filebrowser.hh"
 #endif
-//#define DR_WAV_IMPLEMENTATION
+#define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
 #include <vector>
 #include "cmath"
@@ -22,7 +22,7 @@
 
 using namespace std;
 
-struct DrumPlayer1 : Module {
+struct DrumPlayerMini : Module {
 
 	#include "shapes.hpp"
 
@@ -146,7 +146,7 @@ struct DrumPlayer1 : Module {
 	const float maxAdsrTime = 10.f;
 	const float minAdsrTime = 0.001f;
 
-	DrumPlayer1() {
+	DrumPlayerMini() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
 		//for (int i = 0; i < 4; i++) {
@@ -780,11 +780,11 @@ struct DrumPlayer1 : Module {
 	}
 };
 
-struct dp1Display : TransparentWidget {
-	DrumPlayer1 *module;
+struct dpDisplay : TransparentWidget {
+	DrumPlayerMini *module;
 	int frame = 0;
 
-	dp1Display() {
+	dpDisplay() {
 
 	}
 
@@ -799,7 +799,7 @@ struct dp1Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayer1 *module = dynamic_cast<DrumPlayer1*>(this->module);
+		DrumPlayerMini *module = dynamic_cast<DrumPlayerMini*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -840,7 +840,7 @@ struct dp1Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayer1 *module = dynamic_cast<DrumPlayer1 *>(this->module);
+		DrumPlayerMini *module = dynamic_cast<DrumPlayerMini *>(this->module);
 		assert(module);
 
 		if (module) {
@@ -884,23 +884,23 @@ struct dp1Display : TransparentWidget {
 };
 
 
-struct DrumPlayer1Widget : ModuleWidget {
-	DrumPlayer1Widget(DrumPlayer1 *module) {
+struct DrumPlayerMiniWidget : ModuleWidget {
+	DrumPlayerMiniWidget(DrumPlayerMini *module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/DrumPlayer1.svg")));
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/DrumPlayerMini.svg")));
 
-		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
-		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		//addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
+		//addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		{
-			dp1Display *display = new dp1Display();
+			dpDisplay *display = new dpDisplay();
 			display->box.pos = Vec(6, 15);
-			display->box.size = Vec(41, 24);
+			display->box.size = Vec(18, 24);
 			display->module = module;
 			addChild(display);
 		}
 
-		const float xStart = 7.62f;
+		const float xCenter = 5.08f;
 		//const float xDelta = 16;
 
 		const float yTrig =	19.5;
@@ -917,28 +917,28 @@ struct DrumPlayer1Widget : ModuleWidget {
 		const float yOut = 117;
 
 		//for (int i = 0; i < 4; i++) {
-			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xStart, 9)), module, DrumPlayer1::SLOT_LIGHT));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xCenter, 9)), module, DrumPlayerMini::SLOT_LIGHT));
 
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart, yTrig)), module, DrumPlayer1::TRIG_INPUT));
-			//addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(9, 31.5)), module, DrumPlayer1::TRIGVOL_PARAM));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yTrig)), module, DrumPlayerMini::TRIG_INPUT));
+			//addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(9, 31.5)), module, DrumPlayerMini::TRIGVOL_PARAM));
 
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart, yAcc)), module, DrumPlayer1::ACC_INPUT));
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStart, yAccVol)), module, DrumPlayer1::ACCVOL_PARAM));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yAcc)), module, DrumPlayerMini::ACC_INPUT));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yAccVol)), module, DrumPlayerMini::ACCVOL_PARAM));
 
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStart, yDecKnob)), module, DrumPlayer1::DECAY_PARAM));
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart, yDecIn)), module, DrumPlayer1::DECAY_INPUT));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yDecKnob)), module, DrumPlayerMini::DECAY_PARAM));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yDecIn)), module, DrumPlayerMini::DECAY_INPUT));
 
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStart, yTune)), module, DrumPlayer1::TUNE_PARAM));
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart, yVoct)), module, DrumPlayer1::VOCT_INPUT));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yTune)), module, DrumPlayerMini::TUNE_PARAM));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yVoct)), module, DrumPlayerMini::VOCT_INPUT));
 
-			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xStart, yChoke)), module, DrumPlayer1::FUNC_PARAM, DrumPlayer1::FUNC_LIGHT));
+			addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xCenter, yChoke)), module, DrumPlayerMini::FUNC_PARAM, DrumPlayerMini::FUNC_LIGHT));
 
-			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xStart, yOut)), module, DrumPlayer1::OUT_OUTPUT));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut)), module, DrumPlayerMini::OUT_OUTPUT));
 		//}
 	}
 
 	void appendContextMenu(Menu *menu) override {
-	   	DrumPlayer1 *module = dynamic_cast<DrumPlayer1*>(this->module);
+	   	DrumPlayerMini *module = dynamic_cast<DrumPlayerMini*>(this->module);
 			assert(module);
 		
 		menu->addChild(new MenuSeparator());
@@ -970,7 +970,7 @@ struct DrumPlayer1Widget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		
 		struct ModeItem : MenuItem {
-			DrumPlayer1* module;
+			DrumPlayerMini* module;
 			int interpolationMode;
 			void onAction(const event::Action& e) override {
 				module->interpolationMode = interpolationMode;
@@ -991,7 +991,13 @@ struct DrumPlayer1Widget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("Decay knob full clockwise"));
+			menu->addChild(createMenuLabel("disables decay setting"));
+		}));
 	}
 };
 
-Model *modelDrumPlayer1 = createModel<DrumPlayer1, DrumPlayer1Widget>("DrumPlayer1");
+Model *modelDrumPlayerMini = createModel<DrumPlayerMini, DrumPlayerMiniWidget>("DrumPlayerMini");

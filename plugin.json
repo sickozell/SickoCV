@@ -14,6 +14,16 @@
   "changelogUrl": "https://github.com/sickozell/SickoCV/blob/main/changelog.md",
   "modules": [
     {
+      "slug": "AdMini",
+      "name": "ad mini",
+      "description": "Ad function generator with VCA",
+      "tags": [
+        "Function generator",
+        "Voltage-controlled amplifier",
+        "Polyphonic"
+      ]
+    },
+    {
       "slug": "Adder8",
       "name": "adder8",
       "description": "8 adder and subtractor",
@@ -201,12 +211,11 @@
       ]
     },
     {
-      "slug": "DrumPlayer1",
-      "name": "drumPlayer1",
-      "description": "Drum Sample Player (dp1)",
+      "slug": "DrumPlayerMini",
+      "name": "drumPlayer mini",
+      "description": "Drum Sample Player (dp)",
       "tags": [
-        "Sampler",
-        "Drum"
+        "Sampler"
       ]
     },
     {
@@ -217,6 +226,27 @@
         "Envelope generator",
         "Voltage-controlled amplifier",
         "Polyphonic"
+      ]
+    },
+    {
+      "slug": "EnverMini",
+      "name": "enver mini",
+      "description": "Envelope generator with VCA",
+      "tags": [
+        "Envelope generator",
+        "Voltage-controlled amplifier",
+        "Polyphonic"
+      ]
+    },
+    {
+      "slug": "EnverMiniX",
+      "name": "enver mini expander",
+      "description": "Expander for enver mini and ad mini",
+      "tags": [
+        "Envelope generator",
+        "Voltage-controlled amplifier",
+        "Polyphonic",
+        "Expander"
       ]
     },
     {
@@ -261,7 +291,7 @@
     {
       "slug": "Modulator",
       "name": "modulator",
-      "description": "triangle/ramp LFOs with sync feature",
+      "description": "triangle/ramp LFOs with sync feature (mod)",
       "tags": [
         "Low-frequency oscillator"
       ]
@@ -269,7 +299,7 @@
     {
       "slug": "Modulator7",
       "name": "modulator7",
-      "description": "7 triangle/ramp LFOs with sync feature",
+      "description": "7 triangle/ramp LFOs with sync feature (mod7)",
       "tags": [
         "Low-frequency oscillator",
         "Polyphonic"
@@ -278,7 +308,7 @@
     {
       "slug": "Modulator7Compact",
       "name": "modulator7 Compact",
-      "description": "7 unipolar triangle LFOs",
+      "description": "7 unipolar triangle LFOs (mod7)",
       "tags": [
         "Low-frequency oscillator"
       ]
@@ -345,6 +375,14 @@
       "slug": "RandLoops",
       "name": "randLoops",
       "description": "random voltage/trigger sequencer inspired by Turing Machine",
+      "tags": [
+        "Sequencer"
+      ]
+    },
+    {
+      "slug": "RandLoopsMini",
+      "name": "randLoops mini",
+      "description": "random voltage/trigger sequencer inspired by Turing Machine (rl)",
       "tags": [
         "Sequencer"
       ]
@@ -482,6 +520,16 @@
     {
       "slug": "Slewer",
       "name": "slewer",
+      "description": "Slew Limiter",
+      "tags": [
+        "Slew limiter",
+        "Low-frequency oscillator",
+        "Polyphonic"
+      ]
+    },
+    {
+      "slug": "SlewerMini",
+      "name": "slewer mini",
       "description": "Slew Limiter",
       "tags": [
         "Slew limiter",

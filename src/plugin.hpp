@@ -3,13 +3,11 @@
 
 using namespace rack;
 
-// Declare the Plugin, defined in plugin.cpp
 extern Plugin* pluginInstance;
 
 #include "Controls.hpp"
 
-// Declare each Model, defined in each module source file
-// extern Model* modelMyModule;
+extern Model* modelAdMini;
 extern Model* modelAdder8;
 extern Model* modelBgates;
 extern Model* modelBlender;
@@ -30,8 +28,10 @@ extern Model* modelDrumPlayer;
 extern Model* modelDrumPlayerMk2;
 extern Model* modelDrumPlayerPlus;
 extern Model* modelDrumPlayerXtra;
-extern Model* modelDrumPlayer1;
+extern Model* modelDrumPlayerMini;
 extern Model* modelEnver;
+extern Model* modelEnverMini;
+extern Model* modelEnverMiniX;
 extern Model* modelHolder;
 extern Model* modelHolderCompact;
 extern Model* modelHolder8;
@@ -47,6 +47,7 @@ extern Model* modelPolyMuter8Plus;
 extern Model* modelPolyMuter16;
 extern Model* modelPolyMuter16Plus;
 extern Model* modelRandLoops;
+extern Model* modelRandLoopsMini;
 extern Model* modelRandLoops8;
 extern Model* modelShifter;
 extern Model* modelSickoAmp;
@@ -63,6 +64,7 @@ extern Model* modelSickoSampler;
 extern Model* modelSickoSampler2;
 extern Model* modelSimpleSeq4;
 extern Model* modelSlewer;
+extern Model* modelSlewerMini;
 extern Model* modelStepSeq;
 extern Model* modelStepSeqPlus;
 extern Model* modelStepSeq8x;
