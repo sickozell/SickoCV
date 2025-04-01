@@ -205,7 +205,7 @@ struct StepSeqPlus : Module {
 		paramQuantities[RST_PARAM]->snapEnabled = true;
 		configInput(RST_INPUT, "Reset");
 
-		configOutput(OUT_OUTPUT, "Output");
+		configOutput(OUT_OUTPUT, "Out");
 
 		configParam(LENGTH_PARAM, 1.f,16.f, 16.f, "Length");
 		paramQuantities[LENGTH_PARAM]->snapEnabled = true;
@@ -312,7 +312,6 @@ struct StepSeqPlus : Module {
 		lights[STEP_LIGHT+15].setBrightness(0);
 
 		setButLight = false;
-		setButLightDelta = 2 / APP->engine->getSampleRate();
 		setButLightValue = 0.f;
 
 		for (int i = 0; i < 16; i++) {
@@ -725,7 +724,7 @@ struct StepSeqPlus : Module {
 			progRst[p] = 1;
 
 			for (int s = 0; s < 16; s++)
-				progSeq[p][s] = 0;
+				progSeq[p][s] = 0.5f;
 		}
 		lastProg = 0;
 	}
@@ -764,6 +763,13 @@ struct StepSeqPlus : Module {
 
 	}
 	
+	void randomizeTrack() {
+		for (int st = 0; st < 16; st++) {
+			wSeq[st] = random::uniform();
+			params[STEP_PARAM+st].setValue(wSeq[st]);
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
 
 		// ----------- AUTO SWITCH
@@ -1037,7 +1043,6 @@ struct StepSeqPlus : Module {
 
 		if (runSetting) {
 
-			//maxSteps = params[LENGTH_PARAM].getValue();
 			maxSteps = wSteps;
 
 			if (inputs[LENGTH_INPUT].isConnected()) {
@@ -1111,8 +1116,7 @@ struct StepSeqPlus : Module {
 						clkValue = 10.f;
 					else if (clkValue < 0.f)
 						clkValue = 0.f;
-
-					
+	
 					if (clkValue != prevClkValue) {
 						
 						currAddr = 1+int(clkValue / 10 * (maxSteps));
@@ -1200,8 +1204,7 @@ struct StepSeqPlusDisplay : TransparentWidget {
 
 				currentDisplay = to_string(module->workingProg);
 
-				//if (!module->pendingUpdate) {
-				if (!module->progChanged) {	// NEW
+				if (!module->progChanged) {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 2)
@@ -1346,6 +1349,9 @@ struct StepSeqPlusWidget : ModuleWidget {
 
 	void appendContextMenu(Menu* menu) override {
 		StepSeqPlus* module = dynamic_cast<StepSeqPlus*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Randomize Steps", "", [=]() {module->randomizeTrack();}));
 
 		menu->addChild(new MenuSeparator());
 

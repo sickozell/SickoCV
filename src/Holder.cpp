@@ -89,7 +89,7 @@ struct Holder : Module {
 		configInput(OFFSET_INPUT, "Offset");
 
 		configOutput(OUT_OUTPUT, "Signal");
-		configOutput(TRIG_OUTPUT, "Gate");
+		configOutput(TRIG_OUTPUT, "Trig");
 	}
 
 	void onReset(const ResetEvent &e) override {

@@ -2816,7 +2816,7 @@ struct DrumPlayerXtraWidget : ModuleWidget {
 			if (module->rootFound) {
 				menu->addChild(createMenuLabel(module->userFolder));
 
-				menu->addChild(createSubmenuItem("Randomize", "", [=](Menu* menu) {
+				menu->addChild(createSubmenuItem("Randomize (exper.)", "", [=](Menu* menu) {
 					menu->addChild(createMenuItem("All slots", "", [=]() {module->randomizeAllSlots();}));
 					menu->addChild(createMenuItem("Slot 1", "", [=]() {module->randomizeSlot(0);}));
 					menu->addChild(createMenuItem("Slot 2", "", [=]() {module->randomizeSlot(1);}));

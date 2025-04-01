@@ -22,17 +22,22 @@
 
 using namespace std;
 
-struct DrumPlayer : Module {
+struct DrumPlayerMk2 : Module {
+
+	#include "shapes.hpp"
+
 	enum ParamIds {
-		ENUMS(TRIGVOL_PARAM,4),
 		ENUMS(ACCVOL_PARAM,4),
-		ENUMS(SPEED_PARAM,4),
-		ENUMS(CHOKE_SWITCH,3),
+		ENUMS(DECAY_PARAM,4),
+		ENUMS(TUNE_PARAM,4),
+		ENUMS(FUNC_PARAM,4),
 		NUM_PARAMS 
 	};
 	enum InputIds {
 		ENUMS(TRIG_INPUT,4),
 		ENUMS(ACC_INPUT,4),
+		ENUMS(DECAY_INPUT,4),
+		ENUMS(VOCT_INPUT,4),
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -41,6 +46,7 @@ struct DrumPlayer : Module {
 	};
 	enum LightIds {
 		ENUMS(SLOT_LIGHT,4),
+		ENUMS(FUNC_LIGHT,4),
 		NUM_LIGHTS
 	};
   
@@ -59,7 +65,16 @@ struct DrumPlayer : Module {
 
 	double samplePos[4] = {0,0,0,0};
 	double sampleCoeff[4];
-	double currentSpeed = 0;
+	double currentSpeed[4] = {0,0,0,0};
+
+	double tune[4] = {0,0,0,0};
+	double prevTune[4] = {-1,-1,-1,-1};
+
+	double voct[4] = {0,0,0,0};
+	double prevVoct[4] = {-1,-1,-1,-1};
+	double speedVoct[4] = {0,0,0,0};
+
+	double distancePos[4] = {0,0,0,0};
 
 	double prevSampleWeight [4] = {0,0,0,0};
 	double currSampleWeight [4] = {0,0,0,0};
@@ -100,41 +115,56 @@ struct DrumPlayer : Module {
 
 	double a0, a1, a2, b1, b2, z1, z2;
 
-	DrumPlayer() {
+	int functionButton = 0;
+	bool reversePlay[4] = {false, false, false, false};
+
+	float env[4] = {1,1,1,1};
+	float deltaValue[4] = {0,0,0,0};
+
+	float sr = float(APP->engine->getSampleRate());
+	float srCoeff = 1 / sr;
+
+	float decayValue[4];
+	float decayInValue[4];
+	float decayKnob[4] = {0.f, 0.f, 0.f, 0.f};
+	float prevDecayKnob[4] = {-1.f, -1.f, -1.f, -1.f};
+
+	float stageLevel[4] = {-1.f, -1.f, -1.f, -1.f};
+	float stageCoeff[4] = {0.f, 0.f, 0.f, 0.f};
+
+	bool dontDecay[4] = {true, true, true, true};
+
+	bool logDecay = false;
+
+	static constexpr float minStageTime = 1.f;  // in milliseconds
+	static constexpr float maxStageTime = 10000.f;  // in milliseconds
+	
+	static constexpr float minStageTimeSec = 0.001f;  // in seconds
+	static constexpr float maxStageTimeSec = 10.f;  // in seconds
+	
+	const float maxAdsrTime = 10.f;
+	const float minAdsrTime = 0.001f;
+
+	DrumPlayerMk2() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configInput(TRIG_INPUT,"Trig #1");
-		configInput(TRIG_INPUT+1,"Trig #2");
-		configInput(TRIG_INPUT+2,"Trig #3");
-		configInput(TRIG_INPUT+3,"Trig #4");
 
-		configParam(TRIGVOL_PARAM, 0.f, 2.0f, 1.0f, "Standard Level #1", "%", 0, 100);
-		configParam(TRIGVOL_PARAM+1, 0.f, 2.0f, 1.0f, "Standard Level #2", "%", 0, 100);
-		configParam(TRIGVOL_PARAM+2, 0.f, 2.0f, 1.0f, "Standard Level #3", "%", 0, 100);
-		configParam(TRIGVOL_PARAM+3, 0.f, 2.0f, 1.0f, "Standard Level #4", "%", 0, 100);
-
-		configInput(ACC_INPUT,"Accent #1");
-		configInput(ACC_INPUT+1,"Accent #2");
-		configInput(ACC_INPUT+2,"Accent #3");
-		configInput(ACC_INPUT+3,"Accent #4");
-
-		configParam(ACCVOL_PARAM, 0.f, 2.0f, 1.0f, "Accent Level #1", "%", 0, 100);
-		configParam(ACCVOL_PARAM+1, 0.f, 2.0f, 1.0f, "Accent Level #2", "%", 0, 100);
-		configParam(ACCVOL_PARAM+2, 0.f, 2.0f, 1.0f, "Accent Level #3", "%", 0, 100);
-		configParam(ACCVOL_PARAM+3, 0.f, 2.0f, 1.0f, "Accent Level #4", "%", 0, 100);
-
-		configParam(SPEED_PARAM, 0.01f, 2.0f, 1.0f, "Speed #1", "x", 0, 1);
-		configParam(SPEED_PARAM+1, 0.01f, 2.0f, 1.0f, "Speed #2", "x", 0, 1);
-		configParam(SPEED_PARAM+2, 0.01f, 2.0f, 1.0f, "Speed #3", "x", 0, 1);
-		configParam(SPEED_PARAM+3, 0.01f, 2.0f, 1.0f, "Speed #4", "x", 0, 1);
-
-		configSwitch(CHOKE_SWITCH, 0.f, 1.f, 0.f, "Choke #1", {"Off", "On"});
-		configSwitch(CHOKE_SWITCH+1, 0.f, 1.f, 0.f, "Choke #2", {"Off", "On"});
-		configSwitch(CHOKE_SWITCH+2, 0.f, 1.f, 0.f, "Choke #3", {"Off", "On"});
-
-		configOutput(OUT_OUTPUT,"out #1");
-		configOutput(OUT_OUTPUT+1,"out #2");
-		configOutput(OUT_OUTPUT+2,"out #3");
-		configOutput(OUT_OUTPUT+3,"out #4");
+		for (int i = 0; i < 4; i++) {
+			configInput(TRIG_INPUT+i,("Trig #"+to_string(i+1)).c_str());
+			//configParam(TRIGVOL_PARAM+i, 0.f, 2.0f, 1.0f, ("Standard Level #"+to_string(i+1)).c_str(), "%", 0, 100);
+			configInput(ACC_INPUT+i,("Accent #"+to_string(i+1)).c_str());
+			configParam(ACCVOL_PARAM+i, 1.f, 2.0f, 1.0f, ("Accent Level #"+to_string(i+1)).c_str(), "%", 0, 100);
+			//configParam(DECAY_PARAM+i, 0.01f, 2.0f, 2.0f, ("Decay #"+to_string(i+1)).c_str(), "s", 0, 1);
+			configParam(DECAY_PARAM+i, 0.f, 1.f, 1.f, ("Decay #"+to_string(i+1)).c_str(), " ms", maxStageTime / minStageTime, minStageTime);
+			configInput(DECAY_INPUT+i,("Decay #"+to_string(i+1)).c_str());
+			//configParam(TUNE_PARAM+i, 0.01f, 2.0f, 1.0f, ("Tune #"+to_string(i+1)).c_str(), "x", 0, 1);
+			configParam(TUNE_PARAM+i, -2.f, 2.0f, 0.f, ("Tune #"+to_string(i+1)).c_str(), " semitones", 0, 12);
+			configInput(VOCT_INPUT+i,("V/Oct #"+to_string(i+1)).c_str());
+			if (i == 0 || i == 2)
+				configSwitch(FUNC_PARAM+i, 0.f, 1.f, 0.f, ("Choke #"+to_string(i+1)).c_str(), {"Off", "On"});
+			else
+				configSwitch(FUNC_PARAM+i, 0.f, 1.f, 0.f, ("Reverse #"+to_string(i+1)).c_str(), {"Off", "On"});
+			configOutput(OUT_OUTPUT+i,("Out #"+to_string(i+1)).c_str());
+		}
 
 		playBuffer[0][0].resize(0);
 		playBuffer[1][0].resize(0);
@@ -167,6 +197,9 @@ struct DrumPlayer : Module {
 				sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());
 		}
 		fadeDecrement = 1000 / (APP->engine->getSampleRate());
+
+		sr = float(APP->engine->getSampleRate());
+		srCoeff = 1 / sr;
 	}
 
 	void onAdd(const AddEvent& e) override {
@@ -195,6 +228,7 @@ struct DrumPlayer : Module {
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "logDecay", json_boolean(logDecay));
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
 		json_object_set_new(rootJ, "OutsMode", json_integer(outsMode));
@@ -208,6 +242,9 @@ struct DrumPlayer : Module {
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+		json_t* logDecayJ = json_object_get(rootJ, "logDecay");
+		if (logDecayJ)
+			logDecay = json_boolean_value(logDecayJ);
 		json_t* interpolationJ = json_object_get(rootJ, "Interpolation");
 		if (interpolationJ)
 			interpolationMode = json_integer_value(interpolationJ);
@@ -504,7 +541,7 @@ struct DrumPlayer : Module {
 			vector<float>().swap(playBuffer[slot][1]);
 
 			for (unsigned int i = 0; i < tsc; i = i + c) {
-				playBuffer[slot][0].push_back(pSampleData[i]);
+				playBuffer[slot][0].push_back(pSampleData[i] * 5);
 				playBuffer[slot][0].push_back(0);
 			}
 			totalSampleC[slot] = playBuffer[slot][0].size();
@@ -555,8 +592,8 @@ struct DrumPlayer : Module {
 		std::vector<float> data;
 
 		for (unsigned int i = 0; i <= playBuffer[slot][0].size(); i = i + 2)
-			//data.push_back(playBuffer[slot][0][i] / 5);
-			data.push_back(playBuffer[slot][0][i]);
+			data.push_back(playBuffer[slot][0][i] / 5);
+			//data.push_back(playBuffer[slot][0][i]);
 
 		drwav_data_format format;
 		format.container = drwav_container_riff;
@@ -599,9 +636,17 @@ struct DrumPlayer : Module {
 		totalSampleC[slot] = 0;
 	}
 
+	static float convertCVToSec(float cv) {		
+		return minStageTimeSec * std::pow(maxStageTimeSec / minStageTimeSec, cv);
+	}
+
 	void process(const ProcessArgs &args) override {
 		summedOutput = 0;
 		for (int slot = 0; slot < 4; slot++){
+
+			functionButton = params[FUNC_PARAM+slot].getValue();
+
+			lights[FUNC_LIGHT+slot].setBrightness(functionButton);
 
 			trigValue[slot] = inputs[TRIG_INPUT+slot].getVoltage();
 
@@ -621,27 +666,40 @@ struct DrumPlayer : Module {
 				if (inputs[ACC_INPUT+slot].getVoltage() > 1)
 					level[slot] = params[ACCVOL_PARAM+slot].getValue();
 				else
-					level[slot] = params[TRIGVOL_PARAM+slot].getValue();
+					level[slot] = 1;
 				
-				if (slot < 3 && params[CHOKE_SWITCH+slot].getValue()) {
-					choking[slot+1] = true;
-					chokeValue[slot+1] = 1.f;
+				if (functionButton) {
+					if (slot == 0 || slot == 2) {
+						choking[slot+1] = true;
+						chokeValue[slot+1] = 1.f;
+					} else {
+						reversePlay[slot] = true;
+						samplePos[slot] = totalSampleC[slot];
+						prevSamplePos[slot] = totalSampleC[slot];
+					}
+				} else {
+					reversePlay[slot] = false;
 				}
+
+				stageLevel[slot] = 1;
+
 			}
 			prevTrigValue[slot] = trigValue[slot];
 			currentOutput = 0;
 
-			if (fileLoaded[slot] && play[slot] && floor(samplePos[slot]) < totalSampleC[slot]) {
+			if (fileLoaded[slot] && play[slot] && 
+				((!reversePlay[slot] && floor(samplePos[slot]) < totalSampleC[slot]) ||
+				 (reversePlay[slot] && floor(samplePos[slot]) >= 0))) {
 				switch (interpolationMode) {
 					case NO_INTERP:
-						currentOutput = 5 * level[slot] * playBuffer[slot][antiAlias][floor(samplePos[slot])];
+						currentOutput = level[slot] * playBuffer[slot][antiAlias][floor(samplePos[slot])];
 					break;
 
 					case LINEAR1_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[slot] * float(
+							currentOutput = level[slot] * float(
 												(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
 												(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
 											);
@@ -650,9 +708,9 @@ struct DrumPlayer : Module {
 
 					case LINEAR2_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[slot] * float(
+							currentOutput = level[slot] * float(
 												(
 													(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])] * (1-prevSampleWeight[slot])) +
 													(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])+1] * prevSampleWeight[slot]) +
@@ -665,7 +723,7 @@ struct DrumPlayer : Module {
 
 					case HERMITE_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
 							if (floor(samplePos[slot]) > 1 && floor(samplePos[slot]) < totalSamples[slot] - 1) {
 								/*
@@ -683,10 +741,41 @@ struct DrumPlayer : Module {
 									(((((a3 * currSampleWeight[slot]) + a2) * currSampleWeight[slot]) + a1) * currSampleWeight[slot]) + playBuffer[slot][antiAlias][floor(samplePos[slot])]
 								);
 							} else {
-								currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+								currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 							}
 						}
 					break;
+				}
+
+				decayKnob[slot] = params[DECAY_PARAM+slot].getValue();
+				if (decayKnob[slot] != prevDecayKnob[slot]) {
+					decayValue[slot] = convertCVToSec(decayKnob[slot]);
+					if (decayKnob[slot] != 1)
+						dontDecay[slot] = false;
+					else
+						dontDecay[slot] = true;
+				}
+				prevDecayKnob[slot] = decayKnob[slot];
+
+				if (!inputs[DECAY_INPUT+slot].isConnected()) {
+					stageCoeff[slot] = srCoeff / decayValue[slot];
+				} else {
+
+					decayInValue[slot] = decayValue[slot] + (inputs[DECAY_INPUT+slot].getVoltage());
+					if (decayInValue[slot] < minAdsrTime)
+						decayInValue[slot] = minAdsrTime;
+					stageCoeff[slot] = srCoeff / decayInValue[slot];
+				}
+
+				if (!dontDecay[slot]) {
+					stageLevel[slot] -= stageCoeff[slot];
+
+					if (stageLevel[slot] < 0) {
+						stageLevel[slot] = 0;
+						play[slot] = false;
+					}
+
+					currentOutput *= expTable[logDecay][int(expTableCoeff * stageLevel[slot])];
 				}
 
 				if (slot > 0 && choking[slot]) {
@@ -702,8 +791,31 @@ struct DrumPlayer : Module {
 
 				prevSamplePos[slot] = samplePos[slot];
 
-				currentSpeed = double(params[SPEED_PARAM+slot].getValue());
-				samplePos[slot] += sampleCoeff[slot]*currentSpeed;
+				tune[slot] = double(params[TUNE_PARAM+slot].getValue());
+				if (tune[slot] != prevTune[slot]) {
+					prevTune[slot] = tune[slot];
+					currentSpeed[slot] = double(powf(2,tune[slot]));
+					if (currentSpeed[slot] > 4)
+						currentSpeed[slot] = 4;
+					else if (currentSpeed[slot] < 0.25)
+						currentSpeed[slot] = 0.25;
+				}
+
+				if (inputs[VOCT_INPUT+slot].isConnected()) {
+					voct[slot] = inputs[VOCT_INPUT+slot].getVoltage();
+					if (voct[slot] != prevVoct[slot]) {
+						speedVoct[slot] = pow(2,voct[slot]);
+						prevVoct[slot] = voct[slot];
+					}
+					distancePos[slot] = currentSpeed[slot] * sampleCoeff[slot] * speedVoct[slot];
+				} else
+					distancePos[slot] = currentSpeed[slot] * sampleCoeff[slot];
+
+
+				if (!reversePlay[slot])
+					samplePos[slot] += distancePos[slot];
+				else
+					samplePos[slot] -= distancePos[slot];
 
 				if (interpolationMode > NO_INTERP) {
 					prevSampleWeight[slot] = currSampleWeight[slot];
@@ -713,10 +825,17 @@ struct DrumPlayer : Module {
 				if (fading[slot]) {
 					if (fadingValue[slot] > 0) {
 						fadingValue[slot] -= fadeDecrement;
-						currentOutput += (playBuffer[slot][antiAlias][floor(fadedPosition[slot])] * fadingValue[slot] * level[slot] * 5);
-						fadedPosition[slot] += sampleCoeff[slot]*currentSpeed;
-						if (fadedPosition[slot] > totalSamples[slot])
-							fading[slot] = false;
+						currentOutput += (playBuffer[slot][antiAlias][floor(fadedPosition[slot])] * fadingValue[slot] * level[slot]);
+
+						if (!reversePlay[slot]) {
+							fadedPosition[slot] += distancePos[slot];
+							if (fadedPosition[slot] > totalSamples[slot])
+								fading[slot] = false;
+						} else {
+							fadedPosition[slot] -= distancePos[slot];
+							if (fadedPosition[slot] <= 0)
+								fading[slot] = false;
+						}
 					} else
 						fading[slot] = false;
 				}
@@ -757,11 +876,11 @@ struct DrumPlayer : Module {
 	}
 };
 
-struct dpSlot1Display : TransparentWidget {
-	DrumPlayer *module;
+struct dpMk2Slot1Display : TransparentWidget {
+	DrumPlayerMk2 *module;
 	int frame = 0;
 
-	dpSlot1Display() {
+	dpMk2Slot1Display() {
 
 	}
 
@@ -776,7 +895,7 @@ struct dpSlot1Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayer *module = dynamic_cast<DrumPlayer*>(this->module);
+		DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -817,7 +936,7 @@ struct dpSlot1Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayer *module = dynamic_cast<DrumPlayer *>(this->module);
+		DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2 *>(this->module);
 		assert(module);
 
 		if (module) {
@@ -871,11 +990,11 @@ struct dpSlot1Display : TransparentWidget {
 	}
 };
 
-struct dpSlot2Display : TransparentWidget {
-	DrumPlayer *module;
+struct dpMk2Slot2Display : TransparentWidget {
+	DrumPlayerMk2 *module;
 	int frame = 0;
 
-	dpSlot2Display() {
+	dpMk2Slot2Display() {
 
 	}
 
@@ -890,7 +1009,7 @@ struct dpSlot2Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayer *module = dynamic_cast<DrumPlayer*>(this->module);
+		DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -931,7 +1050,7 @@ struct dpSlot2Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayer *module = dynamic_cast<DrumPlayer *>(this->module);
+		DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2 *>(this->module);
 		assert(module);
 
 		if (module) {
@@ -985,11 +1104,11 @@ struct dpSlot2Display : TransparentWidget {
 	}
 };
 
-struct dpSlot3Display : TransparentWidget {
-	DrumPlayer *module;
+struct dpMk2Slot3Display : TransparentWidget {
+	DrumPlayerMk2 *module;
 	int frame = 0;
 
-	dpSlot3Display() {
+	dpMk2Slot3Display() {
 
 	}
 
@@ -1004,7 +1123,7 @@ struct dpSlot3Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayer *module = dynamic_cast<DrumPlayer*>(this->module);
+		DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -1045,7 +1164,7 @@ struct dpSlot3Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayer *module = dynamic_cast<DrumPlayer *>(this->module);
+		DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2 *>(this->module);
 		assert(module);
 
 		if (module) {
@@ -1099,11 +1218,11 @@ struct dpSlot3Display : TransparentWidget {
 	}
 };
 
-struct dpSlot4Display : TransparentWidget {
-	DrumPlayer *module;
+struct dpMk2Slot4Display : TransparentWidget {
+	DrumPlayerMk2 *module;
 	int frame = 0;
 
-	dpSlot4Display() {
+	dpMk2Slot4Display() {
 
 	}
 
@@ -1118,7 +1237,7 @@ struct dpSlot4Display : TransparentWidget {
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
-		DrumPlayer *module = dynamic_cast<DrumPlayer*>(this->module);
+		DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2*>(this->module);
 			assert(module);
 		std::string currentDir = path;
 		int tempIndex = 1;
@@ -1159,7 +1278,7 @@ struct dpSlot4Display : TransparentWidget {
 	}
 
 	void createContextMenu() {
-		DrumPlayer *module = dynamic_cast<DrumPlayer *>(this->module);
+		DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2 *>(this->module);
 		assert(module);
 
 		if (module) {
@@ -1214,20 +1333,18 @@ struct dpSlot4Display : TransparentWidget {
 };
 
 
-struct DrumPlayerWidget : ModuleWidget {
-	DrumPlayerWidget(DrumPlayer *module) {
+struct DrumPlayerMk2Widget : ModuleWidget {
+	DrumPlayerMk2Widget(DrumPlayerMk2 *module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/DrumPlayer.svg")));
+		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/DrumPlayerMk2.svg")));
 
 		addChild(createWidget<SickoScrewBlack1>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
-		const float xDelta = 16;
-
 		{
-			dpSlot1Display *display = new dpSlot1Display();
+			dpMk2Slot1Display *display = new dpMk2Slot1Display();
 			display->box.pos = Vec(6, 15);
 			display->box.size = Vec(41, 24);
 			display->module = module;
@@ -1235,7 +1352,7 @@ struct DrumPlayerWidget : ModuleWidget {
 		}
 
 		{
-			dpSlot2Display *display = new dpSlot2Display();
+			dpMk2Slot2Display *display = new dpMk2Slot2Display();
 			display->box.pos = Vec(54, 15);
 			display->box.size = Vec(41, 24);
 			display->module = module;
@@ -1243,7 +1360,7 @@ struct DrumPlayerWidget : ModuleWidget {
 		}
 
 		{
-			dpSlot3Display *display = new dpSlot3Display();
+			dpMk2Slot3Display *display = new dpMk2Slot3Display();
 			display->box.pos = Vec(101, 15);
 			display->box.size = Vec(41, 24);
 			display->module = module;
@@ -1251,35 +1368,59 @@ struct DrumPlayerWidget : ModuleWidget {
 		}
 
 		{
-			dpSlot4Display *display = new dpSlot4Display();
+			dpMk2Slot4Display *display = new dpMk2Slot4Display();
 			display->box.pos = Vec(148, 15);
 			display->box.size = Vec(41, 24);
 			display->module = module;
 			addChild(display);
 		}
 
+		const float xStart = 9;
+		const float xDelta = 16;
+
+		const float yTrig =	19.5;
+		const float yAcc = 33.7;
+		const float yAccVol = 42.9;
+
+		const float yDecKnob = 57.4;
+		const float yDecIn = 66.2;
+
+		const float yTune = 81.5;
+		const float yVoct = 89.7;
+
+		const float yChoke = 103.5;
+		const float yOut = 117;
+
 		for (int i = 0; i < 4; i++) {
-			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(9+(xDelta*i), 9)), module, DrumPlayer::SLOT_LIGHT+i));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(xStart+(xDelta*i), 9)), module, DrumPlayerMk2::SLOT_LIGHT+i));
 
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(9+(xDelta*i), 20.2)), module, DrumPlayer::TRIG_INPUT+i));
-			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(9+(xDelta*i), 31.5)), module, DrumPlayer::TRIGVOL_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart+(xDelta*i), yTrig)), module, DrumPlayerMk2::TRIG_INPUT+i));
+			//addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(9+(xDelta*i), 31.5)), module, DrumPlayerMk2::TRIGVOL_PARAM+i));
 
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(9+(xDelta*i), 49.7)), module, DrumPlayer::ACC_INPUT+i));
-			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(9+(xDelta*i), 61)), module, DrumPlayer::ACCVOL_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart+(xDelta*i), yAcc)), module, DrumPlayerMk2::ACC_INPUT+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStart+(xDelta*i), yAccVol)), module, DrumPlayerMk2::ACCVOL_PARAM+i));
 
-			addParam(createParamCentered<SickoKnob>(mm2px(Vec(9+(xDelta*i), 80.5)), module, DrumPlayer::SPEED_PARAM+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStart+(xDelta*i), yDecKnob)), module, DrumPlayerMk2::DECAY_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart+(xDelta*i), yDecIn)), module, DrumPlayerMk2::DECAY_INPUT+i));
 
-			if (i<3)
-				addParam(createParamCentered<CKSS>(mm2px(Vec(9+(xDelta*i), 98.4)), module, DrumPlayer::CHOKE_SWITCH+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStart+(xDelta*i), yTune)), module, DrumPlayerMk2::TUNE_PARAM+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart+(xDelta*i), yVoct)), module, DrumPlayerMk2::VOCT_INPUT+i));
+			if (i == 0 || i == 2)
+				//addParam(createParamCentered<CKSS>(mm2px(Vec(9+(xDelta*i), 98.4)), module, DrumPlayerMk2::FUNC_PARAM+i));
+				addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xStart+(xDelta*i), yChoke)), module, DrumPlayerMk2::FUNC_PARAM+i, DrumPlayerMk2::FUNC_LIGHT+i));
+			else
+				addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<GreenLight>>>(mm2px(Vec(xStart+(xDelta*i), yChoke)), module, DrumPlayerMk2::FUNC_PARAM+i, DrumPlayerMk2::FUNC_LIGHT+i));
 
-			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(9+(xDelta*i), 117)), module, DrumPlayer::OUT_OUTPUT+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xStart+(xDelta*i), yOut)), module, DrumPlayerMk2::OUT_OUTPUT+i));
 		}
 	}
 
 	void appendContextMenu(Menu *menu) override {
-	   	DrumPlayer *module = dynamic_cast<DrumPlayer*>(this->module);
+	   	DrumPlayerMk2 *module = dynamic_cast<DrumPlayerMk2*>(this->module);
 			assert(module);
 		
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Logarithmic Decay", "", &module->logDecay));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Slots"));
 
@@ -1331,7 +1472,7 @@ struct DrumPlayerWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		
 		struct ModeItem : MenuItem {
-			DrumPlayer* module;
+			DrumPlayerMk2* module;
 			int interpolationMode;
 			void onAction(const event::Action& e) override {
 				module->interpolationMode = interpolationMode;
@@ -1353,7 +1494,7 @@ struct DrumPlayerWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 
 		struct OutsItem : MenuItem {
-			DrumPlayer* module;
+			DrumPlayerMk2* module;
 			int outsMode;
 			void onAction(const event::Action& e) override {
 				module->outsMode = outsMode;
@@ -1372,7 +1513,13 @@ struct DrumPlayerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
+			menu->addChild(createMenuLabel("Decay knob full clockwise"));
+			menu->addChild(createMenuLabel("disables decay setting"));
+		}));
 	}
 };
 
-Model *modelDrumPlayer = createModel<DrumPlayer, DrumPlayerWidget>("DrumPlayer");
+Model *modelDrumPlayerMk2 = createModel<DrumPlayerMk2, DrumPlayerMk2Widget>("DrumPlayerMk2");

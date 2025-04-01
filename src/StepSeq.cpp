@@ -283,6 +283,11 @@ struct StepSeq : Module {
 		params[LENGTH_PARAM].setValue(stepSeq_cbSteps);
 		params[RST_PARAM].setValue(stepSeq_cbRst);
 	}
+
+	void randomizeTrack() {
+		for (int st = 0; st < 16; st++)
+			params[STEP_PARAM+st].setValue(random::uniform());
+	}
 	
 	
 	void process(const ProcessArgs& args) override {
@@ -569,6 +574,9 @@ struct StepSeqWidget : ModuleWidget {
 
 	void appendContextMenu(Menu* menu) override {
 		StepSeq* module = dynamic_cast<StepSeq*>(this->module);
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("Randomize Steps", "", [=]() {module->randomizeTrack();}));
 
 		menu->addChild(new MenuSeparator());
 
