@@ -38,8 +38,8 @@ VCV Rack plugin modules
 - [clocker / clocker2](#clocker--clocker2)
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
-- [drumPlayer / drumPlayer+ / drumPlayerXtra](#drumplayer--drumplayer--drumplayerxtra)
-- [enver](#enver)
+- [drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini](#drumplayer--drumplayer--drumplayerxtra--drumplayer-mini)
+- [enver / enver mini](#enver--enver-mini)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [keySampler](#keysampler)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
@@ -418,10 +418,10 @@ Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to para
 
 [back to top](#table-of-contents)
 
-## drumPlayer / drumPlayer+ / drumPlayerXtra
+## drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini
 ### 4 channel Drum Sample Player with accent and choke functionality
 
-![drumplayer](https://github.com/sickozell/SickoCV/assets/80784296/f7691957-dd29-48f3-b26d-7f280feb806b)
+![drumplayer](https://github.com/user-attachments/assets/e6e61c69-6c20-4750-8bc5-927d6ed4fe08)
 
 #### INSTRUCTIONS  
 Load wav samples in the slots using general or slot right-click menu.  
@@ -497,10 +497,10 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 
 [back to top](#table-of-contents)
 
-## enver
+## enver / enver mini
 ### Envelope generator with stereo VCA
 
-![enver](https://github.com/sickozell/SickoCV/assets/80784296/4e3a4dde-8415-4cc9-8904-074e93179546)
+![enver](https://github.com/user-attachments/assets/1f5d8321-b410-47b4-861e-ac47010a458b)
 
 #### - INSTRUCTIONS
 the enver moodule operates with three different modes selecetd by the mode switch:
