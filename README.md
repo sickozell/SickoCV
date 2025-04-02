@@ -1,4 +1,4 @@
-# SickoCV v2.7.2-beta5
+# SickoCV v2.7.3-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,18 +18,9 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog** 
-- added stepSeq8x module
-- added drumPlayerMk2 module
-- added drumPlayer mini module
-- added ad mini module
-- added enver mini module
-- added enver mini expander module
-- added randLoops mini module
-- added slewer mini module
-- trigSeq8x trigSeq trigSeq+ stepSeq stepSeq+: added "randomize steps" menu option
-- slewer: fixed a bug on attack/decay CV inputs
+-
 
-# SickoCV v2.7.2
+# SickoCV v2.7.3
 VCV Rack plugin modules
 
 ![SickoCV modules 2 7 2](https://github.com/user-attachments/assets/c8dc0049-1a35-45aa-854e-7a71c2b76cef)
