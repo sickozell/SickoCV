@@ -4,6 +4,8 @@ struct SwitcherSt : Module {
 	enum ParamId {
 		MODE_SWITCH,
 		FADE_PARAM,
+		TRIG_PARAM,
+		RST_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -24,14 +26,16 @@ struct SwitcherSt : Module {
 		IN2_LIGHT,
 		OUT1_LIGHT,
 		OUT2_LIGHT,
+		TRIG_LIGHT,
+		RST_LIGHT,
 		LIGHTS_LEN
 	};
 
 	bool initStart = false;
 	int mode = 1;
 	int prevMode = 0;
-	bool trigConnection = false;
-	bool prevTrigConnection = false;
+	//bool trigConnection = false;
+	//bool prevTrigConnection = false;
 	int connection = 0;
 	int prevConnection = -1;
 	bool connectionChange = true;
@@ -66,7 +70,9 @@ struct SwitcherSt : Module {
 		//configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", "ms", maxStageTime / minStageTime, minStageTime);
 		configParam(FADE_PARAM, 0.f, 1.f, 0.f, "Fade Time", "ms", 10000.f, 1.f);
 		configInput(TRIG_INPUT, "Trig/Gate");
+		configSwitch(TRIG_PARAM, 0.f, 1.f, 0.f, "Trig/Gate", {"OFF", "ON"});
 		configInput(RST_INPUT, "Reset");
+		configSwitch(RST_PARAM, 0.f, 1.f, 0.f, "Reset", {"OFF", "ON"});
 		configInput(IN1_INPUT, "IN 1 Left");
 		configInput(IN1_INPUT+1, "IN 1 Right");
 		configInput(IN2_INPUT, "IN 2 Left");
@@ -82,8 +88,8 @@ struct SwitcherSt : Module {
 		initStart = false;
 		mode = 1;
 		prevMode = 0;
-		trigConnection = false;
-		prevTrigConnection = false;
+		//trigConnection = false;
+		//prevTrigConnection = false;
 		connection = 0;
 		prevConnection = -1;
 		connectionChange = true;
@@ -127,7 +133,32 @@ struct SwitcherSt : Module {
 		return minStageTime * std::pow(maxStageTime / minStageTime, cv) / 1000;
 	}*/
 
+	void inline checkReset() {
+
+		rst = inputs[RST_INPUT].getVoltage() + params[RST_PARAM].getValue();
+		lights[RST_LIGHT].setBrightness(rst);
+
+		if (rst >= 1 && prevRst < 1) {
+			if (currentSwitch) {
+				currentSwitch = 0;
+				connectionChange = true;
+				if (fadeValue > noEnvTime) {
+					if (fading) {
+						startFade = 1-lastFade;
+					} else {
+						fading = true;
+						startFade = 0;
+					}
+					currentFadeSample = 0;
+				}
+			}
+		}
+		prevRst = rst; 
+		
+	}
+
 	void process(const ProcessArgs& args) override {
+		/*
 		trigConnection = inputs[TRIG_INPUT].isConnected();
 		if (!trigConnection) {
 			if (prevTrigConnection) {
@@ -148,7 +179,7 @@ struct SwitcherSt : Module {
 				prevConnection = -1;
 			}
 		} else {
-
+		*/
 			connection = 0;
 			if (inputs[IN1_INPUT].isConnected())
 				connection = 1;
@@ -186,7 +217,10 @@ struct SwitcherSt : Module {
 				prevMode = mode;
 			}
 
-			trigValue = inputs[TRIG_INPUT].getVoltage();
+			trigValue = params[TRIG_PARAM].getValue();
+			lights[TRIG_LIGHT].setBrightness(trigValue);
+
+			trigValue += inputs[TRIG_INPUT].getVoltage();
 			
 			switch (mode) {
 				// ************************************** GATE MODE **********
@@ -246,25 +280,8 @@ struct SwitcherSt : Module {
 
 			switch (connection) {
 				case 4: 										// OUT1 = 4
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -336,25 +353,8 @@ struct SwitcherSt : Module {
 				break;
 				
 				case 8:											// OUT2 = 8
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -426,25 +426,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 12: 										// OUT1 + OUT2 = 12
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -536,25 +519,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 5:											// IN1 + OUT1 = 5
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -636,25 +602,8 @@ struct SwitcherSt : Module {
 				break;
 				
 				case 10:											// IN2 + OUT2 = 10
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -736,25 +685,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 9:											// IN1 + OUT2 = 9
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -836,25 +768,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 6:											// IN2 + OUT1 = 6
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -936,25 +851,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 7:													// IN1 + IN2 + OUT1 = 7
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -1036,25 +934,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 11:												// IN1 + IN2 + OUT2 = 11
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -1136,25 +1017,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 13:											// IN1 + OUT1 + OUT2 = 13
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -1258,25 +1122,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 14:										// IN2 + OUT1 + OUT2 = 14
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -1380,25 +1227,8 @@ struct SwitcherSt : Module {
 				break;
 
 				case 15:						// IN1 + IN2 + OUT1 + OUT2 = 15
-					if (inputs[RST_INPUT].isConnected()) {
-						rst = inputs[RST_INPUT].getVoltage();
-						if (rst >= 1 && prevRst < 1) {
-							if (currentSwitch) {
-								currentSwitch = 0;
-								connectionChange = true;
-								if (fadeValue > noEnvTime) {
-									if (fading) {
-										startFade = 1-lastFade;
-									} else {
-										fading = true;
-										startFade = 0;
-									}
-									currentFadeSample = 0;
-								}
-							}
-						}
-						prevRst = rst; 
-					}
+					
+					checkReset();
 
 					if (fading) {
 						if (fadeValue > 10)
@@ -1512,8 +1342,8 @@ struct SwitcherSt : Module {
 						connectionChange = false;
 					}
 			}
-		}
-		prevTrigConnection = trigConnection;
+		//}
+		//prevTrigConnection = trigConnection;
 	}
 };
 
@@ -1527,8 +1357,14 @@ struct SwitcherStWidget : ModuleWidget {
 
 		addParam(createParamCentered<CKSS>(mm2px(Vec(4, 11.35)), module, SwitcherSt::MODE_SWITCH));
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 26)), module, SwitcherSt::TRIG_INPUT));
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 39)), module, SwitcherSt::RST_INPUT));
+		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 26)), module, SwitcherSt::TRIG_INPUT));
+		
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(14.3, 26)), module, SwitcherSt::TRIG_INPUT));
+		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(6, 26)), module, SwitcherSt::TRIG_PARAM, SwitcherSt::TRIG_LIGHT));
+		
+		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(10.16, 39)), module, SwitcherSt::RST_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(6, 39)), module, SwitcherSt::RST_INPUT));
+		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(14.3, 39)), module, SwitcherSt::RST_PARAM, SwitcherSt::RST_LIGHT));
 
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(6, 55.5)), module, SwitcherSt::IN1_INPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(14.3, 55.5)), module, SwitcherSt::IN1_INPUT+1));

@@ -1,3 +1,6 @@
+### 2.7.3 (2025-04-07)
+- siwtcherSt: added trigger and reset buttons
+
 ### 2.7.2 (2025-04-01)
 - added stepSeq8x module
 - added drumPlayerMk2 module
