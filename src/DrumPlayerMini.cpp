@@ -153,7 +153,7 @@ struct DrumPlayerMini : Module {
 			configInput(TRIG_INPUT, "Trig");
 			//configParam(TRIGVOL_PARAM, 0.f, 2.0f, 1.0f, "Standard Level", "%", 0, 100);
 			configInput(ACC_INPUT, "Accent");
-			configParam(ACCVOL_PARAM, 1.f, 2.0f, 1.0f, "Accent Level", "%", 0, 100);
+			configParam(ACCVOL_PARAM, 0.f, 2.0f, 1.0f, "Accent Level", "%", 0, 100);
 			//configParam(DECAY_PARAM+i, 0.01f, 2.0f, 2.0f, ("Decay #"+to_string(i+1)).c_str(), "s", 0, 1);
 			configParam(DECAY_PARAM, 0.f, 1.f, 1.f, "Decay", " ms", maxStageTime / minStageTime, minStageTime);
 			configInput(DECAY_INPUT,"Decay");

@@ -152,7 +152,7 @@ struct DrumPlayerMk2 : Module {
 			configInput(TRIG_INPUT+i,("Trig #"+to_string(i+1)).c_str());
 			//configParam(TRIGVOL_PARAM+i, 0.f, 2.0f, 1.0f, ("Standard Level #"+to_string(i+1)).c_str(), "%", 0, 100);
 			configInput(ACC_INPUT+i,("Accent #"+to_string(i+1)).c_str());
-			configParam(ACCVOL_PARAM+i, 1.f, 2.0f, 1.0f, ("Accent Level #"+to_string(i+1)).c_str(), "%", 0, 100);
+			configParam(ACCVOL_PARAM+i, 0.f, 2.0f, 1.0f, ("Accent Level #"+to_string(i+1)).c_str(), "%", 0, 100);
 			//configParam(DECAY_PARAM+i, 0.01f, 2.0f, 2.0f, ("Decay #"+to_string(i+1)).c_str(), "s", 0, 1);
 			configParam(DECAY_PARAM+i, 0.f, 1.f, 1.f, ("Decay #"+to_string(i+1)).c_str(), " ms", maxStageTime / minStageTime, minStageTime);
 			configInput(DECAY_INPUT+i,("Decay #"+to_string(i+1)).c_str());
