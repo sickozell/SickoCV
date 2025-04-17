@@ -555,7 +555,8 @@ struct DrumPlayerMk2 : Module {
 		std::string path = fromPath;
 		unsigned int c;
 		unsigned int sr;
-		drwav_uint64 tsc;
+		//drwav_uint64 tsc;
+		uint64_t tsc;
 		//float* pSampleData;
 		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
 		float* pSampleData = LoadWavFileF32(path.c_str(), &c, &sr, &tsc);	// new dr_wav lib
