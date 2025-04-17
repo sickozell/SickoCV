@@ -1,4 +1,5 @@
 ### 2.7.3 (2025-04-07)
+- updated dr_wav library
 - siwtcherSt: added trigger and reset buttons
 
 ### 2.7.2 (2025-04-01)

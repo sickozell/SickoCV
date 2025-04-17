@@ -11,7 +11,7 @@
 #if defined(METAMODULE)
 #include "async_filebrowser.hh"
 #endif
-#define DR_WAV_IMPLEMENTATION	// this should be the only module to leave uncommented
+//#define DR_WAV_IMPLEMENTATION	// this should be the only module to leave uncommented CHANGED TO CLOCKER
 #include "dr_wav.h"
 #include <vector>
 #include "cmath"
@@ -454,6 +454,36 @@ struct DrumPlayer : Module {
 			playBuffer[slot2][1].push_back(playBuffer[slot1][1][i]);
 		}
 	}
+	
+//	-----------------------------------------------------------------------------------------------
+
+	float* LoadWavFileF32(const std::string& path, uint32_t* channels, uint32_t* sampleRate, uint64_t* totalSampleCount) {
+	    drwav wav;
+	    if (!drwav_init_file(&wav, path.c_str(), nullptr)) {
+	        return nullptr;
+	    }
+
+	    if (channels) *channels = wav.channels;
+	    if (sampleRate) *sampleRate = wav.sampleRate;
+
+	    uint64_t frameCount = wav.totalPCMFrameCount;
+	    uint64_t sampleCount = frameCount * wav.channels;
+
+	    float* pSampleData = (float*)malloc((size_t)sampleCount * sizeof(float));
+	    if (!pSampleData) {
+	        drwav_uninit(&wav);
+	        return nullptr;
+	    }
+
+	    uint64_t framesRead = drwav_read_pcm_frames_f32(&wav, frameCount, pSampleData);
+	    drwav_uninit(&wav);
+
+	    if (totalSampleCount) *totalSampleCount = framesRead * wav.channels;
+
+	    return pSampleData;
+	}
+
+//	-----------------------------------------------------------------------------------------------	
 
 	void menuLoadSample(int slot) {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
@@ -488,8 +518,9 @@ struct DrumPlayer : Module {
 		unsigned int c;
 		unsigned int sr;
 		drwav_uint64 tsc;
-		float* pSampleData;
-		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
+		//float* pSampleData;
+		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
+		float* pSampleData = LoadWavFileF32(path.c_str(), &c, &sr, &tsc);	// new dr_wav lib
 
 		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
 			fileFound[slot] = true;
@@ -509,7 +540,7 @@ struct DrumPlayer : Module {
 			}
 			totalSampleC[slot] = playBuffer[slot][0].size();
 			totalSamples[slot] = totalSampleC[slot]-1;
-			drwav_free(pSampleData);
+//			drwav_free(pSampleData);	// unused (old dr_wav)
 
 			for (unsigned int i = 1; i < totalSamples[slot]; i = i + 2)		// averaging oversampled vector
 				playBuffer[slot][0][i] = playBuffer[slot][0][i-1] * .5f + playBuffer[slot][0][i+1] * .5f;
@@ -547,6 +578,33 @@ struct DrumPlayer : Module {
 		}
 	};
 
+// -------------------------------------------------------------------------------------------------------------------------------
+
+	bool SaveWavFileF32(const std::string& path, const std::vector<float>& data, uint32_t sampleRate, uint32_t channels) {
+	    drwav_data_format format;
+	    format.container = drwav_container_riff;      // Standard WAV
+	    format.format = DR_WAVE_FORMAT_IEEE_FLOAT;    // Float 32-bit
+	    format.channels = channels;
+	    format.sampleRate = sampleRate;
+	    format.bitsPerSample = 32;
+
+	    drwav wav;
+	    if (!drwav_init_file_write(&wav, path.c_str(), &format, nullptr)) {
+	        return false;
+	    }
+
+	    drwav_uint64 framesToWrite = data.size() / channels;
+
+	    // Scrivi i frame
+	    drwav_uint64 framesWritten = drwav_write_pcm_frames(&wav, framesToWrite, data.data());
+
+	    drwav_uninit(&wav);
+
+	    return framesWritten == framesToWrite;
+	}
+
+// -------------------------------------------------------------------------------------------------------------------------------
+
 	void saveSample(std::string path, int slot) {
 		drwav_uint64 samples;
 
@@ -573,9 +631,17 @@ struct DrumPlayer : Module {
 		if (path.substr(path.size() - 4) != ".wav" && path.substr(path.size() - 4) != ".WAV")
 			path += ".wav";
 
+/*
 		drwav *pWav = drwav_open_file_write(path.c_str(), &format);
 		drwav_write(pWav, samples, data.data());
 		drwav_close(pWav);
+*/
+
+		bool ok = SaveWavFileF32(path.c_str(), data, format.sampleRate, format.channels);
+		if (!ok) {
+		    // std::cerr << "Errore durante il salvataggio WAV" << std::endl;
+		    INFO("ERROR WRITING");
+		}
 
 		data.clear();
 	}

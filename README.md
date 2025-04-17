@@ -1,4 +1,4 @@
-# SickoCV v2.7.3-beta1
+# SickoCV v2.7.3-beta2
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -18,7 +18,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog** 
--
+- updated dr_wav library
+- siwtcherSt: added trigger and reset buttons
 
 # SickoCV v2.7.3
 VCV Rack plugin modules
