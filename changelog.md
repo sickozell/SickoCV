@@ -3,6 +3,8 @@
 - adMini / enverMini : added "LVL knob -> ENV out" option in context menu
 - drumPlayerMk2 / drumPlayerMini : change accent level range to 0-200%
 
+### 2.7.3
+
 ### 2.7.2 (2025-04-01)
 - added stepSeq8x module
 - added drumPlayerMk2 module
