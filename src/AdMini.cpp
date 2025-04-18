@@ -21,7 +21,7 @@ struct AdMini : Module {
 		SHAPE_PARAM,
 		ATTACK_PARAM,
 		DECAY_PARAM,
-		VOL_PARAM,
+		LVL_PARAM,
 		NUM_PARAMS 
 	};
 	enum InputIds {
@@ -38,6 +38,7 @@ struct AdMini : Module {
 	};
 	enum LightIds {
 		ENUMS(MODE_LIGHT, 3),
+		LVL2ENV_LIGHT,
 		NUM_LIGHTS
 	};
   
@@ -84,6 +85,8 @@ struct AdMini : Module {
 	float lightGValue = 0.f;
 	//float lightBValue = 0.f;
 
+	bool lvlToEnv = false;
+
 	static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	
@@ -112,7 +115,7 @@ struct AdMini : Module {
 		configInput(DECAY_INPUT,"Decay CV");
 		configOutput(ENV_OUTPUT,"Envelope");
 		configInput(SIGNAL_INPUT,"Signal");
-		configParam(VOL_PARAM, 0.f, 1.f, 1.f, "VCA","", 0, 100);
+		configParam(LVL_PARAM, 0.f, 1.f, 1.f, "Level","", 0, 100);
 		configOutput(SIGNAL_OUTPUT,"Signal");
 
 		lights[MODE_LIGHT+2].setBrightness(0.f);
@@ -128,6 +131,7 @@ struct AdMini : Module {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "mode", json_integer(mode));
+		json_object_set_new(rootJ, "lvlToEnv", json_boolean(lvlToEnv));
 
 		return rootJ;
 	}
@@ -136,6 +140,9 @@ struct AdMini : Module {
 		json_t* modeJ = json_object_get(rootJ, "mode");
 		if (modeJ)
 			mode = json_integer_value(modeJ);
+		json_t* lvlToEnvJ = json_object_get(rootJ, "lvlToEnv");
+		if (lvlToEnvJ)
+			lvlToEnv = json_boolean_value(lvlToEnvJ);
 	}
 
 
@@ -177,6 +184,8 @@ struct AdMini : Module {
 
 	void process(const ProcessArgs &args) override {
 
+		lights[LVL2ENV_LIGHT].setBrightness(lvlToEnv);
+
 		switch (mode) {
 
 			case FUNC_MODE:
@@ -194,6 +203,8 @@ struct AdMini : Module {
 		lights[MODE_LIGHT+1].setBrightness(lightGValue);
 
 		shape = params[SHAPE_PARAM].getValue();
+
+		volLevel = params[LVL_PARAM].getValue();
 
 		if (inputs[TRIG_INPUT].isConnected())
 			chanTrig = inputs[TRIG_INPUT].getChannels();
@@ -385,13 +396,16 @@ struct AdMini : Module {
 
 			}
 
-			outputs[ENV_OUTPUT].setVoltage(env[c] * 10, c);
+			if (!lvlToEnv)
+				outputs[ENV_OUTPUT].setVoltage(env[c] * 10, c);
+			else
+				outputs[ENV_OUTPUT].setVoltage(env[c] * 10 * volLevel, c);
 
 		}
 
 		outputs[ENV_OUTPUT].setChannels(chanTrig);
 
-		volLevel = params[VOL_PARAM].getValue();
+		
 
 		// --------- VCA
 
@@ -479,9 +493,10 @@ struct AdMiniWidget : ModuleWidget {
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yDecIn)), module, AdMini::DECAY_INPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yEnv)), module, AdMini::ENV_OUTPUT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xCenter, yIn1)), module, AdMini::SIGNAL_INPUT));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yVol)), module, AdMini::VOL_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xCenter, yVol)), module, AdMini::LVL_PARAM));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut1)), module, AdMini::SIGNAL_OUTPUT));
 		addChild(createLightCentered<SmallLight<RedGreenBlueLight>>(mm2px(Vec(xLight, yGate - yLightShift)), module, AdMini::MODE_LIGHT));
+		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xLight, yEnv - yLightShift)), module, AdMini::LVL2ENV_LIGHT));
 	}
 
 		void appendContextMenu(Menu* menu) override {
@@ -506,6 +521,9 @@ struct AdMiniWidget : ModuleWidget {
 			modeItem->mode = i;
 			menu->addChild(modeItem);
 		}
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("LVL knob -> ENV out", "", &module->lvlToEnv));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Add Expander", "", [=]() {module->addExpander(modelEnverMiniX, this);}));

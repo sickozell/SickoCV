@@ -23,7 +23,7 @@
 #if defined(METAMODULE)
 #include "async_filebrowser.hh"
 #endif
-//#define DR_WAV_IMPLEMENTATION
+#define DR_WAV_IMPLEMENTATION	// this is the next standard position
 #include "dr_wav.h"
 #include <vector>
 #include "cmath"
@@ -548,6 +548,36 @@ struct Clocker : Module {
 		return (((((c3 * t) + c2) * t) + c1) * t) + c0;
 	}
 	
+//	-----------------------------------------------------------------------------------------------
+
+	float* LoadWavFileF32(const std::string& path, uint32_t* channels, uint32_t* sampleRate, uint64_t* totalSampleCount) {
+	    drwav wav;
+	    if (!drwav_init_file(&wav, path.c_str(), nullptr)) {
+	        return nullptr;
+	    }
+
+	    if (channels) *channels = wav.channels;
+	    if (sampleRate) *sampleRate = wav.sampleRate;
+
+	    uint64_t frameCount = wav.totalPCMFrameCount;
+	    uint64_t sampleCount = frameCount * wav.channels;
+
+	    float* pSampleData = (float*)malloc((size_t)sampleCount * sizeof(float));
+	    if (!pSampleData) {
+	        drwav_uninit(&wav);
+	        return nullptr;
+	    }
+
+	    uint64_t framesRead = drwav_read_pcm_frames_f32(&wav, frameCount, pSampleData);
+	    drwav_uninit(&wav);
+
+	    if (totalSampleCount) *totalSampleCount = framesRead * wav.channels;
+
+	    return pSampleData;
+	}
+
+//	-----------------------------------------------------------------------------------------------	
+
 	void menuLoadSample(int slot) {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
@@ -584,9 +614,11 @@ struct Clocker : Module {
 
 		unsigned int c;
 		unsigned int sr;
-		drwav_uint64 tsc;
-		float* pSampleData;
-		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
+		//drwav_uint64 tsc;
+		uint64_t tsc;
+		//float* pSampleData;
+		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
+		float* pSampleData = LoadWavFileF32(path.c_str(), &c, &sr, &tsc);	// new dr_wav lib
 
 		if (pSampleData != NULL && tsc > minSamplesToLoad * c) {
 			fileFound[slot] = true;
@@ -606,9 +638,8 @@ struct Clocker : Module {
 				}
 				totalSampleC[slot] = playBuffer[slot].size();
 				totalSamples[slot] = totalSampleC[slot]-1;
-				drwav_free(pSampleData);
+//				drwav_free(pSampleData);
 
-				//sampleRate = APP->engine->getSampleRate() * 2;
 				sampleRate[slot] = APP->engine->getSampleRate();
 
 			} else {											// ***************** RESAMPLE ****************************************
@@ -617,7 +648,7 @@ struct Clocker : Module {
 					tempBuffer.push_back(0);
 				}
 
-				drwav_free(pSampleData);
+//				drwav_free(pSampleData);
 
 				drwav_uint64 tempSampleC = tempBuffer.size();
 				drwav_uint64 tempSamples = tempSampleC-1;
@@ -695,14 +726,7 @@ struct Clocker : Module {
 			tempBuffer2.clear();
 
 			char* pathDup = strdup(path.c_str());
-			/*
-			fileDescription[slot] = basename(pathDup);
 
-			free(pathDup);
-			storedPath[slot] = path;
-
-			fileLoaded[slot] = true;
-			*/
 			if (customClick) {
 				fileDescription[slot] = basename(pathDup);
 
@@ -712,12 +736,15 @@ struct Clocker : Module {
 			fileLoaded[slot] = true;
 			free(pathDup);
 
+			free(pSampleData);  // non dimenticare!
+
 		} else {
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
 			storedPath[slot] = path;
 			fileDescription[slot] = "(!)"+path;
 		}
+
 	};
 	
 	void clearSlot(int slot) {

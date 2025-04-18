@@ -1,11 +1,11 @@
-git tag v2.7.2-beta5 -m "create v2.7.2-beta5"  
+git tag v2.7.3-beta4 -m "create v2.7.3-beta4"  
 git push origin --tags  
 
 delete local tag  
-git tag -d v2.7.2-beta
+git tag -d v2.7.3-beta
 
 delete remote
-git push --delete origin v2.7.2-beta
+git push --delete origin v2.7.3-beta
 
 
 ### How to build a VCVRack plugin with Github Action
