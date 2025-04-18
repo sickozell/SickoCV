@@ -1378,7 +1378,7 @@ struct SwitcherSt : Module {
 		//	begin comment for button version
 		}
 		prevTrigConnection = trigConnection;
-		// end omment for button version
+		// end comment for button version
 	}
 };
 
