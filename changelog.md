@@ -2,7 +2,6 @@
 - updated dr_wav library
 - adMini / enverMini : added "LVL knob -> ENV out" option in context menu
 - drumPlayerMk2 / drumPlayerMini : change accent level range to 0-200%
-- switcherSt: added trigger and reset buttons
 
 ### 2.7.2 (2025-04-01)
 - added stepSeq8x module
