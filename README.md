@@ -1,4 +1,4 @@
-# SickoCV v2.7.4-beta1
+# SickoCV v2.7.3-beta4
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -22,7 +22,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - adMini / enverMini : added "LVL knob -> ENV out" option in context menu
 - drumPlayerMk2 / drumPlayerMini : change accent level range to 0-200%
 
-# SickoCV v2.7.4
+# SickoCV v2.7.3
 VCV Rack plugin modules
 
 ![SickoCV modules 2 7 2](https://github.com/user-attachments/assets/c8dc0049-1a35-45aa-854e-7a71c2b76cef)
