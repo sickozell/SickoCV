@@ -20,10 +20,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog** 
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
 
-# SickoCV v2.7.3
+# SickoCV v2.7.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 2](https://github.com/user-attachments/assets/c8dc0049-1a35-45aa-854e-7a71c2b76cef)
+![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/fcb8ad8e-14e5-4295-9a21-28113a861d15)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
