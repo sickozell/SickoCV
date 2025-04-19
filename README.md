@@ -500,7 +500,7 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 ## enver / enver mini / ad mini
 ### Envelope/function generator with stereo VCA
 
-![enver](https://github.com/user-attachments/assets/1f5d8321-b410-47b4-861e-ac47010a458b)
+![enver](https://github.com/user-attachments/assets/be063e58-9a2f-4fb5-a8c4-fe6538c60157)
 
 #### - INSTRUCTIONS
 the enver moodule operates with three different modes selecetd by the mode switch:
