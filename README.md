@@ -518,8 +518,8 @@ ENV out is the envelope output.
 INV out is the inverted envelope output to use for ducking purposes. The INV knob is used to set the inverting strength.  
 A D S R outputs send a 1ms trigger at the end of every single stage.  
 
-The built-in VCA section consists of a stereo audio input, a master volume knob, a volume CV input, and a stereo audio output.  
-Please note that using the volume CV input as a velocity control from an external keyboard, the volume knob has to be set to zero. 
+The built-in VCA section consists of a stereo audio input, a level knob, a level CV input, and a stereo audio output.  
+Please note that using the level CV input as a velocity control from an external keyboard, the LVL knob has to be set to zero. 
 
 #### - ENVER mini
 
