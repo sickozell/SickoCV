@@ -2090,10 +2090,11 @@ struct TrigSeq8xWidget : ModuleWidget {
 		const float xSet = 97.5f;
 		const float xAuto = 109.7f;
 
-		const float xRecallBut = 129.f;
-		//const float xRecallIn = 133.5f;
+		//const float xRecallBut = 129.f;
+		//const float xStore = 144.4f;
 
-		const float xStore = 144.4f;
+		const float xRecallBut = 127.5f;
+		const float xStore = 142.9f;
 
 		const float yStart = 37.5f;
 		const float yDelta = 11.2f;

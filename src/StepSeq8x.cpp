@@ -537,7 +537,7 @@ struct StepSeq8x : Module {
 		configSwitch(RUNBUT_PARAM, 0.f, 1.f, 1.f, "Run", {"OFF", "ON"});
 		configInput(RUN_INPUT, "Run");
 		
-		configParam(RST_PARAM, 1.f,16.f, 1.f, "Rst Step / Atten.");
+		configParam(RST_PARAM, 1.f,16.f, 1.f, "Rst Step");
 		paramQuantities[RST_PARAM]->snapEnabled = true;
 		configInput(RST_INPUT, "Reset");
 
@@ -1950,10 +1950,9 @@ struct StepSeq8xWidget : ModuleWidget {
 		const float xSet = 97.5f;
 		const float xAuto = 109.7f;
 
-		const float xRecallBut = 129.f;
-		//const float xRecallIn = 133.5f;
+		const float xRecallBut = 127.5f;
 
-		const float xStore = 144.4f;
+		const float xStore = 142.9f;
 
 		const float yStart = 37.5f;
 		const float yDelta = 11.2f;

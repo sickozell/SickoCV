@@ -118,7 +118,7 @@ struct EnverMini : Module {
 		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
 		configOutput(ENV_OUTPUT,"Envelope");
 		configInput(SIGNAL_INPUT,"Signal");
-		configParam(LVL_PARAM, 0.f, 1.f, 1.f, "Level","", 0, 100);
+		configParam(LVL_PARAM, 0.f, 1.f, 1.f, "Level","%", 0, 100);
 		configOutput(SIGNAL_OUTPUT,"Signal");
 
 		lights[MODE_LIGHT+2].setBrightness(0.f);

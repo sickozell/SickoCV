@@ -1,3 +1,6 @@
+### 2.7.4 (2025-04-19)
+- stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
+
 ### 2.7.3 (2025-04-18)
 - updated dr_wav library
 - adMini / enverMini : added "LVL knob -> ENV out" option in context menu
