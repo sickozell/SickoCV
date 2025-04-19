@@ -548,7 +548,7 @@ struct EnverMiniWidget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xLight, yEnv - yLightShift)), module, EnverMini::LVL2ENV_LIGHT));
 	}
 
-		void appendContextMenu(Menu* menu) override {
+	void appendContextMenu(Menu* menu) override {
 		EnverMini* module = dynamic_cast<EnverMini*>(this->module);
 
 		menu->addChild(new MenuSeparator());

@@ -177,8 +177,8 @@ struct Enver : Module {
 		configInput(LEFT_INPUT,"Left");
 		configInput(RIGHT_INPUT,"Right");
 
-		configParam(VOL_PARAM, 0.f, 1.f, 1.f, "Vol","", 0, 100);
-		configInput(VOL_INPUT,"Vol");
+		configParam(VOL_PARAM, 0.f, 1.f, 1.f, "Level","%", 0, 100);
+		configInput(VOL_INPUT,"Level");
 
 		configOutput(LEFT_OUTPUT,"Left");
 		configOutput(RIGHT_OUTPUT,"Right");
