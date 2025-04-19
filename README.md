@@ -1,7 +1,7 @@
 # SickoCV v2.7.3
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 2](https://github.com/user-attachments/assets/c8dc0049-1a35-45aa-854e-7a71c2b76cef)
+![SickoCV modules 2 7 3](https://github.com/user-attachments/assets/d89bd63a-28d8-4ecd-8871-b763f57085b4)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -17,7 +17,7 @@ VCV Rack plugin modules
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini](#drumplayer--drumplayer--drumplayerxtra--drumplayer-mini)
-- [enver / enver mini](#enver--enver-mini)
+- [enver / enver mini / ad mini](#enver--enver-mini--ad-mini)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [keySampler](#keysampler)
 - [modulator / modulator7 / modulator7 Compact](#modulator--modulator7--modulator7-compact)
@@ -475,10 +475,10 @@ Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerX
 
 [back to top](#table-of-contents)
 
-## enver / enver mini
-### Envelope generator with stereo VCA
+## enver / enver mini / ad mini
+### Envelope/function generator with stereo VCA
 
-![enver](https://github.com/user-attachments/assets/1f5d8321-b410-47b4-861e-ac47010a458b)
+![enver](https://github.com/user-attachments/assets/be063e58-9a2f-4fb5-a8c4-fe6538c60157)
 
 #### - INSTRUCTIONS
 the enver moodule operates with three different modes selecetd by the mode switch:
@@ -496,8 +496,21 @@ ENV out is the envelope output.
 INV out is the inverted envelope output to use for ducking purposes. The INV knob is used to set the inverting strength.  
 A D S R outputs send a 1ms trigger at the end of every single stage.  
 
-The built-in VCA section consists of a stereo audio input, a master volume knob, a volume CV input, and a stereo audio output.  
-Please note that using the volume CV input as a velocity control from an external keyboard, the volume knob has to be set to zero. 
+The built-in VCA section consists of a stereo audio input, a level knob, a level CV input, and a stereo audio output.  
+Please note that using the level CV input as a velocity control from an external keyboard, the LVL knob has to be set to zero. 
+
+#### - ENVER mini / AD mini
+
+The "enver mini" module consists in a reduced 2hp version with mono vca.  
+The "AD mini" module is a simple AD function generator with cv inputs on attack/decay and integrated vca.
+
+**Right-click menu** (mini version only)
+
+- Module Mode. Envelope (default, enver only), Function, Loop.
+- LVL knob -> ENV out.  The LVL knob also attenuates the envelope output. A green led on env output remains lit.
+- Add Expander. Adding expanders increase in/out vca signal channels to be affected by the main envelope.
+
+[back to top](#table-of-contents)
 
 ## holder / holder Compact / holder8
 ### Sample & Hold or Track & Hold with noise generator, probability and range
