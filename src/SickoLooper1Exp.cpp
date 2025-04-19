@@ -947,9 +947,11 @@ struct SickoLooper1Exp : Module {
 		//tempBuffer[1].clear();
 		vector<float> tempBuffer[2];
 
-		unsigned int c;
-		unsigned int sr;
+		//unsigned int c;
+		//unsigned int sr;
 		//drwav_uint64 tsc;
+		uint32_t c;
+		uint32_t sr;
 		uint64_t tsc;
 		//float* pSampleData;
 		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);

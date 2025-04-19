@@ -457,9 +457,11 @@ struct DrumPlayerMini : Module {
 
 	void loadSample(std::string fromPath) {
 		std::string path = fromPath;
-		unsigned int c;
-		unsigned int sr;
+		//unsigned int c;
+		//unsigned int sr;
 		//drwav_uint64 tsc;
+		uint32_t c;
+		uint32_t sr;
 		uint64_t tsc;
 		//float* pSampleData;
 		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
