@@ -521,7 +521,7 @@ A D S R outputs send a 1ms trigger at the end of every single stage.
 The built-in VCA section consists of a stereo audio input, a master volume knob, a volume CV input, and a stereo audio output.  
 Please note that using the volume CV input as a velocity control from an external keyboard, the volume knob has to be set to zero. 
 
-##### enver mini
+#### - enver mini
 
 The "enver mini" module consists in a reduced 2hp version with mono vca.  
 
@@ -531,7 +531,7 @@ The "enver mini" module consists in a reduced 2hp version with mono vca.
 - LVL knob -> ENV out.  The LVL knob also attenuates the envelope output. A green led on env output remains lit.
 - Add Expander. Adding expanders increase in/out vca signal channels to be affected by the main envelope.
 
-##### AD mini
+#### - AD mini
 The "AD mini" module is a simple AD function generator with cv inputs on attack/decay and integrated vca.
 
 **Right-click menu**
