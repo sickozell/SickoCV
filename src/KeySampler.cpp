@@ -153,7 +153,12 @@ struct KeySampler : Module {
 	//metamodule change
 	//vector<float> tempBuffer[2];
 
-	vector<double> displayBuff[8];
+// begin changes by DanGreen
+	//vector<double> displayBuff[8];
+	vector<float> displayBuff[8];
+	const int displaySize = 140;
+// end changes by DanGreen
+
 	int currentDisplay = 0;
 	int displaySlot = 0;
 	float voctDisplay = 100.f;
@@ -565,13 +570,16 @@ struct KeySampler : Module {
 
 	bool unlimitedRecording = false;
 
+// begin changes by DanGreen
 #if defined(METAMODULE)
-	const drwav_uint64 recordingLimit = 48000 * 2 * 60; // 60 sec limit on MM = 5.5MB
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2; // 60 sec mono, 30 sec stereo limit on MM (~25.5MB ram with 2x oversample)
 #else
-	const drwav_uint64 recordingLimit = 52428800 * 2;
-	// const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+	//const drwav_uint64 recordingLimit = 52428800 * 2; // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 10mins stereo at 48.000khz)
+	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
 #endif
-	
+// end changes by DanGreen
+
 	drwav_uint64 currentRecordingLimit = recordingLimit;
 
 	static constexpr float minStageTime = 1.f;  // in milliseconds
@@ -899,6 +907,8 @@ struct KeySampler : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
+// begin changes by DanGreen
+#if !defined(METAMODULE)
 		for (int slot = 0; slot < 8; slot++) {
 			if (!fileLoaded[slot]) {
 				std::string patchFile = system::join(getPatchStorageDirectory(), ("slot"+to_string(slot+1)+".wav").c_str());
@@ -906,12 +916,15 @@ struct KeySampler : Module {
 				loadSample(patchFile, slot);
 			}
 		}
+#endif
+// end changes by DanGreen
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
+// begin changes by DanGreen
+#if !defined(METAMODULE)
 		system::removeRecursively(getPatchStorageDirectory().c_str());
-		
 		for (int slot = 0; slot < 8; slot++) {
 			if (fileLoaded[slot]) {
 				if (sampleInPatch) {
@@ -922,6 +935,8 @@ struct KeySampler : Module {
 				}
 			}
 		}
+#endif
+// end changes by DanGreen
 		Module::onSave(e);
 	}
 
@@ -981,7 +996,13 @@ struct KeySampler : Module {
 			saveOversampled = json_boolean_value(saveOversampledJ);
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
+// begin changes by DanGreen
+#if defined (METAMODULE)
+			antiAlias = 1;
+#else
 			antiAlias = json_integer_value(antiAliasJ);
+#endif
+// end changes by DanGreen
 		json_t* quantizeJ = json_object_get(rootJ, "quantize");
 		if (quantizeJ)
 			quantize = json_boolean_value(quantizeJ);
@@ -1372,29 +1393,33 @@ struct KeySampler : Module {
 					//tempBuffer[1].clear();
 					vector<float> tempBuffer[2];
 
+					resampleCoeff = oldSampleRate / newSampleRate / 2;
+
 					for (unsigned int i=0; i < totalSampleC[slot]; i++) {
 						tempBuffer[LEFT].push_back(playBuffer[slot][LEFT][0][i]);
 						if (channels[slot] == 2) {
 							tempBuffer[RIGHT].push_back(playBuffer[slot][RIGHT][0][i]);
 						}
 					}
-					
-					playBuffer[slot][LEFT][0].clear();
-					playBuffer[slot][LEFT][1].clear();
-					playBuffer[slot][RIGHT][0].clear();
-					playBuffer[slot][RIGHT][1].clear();
-
-					// metamodule change
+// begin changes by DanGreen					
+//					playBuffer[slot][LEFT][0].clear();
+//					playBuffer[slot][LEFT][1].clear();
+//					playBuffer[slot][RIGHT][0].clear();
+//					playBuffer[slot][RIGHT][1].clear();
+					const auto numSamples = (totalSampleC[slot] / resampleCoeff) + 10;
 					vector<float>().swap(playBuffer[slot][LEFT][0]);
-					vector<float>().swap(playBuffer[slot][RIGHT][0]);
 					vector<float>().swap(playBuffer[slot][LEFT][1]);
+					vector<float>().swap(playBuffer[slot][RIGHT][0]);
 					vector<float>().swap(playBuffer[slot][RIGHT][1]);
+					playBuffer[slot][LEFT][0].reserve(numSamples);
+					playBuffer[slot][LEFT][1].reserve(numSamples);
+					playBuffer[slot][RIGHT][0].reserve(numSamples);
+					playBuffer[slot][RIGHT][1].reserve(numSamples);
+// end changes by DanGreen
 
 					drwav_uint64 tempSampleC = totalSampleC[slot];
 					drwav_uint64 tempSamples = totalSamples[slot];
 			
-					resampleCoeff = oldSampleRate / (newSampleRate) / 2;
-					
 					double currResamplePos = 0;
 					double floorCurrResamplePos = 0;
 
@@ -1454,6 +1479,13 @@ struct KeySampler : Module {
 					//tempBuffer[LEFT].clear();
 					//tempBuffer[RIGHT].clear();
 
+// begin changes by DanGreen
+				vector<float>().swap(tempBuffer[LEFT]);
+				vector<float>().swap(tempBuffer[RIGHT]);
+				tempBuffer[LEFT].reserve(0);
+				tempBuffer[RIGHT].reserve(0);
+// end changes by DanGreen
+
 					// ***************************************************************************
 					totalSampleC[slot] = playBuffer[slot][LEFT][0].size();
 					totalSamples[slot] = totalSampleC[slot]-1;					// *****   DA VERIFICARE se è -2 ********************************************
@@ -1472,7 +1504,7 @@ struct KeySampler : Module {
 					prevKnobLoopStartPos[slot] = -1.f;
 					prevKnobLoopEndPos[slot] = 2.f;
 
-					vector<double>().swap(displayBuff[slot]);
+					vector<float>().swap(displayBuff[slot]);
 					for (int i = 0; i < floor(totalSampleC[slot]); i = i + floor(totalSampleC[slot]/wavDisp))
 						displayBuff[slot].push_back(playBuffer[slot][0][0][i]);
 
@@ -1807,7 +1839,7 @@ struct KeySampler : Module {
 
 			for (int c=0; c < 16; c++)
 				samplePos[slot][c] = 0;
-			
+/*
 			playBuffer[slot][LEFT][0].clear();
 			playBuffer[slot][LEFT][1].clear();
 			playBuffer[slot][RIGHT][0].clear();
@@ -1821,12 +1853,38 @@ struct KeySampler : Module {
 			vector<float>().swap(playBuffer[slot][RIGHT][0]);
 			vector<float>().swap(playBuffer[slot][LEFT][1]);
 			vector<float>().swap(playBuffer[slot][RIGHT][1]);
+*/
+			//double resampleCoeff = APP->engine->getSampleRate() / fileSampleRate[slot];
+			double resampleCoeff = tempSampleRate * .5 / (APP->engine->getSampleRate());
 
 			if (!unlimitedRecording) {
 				if (tsc > recordingLimit / 2)
-					tsc = recordingLimit / 2;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+					tsc = recordingLimit / 2;	// set memory allocation limit
 			}
 
+			uint64_t newTsc = ceil((double)tsc / resampleCoeff);
+			
+// begin changes by DanGreen			
+//			playBuffer[slot][LEFT][0].clear();
+//			playBuffer[slot][LEFT][1].clear();
+//			playBuffer[slot][RIGHT][0].clear();
+//			playBuffer[slot][RIGHT][1].clear();
+
+			// Shrink playBuffer to fit:
+ 			const auto numSamples = fileChannels[slot] == 2 ? newTsc : newTsc * 2;
+ 			vector<float>().swap(playBuffer[slot][LEFT][0]);
+ 			vector<float>().swap(playBuffer[slot][LEFT][1]);
+ 			playBuffer[slot][LEFT][0].reserve(numSamples+10);
+ 			playBuffer[slot][LEFT][1].reserve(numSamples+10);
+ 
+ 			vector<float>().swap(playBuffer[slot][RIGHT][0]);
+ 			vector<float>().swap(playBuffer[slot][RIGHT][1]);
+ 			if (c == 2) {
+ 				playBuffer[slot][RIGHT][0].reserve(numSamples+10);
+ 				playBuffer[slot][RIGHT][1].reserve(numSamples+10);
+ 			}
+
+// end changes by DanGreen	
 			if (sr == APP->engine->getSampleRate()) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
 					playBuffer[slot][LEFT][0].push_back(pSampleData[i] * 5);
@@ -1839,6 +1897,7 @@ struct KeySampler : Module {
 				totalSampleC[slot] = playBuffer[slot][LEFT][0].size();
 				totalSamples[slot] = totalSampleC[slot]-1;					// *****   DA VERIFICARE se è -2 ********************************************
 //				drwav_free(pSampleData);
+				free(pSampleData);  // non dimenticare!
 
 				for (unsigned int i = 1; i < totalSamples[slot]; i = i+2) { // **************** tempSamples  o tempSampleC ????
 					playBuffer[slot][LEFT][0][i] = playBuffer[slot][LEFT][0][i-1] * .5f + playBuffer[slot][LEFT][0][i+1] * .5f;
@@ -1862,12 +1921,21 @@ struct KeySampler : Module {
 				totalSampleC[slot] = playBuffer[slot][LEFT][0].size();
 				totalSamples[slot] = totalSampleC[slot]-1;					// *****   DA VERIFICARE se è -2 ********************************************
 //				drwav_free(pSampleData);
+				free(pSampleData);  // non dimenticare!
 
 				resampled[slot] = false;
 
 				//sampleRate = APP->engine->getSampleRate() * 2;
 
 			} else {											// ***************** RESAMPLE ****************************************
+
+// begin changes by DanGreen
+				vector<float> tempBuffer[2];
+				tempBuffer[LEFT].reserve(numSamples);
+				if (fileChannels[slot] == 2)
+					tempBuffer[LEFT].reserve(numSamples);
+// end changes by DanGreen
+
 				for (unsigned int i=0; i < tsc; i = i + c) {
 					tempBuffer[LEFT].push_back(pSampleData[i] * 5);
 					tempBuffer[LEFT].push_back(0);
@@ -1878,6 +1946,7 @@ struct KeySampler : Module {
 				}
 
 //				drwav_free(pSampleData);
+				free(pSampleData);  // non dimenticare!
 
 				drwav_uint64 tempSampleC = tempBuffer[LEFT].size();
 				drwav_uint64 tempSamples = tempSampleC-1;					// *****   DA VERIFICARE se è -2 ********************************************
@@ -1895,7 +1964,7 @@ struct KeySampler : Module {
 
 				// ***************************************************************************
 
-				double resampleCoeff = tempSampleRate * .5 / (APP->engine->getSampleRate());
+				//double resampleCoeff = tempSampleRate * .5 / (APP->engine->getSampleRate());
 				double currResamplePos = 0;
 				int floorCurrResamplePos = 0;
 
@@ -1954,6 +2023,13 @@ struct KeySampler : Module {
 				// metamodule change
 				//tempBuffer[LEFT].clear();
 				//tempBuffer[RIGHT].clear();
+				
+// begin changes by DanGreen
+				vector<float>().swap(tempBuffer[LEFT]);
+				vector<float>().swap(tempBuffer[RIGHT]);
+				tempBuffer[LEFT].reserve(0);
+				tempBuffer[RIGHT].reserve(0);
+// end changes by DanGreen
 
 				// ***************************************************************************
 
@@ -1972,7 +2048,7 @@ struct KeySampler : Module {
 					playBuffer[slot][RIGHT][1].push_back(biquadLpf2(playBuffer[slot][RIGHT][0][i]));
 			}
 
-			vector<double>().swap(displayBuff[slot]);
+			vector<float>().swap(displayBuff[slot]);
 			for (int i = 0; i < floor(totalSampleC[slot]); i = i + floor(totalSampleC[slot]/wavDisp))
 				displayBuff[slot].push_back(playBuffer[slot][0][0][i]);
 
@@ -2130,17 +2206,6 @@ struct KeySampler : Module {
 		recSamples = 0;
 		recTimeDisplay[slot] = "";
 		channelsDisplay[slot] = "";
-		playBuffer[slot][LEFT][0].clear();
-		playBuffer[slot][RIGHT][0].clear();
-		playBuffer[slot][LEFT][1].clear();
-		playBuffer[slot][RIGHT][1].clear();
-		displayBuff[slot].clear();
-
-		// metamodule change
-		vector<float>().swap(playBuffer[slot][LEFT][0]);
-		vector<float>().swap(playBuffer[slot][RIGHT][0]);
-		vector<float>().swap(playBuffer[slot][LEFT][1]);
-		vector<float>().swap(playBuffer[slot][RIGHT][1]);
 
 		totalSampleC[slot] = 0;
 		totalSamples[slot] = 0;
@@ -2150,6 +2215,25 @@ struct KeySampler : Module {
 		for (int slot = 0; slot < 8; slot++)
 			for (int c=0; c < 16; c++)
 				fadingValue[slot][c] = 1;
+
+// begin changes by DanGreen
+//		playBuffer[slot][LEFT][0].clear();
+//		playBuffer[slot][RIGHT][0].clear();
+//		playBuffer[slot][LEFT][1].clear();
+//		playBuffer[slot][RIGHT][1].clear();
+
+		vector<float>().swap(playBuffer[slot][LEFT][0]);
+		vector<float>().swap(playBuffer[slot][LEFT][1]);
+		vector<float>().swap(playBuffer[slot][RIGHT][0]);
+		vector<float>().swap(playBuffer[slot][RIGHT][1]);
+		playBuffer[slot][LEFT][0].reserve(0);
+ 		playBuffer[slot][LEFT][1].reserve(0);
+ 		playBuffer[slot][RIGHT][0].reserve(0);
+ 		playBuffer[slot][RIGHT][1].reserve(0);
+
+		vector<float>().swap(displayBuff[slot]);
+		displayBuff[slot].reserve(displaySize);
+ // end changes by DanGreen
 	}
 
 	void resetCursors() {
@@ -3663,7 +3747,7 @@ struct KeySampler : Module {
 					totalSampleC[recSlot] = playBuffer[recSlot][0][0].size();
 					totalSamples[recSlot] = totalSampleC[recSlot]-1;
 
-					vector<double>().swap(displayBuff[recSlot]);
+					vector<float>().swap(displayBuff[recSlot]);
 
 					for (int i = 0; i < floor(totalSampleC[recSlot]); i = i + floor(totalSampleC[recSlot]/wavDisp))
 						displayBuff[recSlot].push_back(playBuffer[recSlot][0][0][i]);
@@ -4578,7 +4662,13 @@ struct KeySamplerWidget : ModuleWidget {
 		} }));
 
 		menu->addChild(new MenuSeparator());
+// begin changes by DanGreen
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Anti-aliasing filter (ON)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
+#endif
+// end changes by DanGreen
 
 		menu->addChild(new MenuSeparator());
 		/*
@@ -4616,10 +4706,15 @@ struct KeySamplerWidget : ModuleWidget {
 		*/
 
 		menu->addChild(new MenuSeparator());
+// begin changes by DanGreen
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Store Sample in Patch (OFF)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
-#if !defined(METAMODULE)
 		menu->addChild(createBoolPtrMenuItem("Unlimited REC (risky)", "", &module->unlimitedRecording));
 #endif
+// end changes by DanGreen
+		
 	}
 };
 

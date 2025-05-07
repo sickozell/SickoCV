@@ -129,8 +129,8 @@ struct Clocker : Module {
 	const unsigned int minSamplesToLoad = 9;
 
 	vector<float> playBuffer[2];
-	vector<float> tempBuffer;
-	vector<float> tempBuffer2;
+//	vector<float> tempBuffer;
+//	vector<float> tempBuffer2;
 
 	bool fileLoaded[2] = {false, false};
 	bool fileFound[2] = {false, false};
@@ -272,6 +272,8 @@ struct Clocker : Module {
 	int divCount[4] = {1, 1, 1, 1};
 
 	bool divSwing[4] = {false, false, false, false};
+
+	drwav_uint64 recordingLimit = 48000 * 2 * 2; // set memory allocation limit to 2 seconds)
 
 	Clocker() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -626,13 +628,25 @@ struct Clocker : Module {
 			fileFound[slot] = true;
 			sampleRate[slot] = sr * 2;
 			
-			playBuffer[slot].clear();
+			double resampleCoeff = APP->engine->getSampleRate() / sr;
 
-			tempBuffer.clear();
-			tempBuffer2.clear();
+			if (tsc > recordingLimit / 2)
+				tsc = recordingLimit / 2;	// set memory allocation limit
 
-			if (tsc > 96000)
-				tsc = 96000;	// set memory allocation limit to 96000 samples*/
+			uint64_t newTsc = ceil((double)tsc * resampleCoeff);
+
+// begin changes by DanGreen
+//			tempBuffer.clear();
+//			tempBuffer2.clear();
+			const auto numSamples = c == 2 ? newTsc : newTsc * 2;
+			vector<float>().swap(playBuffer[slot]);
+			playBuffer[slot].reserve(numSamples+10);
+
+			vector<float> tempBuffer;
+			tempBuffer.reserve(numSamples+10);
+			vector<float> tempBuffer2;
+			tempBuffer2.reserve(numSamples+10);
+// end changes by DanGreen
 
 			if (sr == APP->engine->getSampleRate()) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -641,6 +655,7 @@ struct Clocker : Module {
 				totalSampleC[slot] = playBuffer[slot].size();
 				totalSamples[slot] = totalSampleC[slot]-1;
 //				drwav_free(pSampleData);
+				free(pSampleData);  // non dimenticare!
 
 				sampleRate[slot] = APP->engine->getSampleRate();
 
@@ -651,6 +666,7 @@ struct Clocker : Module {
 				}
 
 //				drwav_free(pSampleData);
+				free(pSampleData);  // non dimenticare!
 
 				drwav_uint64 tempSampleC = tempBuffer.size();
 				drwav_uint64 tempSamples = tempSampleC-1;
@@ -724,8 +740,14 @@ struct Clocker : Module {
 
 			}
 
-			tempBuffer.clear();
-			tempBuffer2.clear();
+// begin changes by DanGreen
+			//tempBuffer.clear();
+			//tempBuffer2.clear();
+			vector<float>().swap(tempBuffer);
+			vector<float>().swap(tempBuffer2);
+			tempBuffer.reserve(0);
+			tempBuffer2.reserve(0);
+// end changes by DanGreen
 
 			char* pathDup = strdup(path.c_str());
 
@@ -737,8 +759,6 @@ struct Clocker : Module {
 			}
 			fileLoaded[slot] = true;
 			free(pathDup);
-
-			free(pSampleData);  // non dimenticare!
 
 		} else {
 			fileFound[slot] = false;
@@ -755,8 +775,12 @@ struct Clocker : Module {
 		if (clickSelect == CLICK_CUSTOM) {
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
-			playBuffer[slot].clear();
 			totalSampleC[slot] = 0;
+// begin changes by DanGreen
+			//playBuffer[slot].clear();
+			vector<float>().swap(playBuffer[slot]);
+			playBuffer[slot].reserve(0);
+// end changes by DanGreen
 		}
 	}
 

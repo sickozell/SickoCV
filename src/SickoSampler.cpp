@@ -139,7 +139,12 @@ struct SickoSampler : Module {
 	//metamodule change
 	//vector<float> tempBuffer[2];
 
-	vector<double> displayBuff;
+// begin changes by DanGreen
+	//vector<double> displayBuff;
+	vector<float> displayBuff;
+	const int displaySize = 160;
+// end changes by DanGreen
+
 	float recCoeffDisplay;
 	drwav_uint64 prevRecTotalSampleC;
 	int currentDisplay = 0;
@@ -387,12 +392,15 @@ struct SickoSampler : Module {
 
 	bool unlimitedRecording = false;
 
+// begin changes by DanGreen
 #if defined(METAMODULE)
-	const drwav_uint64 recordingLimit = 48000 * 2 * 60; // 60 sec limit on MM = 5.5MB
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2; // 60 sec mono, 30 sec stereo limit on MM (~25.5MB ram with 2x oversample)
 #else
-	const drwav_uint64 recordingLimit = 52428800 * 2;
-	// const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+	//const drwav_uint64 recordingLimit = 52428800 * 2; // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 20mins at 48.000khz MONO)
+	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
 #endif
+// end changes by DanGreen
 
 	drwav_uint64 currentRecordingLimit = recordingLimit;
 
@@ -564,15 +572,21 @@ struct SickoSampler : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
+// begin changes by DanGreen
+#if !defined(METAMODULE)
 		if (!fileLoaded) {
 			std::string patchFile = system::join(getPatchStorageDirectory(), "sample.wav");
 			loadFromPatch = true;
 			loadSample(patchFile);
 		}
+#endif
+// end changes by DanGreen
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
+// begin changes by DanGreen
+#if !defined(METAMODULE)
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		if (fileLoaded) {
 			if (sampleInPatch) {
@@ -582,7 +596,8 @@ struct SickoSampler : Module {
 				saveSample(patchFile);
 			}
 		}
-
+#endif
+// end changes by DanGreen
 		Module::onSave(e);
 	}
 
@@ -621,7 +636,13 @@ struct SickoSampler : Module {
 			saveOversampled = json_boolean_value(saveOversampledJ);
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
+// begin changes by DanGreen
+#if defined (METAMODULE)
+			antiAlias = 1;
+#else
 			antiAlias = json_integer_value(antiAliasJ);
+#endif
+// end changes by DanGreen
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
@@ -896,28 +917,46 @@ struct SickoSampler : Module {
 			//tempBuffer[1].clear();
 			vector<float> tempBuffer[2];
 
+// begin changes by DanGreen
+			resampleCoeff = sampleRate / (APP->engine->getSampleRate()) / 2;
+
+			const auto numSamples = (totalSampleC / resampleCoeff) + 10;
+			tempBuffer[LEFT].reserve(numSamples);
+			if (fileChannels == 2)
+				tempBuffer[LEFT].reserve(numSamples);
+// end changes by DanGreen
+
+
 			for (unsigned int i=0; i < totalSampleC; i++) {
 				tempBuffer[LEFT].push_back(playBuffer[LEFT][0][i]);
 				if (channels == 2) {
 					tempBuffer[RIGHT].push_back(playBuffer[RIGHT][0][i]);
 				}
 			}
-			
-			playBuffer[LEFT][0].clear();
-			playBuffer[LEFT][1].clear();
-			playBuffer[RIGHT][0].clear();
-			playBuffer[RIGHT][1].clear();
-			// metamodule change
-			vector<float>().swap(playBuffer[LEFT][0]);
-			vector<float>().swap(playBuffer[RIGHT][0]);
-			vector<float>().swap(playBuffer[LEFT][1]);
-			vector<float>().swap(playBuffer[RIGHT][1]);
+
+// begin changes by DanGreen			
+//			playBuffer[LEFT][0].clear();
+//			playBuffer[LEFT][1].clear();
+//			playBuffer[RIGHT][0].clear();
+//			playBuffer[RIGHT][1].clear();
+
+			// Shrink playBuffer to fit:
+ 			vector<float>().swap(playBuffer[LEFT][0]);
+ 			vector<float>().swap(playBuffer[LEFT][1]);
+ 			playBuffer[LEFT][0].reserve(numSamples);
+ 			playBuffer[LEFT][1].reserve(numSamples);
+ 
+ 			vector<float>().swap(playBuffer[RIGHT][0]);
+ 			vector<float>().swap(playBuffer[RIGHT][1]);
+ 			if (channels == 2) {
+ 				playBuffer[RIGHT][0].reserve(numSamples);
+ 				playBuffer[RIGHT][1].reserve(numSamples);
+ 			}
+// end changes by DanGreen		
 
 			drwav_uint64 tempSampleC = totalSampleC;
 			drwav_uint64 tempSamples = totalSamples;
 	
-			resampleCoeff = sampleRate / (APP->engine->getSampleRate()) / 2;
-			
 			double currResamplePos = 0;
 			double floorCurrResamplePos = 0;
 
@@ -977,6 +1016,13 @@ struct SickoSampler : Module {
 			//tempBuffer[LEFT].clear();
 			//tempBuffer[RIGHT].clear();
 
+// begin changes by DanGreen
+				vector<float>().swap(tempBuffer[LEFT]);
+				vector<float>().swap(tempBuffer[RIGHT]);
+				tempBuffer[LEFT].reserve(0);
+				tempBuffer[RIGHT].reserve(0);
+// end changes by DanGreen
+
 			totalSampleC = playBuffer[LEFT][0].size();
 			totalSamples = totalSampleC-1;
 			sampleRate = APP->engine->getSampleRate() * 2;
@@ -993,9 +1039,12 @@ struct SickoSampler : Module {
 			prevKnobLoopStartPos = -1.f;
 			prevKnobLoopEndPos = 2.f;
 
+// begin changes by DanGreen
+			vector<float>().swap(displayBuff);
+			displayBuff.reserve(displaySize);
+// end changes by DanGreen
 
-			vector<double>().swap(displayBuff);
-			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/240))
+			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/displaySize))
 				displayBuff.push_back(playBuffer[0][0][i]);
 
 			resampled = true;
@@ -1302,7 +1351,7 @@ struct SickoSampler : Module {
 		// metamodule change
 		//tempBuffer[0].clear();
 		//tempBuffer[1].clear();
-		vector<float> tempBuffer[2];
+		//vector<float> tempBuffer[2];
 
 		//unsigned int c;
 		//unsigned int sr;
@@ -1321,27 +1370,39 @@ struct SickoSampler : Module {
 			sampleRate = sr * 2;
 			fileSampleRate = sr;
 			
-			for (int c=0; c < 16; c++)
-				samplePos[c] = 0;
-
-			playBuffer[LEFT][0].clear();
-			playBuffer[LEFT][1].clear();
-			playBuffer[RIGHT][0].clear();
-			playBuffer[RIGHT][1].clear();
-			tempBuffer[LEFT].clear();
-			tempBuffer[RIGHT].clear();
-			displayBuff.clear();
-
-			// metamodule change
-			vector<float>().swap(playBuffer[LEFT][0]);
-			vector<float>().swap(playBuffer[RIGHT][0]);
-			vector<float>().swap(playBuffer[LEFT][1]);
-			vector<float>().swap(playBuffer[RIGHT][1]);
-
+			//double resampleCoeff = APP->engine->getSampleRate() / fileSampleRate;
+			double resampleCoeff = sampleRate * .5 / (APP->engine->getSampleRate());
+			
 			if (!unlimitedRecording) {
 				if (tsc > recordingLimit / 2)
-					tsc = recordingLimit / 2;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+					tsc = recordingLimit / 2;	// set memory allocation limit
 			}
+
+			uint64_t newTsc = ceil((double)tsc / resampleCoeff);
+
+// begin changes by DanGreen
+//			playBuffer[LEFT][0].clear();
+//			playBuffer[LEFT][1].clear();
+//			playBuffer[RIGHT][0].clear();
+//			playBuffer[RIGHT][1].clear();
+//			tempBuffer[LEFT].clear();
+//			tempBuffer[RIGHT].clear();
+			//displayBuff.clear();
+
+			// Shrink playBuffer to fit:
+ 			const auto numSamples = fileChannels == 2 ? newTsc : newTsc * 2;
+ 			vector<float>().swap(playBuffer[LEFT][0]);
+ 			vector<float>().swap(playBuffer[LEFT][1]);
+ 			playBuffer[LEFT][0].reserve(numSamples+10);
+ 			playBuffer[LEFT][1].reserve(numSamples+10);
+ 
+ 			vector<float>().swap(playBuffer[RIGHT][0]);
+ 			vector<float>().swap(playBuffer[RIGHT][1]);
+ 			if (channels == 2) {
+ 				playBuffer[RIGHT][0].reserve(numSamples+10);
+ 				playBuffer[RIGHT][1].reserve(numSamples+10);
+ 			}
+// end changes by DanGreen
 
 			if (sr == APP->engine->getSampleRate()) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -1355,6 +1416,9 @@ struct SickoSampler : Module {
 				totalSampleC = playBuffer[LEFT][0].size();
 				totalSamples = totalSampleC-1;
 //				drwav_free(pSampleData);
+// begin changes by DanGreen
+				free(pSampleData);
+// end changes by DanGreen
 
 				for (unsigned int i = 1; i < totalSamples; i = i+2) {
 					playBuffer[LEFT][0][i] = playBuffer[LEFT][0][i-1] * .5f + playBuffer[LEFT][0][i+1] * .5f;
@@ -1378,12 +1442,23 @@ struct SickoSampler : Module {
 				totalSampleC = playBuffer[LEFT][0].size();
 				totalSamples = totalSampleC-1;
 //				drwav_free(pSampleData);
+// begin changes by DanGreen
+				free(pSampleData);
+// end changes by DanGreen
 
 				resampled = false;
 
 				sampleRate = APP->engine->getSampleRate() * 2;
 
 			} else {											// ***************** RESAMPLE ****************************************
+
+// begin changes by DanGreen
+				vector<float> tempBuffer[2];
+				tempBuffer[LEFT].reserve(numSamples);
+				if (fileChannels == 2)
+					tempBuffer[LEFT].reserve(numSamples);
+// end changes by DanGreen
+
 				for (unsigned int i=0; i < tsc; i = i + c) {
 					tempBuffer[LEFT].push_back(pSampleData[i] * 5);
 					tempBuffer[LEFT].push_back(0);
@@ -1394,6 +1469,9 @@ struct SickoSampler : Module {
 				}
 
 //				drwav_free(pSampleData);
+// begin changes by DanGreen
+				free(pSampleData);
+// end changes by DanGreen
 
 				drwav_uint64 tempSampleC = tempBuffer[LEFT].size();
 				drwav_uint64 tempSamples = tempSampleC-1;
@@ -1411,7 +1489,7 @@ struct SickoSampler : Module {
 
 				// ***************************************************************************
 
-				double resampleCoeff = sampleRate * .5 / (APP->engine->getSampleRate());
+				//double resampleCoeff = sampleRate * .5 / (APP->engine->getSampleRate());
 				double currResamplePos = 0;
 				int floorCurrResamplePos = 0;
 
@@ -1470,7 +1548,13 @@ struct SickoSampler : Module {
 				// metamodule change
 				//tempBuffer[LEFT].clear();
 				//tempBuffer[RIGHT].clear();
-				
+// begin changes by DanGreen
+				vector<float>().swap(tempBuffer[LEFT]);
+				vector<float>().swap(tempBuffer[RIGHT]);
+				tempBuffer[LEFT].reserve(0);
+				tempBuffer[RIGHT].reserve(0);
+// end changes by DanGreen
+
 				// ***************************************************************************
 
 				totalSampleC = playBuffer[LEFT][0].size();
@@ -1488,8 +1572,13 @@ struct SickoSampler : Module {
 					playBuffer[RIGHT][1].push_back(biquadLpf2(playBuffer[RIGHT][0][i]));
 			}
 
-			vector<double>().swap(displayBuff);
-			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/240))
+// begin changes by DanGreen
+			//vector<double>().swap(displayBuff);
+			vector<float>().swap(displayBuff);
+			displayBuff.reserve(displaySize);
+// end changes by DanGreen
+
+			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/displaySize))
 				displayBuff.push_back(playBuffer[0][0][i]);
 
 			seconds = totalSampleC * 0.5 / (APP->engine->getSampleRate());
@@ -1638,16 +1727,6 @@ struct SickoSampler : Module {
 		recSamples = 0;
 		recTimeDisplay = "";
 		channelsDisplay = "";
-		playBuffer[LEFT][0].clear();
-		playBuffer[RIGHT][0].clear();
-		playBuffer[LEFT][1].clear();
-		playBuffer[RIGHT][1].clear();
-		displayBuff.clear();
-		// metamodule change
-		vector<float>().swap(playBuffer[LEFT][0]);
-		vector<float>().swap(playBuffer[RIGHT][0]);
-		vector<float>().swap(playBuffer[LEFT][1]);
-		vector<float>().swap(playBuffer[RIGHT][1]);
 
 		totalSampleC = 0;
 		totalSamples = 0;
@@ -1657,7 +1736,26 @@ struct SickoSampler : Module {
 		infoToSave= "";
 		for (int i=0; i < 16; i++)
 			fadingValue[i] = 1;
-		
+
+// begin changes by DanGreen
+//		playBuffer[LEFT][0].clear();
+//		playBuffer[RIGHT][0].clear();
+//		playBuffer[LEFT][1].clear();
+//		playBuffer[RIGHT][1].clear();
+
+		vector<float>().swap(playBuffer[LEFT][0]);
+		vector<float>().swap(playBuffer[LEFT][1]);
+		vector<float>().swap(playBuffer[RIGHT][0]);
+		vector<float>().swap(playBuffer[RIGHT][1]);
+		playBuffer[LEFT][0].reserve(0);
+ 		playBuffer[LEFT][1].reserve(0);
+ 		playBuffer[RIGHT][0].reserve(0);
+ 		playBuffer[RIGHT][1].reserve(0);
+
+ 		vector<float>().swap(displayBuff);
+		displayBuff.reserve(displaySize);
+ // end changes by DanGreen
+
 		//INFO ("[ SickoCV ] Slot Cleared");
 
 	}
@@ -3933,8 +4031,14 @@ struct SickoSampler : Module {
 					prevKnobLoopStartPos = -1.f;
 					prevKnobLoopEndPos = 2.f;
 				}
-				
-				vector<double>().swap(displayBuff);
+
+// begin changes by DanGreen
+				//displayBuff.clear();
+				//vector<double>().swap(displayBuff);
+				vector<float>().swap(displayBuff);
+				displayBuff.reserve(displaySize);
+// end changes by DanGreen
+
 				for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/240))
 					displayBuff.push_back(playBuffer[0][0][i]);
 
@@ -5601,7 +5705,13 @@ struct SickoSamplerWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
+// begin changes by DanGreen
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Anti-aliasing filter (ON)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
+#endif
+// end changes by DanGreen
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
@@ -5628,10 +5738,15 @@ struct SickoSamplerWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
+// begin changes by DanGreen
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Store Sample in Patch (OFF)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
-#if !defined(METAMODULE)
 		menu->addChild(createBoolPtrMenuItem("Unlimited REC (risky)", "", &module->unlimitedRecording));
 #endif
+// end changes by DanGreen
+
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Presets", "", [=](Menu * menu) {
 			menu->addChild(createMenuItem("Wavetable", "", [=]() {module->setPreset(0);}));

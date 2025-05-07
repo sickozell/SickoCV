@@ -1875,9 +1875,9 @@ struct StepSeq8xDisplay : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 2)
-						nvgTextBox(args.vg, 8, 30, 80, currentDisplay.c_str(), NULL);
+						nvgTextBox(args.vg, 9, 31, 80, currentDisplay.c_str(), NULL);
 					else
-						nvgTextBox(args.vg, 16, 30, 80, currentDisplay.c_str(), NULL);
+						nvgTextBox(args.vg, 16, 31, 80, currentDisplay.c_str(), NULL);
 
 				} else {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));

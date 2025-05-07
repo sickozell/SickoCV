@@ -355,7 +355,7 @@ struct Slewer : Module {
 						normalCoeff = stageCoeff * 2.06;
 						normalRange = slewEnd[c] - slewStart[c];
 						normalCoeff2 = stageCoeff * normalRange;
-						
+/*						
 						if (shape < 0.5) {
 							normalShape = shape * 2;
 
@@ -373,6 +373,24 @@ struct Slewer : Module {
 							slewExpCoeff[c] += normalCoeff;
 							stageLevel[c] += (normalCoeff2 * (1 - normalShape)) + (slewExpCoeff[c] * normalCoeff2 * normalShape);
 							stageSample[c]++;
+						}
+*/
+						if (shape < 0.5) {
+							normalShape = shape * 2;
+
+							slewExpCoeff[c] += normalCoeff;
+							stageLevel[c] += (normalCoeff2 * normalShape) + (slewExpCoeff[c] * normalCoeff2 * (1 - normalShape));
+							stageSample[c]++;
+						} else {
+							normalShape = (shape - 0.5) * 2;
+
+							stageSample[c]++;
+							slewLogCoeff[c] -= normalCoeff;
+							
+							if (slewLogCoeff[c] < 0.3)
+								slewLogCoeff[c] = 0.3;
+
+							stageLevel[c] += (slewLogCoeff[c] * normalCoeff2 * normalShape) + (normalCoeff2 * (1 - normalShape));
 						}
 
 						if (stageLevel[c] >= slewEnd[c]) {
@@ -399,7 +417,7 @@ struct Slewer : Module {
 						normalCoeff2 = stageCoeff_D * normalRange;
 
 						if (!symm) {
-
+							/*
 							if (shape < 0.5) {
 								normalShape = shape * 2;
 
@@ -418,9 +436,26 @@ struct Slewer : Module {
 								stageLevel[c] -= (normalCoeff2 * (1 - normalShape)) + (slewExpCoeff[c] * normalCoeff2 * normalShape);
 								stageSample[c]++;
 							}
+							*/
+							if (shape < 0.5) {
+								normalShape = (shape * 2);
 
+								slewExpCoeff[c] += normalCoeff;
+								stageLevel[c] -= (normalCoeff2 * normalShape) + (slewExpCoeff[c] * normalCoeff2 * (1 - normalShape));
+								stageSample[c]++;							
+							} else {
+								normalShape = (shape - 0.5) * 2;
+
+								stageSample[c]++;
+								slewLogCoeff[c] -= normalCoeff;
+								
+								if (slewLogCoeff[c] < 0.3)
+									slewLogCoeff[c] = 0.3;
+
+								stageLevel[c] -= (slewLogCoeff[c] * normalCoeff2 * normalShape) + (normalCoeff2 * (1 - normalShape));
+							}
 						} else {	// symmetric decay
-
+							/*
 							if (shape < 0.5) {
 								normalShape = shape * 2;
 
@@ -438,6 +473,24 @@ struct Slewer : Module {
 
 								stageLevel[c] -= (normalCoeff2 * (1 - normalShape)) + (slewLogCoeff[c] * normalCoeff2 * normalShape);
 								stageSample[c]++;
+							}
+							*/
+							if (shape < 0.5) {
+								normalShape = shape * 2;
+
+								slewLogCoeff[c] -= normalCoeff;
+								if (slewLogCoeff[c] < 0.3)
+									slewLogCoeff[c] = 0.3;
+
+								stageLevel[c] -= (normalCoeff2 * normalShape) + (slewLogCoeff[c] * normalCoeff2 * (1 - normalShape));
+								stageSample[c]++;							
+							} else {
+								normalShape = (shape - 0.5) * 2;
+
+								stageSample[c]++;
+								slewExpCoeff[c] += normalCoeff;
+								
+								stageLevel[c] -= (slewExpCoeff[c] * normalCoeff2 * normalShape) + (normalCoeff2 * (1 - normalShape));
 							}
 						}
 
@@ -504,7 +557,7 @@ struct Slewer : Module {
 						normalCoeff = stageCoeff * 2.06;
 						normalRange = slewEnd[0] - slewStart[0];
 						normalCoeff2 = stageCoeff * normalRange;
-						
+						/*
 						if (shape < 0.5) {
 							normalShape = shape * 2;
 
@@ -522,6 +575,24 @@ struct Slewer : Module {
 							slewExpCoeff[0] += normalCoeff;
 							stageLevel[0] += (normalCoeff2 * (1 - normalShape)) + (slewExpCoeff[0] * normalCoeff2 * normalShape);
 							stageSample[0]++;
+						}
+						*/
+						if (shape < 0.5) {
+							normalShape = shape * 2;
+
+							slewExpCoeff[0] += normalCoeff;
+							stageLevel[0] += (normalCoeff2 * normalShape) + (slewExpCoeff[0] * normalCoeff2 * (1 - normalShape));
+							stageSample[0]++;						
+						} else {
+							normalShape = (shape - 0.5) * 2;
+
+							stageSample[0]++;
+							slewLogCoeff[0] -= normalCoeff;
+							
+							if (slewLogCoeff[0] < 0.3)
+								slewLogCoeff[0] = 0.3;
+
+							stageLevel[0] += (slewLogCoeff[0] * normalCoeff2 * normalShape) + (normalCoeff2 * (1 - normalShape));
 						}
 						
 						if (stageLevel[0] >= slewEnd[0]) {
@@ -553,7 +624,7 @@ struct Slewer : Module {
 						normalCoeff2 = stageCoeff_D * normalRange;
 
 						if (!symm) {
-
+							/*
 							if (shape < 0.5) {
 								normalShape = shape * 2;
 
@@ -572,9 +643,26 @@ struct Slewer : Module {
 								stageLevel[0] -= (normalCoeff2 * (1 - normalShape)) + (slewExpCoeff[0] * normalCoeff2 * normalShape);
 								stageSample[0]++;
 							}
+							*/
+							if (shape < 0.5) {
+								normalShape = shape * 2;
 
+								slewExpCoeff[0] += normalCoeff;
+								stageLevel[0] -= (normalCoeff2 * normalShape) + (slewExpCoeff[0] * normalCoeff2 * (1 - normalShape));
+								stageSample[0]++;							
+							} else {
+								normalShape = (shape - 0.5) * 2;
+
+								stageSample[0]++;
+								slewLogCoeff[0] -= normalCoeff;
+								
+								if (slewLogCoeff[0] < 0.3)
+									slewLogCoeff[0] = 0.3;
+
+								stageLevel[0] -= (slewLogCoeff[0] * normalCoeff2 * normalShape) + (normalCoeff2 * (1 - normalShape));
+							}
 						} else {	// symmetric decay
-
+/*
 							if (shape < 0.5) {
 								normalShape = shape * 2;
 
@@ -592,6 +680,25 @@ struct Slewer : Module {
 
 								stageLevel[0] -= (normalCoeff2 * (1 - normalShape)) + (slewLogCoeff[0] * normalCoeff2 * normalShape);
 								stageSample[0]++;
+							}
+*/
+							if (shape < 0.5) {
+								normalShape = shape * 2;
+
+								slewLogCoeff[0] -= normalCoeff;
+								if (slewLogCoeff[0] < 0.3)
+									slewLogCoeff[0] = 0.3;
+
+								stageLevel[0] -= (normalCoeff2 * normalShape) + (slewLogCoeff[0] * normalCoeff2 * (1 - normalShape));
+								stageSample[0]++;
+							} else {
+
+								normalShape = (shape - 0.5) * 2;
+
+								stageSample[0]++;
+								slewExpCoeff[0] += normalCoeff;
+								
+								stageLevel[0] -= (slewExpCoeff[0] * normalCoeff2 * normalShape) + (normalCoeff2 * (1 - normalShape));
 							}
 						}
 

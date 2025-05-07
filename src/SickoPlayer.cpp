@@ -106,7 +106,13 @@ struct SickoPlayer : Module {
 	const unsigned int minSamplesToLoad = 124;
 
 	vector<float> playBuffer[2][2];
-	vector<double> displayBuff;
+
+// begin changes by DanGreen
+	//vector<double> displayBuff;
+	vector<float> displayBuff;
+	const int displaySize = 240;
+// end changes by DanGreen
+
 	int currentDisplay = 0;
 	float voctDisplay = 100.f;
 
@@ -268,14 +274,15 @@ struct SickoPlayer : Module {
 	bool prevPrevSample = false;
 
 	bool unlimitedRecording = false;
+// begin changes by DanGreen
 #if defined(METAMODULE)
-	const drwav_uint64 recordingLimit = 48000 * 2 * 60; // 60 sec limit on MM = 5.5MB
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2; // 60 sec mono, 30 sec stereo limit on MM (~25.5MB ram with 2x oversample)
 #else
-	const drwav_uint64 recordingLimit = 52428800 * 2; // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
-	// const drwav_uint64 recordingLimit = 480000; // 10 sec for test purposes
+	//const drwav_uint64 recordingLimit = 52428800 * 2; // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 20mins at 48.000khz MONO)
+	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
 #endif
-
-	drwav_uint64 currentRecordingLimit = recordingLimit;
+// end changes by DanGreen
 
 	static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
@@ -409,15 +416,21 @@ struct SickoPlayer : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
+// begin changes by DanGreen
+#if !defined(METAMODULE)
 		if (!fileLoaded) {
 			std::string patchFile = system::join(getPatchStorageDirectory(), "sample.wav");
 			loadFromPatch = true;
 			loadSample(patchFile);
 		}		
+#endif
+// end changes by DanGreen
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
+// begin changes by DanGreen
+#if !defined(METAMODULE)
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		if (fileLoaded) {
 			if (sampleInPatch) {
@@ -425,6 +438,8 @@ struct SickoPlayer : Module {
 				saveSample(patchFile);
 			}
 		}
+#endif
+// end changes by DanGreen
 		Module::onSave(e);
 	}
 
@@ -458,7 +473,14 @@ struct SickoPlayer : Module {
 			interpolationMode = json_integer_value(interpolationJ);
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
+// begin changes by DanGreen
+#if defined (METAMODULE)
+			antiAlias = 1;
+#else
 			antiAlias = json_integer_value(antiAliasJ);
+#endif
+// end changes by DanGreen
+
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
@@ -803,21 +825,30 @@ struct SickoPlayer : Module {
 			
 			for (int c=0; c < 16; c++)
 				samplePos[c] = 0;
-			playBuffer[LEFT][0].clear();
-			playBuffer[LEFT][1].clear();
-			playBuffer[RIGHT][0].clear();
-			playBuffer[RIGHT][1].clear();
-			displayBuff.clear();
 
-			/*
-			if (tsc > 52428800)
-				tsc = 52428800;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
-			*/
 			if (!unlimitedRecording) {
 				if (tsc > recordingLimit / 2)
-					tsc = recordingLimit / 2;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+					tsc = recordingLimit / 2;	// set memory allocation limit
 			}
-
+// begin changes by DanGreen			
+//			playBuffer[LEFT][0].clear();
+//			playBuffer[LEFT][1].clear();
+//			playBuffer[RIGHT][0].clear();
+//			playBuffer[RIGHT][1].clear();
+			// Shrink playBuffer to fit:
+ 			const auto numSamples = channels == 2 ? tsc : tsc * 2;
+ 			vector<float>().swap(playBuffer[LEFT][0]);
+ 			vector<float>().swap(playBuffer[LEFT][1]);
+ 			playBuffer[LEFT][0].reserve(numSamples+10);	// 10 samples overhead
+ 			playBuffer[LEFT][1].reserve(numSamples+10);
+ 
+ 			vector<float>().swap(playBuffer[RIGHT][0]);
+ 			vector<float>().swap(playBuffer[RIGHT][1]);
+ 			if (channels == 2) {
+ 				playBuffer[RIGHT][0].reserve(numSamples+10);
+ 				playBuffer[RIGHT][1].reserve(numSamples+10);
+ 			}
+// end changes by DanGreen			
 
 			for (unsigned int i=0; i < tsc; i = i + c) {
 				playBuffer[LEFT][0].push_back(pSampleData[i] * 5);
@@ -830,6 +861,8 @@ struct SickoPlayer : Module {
 			totalSampleC = playBuffer[LEFT][0].size();
 			totalSamples = totalSampleC-1;
 //			drwav_free(pSampleData);
+			free(pSampleData);
+
 			for (unsigned int i = 1; i < totalSamples; i = i+2) {		// averaging oversampled vector
 				playBuffer[LEFT][0][i] = playBuffer[LEFT][0][i-1] * .5f + playBuffer[LEFT][0][i+1] * .5f;
 				if (channels == 2)
@@ -853,9 +886,24 @@ struct SickoPlayer : Module {
 			prevKnobLoopStartPos = -1.f;
 			prevKnobLoopEndPos = 2.f;
 
-			vector<double>().swap(displayBuff);		// creating the display vector
-			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/240))
+// begin changes by DanGreen
+			//displayBuff.clear();
+			//vector<double>().swap(displayBuff);
+			vector<float>().swap(displayBuff);
+			displayBuff.reserve(displaySize);
+// end changes by DanGreen
+
+			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/displaySize))
 				displayBuff.push_back(playBuffer[0][0][i]);
+
+// begin changes by DanGreen
+#if defined(METAMODULE)
+			vector<float>().swap(playBuffer[LEFT][0]);
+ 			playBuffer[LEFT][0].reserve(0);
+ 			vector<float>().swap(playBuffer[RIGHT][0]);
+ 			playBuffer[RIGHT][0].reserve(0);
+#endif
+// end changes by DanGreen
 
 			seconds = totalSampleC / sampleRate;
 			minutes = (seconds / 60) % 60;
@@ -944,17 +992,24 @@ struct SickoPlayer : Module {
 	};
 
 	void saveSample(std::string path) {
+
+// begin changes by DanGreen
+		int tempAlias = 0;
+#if defined (METAMODULE)
+		tempAlias = 1;
+#endif
 		drwav_uint64 samples;
 
-		samples = playBuffer[LEFT][0].size();
+		samples = playBuffer[LEFT][tempAlias].size();
 
 		std::vector<float> data;
 
-		for (unsigned int i = 0; i <= playBuffer[LEFT][0].size(); i = i + 2) {
-			data.push_back(playBuffer[LEFT][0][i] / 5);
+		for (unsigned int i = 0; i <= playBuffer[LEFT][tempAlias].size(); i = i + 2) {
+			data.push_back(playBuffer[LEFT][tempAlias][i] / 5);
 			if (channels == 2)
-				data.push_back(playBuffer[RIGHT][0][i] / 5);
+				data.push_back(playBuffer[RIGHT][tempAlias][i] / 5);
 		}
+// end changes by DanGreen
 
 		drwav_data_format format;
 		format.container = drwav_container_riff;
@@ -998,12 +1053,30 @@ struct SickoPlayer : Module {
 		channelsDisplay = "";
 		loadFromPatch = false;
 		restoreLoadFromPatch = false;
-		playBuffer[LEFT][0].clear();
-		playBuffer[RIGHT][0].clear();
-		playBuffer[LEFT][1].clear();
-		playBuffer[RIGHT][1].clear();
+		
+// begin changes by DanGreen		
 		totalSampleC = 0;
 		totalSamples = 0;
+//		playBuffer[LEFT][0].clear();
+//		playBuffer[RIGHT][0].clear();
+//		playBuffer[LEFT][1].clear();
+//		playBuffer[RIGHT][1].clear();
+		//displayBuff.clear();
+		//vector<double>().swap(displayBuff);
+		vector<float>().swap(displayBuff);
+		displayBuff.reserve(displaySize);
+
+		// Shrink playBuffer to zero:
+		vector<float>().swap(playBuffer[LEFT][0]);
+		vector<float>().swap(playBuffer[LEFT][1]);
+		vector<float>().swap(playBuffer[RIGHT][0]);
+		vector<float>().swap(playBuffer[RIGHT][1]);
+		playBuffer[LEFT][0].reserve(0);
+		playBuffer[LEFT][1].reserve(0);
+		playBuffer[RIGHT][0].reserve(0);
+		playBuffer[RIGHT][1].reserve(0);
+ 			
+// end changes by DanGreen
 	}
 
 	void resetCursors() {
@@ -2830,8 +2903,15 @@ struct SickoPlayerWidget : ModuleWidget {
 				menu->addChild(modeItem);
 			}
 		}));
-		
+
+// begin changes by DanGreen
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Anti-aliasing filter (ON)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
+#endif
+// end changes by DanGreen
+
 		menu->addChild(createBoolPtrMenuItem("Phase scan", "", &module->phaseScan));
 
 		menu->addChild(new MenuSeparator());
@@ -2856,7 +2936,15 @@ struct SickoPlayerWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Reset cursors on Load", "", &module->resetCursorsOnLoad));
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
+
+// begin changes by DanGreen
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Store Sample in Patch (OFF)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
+#endif
+// end changes by DanGreen
+
 		menu->addChild(createBoolPtrMenuItem("Unlimited Sample Size (risky)", "", &module->unlimitedRecording));
 		
 		menu->addChild(new MenuSeparator());

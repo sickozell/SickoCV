@@ -100,6 +100,16 @@ struct DrumPlayer : Module {
 
 	double a0, a1, a2, b1, b2, z1, z2;
 
+	// begin changes by DanGreen
+#if defined(METAMODULE)
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2; // 60 sec mono, 30 sec stereo limit on MM (~25.5MB ram with 2x oversample)
+#else
+	//const drwav_uint64 recordingLimit = 52428800 * 2; // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 20mins at 48.000khz MONO)
+	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
+#endif
+// end changes by DanGreen
+
 	DrumPlayer() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configInput(TRIG_INPUT,"Trig #1");
@@ -170,6 +180,8 @@ struct DrumPlayer : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
+// begin changes by DanGreen
+#if !defined(METAMODULE)
 		for (int slot = 0; slot < 4; slot++) {
 			if (!fileLoaded[slot] && storedPath[slot] != "") {
 				std::string patchFile = system::join(getPatchStorageDirectory(), ("slot"+to_string(slot+1)+".wav").c_str());
@@ -177,10 +189,14 @@ struct DrumPlayer : Module {
 				loadSample(patchFile, slot);
 			}
 		}
+#endif
+// end changes by DanGreen
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
+// begin changes by DanGreen
+#if !defined(METAMODULE)
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		if (sampleInPatch) {
 			for (int slot = 0; slot < 4; slot++) {
@@ -190,6 +206,8 @@ struct DrumPlayer : Module {
 				}
 			}
 		}
+#endif
+// end changes by DanGreen
 		Module::onSave(e);
 	}
 
@@ -213,7 +231,13 @@ struct DrumPlayer : Module {
 			interpolationMode = json_integer_value(interpolationJ);
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
+// begin changes by DanGreen
+#if defined (METAMODULE)
+			antiAlias = 1;
+#else
 			antiAlias = json_integer_value(antiAliasJ);
+#endif
+// end changes by DanGreen
 		json_t* outsModeJ = json_object_get(rootJ, "OutsMode");
 		if (outsModeJ)
 			outsMode = json_integer_value(outsModeJ);
@@ -530,12 +554,19 @@ struct DrumPlayer : Module {
 			//channels[slot] = c;
 			sampleRate[slot] = sr * 2;
 			calcBiquadLpf(20000.0, sampleRate[slot], 1);
-			playBuffer[slot][0].clear();
-			playBuffer[slot][1].clear();
 
-			// metamodule change
+			if (tsc > recordingLimit / 2)
+				tsc = recordingLimit / 2;	// set memory allocation limit
+
+// begin changes by DanGreen	
+//			playBuffer[slot][0].clear();
+//			playBuffer[slot][1].clear();
+			const auto numSamples = c == 2 ? tsc : tsc * 2;
 			vector<float>().swap(playBuffer[slot][0]);
 			vector<float>().swap(playBuffer[slot][1]);
+			playBuffer[slot][0].reserve(numSamples+10);
+ 			playBuffer[slot][1].reserve(numSamples+10);
+// end changes by DanGreen
 
 			for (unsigned int i = 0; i < tsc; i = i + c) {
 				playBuffer[slot][0].push_back(pSampleData[i]);
@@ -544,6 +575,9 @@ struct DrumPlayer : Module {
 			totalSampleC[slot] = playBuffer[slot][0].size();
 			totalSamples[slot] = totalSampleC[slot]-1;
 //			drwav_free(pSampleData);	// unused (old dr_wav)
+// begin changes by DanGreen
+			free(pSampleData);
+// end changes by DanGreen
 
 			for (unsigned int i = 1; i < totalSamples[slot]; i = i + 2)		// averaging oversampled vector
 				playBuffer[slot][0][i] = playBuffer[slot][0][i-1] * .5f + playBuffer[slot][0][i+1] * .5f;
@@ -554,6 +588,13 @@ struct DrumPlayer : Module {
 				playBuffer[slot][1].push_back(biquadLpf(playBuffer[slot][0][i]));
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());		// the % distance between samples at speed 1x
+
+// begin changes by DanGreen
+#if defined(METAMODULE)
+			vector<float>().swap(playBuffer[slot][0]);
+ 			playBuffer[slot][0].reserve(0);
+#endif
+// end changes by DanGreen
 
 			if (loadFromPatch[slot])
 				path = storedPath[slot];
@@ -609,15 +650,22 @@ struct DrumPlayer : Module {
 // -------------------------------------------------------------------------------------------------------------------------------
 
 	void saveSample(std::string path, int slot) {
+
+// begin changes by DanGreen
+		int tempAlias = 0;
+#if defined (METAMODULE)
+		tempAlias = 1;
+#endif
 		drwav_uint64 samples;
 
-		samples = playBuffer[slot][0].size();
+		samples = playBuffer[slot][tempAlias].size();
 
 		std::vector<float> data;
 
-		for (unsigned int i = 0; i <= playBuffer[slot][0].size(); i = i + 2)
-			//data.push_back(playBuffer[slot][0][i] / 5);
-			data.push_back(playBuffer[slot][0][i]);
+		for (unsigned int i = 0; i <= playBuffer[slot][tempAlias].size(); i = i + 2)
+			//data.push_back(playBuffer[slot][tempAlias][i] / 5);
+			data.push_back(playBuffer[slot][tempAlias][i]);
+// end changes by DanGreen
 
 		drwav_data_format format;
 		format.container = drwav_container_riff;
@@ -658,14 +706,17 @@ struct DrumPlayer : Module {
 		storedPath[slot] = "";
 		fileDescription[slot] = "--none--";
 		fileFound[slot] = false;
-		playBuffer[slot][0].clear();
-		playBuffer[slot][1].clear();
+		totalSampleC[slot] = 0;
 
-		// metamodule change
+// begin changes by DanGreen
+//		playBuffer[slot][0].clear();
+//		playBuffer[slot][1].clear();
 		vector<float>().swap(playBuffer[slot][0]);
 		vector<float>().swap(playBuffer[slot][1]);
+		playBuffer[slot][0].reserve(0);
+ 		playBuffer[slot][1].reserve(0);
+ // end changes by DanGreen
 
-		totalSampleC[slot] = 0;
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -1417,7 +1468,13 @@ struct DrumPlayerWidget : ModuleWidget {
 			}
 		}));
 
+// begin changes by DanGreen
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Anti-aliasing filter (ON)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
+#endif
+// end changes by DanGreen
 
 		menu->addChild(new MenuSeparator());
 
@@ -1440,7 +1497,13 @@ struct DrumPlayerWidget : ModuleWidget {
 		}));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));
+// begin changes by DanGreen
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Store Sample in Patch (OFF)"));
+#else
+		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
+#endif
+// end changes by DanGreen
 	}
 };
 
