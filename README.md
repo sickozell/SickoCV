@@ -1,4 +1,4 @@
-# SickoCV v2.7.4-beta2
+# SickoCV v2.7.4-beta3
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -22,6 +22,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - all sampler modules: improved memory allocation management
 - slewer/slewer mini: inverted shapes on shape knob
 - sickoSampler2: fixed a bug drawing the playhead outside the module
+- clocker2: added CV clock feature
 
 # SickoCV v2.7.4
 VCV Rack plugin modules

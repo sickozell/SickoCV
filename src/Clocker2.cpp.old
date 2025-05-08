@@ -97,7 +97,6 @@ struct Clocker2 : Module {
 	double sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 
 	double bpm = 0.1;
-	double prevBpm = 0;
 
 	std::string storedPath[2] = {"",""};
 	std::string fileDescription[2] = {"--none--","--none--"};
@@ -218,12 +217,6 @@ struct Clocker2 : Module {
 
 	bool divSwing[6] = {false, false, false, false, false, false};
 
-	bool cvClockIn = false;
-	bool cvClockOut = false;
-	float cvClockInValue = 0.f;
-	float prevCvClockInValue = 11.f;
-	float cvClockOutValue = 0.f;
-
 	Clocker2() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		
@@ -341,8 +334,6 @@ struct Clocker2 : Module {
 		json_object_set_new(rootJ, "Swing4", json_boolean(divSwing[3]));
 		json_object_set_new(rootJ, "Swing5", json_boolean(divSwing[4]));
 		json_object_set_new(rootJ, "Swing6", json_boolean(divSwing[5]));
-		json_object_set_new(rootJ, "cvClockIn", json_boolean(cvClockIn));
-		json_object_set_new(rootJ, "cvClockOut", json_boolean(cvClockOut));
 		return rootJ;
 	}
 
@@ -412,12 +403,7 @@ struct Clocker2 : Module {
 		json_t* swing6J = json_object_get(rootJ, "Swing6");
 		if (swing6J)
 			divSwing[5] = json_boolean_value(swing6J);
-		json_t* cvClockInJ = json_object_get(rootJ, "cvClockIn");
-		if (cvClockInJ)
-			cvClockIn = json_boolean_value(cvClockInJ);
-		json_t* cvClockOutJ = json_object_get(rootJ, "cvClockOut");
-		if (cvClockOutJ)
-			cvClockOut = json_boolean_value(cvClockOutJ);
+
 	}
 
 	void changePpqnSetting() {
@@ -486,33 +472,19 @@ struct Clocker2 : Module {
 
 		extConn = inputs[EXTCLOCK_INPUT].isConnected();
 		if (extConn && !prevExtConn) {
-
-			if (cvClockIn) {
-				extSync = true;
-				prevCvClockInValue = 11;
-			} else {
-				extSync = false;
-				bpm = 0.0;
-				pulseNr = 0;
-				/*
-				firstRegSync = true;
-				registerSum = 0;
-				registerPos = 0;
-				
-				pulseSample = 0;
-				extClockSample = 1.0;
-				prevExtClockSample = 1.0;
-				*/
-			}
-		} /*else if (!extConn && prevExtConn) {
-			bpm = (double)params[BPM_KNOB_PARAM].getValue()/10;
-
-			if (cvClockOut) {
-				cvClockOutValue = log2(bpm / 120.0f);
-				outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-			}
-			prevBpm = bpm;
-		}*/
+			extSync = false;
+			bpm = 0.0;
+			pulseNr = 0;
+			/*
+			firstRegSync = true;
+			registerSum = 0;
+			registerPos = 0;
+			
+			pulseSample = 0;
+			extClockSample = 1.0;
+			prevExtClockSample = 1.0;
+			*/
+		}
 		prevExtConn = extConn;
 
 		// ********* RUN SETTING
@@ -538,10 +510,7 @@ struct Clocker2 : Module {
 				resetStart = true;
 				if (!extConn)
 					clockSample = 1.0;
-				
-				if (!cvClockOut)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				
+				outputs[CLOCK_OUTPUT].setVoltage(0.f);
 				for (int d = 0; d < 6; d++) {
 					divPulse[d] = false;
 					divClockSample[d] = 1.0;
@@ -562,10 +531,7 @@ struct Clocker2 : Module {
 					clockSample = 1.0;
 				else
 					extSync = false;
-				
-				if (!cvClockOut)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				
+				outputs[CLOCK_OUTPUT].setVoltage(0.f);
 				for (int d = 0; d < 6; d++) {
 					divPulse[d] = false;
 					divClockSample[d] = 1.0;
@@ -596,12 +562,7 @@ struct Clocker2 : Module {
 
 		if (resetValue >= 1 && prevResetValue < 1) {
 
-			// ******** NEW ***********
-			clockSample = 1.0;
-
-			if (!cvClockOut)
-				outputs[CLOCK_OUTPUT].setVoltage(0.f);
-
+			outputs[CLOCK_OUTPUT].setVoltage(0.f);
 			for (int d = 0; d < 6; d++) {
 				divPulse[d] = false;
 				divClockSample[d] = 1.0;
@@ -624,16 +585,6 @@ struct Clocker2 : Module {
 			
 			bpm = (double)params[BPM_KNOB_PARAM].getValue()/10;
 
-			if (cvClockOut) {
-				
-				//if (bpm != prevBpm)
-					cvClockOutValue = log2(bpm / 120.0f);
-				
-				outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-				
-			}
-			prevBpm = bpm;
-
 			// **************   RUN PROCESS   ***************
 
 			if (runSetting && resetPulseTime <= 0) {
@@ -642,8 +593,7 @@ struct Clocker2 : Module {
 
 				maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
 				if (clockSample > maxPulseSample)
-					if (!cvClockOut)
-						outputs[CLOCK_OUTPUT].setVoltage(0.f);
+					outputs[CLOCK_OUTPUT].setVoltage(0.f);
 
 				// ************ DIV / MULT
 
@@ -751,8 +701,7 @@ struct Clocker2 : Module {
 						}
 					}
 					
-					if (!cvClockOut)
-						outputs[CLOCK_OUTPUT].setVoltage(10.f);
+					outputs[CLOCK_OUTPUT].setVoltage(10.f);
 					
 				}
 
@@ -771,169 +720,65 @@ struct Clocker2 : Module {
 			// ************************************************ EXTERNAL CLOCK
 
 			// ********** EXTERNAL SYNC
-
-			if (cvClockIn) {
-
-				cvClockInValue = inputs[EXTCLOCK_INPUT].getVoltage();
-				if (cvClockInValue != prevCvClockInValue) {
-					bpm = 120.0f * pow(2.0f, cvClockInValue);
-					if (bpm > 999)
-						bpm = 999;
-
-					if (cvClockOut) {
-						cvClockOutValue = log2(bpm / 120.0f);
-						outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-					}
-
-					
-				}
-				prevCvClockInValue = cvClockInValue;
-				
-				clockMaxSample = sampleRateCoeff / bpm;
-				
-				if (clockSample > clockMaxSample || resetStart)  {
-
-					if (resetStart) {
-						clockSample = 1.0;
-						resetStart = false;
-					} else
-						clockSample -= clockMaxSample;
-
-					if (runSetting) {
-						extBeat = true;
-						clockSample = 1.0;
-					}
-
-					for (int d = 0; d < 6; d++) {
-						
-						if (!divSwing[d]) {
-
-							//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divClockSample[d] = 1.0;
-								divPulse[d] = true;
-								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-							} else {
-								// ***** CLOCK DIVIDER *****
-								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divCount[d]++;
-								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
-									divClockSample[d] = 1.0;
-									divCount[d] = 1;
-									divPulse[d] = true;
-									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-								}
-							}
-						} else {
-							
-							//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
-								divOddCounter[d] = 1;
-								divClockSample[d] = 1.0;
-								divPulse[d] = true;
-								divPulseTime[d] = oneMsTime;
-								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-							} else {
-								// ***** CLOCK DIVIDER *****
-								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divCount[d]++;
-								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
-									divOddCounter[d] = 1;
-
-									divClockSample[d] = 1.0;
-									divCount[d] = 1;
-									divPulse[d] = true;
-									divPulseTime[d] = oneMsTime;
-									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-								}
-							}
-						}
-					}
-
-					if (!cvClockOut)
-						outputs[CLOCK_OUTPUT].setVoltage(10.f);
-
-				} else {
-					
-					extBeat = false;
-				}
-
-					
-
-			} else {
 			
-				extTrigValue = inputs[EXTCLOCK_INPUT].getVoltage();
-					
-				if (extTrigValue >= 1 && prevExtTrigValue < 1) {
+			extTrigValue = inputs[EXTCLOCK_INPUT].getVoltage();
+				
+			if (extTrigValue >= 1 && prevExtTrigValue < 1) {
 
-					pulseNr++;
-					if (extSync) {
+				pulseNr++;
+				if (extSync) {
 
-						/*
-						if (pulseNr > ppqnComparison) {
-							pulseNr = 0;
-							clockMaxSample = clockSample;
-							midBeatMaxSample = clockMaxSample / 2;
-							clockSample = 0.0;
-							
-							if (runSetting)
-								extBeat = true;
-
-							// calculate bpms
-							bpm = round(sampleRateCoeff / clockMaxSample);
-							if (bpm > 999)
-								bpm = 999;
-						}
-						*/
-
-						//clockMaxSample = clockSample * (ppqnValue2 - pulseNr);
-
-						if (pulseNr > ppqnComparison) {
-							pulseNr = 0;
-							clockMaxSample = clockSample;
-							clockSample = 0.0;
-							
-							if (runSetting)
-								extBeat = true;
-
-							// calculate bpms
-							bpm = round(sampleRateCoeff / clockMaxSample);
-							if (bpm > 999)
-								bpm = 999;
-
-							if (cvClockOut) {
-								cvClockOutValue = log2(bpm / 120.0f);
-								outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-							}
-						}
-
-					} else {
-
-						bpm = 0.0;
-						extSync = true;
-						clockSample = 1.0;
+					/*
+					if (pulseNr > ppqnComparison) {
 						pulseNr = 0;
-
+						clockMaxSample = clockSample;
+						midBeatMaxSample = clockMaxSample / 2;
+						clockSample = 0.0;
+						
 						if (runSetting)
 							extBeat = true;
+
+						// calculate bpms
+						bpm = round(sampleRateCoeff / clockMaxSample);
+						if (bpm > 999)
+							bpm = 999;
+					}
+					*/
+
+					//clockMaxSample = clockSample * (ppqnValue2 - pulseNr);
+
+					if (pulseNr > ppqnComparison) {
+						pulseNr = 0;
+						clockMaxSample = clockSample;
+						clockSample = 0.0;
+						
+						if (runSetting)
+							extBeat = true;
+
+						// calculate bpms
+						bpm = round(sampleRateCoeff / clockMaxSample);
+						if (bpm > 999)
+							bpm = 999;
 					}
 
 				} else {
-					extBeat = false;
-				}
-				prevExtTrigValue = extTrigValue;
+					bpm = 0.0;
+					extSync = true;
+					clockSample = 1.0;
+					pulseNr = 0;
 
-				//extClockSample++;
-			
+					if (runSetting)
+						extBeat = true;
+				}
+
+			} else {
+				extBeat = false;
 			}
+			prevExtTrigValue = extTrigValue;
+
+			//extClockSample++;
+		
+
 			// **************   RUN PROCESS   ***************
 
 			if (runSetting && resetPulseTime <= 0) {
@@ -942,8 +787,7 @@ struct Clocker2 : Module {
 
 				maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
 				if (clockSample > maxPulseSample)
-					if (!cvClockOut)
-						outputs[CLOCK_OUTPUT].setVoltage(0.f);
+					outputs[CLOCK_OUTPUT].setVoltage(0.f);
 
 				// ************ DIV / MULT
 
@@ -1042,9 +886,8 @@ struct Clocker2 : Module {
 								}
 							}
 						}
-						
-						if (!cvClockOut)
-							outputs[CLOCK_OUTPUT].setVoltage(10.f);
+
+						outputs[CLOCK_OUTPUT].setVoltage(10.f);
 					
 					}
 				}
@@ -1107,8 +950,7 @@ struct Clocker2DisplayTempo : TransparentWidget {
 				std::string tempBpmInt;
 				std::string tempBpmDec;
 
-				//if (!module->inputs[module->EXTCLOCK_INPUT].isConnected()) {
-				if (!module->extConn) {
+				if (!module->inputs[module->EXTCLOCK_INPUT].isConnected()) {
 					tempBpmInteger = int(module->bpm * 10 + .5);
 
 					tempBpm = to_string(tempBpmInteger);
@@ -1818,10 +1660,6 @@ struct Clocker2Widget : ModuleWidget {
 			menu->addChild(createBoolPtrMenuItem("Reset Bar", "", &module->resetOnStop));
 			menu->addChild(createBoolPtrMenuItem("Pulse to RST out", "", &module->resetPulseOnStop));
 		}));
-
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
-		menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
 	}
 };
 
