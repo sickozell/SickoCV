@@ -112,15 +112,14 @@ struct DrumPlayerPlus : Module {
 
 	double a0, a1, a2, b1, b2, z1, z2;
 
-// begin changes by DanGreen
+// begin changes for metamodule
 #if defined(METAMODULE)
-	const drwav_uint64 recordingLimit = 48000 * 60 * 2; // 60 sec mono, 30 sec stereo limit on MM (~25.5MB ram with 2x oversample)
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2 * 2; // 2mins mono, 1min stereo limit on MM
 #else
-	//const drwav_uint64 recordingLimit = 52428800 * 2; // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
 	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 20mins at 48.000khz MONO)
 	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 
 	DrumPlayerPlus() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -217,7 +216,7 @@ struct DrumPlayerPlus : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
-// begin changes by DanGreen
+// begin changes for metamodule
 #if !defined(METAMODULE)
 		for (int slot = 0; slot < 4; slot++) {
 			if (!fileLoaded[slot] && storedPath[slot] != "") {
@@ -227,12 +226,12 @@ struct DrumPlayerPlus : Module {
 			}
 		}
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
-// begin changes by DanGreen
+// begin changes for metamodule
 #if !defined(METAMODULE)
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		if (sampleInPatch) {
@@ -244,7 +243,7 @@ struct DrumPlayerPlus : Module {
 			}
 		}
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 		Module::onSave(e);
 	}
 
@@ -269,13 +268,13 @@ struct DrumPlayerPlus : Module {
 			interpolationMode = json_integer_value(interpolationJ);
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
-// begin changes by DanGreen
+// begin changes for metamodule
 #if defined (METAMODULE)
 			antiAlias = 1;
 #else
 			antiAlias = json_integer_value(antiAliasJ);
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 		json_t* outsModeJ = json_object_get(rootJ, "OutsMode");
 		if (outsModeJ)
 			outsMode = json_integer_value(outsModeJ);
@@ -610,15 +609,13 @@ struct DrumPlayerPlus : Module {
 			if (tsc > recordingLimit / 2)
 				tsc = recordingLimit / 2;	// set memory allocation limit
 
-// begin changes by DanGreen	
-//			playBuffer[slot][0].clear();
-//			playBuffer[slot][1].clear();
+// begin changes for metamodule	
 			const auto numSamples = c == 2 ? tsc : tsc * 2;
 			vector<float>().swap(playBuffer[slot][0]);
 			vector<float>().swap(playBuffer[slot][1]);
 			playBuffer[slot][0].reserve(numSamples+10);
  			playBuffer[slot][1].reserve(numSamples+10);
-// end changes by DanGreen
+// end changes for metamodule
 
 			for (unsigned int i = 0; i < tsc; i = i + c) {
 				playBuffer[slot][0].push_back(pSampleData[i]);
@@ -626,10 +623,8 @@ struct DrumPlayerPlus : Module {
 			}
 			totalSampleC[slot] = playBuffer[slot][0].size();
 			totalSamples[slot] = totalSampleC[slot]-1;
-//			drwav_free(pSampleData);	// unused (old dr_wav)
-// begin changes by DanGreen
+
 			free(pSampleData);
-// end changes by DanGreen
 
 			for (unsigned int i = 1; i < totalSamples[slot]; i = i + 2)		// averaging oversampled vector
 				playBuffer[slot][0][i] = playBuffer[slot][0][i-1] * .5f + playBuffer[slot][0][i+1] * .5f;
@@ -641,12 +636,12 @@ struct DrumPlayerPlus : Module {
 
 			sampleCoeff[slot] = sampleRate[slot] / (APP->engine->getSampleRate());		// the % distance between samples at speed 1x
 
-// begin changes by DanGreen
+// begin changes for metamodule
 #if defined(METAMODULE)
 			vector<float>().swap(playBuffer[slot][0]);
- 			playBuffer[slot][0].reserve(0);
+ 			//playBuffer[slot][0].reserve(0);
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 
 			if (loadFromPatch[slot])
 				path = storedPath[slot];
@@ -721,7 +716,7 @@ struct DrumPlayerPlus : Module {
 
 	void saveSample(std::string path, int slot) {
 
-// begin changes by DanGreen
+// begin changes for metamodule
 		int tempAlias = 0;
 #if defined (METAMODULE)
 		tempAlias = 1;
@@ -735,7 +730,7 @@ struct DrumPlayerPlus : Module {
 		for (unsigned int i = 0; i <= playBuffer[slot][tempAlias].size(); i = i + 2)
 			//data.push_back(playBuffer[slot][tempAlias][i] / 5);
 			data.push_back(playBuffer[slot][tempAlias][i]);
-// end changes by DanGreen
+// end changes for metamodule
 
 		drwav_data_format format;
 		format.container = drwav_container_riff;
@@ -778,14 +773,14 @@ struct DrumPlayerPlus : Module {
 		currFileDisplay[slot] = "-----";
 		totalSampleC[slot] = 0;
 
-// begin changes by DanGreen		
+// begin changes for metamodule		
 //		playBuffer[slot][0].clear();
 //		playBuffer[slot][1].clear();
 		vector<float>().swap(playBuffer[slot][0]);
 		vector<float>().swap(playBuffer[slot][1]);
-		playBuffer[slot][0].reserve(0);
- 		playBuffer[slot][1].reserve(0);
- // end changes by DanGreen
+		//playBuffer[slot][0].reserve(0);
+ 		//playBuffer[slot][1].reserve(0);
+ // end changes for metamodule
 
 	}
 	
@@ -1670,13 +1665,13 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 			}
 		}));
 
-// begin changes by DanGreen
+// begin changes for metamodule
 #if defined (METAMODULE)
 		menu->addChild(createMenuLabel("Anti-aliasing filter (ON)"));
 #else
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 
 		menu->addChild(new MenuSeparator());
 		struct OutsItem : MenuItem {
@@ -1699,13 +1694,13 @@ struct DrumPlayerPlusWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Scrolling sample names", "", &module->scrolling));
-// begin changes by DanGreen
+// begin changes for metamodule
 #if defined (METAMODULE)
 		menu->addChild(createMenuLabel("Store Sample in Patch (OFF)"));
 #else
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 	}
 };
 

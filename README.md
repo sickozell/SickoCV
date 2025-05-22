@@ -1,4 +1,4 @@
-# SickoCV v2.7.4-beta3
+# SickoCV v2.7.4-beta5
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -1355,6 +1355,7 @@ Please refer to sickoPlayer documentation.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
+Thanks to [Dan Green](https://forum.4ms.info/u/danngreen/summary) from [4ms](https://4mscompany.com/) for his precious help in developing the metamodule porting of this plugin, general optimization and suggestions.  
 A very big thanks to [Omri Cohen](https://omricohen-music.com/) for developing help and support  
 Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [AuxMux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
 Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  

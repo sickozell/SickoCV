@@ -635,7 +635,7 @@ struct Clocker : Module {
 
 			uint64_t newTsc = ceil((double)tsc * resampleCoeff);
 
-// begin changes by DanGreen
+// begin changes for metamodule
 //			tempBuffer.clear();
 //			tempBuffer2.clear();
 			const auto numSamples = c == 2 ? newTsc : newTsc * 2;
@@ -646,7 +646,7 @@ struct Clocker : Module {
 			tempBuffer.reserve(numSamples+10);
 			vector<float> tempBuffer2;
 			tempBuffer2.reserve(numSamples+10);
-// end changes by DanGreen
+// end changes for metamodule
 
 			if (sr == APP->engine->getSampleRate()) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -654,8 +654,7 @@ struct Clocker : Module {
 				}
 				totalSampleC[slot] = playBuffer[slot].size();
 				totalSamples[slot] = totalSampleC[slot]-1;
-//				drwav_free(pSampleData);
-				free(pSampleData);  // non dimenticare!
+				free(pSampleData);
 
 				sampleRate[slot] = APP->engine->getSampleRate();
 
@@ -665,8 +664,7 @@ struct Clocker : Module {
 					tempBuffer.push_back(0);
 				}
 
-//				drwav_free(pSampleData);
-				free(pSampleData);  // non dimenticare!
+				free(pSampleData);
 
 				drwav_uint64 tempSampleC = tempBuffer.size();
 				drwav_uint64 tempSamples = tempSampleC-1;
@@ -740,14 +738,12 @@ struct Clocker : Module {
 
 			}
 
-// begin changes by DanGreen
-			//tempBuffer.clear();
-			//tempBuffer2.clear();
-			vector<float>().swap(tempBuffer);
-			vector<float>().swap(tempBuffer2);
-			tempBuffer.reserve(0);
-			tempBuffer2.reserve(0);
-// end changes by DanGreen
+// begin changes for metamodule
+			//vector<float>().swap(tempBuffer);
+			//vector<float>().swap(tempBuffer2);
+			//tempBuffer.reserve(0);
+			//tempBuffer2.reserve(0);
+// end changes for metamodule
 
 			char* pathDup = strdup(path.c_str());
 
@@ -776,11 +772,11 @@ struct Clocker : Module {
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
 			totalSampleC[slot] = 0;
-// begin changes by DanGreen
+// begin changes for metamodule
 			//playBuffer[slot].clear();
 			vector<float>().swap(playBuffer[slot]);
-			playBuffer[slot].reserve(0);
-// end changes by DanGreen
+			//playBuffer[slot].reserve(0);
+// end changes for metamodule
 		}
 	}
 

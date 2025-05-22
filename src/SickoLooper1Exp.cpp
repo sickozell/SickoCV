@@ -410,15 +410,14 @@ struct SickoLooper1Exp : Module {
 	bool extBeat = false;
 	*/
 
-// begin changes by DanGreen
+// begin changes for metamodule
 #if defined(METAMODULE)
-	const drwav_uint64 recordingLimit = 48000 * 60 * 2; // 60 sec mono, 30 sec stereo limit on MM (~25.5MB ram with 2x oversample)
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2 * 2; // 2mins mono, 1min stereo limit on MM
 #else
-	//const drwav_uint64 recordingLimit = 52428800 * 2; // set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
 	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 10mins stereo at 48.000khz)
 	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 	
 	// ***************************************************************************************************
 	// ***************************************************************************************************
@@ -592,7 +591,7 @@ struct SickoLooper1Exp : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
-// begin changes by DanGreen
+// begin changes for metamodule
 #if !defined(METAMODULE)
 		std::string path;
 		path = system::join(getPatchStorageDirectory(), "track.wav");
@@ -600,12 +599,12 @@ struct SickoLooper1Exp : Module {
 		if (fileLoaded)
 			trackRecorded = true;
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
-// begin changes by DanGreen
+// begin changes for metamodule
 #if !defined(METAMODULE)
 		std::string path;
 		system::removeRecursively(getPatchStorageDirectory().c_str());
@@ -614,7 +613,7 @@ struct SickoLooper1Exp : Module {
 			saveSample(path);
 		}
 #endif
-// end changes by DanGreen
+// end changes for metamodule
 		Module::onSave(e);
 	}
 
@@ -664,13 +663,13 @@ struct SickoLooper1Exp : Module {
 
 
 				// ***************************************************************************
-// begin changes by DanGreen			
+// begin changes for metamodule			
 				// Shrink tempBuffer to fit:
 				const auto numSamples = (totalSampleC / resampleCoeff) + 10;
 				tempBuffer[LEFT].reserve(numSamples);
 	 			tempBuffer[RIGHT].reserve(numSamples);
 	 
-// end changes by DanGreen	
+// end changes for metamodule	
 
 				for (unsigned int i=0; i < trackBuffer[LEFT].size(); i = i + 2) {
 					tempBuffer[LEFT].push_back(trackBuffer[LEFT][i]);
@@ -694,18 +693,22 @@ struct SickoLooper1Exp : Module {
 
 				// ***************************************************************************
 
-// begin changes by DanGreen
+// begin changes for metamodule
 //				trackBuffer[LEFT].clear();
 //				trackBuffer[RIGHT].clear();
 	 			vector<float>().swap(trackBuffer[LEFT]);
 	 			vector<float>().swap(trackBuffer[RIGHT]);
 	 			trackBuffer[LEFT].reserve(numSamples);
 	 			trackBuffer[RIGHT].reserve(numSamples);
-	 			
-// end changes by DanGreen	
+// end changes for metamodule	
 
 				double currResamplePos = 0;
+				
+#if defined(METAMODULE_BUILTIN)
+				int floorCurrResamplePos = 0;	// 4ms change
+#else
 				double floorCurrResamplePos = 0;
+#endif
 
 				trackBuffer[LEFT].push_back(tempBuffer[LEFT][0]);
 				trackBuffer[RIGHT].push_back(tempBuffer[RIGHT][0]);
@@ -792,13 +795,14 @@ struct SickoLooper1Exp : Module {
 				else
 					totalSampleC = trackBuffer[LEFT].size();
 				totalSamples = totalSampleC-1;
-
-// begin changes by DanGreen
+/*
+// begin changes for metamodule
 				vector<float>().swap(tempBuffer[LEFT]);
 				vector<float>().swap(tempBuffer[RIGHT]);
 				tempBuffer[LEFT].reserve(0);
 				tempBuffer[RIGHT].reserve(0);
-// end changes by DanGreen
+// end changes for metamodule
+*/
 			}
 		}
 		prevSampleRate = sampleRate;
@@ -1009,7 +1013,7 @@ struct SickoLooper1Exp : Module {
 
 			uint64_t newTsc = ceil((double)tsc / resampleCoeff);
 
-// begin changes by DanGreen
+// begin changes for metamodule
 //			trackBuffer[LEFT].clear();
 //			trackBuffer[RIGHT].clear();
 //			tempBuffer[LEFT].clear();
@@ -1018,9 +1022,9 @@ struct SickoLooper1Exp : Module {
 			// metamodule change
 //			vector<float>().swap(trackBuffer[LEFT]);
 //			vector<float>().swap(trackBuffer[RIGHT]);
-// end changes by DanGreen
+// end changes for metamodule
 
-// begin changes by DanGreen
+// begin changes for metamodule
 
 			// Shrink playBuffer to fit:
  			const auto numSamples = fileChannels == 2 ? newTsc : newTsc * 2;
@@ -1030,7 +1034,7 @@ struct SickoLooper1Exp : Module {
  			vector<float>().swap(trackBuffer[RIGHT]);
 			trackBuffer[RIGHT].reserve(numSamples+10);
 
-// end changes by DanGreen
+// end changes for metamodule
 
 			if (fileSampleRate == sampleRate) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -1051,10 +1055,7 @@ struct SickoLooper1Exp : Module {
 				trackBuffer[LEFT].push_back(trackBuffer[LEFT][trackBuffer[LEFT].size()-2] * .5);
 				trackBuffer[RIGHT].push_back(trackBuffer[RIGHT][trackBuffer[RIGHT].size()-2] * .5);
 
-//				drwav_free(pSampleData);
-// begin changes by DanGreen
 				free(pSampleData);
-// end changes by DanGreen
 
 			} else if (fileSampleRate == APP->engine->getSampleRate() * 2) {	// ***** LOAD DIRECTLY OVERSAMPLED, NO RESAMPLE *****
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -1065,18 +1066,16 @@ struct SickoLooper1Exp : Module {
 						trackBuffer[RIGHT].push_back(pSampleData[i] * 5);
 					}
 				}
-//				drwav_free(pSampleData);
-// begin changes by DanGreen
+
 				free(pSampleData);
-// end changes by DanGreen
 
 			} else {											// ***************** RESAMPLE ****************************************
 
-// begin changes by DanGreen
+// begin changes for metamodule
 				vector<float> tempBuffer[2];
 				tempBuffer[LEFT].reserve(numSamples);
 				tempBuffer[RIGHT].reserve(numSamples);
-// end changes by DanGreen
+// end changes for metamodule
 
 				for (unsigned int i=0; i < tsc; i = i + c) {
 					tempBuffer[LEFT].push_back(pSampleData[i] * 5);
@@ -1088,10 +1087,7 @@ struct SickoLooper1Exp : Module {
 					tempBuffer[RIGHT].push_back(0);
 				}
 
-//				drwav_free(pSampleData);
-// begin changes by DanGreen
 				free(pSampleData);
-// end changes by DanGreen
 
 				drwav_uint64 tempSampleC = tempBuffer[LEFT].size();
 				drwav_uint64 tempSamples = tempSampleC-1;					// *****   DA VERIFICARE se è -2 ********************************************
@@ -1195,14 +1191,14 @@ struct SickoLooper1Exp : Module {
 				totalSampleC = trackBuffer[LEFT].size();
 				totalSamples = totalSampleC-1;
 				//	******************************************************************** fine dell'eventuale salto di un passaggio
-
-// begin changes by DanGreen
+/*
+// begin changes for metamodule
 				vector<float>().swap(tempBuffer[LEFT]);
 				vector<float>().swap(tempBuffer[RIGHT]);
 				tempBuffer[LEFT].reserve(0);
 				tempBuffer[RIGHT].reserve(0);
-// end changes by DanGreen
-
+// end changes for metamodule
+*/
 			}
 
 			if (extraSamples)
@@ -1937,14 +1933,14 @@ struct SickoLooper1Exp : Module {
 			if (trackStatus == IDLE && eraseWait && eraseTime != eraseSamples) {
 				eraseWait = false;
 
-// begin changes by DanGreen
+// begin changes for metamodule
 //				trackBuffer[LEFT].resize(0);
 //				trackBuffer[RIGHT].resize(0);
 	 			vector<float>().swap(trackBuffer[LEFT]);
-	 			trackBuffer[LEFT].reserve(0);
+//	 			trackBuffer[LEFT].reserve(0);
 	 			vector<float>().swap(trackBuffer[RIGHT]);
-	 			trackBuffer[RIGHT].reserve(0);
-// end changes by DanGreen
+//	 			trackBuffer[RIGHT].reserve(0);
+// end changes for metamodule
 
 				totalSamples = 0;
 				totalSampleC = 0;
@@ -3150,7 +3146,12 @@ struct SickoLooper1Exp : Module {
 				if (xFadeValue < 0) {
 					extraPlaying = false;
 				} else {
+
+#if defined(METAMODULE_BUILTIN)
+					if (floor(extraPlayPos) >= 1 && (floor(extraPlayPos) + 2) < trackBuffer[LEFT].size()) { // 4ms change
+#else
 					if (extraPlayPos >= 0 && extraPlayPos < trackBuffer[LEFT].size()) {
+#endif
 						currentOutput[LEFT] *= 1-xFadeValue;
 						currentOutput[RIGHT] *= 1-xFadeValue;
 						
@@ -3181,8 +3182,11 @@ struct SickoLooper1Exp : Module {
 				}
 			} else {	// if it's playing full tail, only if direction is FORWARD
 
+#if defined(METAMODULE_BUILTIN)
+				if (extraPlayPos < tailEnd - minTimeSamplesOvs && floor(extraPlayPos) >= 1 && floor(extraPlayPos)+2 < trackBuffer[LEFT].size()) { // 4ms change				
+#else
 				if (extraPlayPos < tailEnd - minTimeSamplesOvs) {
-
+#endif
 					/*
 					currentOutput[LEFT] += trackBuffer[LEFT][extraPlayPos];
 					currentOutput[RIGHT] += trackBuffer[RIGHT][extraPlayPos];
@@ -3206,6 +3210,7 @@ struct SickoLooper1Exp : Module {
 						fadeTailValue = 1;
 					}
 					if (extraPlayPos < tailEnd) {
+					//if (extraPlayPos < tailEnd && floor(extraPlayPos) >= 1 && floor(extraPlayPos)+2 < trackBuffer[LEFT].size()) { // 4ms change
 						fadeTailValue -= fadeTailDelta;
 						//currentOutput[LEFT] += trackBuffer[LEFT][extraPlayPos] * fadeTailValue;
 						//currentOutput[RIGHT] += trackBuffer[RIGHT][extraPlayPos] * fadeTailValue;
@@ -3239,12 +3244,20 @@ struct SickoLooper1Exp : Module {
 				extraRecording = false;
 
 			} else {
+				
+#if defined(METAMODULE_BUILTIN)
+				if ((extraRecPos + 2) >= trackBuffer[LEFT].size()) {	// 4ms change
+					trackBuffer[LEFT].resize(extraRecPos + 3, 0.f);
+					trackBuffer[RIGHT].resize(extraRecPos + 3, 0.f);
+				}
+#else
 				if (extraRecPos >= trackBuffer[LEFT].size()) {
 					trackBuffer[LEFT].push_back(0.f);
 					trackBuffer[LEFT].push_back(0.f);
 					trackBuffer[RIGHT].push_back(0.f);
 					trackBuffer[RIGHT].push_back(0.f);
 				}
+#endif
 
 				if (recFade) {
 					recFadeValue += recFadeDelta;
@@ -3281,7 +3294,15 @@ struct SickoLooper1Exp : Module {
 				} else {
 					trackBuffer[LEFT][extraRecPos+1] = (trackBuffer[LEFT][extraRecPos+2] + trackBuffer[LEFT][extraRecPos]) / 2;
 					trackBuffer[RIGHT][extraRecPos+1] = (trackBuffer[RIGHT][extraRecPos+2] + trackBuffer[RIGHT][extraRecPos]) / 2;
+
+#if defined(METAMODULE_BUILTIN)
+					if (extraRecPos >= sampleCoeff) // 4ms change
+						extraRecPos -= sampleCoeff;
+					else
+						extraRecPos = 0;
+#else
 					extraRecPos -= sampleCoeff;
+#endif
 				}
 			}
 		}
