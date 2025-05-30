@@ -793,7 +793,7 @@ struct SickoLooper1 : Module {
 				
 				double currResamplePos = 0;
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 				int floorCurrResamplePos = 0;	// 4ms change
 #else
 				double floorCurrResamplePos = 0;
@@ -4049,7 +4049,7 @@ struct SickoLooper1 : Module {
 					extraPlaying = false;
 				} else {
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 					if (floor(extraPlayPos) >= 1 && (floor(extraPlayPos) + 2) < trackBuffer[LEFT].size()) { // 4ms change
 #else
 					if (extraPlayPos >= 0 && extraPlayPos < trackBuffer[LEFT].size()) {
@@ -4084,7 +4084,7 @@ struct SickoLooper1 : Module {
 				}
 			} else {	// if it's playing full tail, only if direction is FORWARD
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 				if (extraPlayPos < tailEnd - minTimeSamplesOvs && floor(extraPlayPos) >= 1 && floor(extraPlayPos)+2 < trackBuffer[LEFT].size()) { // 4ms change
 #else
 				if (extraPlayPos < tailEnd - minTimeSamplesOvs) {
@@ -4148,7 +4148,7 @@ struct SickoLooper1 : Module {
 
 			} else {
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 				if ((extraRecPos + 2) >= trackBuffer[LEFT].size()) {	// 4ms change
 					trackBuffer[LEFT].resize(extraRecPos + 3, 0.f);
 					trackBuffer[RIGHT].resize(extraRecPos + 3, 0.f);
@@ -4199,7 +4199,7 @@ struct SickoLooper1 : Module {
 					trackBuffer[LEFT][extraRecPos+1] = (trackBuffer[LEFT][extraRecPos+2] + trackBuffer[LEFT][extraRecPos]) / 2;
 					trackBuffer[RIGHT][extraRecPos+1] = (trackBuffer[RIGHT][extraRecPos+2] + trackBuffer[RIGHT][extraRecPos]) / 2;
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 					if (extraRecPos >= sampleCoeff) // 4ms change
 						extraRecPos -= sampleCoeff;
 					else

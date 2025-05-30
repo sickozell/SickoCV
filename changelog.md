@@ -4,6 +4,7 @@
 - slewer/slewer mini: inverted shapes on shape knob
 - sickoSampler2: fixed a bug drawing the playhead outside the module
 - clocker2: added CV clock feature
+- ad mini: loop status recorded in patch
 - merged repository with 4ms Metamodule repo
 
 ### 2.7.3 (2025-04-18)

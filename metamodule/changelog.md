@@ -1,3 +1,6 @@
+### v0.18
+- fixed some general bugs for MM
+
 ### v0.17
 - doubled sample limits on all sampler modules
 - fixed out of bound bugs on looper modules

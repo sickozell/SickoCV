@@ -96,6 +96,10 @@ struct AdMini : Module {
 	const float maxAdsrTime = 10.f;
 	const float minAdsrTime = 0.001f;
 
+	bool firstRun = true;
+
+	bool loopStatus = false;
+
 	//**************************************************************
 	// EXPANDER variables
 
@@ -132,6 +136,7 @@ struct AdMini : Module {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "mode", json_integer(mode));
 		json_object_set_new(rootJ, "lvlToEnv", json_boolean(lvlToEnv));
+		json_object_set_new(rootJ, "loopStatus", json_boolean(loopStatus));
 
 		return rootJ;
 	}
@@ -143,6 +148,9 @@ struct AdMini : Module {
 		json_t* lvlToEnvJ = json_object_get(rootJ, "lvlToEnv");
 		if (lvlToEnvJ)
 			lvlToEnv = json_boolean_value(lvlToEnvJ);
+		json_t* loopStatusJ = json_object_get(rootJ, "loopStatus");
+		if (loopStatusJ)
+			loopStatus = json_boolean_value(loopStatusJ);
 	}
 
 
@@ -215,6 +223,18 @@ struct AdMini : Module {
 
 			trigValue[c] = inputs[TRIG_INPUT].getVoltage(c);
 
+			if (firstRun) {
+				firstRun = false;
+				if (mode == LOOP_MODE && loopStatus) {
+					stage[c] = ATTACK_STAGE;
+					stageLevel[c] = 0;
+					refValue[c] = 0;
+					deltaValue[c] = 1.f;
+					slopeCorr[c] = 1.f;
+					loopStatus = true;
+				}
+			}
+
 			switch (mode) {
 
 				case FUNC_MODE:
@@ -264,6 +284,8 @@ struct AdMini : Module {
 							deltaValue[c] = 1.f;
 							slopeCorr[c] = 1.f;
 
+							loopStatus = true;
+
 						} else {
 							if (stage[c] == RELEASE_STAGE) {
 								stage[c] = ATTACK_STAGE;
@@ -271,13 +293,14 @@ struct AdMini : Module {
 								refValue[c] = env[c];
 								deltaValue[c] = 1-env[c];
 								slopeCorr[c] = 1-env[c];
+								loopStatus = true;
 							} else {
 
 								stage[c] = RELEASE_STAGE;
 								stageLevel[c] = 1;
 								refValue[c] = 0;
 								deltaValue[c] = env[c];
-
+								loopStatus = false;
 							}
 						}
 					}

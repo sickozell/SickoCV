@@ -873,7 +873,7 @@ struct SickoLooper5 : Module {
 
 				double currResamplePos = 0;
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 				int floorCurrResamplePos = 0;	// 4ms change
 #else
 				double floorCurrResamplePos = 0;
@@ -916,7 +916,7 @@ struct SickoLooper5 : Module {
 					floorCurrResamplePos = floor(currResamplePos);
 				}
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 				while ( floorCurrResamplePos < tempSamples ) {	// 4ms change
 #else
 				while ( floorCurrResamplePos < tempSampleC ) {
@@ -1305,7 +1305,7 @@ struct SickoLooper5 : Module {
 					floorCurrResamplePos = floor(currResamplePos);
 				}
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 				while ( floorCurrResamplePos < tempSamples ) {	// 4ms change
 #else
 				while ( floorCurrResamplePos < double(tempSampleC) ) {
@@ -4527,7 +4527,7 @@ struct SickoLooper5 : Module {
 				case OVERDUBBING:
 
 					if (samplePos[track] >= trackBuffer[track][LEFT].size()) {
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 						trackBuffer[track][LEFT].resize(samplePos[track] + 1, 0.f);	// 4ms change
 						trackBuffer[track][RIGHT].resize(samplePos[track] + 1, 0.f);
 #else
@@ -4629,7 +4629,7 @@ struct SickoLooper5 : Module {
 
 				} else {
 
-#if defined(METAMODULE_BUILTIN)
+#if defined(METAMODULE)
 					if ((extraRecPos[track]) >= trackBuffer[track][LEFT].size()) {	// 4ms change
 						trackBuffer[track][LEFT].resize(extraRecPos[track] + 1, 0.f);
 						trackBuffer[track][RIGHT].resize(extraRecPos[track] + 1, 0.f);
