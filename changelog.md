@@ -1,7 +1,8 @@
-### 2.7.4 (2025-05-22)
+### 2.7.4 (2025-06-03)
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
 - all sampler modules: improved memory allocation management
 - slewer/slewer mini: inverted shapes on shape knob
+- sickoSampler: fixed a bug that crashes Rack when clearing the sample via trig input during playback
 - sickoSampler2: fixed a bug drawing the playhead outside the module
 - clocker2: added CV clock feature
 - ad mini: loop status recorded in patch

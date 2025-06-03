@@ -1978,217 +1978,209 @@ struct SickoSampler : Module {
 		} else {
 
 			clearTrig = inputs[CLEAR_INPUT].getVoltage();
-			if (clearTrig >= 1 && prevClearTrig < 1)
+			if (clearTrig >= 1 && prevClearTrig < 1) {
 				clearSlot();
-			prevClearTrig = clearTrig;
+			} else {
 
-			knobCueEndPos = params[CUEEND_PARAM].getValue();
-			if (knobCueEndPos != prevKnobCueEndPos) {
-				if (knobCueEndPos < prevKnobCueEndPos)
-					cueEndPos = floor(totalSamples * knobCueEndPos);
-				else
-					cueEndPos = ceil(totalSamples * knobCueEndPos);
-				prevKnobCueEndPos = knobCueEndPos;
-				searchingCueEndPhase = true;
-				scanCueEndSample = cueEndPos;
-				if (cueEndPos < cueStartPos)
-					cueEndPos = cueStartPos;
-			}
-			knobCueStartPos = params[CUESTART_PARAM].getValue();
-			if (knobCueStartPos != prevKnobCueStartPos) {
-				if (knobCueStartPos < prevKnobCueStartPos)
-					cueStartPos = floor(totalSamples * knobCueStartPos);
-				else
-					cueStartPos = ceil(totalSamples * knobCueStartPos);
-				prevKnobCueStartPos = knobCueStartPos;
-				searchingCueStartPhase = true;
-				scanCueStartSample = cueStartPos;
-				if (cueStartPos > cueEndPos)
-					cueStartPos = cueEndPos;
-			}
-			knobLoopEndPos = params[LOOPEND_PARAM].getValue();
-			if (knobLoopEndPos != prevKnobLoopEndPos) {
-				if (knobLoopEndPos < prevKnobLoopEndPos)
-					loopEndPos = floor(totalSamples * knobLoopEndPos);
-				else
-					loopEndPos = ceil(totalSamples * knobLoopEndPos);
-				prevKnobLoopEndPos = knobLoopEndPos;
-				searchingLoopEndPhase = true;
-				scanLoopEndSample = loopEndPos;
-				if (loopEndPos < loopStartPos)
-					loopEndPos = loopStartPos;
-			}
-			knobLoopStartPos = params[LOOPSTART_PARAM].getValue();
-			if (knobLoopStartPos != prevKnobLoopStartPos) {
-				if (knobLoopStartPos < prevKnobLoopStartPos)
-					loopStartPos = floor(totalSamples * knobLoopStartPos);
-				else
-					loopStartPos = ceil(totalSamples * knobLoopStartPos);
-				prevKnobLoopStartPos = knobLoopStartPos;
-				searchingLoopStartPhase = true;
-				scanLoopStartSample = loopStartPos;
-				if (loopStartPos > loopEndPos)
-					loopStartPos = loopEndPos;
-			}
+				prevClearTrig = clearTrig;
 
-			if (phaseScan && !prevPhaseScan) {
-				prevPhaseScan = true;
-				searchingCueEndPhase = true;
-				searchingCueStartPhase = true;
-				searchingLoopEndPhase = true;
-				searchingLoopStartPhase = true;
-			}
+				knobCueEndPos = params[CUEEND_PARAM].getValue();
+				if (knobCueEndPos != prevKnobCueEndPos) {
+					if (knobCueEndPos < prevKnobCueEndPos)
+						cueEndPos = floor(totalSamples * knobCueEndPos);
+					else
+						cueEndPos = ceil(totalSamples * knobCueEndPos);
+					prevKnobCueEndPos = knobCueEndPos;
+					searchingCueEndPhase = true;
+					scanCueEndSample = cueEndPos;
+					if (cueEndPos < cueStartPos)
+						cueEndPos = cueStartPos;
+				}
+				knobCueStartPos = params[CUESTART_PARAM].getValue();
+				if (knobCueStartPos != prevKnobCueStartPos) {
+					if (knobCueStartPos < prevKnobCueStartPos)
+						cueStartPos = floor(totalSamples * knobCueStartPos);
+					else
+						cueStartPos = ceil(totalSamples * knobCueStartPos);
+					prevKnobCueStartPos = knobCueStartPos;
+					searchingCueStartPhase = true;
+					scanCueStartSample = cueStartPos;
+					if (cueStartPos > cueEndPos)
+						cueStartPos = cueEndPos;
+				}
+				knobLoopEndPos = params[LOOPEND_PARAM].getValue();
+				if (knobLoopEndPos != prevKnobLoopEndPos) {
+					if (knobLoopEndPos < prevKnobLoopEndPos)
+						loopEndPos = floor(totalSamples * knobLoopEndPos);
+					else
+						loopEndPos = ceil(totalSamples * knobLoopEndPos);
+					prevKnobLoopEndPos = knobLoopEndPos;
+					searchingLoopEndPhase = true;
+					scanLoopEndSample = loopEndPos;
+					if (loopEndPos < loopStartPos)
+						loopEndPos = loopStartPos;
+				}
+				knobLoopStartPos = params[LOOPSTART_PARAM].getValue();
+				if (knobLoopStartPos != prevKnobLoopStartPos) {
+					if (knobLoopStartPos < prevKnobLoopStartPos)
+						loopStartPos = floor(totalSamples * knobLoopStartPos);
+					else
+						loopStartPos = ceil(totalSamples * knobLoopStartPos);
+					prevKnobLoopStartPos = knobLoopStartPos;
+					searchingLoopStartPhase = true;
+					scanLoopStartSample = loopStartPos;
+					if (loopStartPos > loopEndPos)
+						loopStartPos = loopEndPos;
+				}
 
-			if (phaseScan) {
-				float tempKnob;
-				if (searchingCueEndPhase) {
-					if (playBuffer[LEFT][antiAlias][scanCueEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanCueEndSample] >= 0) {
-						cueEndPos = scanCueEndSample;
-						searchingCueEndPhase = false;
-						tempKnob = cueEndPos/totalSamples;
-						params[CUEEND_PARAM].setValue(tempKnob);
-						knobCueEndPos = tempKnob;
-					} else {
-						scanCueEndSample--;
-						if (scanCueEndSample < cueStartPos) {
-							cueEndPos = cueStartPos;
+				if (phaseScan && !prevPhaseScan) {
+					prevPhaseScan = true;
+					searchingCueEndPhase = true;
+					searchingCueStartPhase = true;
+					searchingLoopEndPhase = true;
+					searchingLoopStartPhase = true;
+				}
+
+				if (phaseScan) {
+					float tempKnob;
+					if (searchingCueEndPhase) {
+						if (playBuffer[LEFT][antiAlias][scanCueEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanCueEndSample] >= 0) {
+							cueEndPos = scanCueEndSample;
 							searchingCueEndPhase = false;
 							tempKnob = cueEndPos/totalSamples;
 							params[CUEEND_PARAM].setValue(tempKnob);
 							knobCueEndPos = tempKnob;
+						} else {
+							scanCueEndSample--;
+							if (scanCueEndSample < cueStartPos) {
+								cueEndPos = cueStartPos;
+								searchingCueEndPhase = false;
+								tempKnob = cueEndPos/totalSamples;
+								params[CUEEND_PARAM].setValue(tempKnob);
+								knobCueEndPos = tempKnob;
 
+							}
 						}
-					}
 
-				}
-				if (searchingCueStartPhase) {
-					if (playBuffer[LEFT][antiAlias][scanCueStartSample+1] >= 0 && playBuffer[LEFT][antiAlias][scanCueStartSample] <= 0) {
-						cueStartPos = scanCueStartSample;
-						searchingCueStartPhase = false;
-						tempKnob = cueStartPos/totalSamples;
-						params[CUESTART_PARAM].setValue(tempKnob);
-						prevKnobCueStartPos = tempKnob;
-					} else {
-						scanCueStartSample++;
-						if (scanCueStartSample > cueEndPos) {
-							cueStartPos = cueEndPos;
+					}
+					if (searchingCueStartPhase) {
+						if (playBuffer[LEFT][antiAlias][scanCueStartSample+1] >= 0 && playBuffer[LEFT][antiAlias][scanCueStartSample] <= 0) {
+							cueStartPos = scanCueStartSample;
 							searchingCueStartPhase = false;
 							tempKnob = cueStartPos/totalSamples;
 							params[CUESTART_PARAM].setValue(tempKnob);
 							prevKnobCueStartPos = tempKnob;
+						} else {
+							scanCueStartSample++;
+							if (scanCueStartSample > cueEndPos) {
+								cueStartPos = cueEndPos;
+								searchingCueStartPhase = false;
+								tempKnob = cueStartPos/totalSamples;
+								params[CUESTART_PARAM].setValue(tempKnob);
+								prevKnobCueStartPos = tempKnob;
+							}
 						}
 					}
-				}
-				if (searchingLoopEndPhase) {
-					if (playBuffer[LEFT][antiAlias][scanLoopEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanLoopEndSample] >= 0) {
-						loopEndPos = scanLoopEndSample;
-						searchingLoopEndPhase = false;
-						tempKnob = loopEndPos/totalSamples;
-						params[LOOPEND_PARAM].setValue(tempKnob);
-						prevKnobLoopEndPos = tempKnob;
-					} else {
-						scanLoopEndSample--;
-						if (scanLoopEndSample < loopStartPos) {
-							loopEndPos = loopStartPos;
+					if (searchingLoopEndPhase) {
+						if (playBuffer[LEFT][antiAlias][scanLoopEndSample-1] <= 0 && playBuffer[LEFT][antiAlias][scanLoopEndSample] >= 0) {
+							loopEndPos = scanLoopEndSample;
 							searchingLoopEndPhase = false;
 							tempKnob = loopEndPos/totalSamples;
 							params[LOOPEND_PARAM].setValue(tempKnob);
 							prevKnobLoopEndPos = tempKnob;
+						} else {
+							scanLoopEndSample--;
+							if (scanLoopEndSample < loopStartPos) {
+								loopEndPos = loopStartPos;
+								searchingLoopEndPhase = false;
+								tempKnob = loopEndPos/totalSamples;
+								params[LOOPEND_PARAM].setValue(tempKnob);
+								prevKnobLoopEndPos = tempKnob;
+							}
 						}
 					}
-				}
-				if (searchingLoopStartPhase) {
-					if (playBuffer[LEFT][antiAlias][scanLoopStartSample+1] >= 0 && playBuffer[LEFT][antiAlias][scanLoopStartSample] <= 0) {
-						loopStartPos = scanLoopStartSample;
-						searchingLoopStartPhase = false;
-						tempKnob = loopStartPos/totalSamples;
-						params[LOOPSTART_PARAM].setValue(tempKnob);
-						prevKnobLoopStartPos = tempKnob;
-					} else {
-						scanLoopStartSample++;
-						if (scanLoopStartSample > loopEndPos) {
-							loopStartPos = loopEndPos;
+					if (searchingLoopStartPhase) {
+						if (playBuffer[LEFT][antiAlias][scanLoopStartSample+1] >= 0 && playBuffer[LEFT][antiAlias][scanLoopStartSample] <= 0) {
+							loopStartPos = scanLoopStartSample;
 							searchingLoopStartPhase = false;
 							tempKnob = loopStartPos/totalSamples;
 							params[LOOPSTART_PARAM].setValue(tempKnob);
 							prevKnobLoopStartPos = tempKnob;
+						} else {
+							scanLoopStartSample++;
+							if (scanLoopStartSample > loopEndPos) {
+								loopStartPos = loopEndPos;
+								searchingLoopStartPhase = false;
+								tempKnob = loopStartPos/totalSamples;
+								params[LOOPSTART_PARAM].setValue(tempKnob);
+								prevKnobLoopStartPos = tempKnob;
+							}
 						}
 					}
+					
+				} else {
+					prevPhaseScan = false;
 				}
-				
-			} else {
-				prevPhaseScan = false;
-			}
 
-			trigMode = params[TRIGGATEMODE_SWITCH].getValue();
-			trigType = params[TRIGMODE_SWITCH].getValue();
+				trigMode = params[TRIGGATEMODE_SWITCH].getValue();
+				trigType = params[TRIGMODE_SWITCH].getValue();
 
-			sustainValue = params[SUSTAIN_PARAM].getValue() + (inputs[SUSTAIN_INPUT].getVoltage() * params[SUSTAINATNV_PARAM].getValue() * 0.1);
-			if (sustainValue > 1)
-				sustainValue = 1;
-			else if (sustainValue < 0)
-				sustainValue = 0;
+				sustainValue = params[SUSTAIN_PARAM].getValue() + (inputs[SUSTAIN_INPUT].getVoltage() * params[SUSTAINATNV_PARAM].getValue() * 0.1);
+				if (sustainValue > 1)
+					sustainValue = 1;
+				else if (sustainValue < 0)
+					sustainValue = 0;
 
-			xFade = params[XFADE_PARAM].getValue();
+				xFade = params[XFADE_PARAM].getValue();
 
-			if (xFade != prevXfade) {
-				if (xFade == 0)
-					fadeSamples = 0;
-				else
-					fadeSamples = floor(convertCVToSeconds(xFade) * args.sampleRate); // number of samples before starting fade
+				if (xFade != prevXfade) {
+					if (xFade == 0)
+						fadeSamples = 0;
+					else
+						fadeSamples = floor(convertCVToSeconds(xFade) * args.sampleRate); // number of samples before starting fade
 
-				prevXfade = xFade;
-			}
+					prevXfade = xFade;
+				}
 
-			// START CHANNEL MANAGEMENT
+				// START CHANNEL MANAGEMENT
 
-			voctDisplay = 100.f;
+				voctDisplay = 100.f;
 
-			for (int c = 0; c < chan; c++) {
+				for (int c = 0; c < chan; c++) {
 
-				if (polyMaster) 
-					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(c) * params[VOLATNV_PARAM].getValue() * 0.2);
-				else
-					masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(0) * params[VOLATNV_PARAM].getValue() * 0.2);
-				
-				if (masterLevel[c] > 2)
-					masterLevel[c] = 2;
-				else if (masterLevel[c] < 0)
-					masterLevel[c] = 0;
+					if (polyMaster) 
+						masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(c) * params[VOLATNV_PARAM].getValue() * 0.2);
+					else
+						masterLevel[c] = params[VOL_PARAM].getValue() + (inputs[VOL_INPUT].getVoltage(0) * params[VOLATNV_PARAM].getValue() * 0.2);
+					
+					if (masterLevel[c] > 2)
+						masterLevel[c] = 2;
+					else if (masterLevel[c] < 0)
+						masterLevel[c] = 0;
 
-				if (c == 0 && trigButValue)
-					trigValue[c] = 1;
-				else
-					trigValue[c] = inputs[TRIG_INPUT].getVoltage(c);
-				
-				switch (trigMode) {
-					case GATE_MODE:												// ***** GATE MODE *****
-						if (trigValue[c] >= 1) {
-							if (!play[c]) {
-								play[c] = true;
-								
-								if (recButton)
-									armRec = true;
+					if (c == 0 && trigButValue)
+						trigValue[c] = 1;
+					else
+						trigValue[c] = inputs[TRIG_INPUT].getVoltage(c);
+					
+					switch (trigMode) {
+						case GATE_MODE:												// ***** GATE MODE *****
+							if (trigValue[c] >= 1) {
+								if (!play[c]) {
+									play[c] = true;
+									
+									if (recButton)
+										armRec = true;
 
-								if (reverseStart) {
-									reversePlaying[c] = REVERSE;
-									samplePos[c] = floor(cueEndPos-1);
-									currSampleWeight[c] = sampleCoeff;
-								} else {
-									reversePlaying[c] = FORWARD;
-									samplePos[c] = floor(cueStartPos+1);
-									currSampleWeight[c] = sampleCoeff;
-								}
-								stage[c] = ATTACK_STAGE;
-								attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
-								if (attackValue > maxAdsrTime) {
-									attackValue = maxAdsrTime;
-								} else if (attackValue < minAdsrTime) {
-									attackValue = minAdsrTime;
-								}
-								stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
-							} else {
-								if (stage[c] == RELEASE_STAGE) {
+									if (reverseStart) {
+										reversePlaying[c] = REVERSE;
+										samplePos[c] = floor(cueEndPos-1);
+										currSampleWeight[c] = sampleCoeff;
+									} else {
+										reversePlaying[c] = FORWARD;
+										samplePos[c] = floor(cueStartPos+1);
+										currSampleWeight[c] = sampleCoeff;
+									}
 									stage[c] = ATTACK_STAGE;
 									attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
 									if (attackValue > maxAdsrTime) {
@@ -2197,72 +2189,244 @@ struct SickoSampler : Module {
 										attackValue = minAdsrTime;
 									}
 									stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
-								}
-							}
-						} else {
-							if (play[c]) {
-								if (recordingState == 1 && !recordRelease) {
-									recButton = 0;
-									params[REC_PARAM].setValue(0);
-									if (rearmSetting) {
-										recRearm = false;
-										recRearmAfter = true;
+								} else {
+									if (stage[c] == RELEASE_STAGE) {
+										stage[c] = ATTACK_STAGE;
+										attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+										if (attackValue > maxAdsrTime) {
+											attackValue = maxAdsrTime;
+										} else if (attackValue < minAdsrTime) {
+											attackValue = minAdsrTime;
+										}
+										stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 									}
 								}
-								if (stage[c] != RELEASE_STAGE) {
-									stage[c] = RELEASE_STAGE;
-									releaseNew[c] = true;
-									releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
-									if (releaseValue > maxAdsrTime) {
-										releaseValue = maxAdsrTime;
-									} else 	if (releaseValue < minAdsrTime) {
-										releaseValue = minAdsrTime;
+							} else {
+								if (play[c]) {
+									if (recordingState == 1 && !recordRelease) {
+										recButton = 0;
+										params[REC_PARAM].setValue(0);
+										if (rearmSetting) {
+											recRearm = false;
+											recRearmAfter = true;
+										}
 									}
+									if (stage[c] != RELEASE_STAGE) {
+										stage[c] = RELEASE_STAGE;
+										releaseNew[c] = true;
+										releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+										if (releaseValue > maxAdsrTime) {
+											releaseValue = maxAdsrTime;
+										} else 	if (releaseValue < minAdsrTime) {
+											releaseValue = minAdsrTime;
+										}
 
-									if (stageLevel[c] != 0)
-										stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
-									else
-										stageCoeff[c] = 1;
+										if (stageLevel[c] != 0)
+											stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+										else
+											stageCoeff[c] = 1;
 
-									if (eocFromTrg) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
+										if (eocFromTrg) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = oneMsSamples;
+												}
 											}
 										}
 									}
 								}
 							}
-						}
-					break;
+						break;
 
-					case TRIG_MODE:												// ***** TRIG MODE *****
+						case TRIG_MODE:												// ***** TRIG MODE *****
 
-						if ((trigValue[c] >= 1 && prevTrigValue[c] < 1) || startPlayOnRec || startStopOnRec || replayNewRecording) {
-						
-							switch (trigType) {
-								case START_STOP:									// trig type: Start/Stop
+							if ((trigValue[c] >= 1 && prevTrigValue[c] < 1) || startPlayOnRec || startStopOnRec || replayNewRecording) {
+							
+								switch (trigType) {
+									case START_STOP:									// trig type: Start/Stop
 
-									if (play[c]) {
-																						
-										if (!inputs[STOP_INPUT].isConnected() || (stopOnRec && !inputs[RECSTOP_INPUT].isConnected())) {
+										if (play[c]) {
+																							
+											if (!inputs[STOP_INPUT].isConnected() || (stopOnRec && !inputs[RECSTOP_INPUT].isConnected())) {
+
+												if (stage[c] != RELEASE_STAGE) {
+													if (recordingState == 1 && !recordRelease) {
+														recButton = 0;
+														params[REC_PARAM].setValue(0);
+														if (rearmSetting && !playOnRec) {
+															recRearm = false;
+															recRearmAfter = true;
+														}
+														
+													}
+													startStopOnRec = false;
+
+													stage[c] = RELEASE_STAGE;
+													releaseNew[c] = true;
+													releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+													if (releaseValue > maxAdsrTime) {
+														releaseValue = maxAdsrTime;
+													} else 	if (releaseValue < minAdsrTime) {
+														releaseValue = minAdsrTime;
+													}
+
+													if (stageLevel[c] != 0)
+														stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+													else
+														stageCoeff[c] = 1;
+
+													if (eocFromTrg) {
+														if (polyOuts) {
+															eoc[c] = true;
+															eocTime[c] = oneMsSamples;
+														} else {
+															if (c == currentDisplay) {
+																eoc[0] = true;
+																eocTime[0] = oneMsSamples;
+															}
+														}
+													}
+												} else {
+													stage[c] = ATTACK_STAGE;
+													attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+													if (attackValue > maxAdsrTime) {
+														attackValue = maxAdsrTime;
+													} else if (attackValue < minAdsrTime) {
+														attackValue = minAdsrTime;
+													}
+													stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
+												}
+											}
+											
+										} else {
+											play[c] = true;
+
+											replayNewRecording = false;
+											
+											if (recButton) {
+												armRec = true;
+												startPlayOnRec = false;
+											}
+
+											if (reverseStart) {
+												reversePlaying[c] = REVERSE;
+												samplePos[c] = floor(cueEndPos-1);
+												currSampleWeight[c] = sampleCoeff;
+											} else {
+												reversePlaying[c] = FORWARD;
+												samplePos[c] = floor(cueStartPos+1);
+												currSampleWeight[c] = sampleCoeff;
+											}
+											stage[c] = ATTACK_STAGE;
+											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+											if (attackValue > maxAdsrTime) {
+												attackValue = maxAdsrTime;
+											} else if (attackValue < minAdsrTime) {
+												attackValue = minAdsrTime;
+											}
+											stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
+										}
+									break;
+
+									case START_RESTART:									// trig type: START RESTART
+										if (!play[c]) {		// ******* START PLAYBACK
+											
+											play[c] = true;
+											
+											replayNewRecording = false;
+
+											if (recButton) {
+												armRec = true;
+												startPlayOnRec = false;
+											}
+											
+											if (reverseStart) {
+												reversePlaying[c] = REVERSE;
+												samplePos[c] = floor(cueEndPos-1);
+												currSampleWeight[c] = sampleCoeff;
+											} else {
+												reversePlaying[c] = FORWARD;
+												samplePos[c] = floor(cueStartPos+1);
+												currSampleWeight[c] = sampleCoeff;
+											}
+											stage[c] = ATTACK_STAGE;
+											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+											if (attackValue > maxAdsrTime) {
+												attackValue = maxAdsrTime;
+											} else if (attackValue < minAdsrTime) {
+												attackValue = minAdsrTime;
+											}
+											stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
+
+										} else {	// ******* RESTART PLAYBACK
+											if (!startStopOnRec) {		// if startStopOnRec it must be handled by STOP MANAGEMENT
+												fadingValue[c] = 1.f;
+												fadedPosition[c] = samplePos[c];
+												if (fadeSamples)
+													fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
+												else
+													fadeCoeff = 1;
+												fadingType[c] = CROSS_FADE;
+												if (reverseStart) {
+													reversePlaying[c] = REVERSE;
+													samplePos[c] = floor(cueEndPos-1);
+													currSampleWeight[c] = sampleCoeff;
+												} else {
+													reversePlaying[c] = FORWARD;
+													samplePos[c] = floor(cueStartPos+1);
+													currSampleWeight[c] = sampleCoeff;
+												}
+												stage[c] = ATTACK_STAGE;
+												attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
+												if (attackValue > maxAdsrTime) {
+													attackValue = maxAdsrTime;
+												} else if (attackValue < minAdsrTime) {
+													attackValue = minAdsrTime;
+												}
+												stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
+
+												if (recordingState) {
+													if (reversePlaying[recOutChan] == FORWARD) {
+
+														startRecPosition = floor(samplePos[recOutChan]) - distancePos[recOutChan];
+														prevRecPosition = startRecPosition - distancePos[recOutChan];
+														currRecPosition = startRecPosition;
+														
+													} else {
+
+														startRecPosition = ceil(samplePos[recOutChan]) + distancePos[recOutChan] + 1;
+														prevRecPosition = startRecPosition + distancePos[recOutChan];
+														currRecPosition = startRecPosition;
+
+													}
+
+													if (prevRecPosition < 0 || prevRecPosition > totalSamples)
+														firstSampleToRecord = true;
+												}
+											} 
+
+										}
+									break;
+									
+									case PLAY_PAUSE:									// trig type: PLAY/PAUSE
+										
+										if (play[c]) {		// STOP PLAYING
 
 											if (stage[c] != RELEASE_STAGE) {
-												if (recordingState == 1 && !recordRelease) {
-													recButton = 0;
+												
+												if (recordingState && !recordRelease) {
 													params[REC_PARAM].setValue(0);
 													if (rearmSetting && !playOnRec) {
 														recRearm = false;
 														recRearmAfter = true;
 													}
-													
+													prevRecButton = 0;
 												}
-												startStopOnRec = false;
-
+												
 												stage[c] = RELEASE_STAGE;
 												releaseNew[c] = true;
 												releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
@@ -2271,7 +2435,6 @@ struct SickoSampler : Module {
 												} else 	if (releaseValue < minAdsrTime) {
 													releaseValue = minAdsrTime;
 												}
-
 												if (stageLevel[c] != 0)
 													stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 												else
@@ -2298,86 +2461,17 @@ struct SickoSampler : Module {
 												}
 												stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 											}
-										}
-										
-									} else {
-										play[c] = true;
+										} else {				// START PLAYING
+											play[c] = true;
+											playPauseToStop[c] = false;
 
-										replayNewRecording = false;
-										
-										if (recButton) {
-											armRec = true;
-											startPlayOnRec = false;
-										}
-
-										if (reverseStart) {
-											reversePlaying[c] = REVERSE;
-											samplePos[c] = floor(cueEndPos-1);
-											currSampleWeight[c] = sampleCoeff;
-										} else {
-											reversePlaying[c] = FORWARD;
-											samplePos[c] = floor(cueStartPos+1);
-											currSampleWeight[c] = sampleCoeff;
-										}
-										stage[c] = ATTACK_STAGE;
-										attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
-										if (attackValue > maxAdsrTime) {
-											attackValue = maxAdsrTime;
-										} else if (attackValue < minAdsrTime) {
-											attackValue = minAdsrTime;
-										}
-										stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
-									}
-								break;
-
-								case START_RESTART:									// trig type: START RESTART
-									if (!play[c]) {		// ******* START PLAYBACK
-										
-										play[c] = true;
-										
-										replayNewRecording = false;
-
-										if (recButton) {
-											armRec = true;
-											startPlayOnRec = false;
-										}
-										
-										if (reverseStart) {
-											reversePlaying[c] = REVERSE;
-											samplePos[c] = floor(cueEndPos-1);
-											currSampleWeight[c] = sampleCoeff;
-										} else {
-											reversePlaying[c] = FORWARD;
-											samplePos[c] = floor(cueStartPos+1);
-											currSampleWeight[c] = sampleCoeff;
-										}
-										stage[c] = ATTACK_STAGE;
-										attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
-										if (attackValue > maxAdsrTime) {
-											attackValue = maxAdsrTime;
-										} else if (attackValue < minAdsrTime) {
-											attackValue = minAdsrTime;
-										}
-										stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
-
-									} else {	// ******* RESTART PLAYBACK
-										if (!startStopOnRec) {		// if startStopOnRec it must be handled by STOP MANAGEMENT
-											fadingValue[c] = 1.f;
-											fadedPosition[c] = samplePos[c];
-											if (fadeSamples)
-												fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
-											else
-												fadeCoeff = 1;
-											fadingType[c] = CROSS_FADE;
-											if (reverseStart) {
-												reversePlaying[c] = REVERSE;
-												samplePos[c] = floor(cueEndPos-1);
-												currSampleWeight[c] = sampleCoeff;
-											} else {
-												reversePlaying[c] = FORWARD;
-												samplePos[c] = floor(cueStartPos+1);
-												currSampleWeight[c] = sampleCoeff;
+											replayNewRecording = false;
+											
+											if (recButton) {
+												armRec = true;
+												startPlayOnRec = false;
 											}
+
 											stage[c] = ATTACK_STAGE;
 											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
 											if (attackValue > maxAdsrTime) {
@@ -2387,365 +2481,339 @@ struct SickoSampler : Module {
 											}
 											stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
 
-											if (recordingState) {
-												if (reversePlaying[recOutChan] == FORWARD) {
-
-													startRecPosition = floor(samplePos[recOutChan]) - distancePos[recOutChan];
-													prevRecPosition = startRecPosition - distancePos[recOutChan];
-													currRecPosition = startRecPosition;
-													
-												} else {
-
-													startRecPosition = ceil(samplePos[recOutChan]) + distancePos[recOutChan] + 1;
-													prevRecPosition = startRecPosition + distancePos[recOutChan];
-													currRecPosition = startRecPosition;
-
+											if (reverseStart == FORWARD) {
+												reversePlaying[c] = FORWARD;
+												if (samplePos[c] < cueStartPos || samplePos[c] > cueEndPos) {
+													samplePos[c] = floor(cueStartPos)+1;
+													currSampleWeight[c] = sampleCoeff;
 												}
-
-												if (prevRecPosition < 0 || prevRecPosition > totalSamples)
-													firstSampleToRecord = true;
+											} else {
+												reversePlaying[c] = REVERSE;
+												if (samplePos[c] < cueStartPos || samplePos[c] > cueEndPos) {
+													samplePos[c] = floor(cueEndPos)-1;
+													currSampleWeight[c] = sampleCoeff;
+												}
 											}
-										} 
+										}
+									break;
+								}
+							}
+							prevTrigValue[c] = trigValue[c];
+
+							// ************************************************* STOP INPUT MANAGEMENT
+							
+							if (stopButValue || startStopOnRec) {	// **** startStopRec here handles stopRecButton when in StartRestart mode
+								stopValue[c] = 1;
+								startStopOnRec = false;
+							} else
+								stopValue[c] = inputs[STOP_INPUT].getVoltage(c);
+
+							if (stopValue[c] >= 1 && prevStopValue[c] < 1) {
+
+								if (trigMode == TRIG_MODE && trigType == PLAY_PAUSE) {
+
+									if (play[c]) {
+										playPauseToStop[c] = true;
+									} else {
+										if (reverseStart == FORWARD) {
+											samplePos[c] = floor(cueStartPos)+1;
+											currSampleWeight[c] = sampleCoeff;
+										} else {
+											samplePos[c] = floor(cueEndPos)-1;
+											currSampleWeight[c] = sampleCoeff;
+										}
+									}
+								}
+
+								if (play[c]) {
+
+									if (stage[c] != RELEASE_STAGE) {
+
+										if (recordingState == 1 && !recordRelease) {
+											recButton = 0;
+											params[REC_PARAM].setValue(0);
+											if (rearmSetting && !playOnRec) {
+												recRearm = false;
+												recRearmAfter = true;
+											}
+											startStopOnRec = false;
+											prevRecButton = 0;			// this avoids to continue playing if SOR button is ON
+										}
+
+										stage[c] = RELEASE_STAGE;
+										releaseNew[c] = true;
+										releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+										if (releaseValue > maxAdsrTime) {
+											releaseValue = maxAdsrTime;
+										} else 	if (releaseValue < minAdsrTime) {
+											releaseValue = minAdsrTime;
+										}
+
+										if (stageLevel[c] != 0)
+											stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+										else
+											stageCoeff[c] = 1;
 
 									}
-								break;
-								
-								case PLAY_PAUSE:									// trig type: PLAY/PAUSE
-									
-									if (play[c]) {		// STOP PLAYING
 
-										if (stage[c] != RELEASE_STAGE) {
-											
-											if (recordingState && !recordRelease) {
-												params[REC_PARAM].setValue(0);
-												if (rearmSetting && !playOnRec) {
-													recRearm = false;
-													recRearmAfter = true;
+									if (eocFromStop) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = oneMsSamples;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = oneMsSamples;
+											}
+										}
+									}
+								}
+							}
+							prevStopValue[c] = stopValue[c];
+
+						break;
+					}
+
+					currentOutput = 0;
+					currentOutputR = 0;
+
+					if (play[c]) {
+						if (inputs[VO_INPUT].isConnected()) {
+							voct[c] = inputs[VO_INPUT].getVoltage(c);
+							if (voct[c] != prevVoct[c]) {
+								speedVoct[c] = pow(2,voct[c]);
+								prevVoct[c] = voct[c];
+							}
+							distancePos[c] = currentSpeed * sampleCoeff * speedVoct[c];
+						} else
+							distancePos[c] = currentSpeed * sampleCoeff;
+
+						//if (play[c] && voct[c] < voctDisplay) {
+						if (voct[c] < voctDisplay) {
+							currentDisplay = c;
+							voctDisplay = voct[c];
+						}
+
+						switch (reversePlaying[c]) {
+							case FORWARD:		// ********************************************************************************************  FORWARD PLAYBACK   ***********
+
+								if (recordingState == 1 && loop && samplePos[c] > floor(loopEndPos - distancePos[c]) && !xtndRec) {
+									waitingRecEdge = true;
+
+									// below it's the same as not recording (code in the next "if")
+									fadingValue[c] = 1.f;
+									fadedPosition[c] = samplePos[c];
+									if (fadeSamples)
+										fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
+									else
+										fadeCoeff = 1;
+
+									if (pingpong) {
+										fadingType[c] = PINGPONG_FADE;
+										reversePlaying[c] = REVERSE;
+										samplePos[c] = floor(loopEndPos)-1;
+										currSampleWeight[c] = sampleCoeff;
+
+										if (eocFromPing) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = oneMsSamples;
 												}
-												prevRecButton = 0;
 											}
-											
-											stage[c] = RELEASE_STAGE;
-											releaseNew[c] = true;
-											releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
-											if (releaseValue > maxAdsrTime) {
-												releaseValue = maxAdsrTime;
-											} else 	if (releaseValue < minAdsrTime) {
-												releaseValue = minAdsrTime;
-											}
-											if (stageLevel[c] != 0)
-												stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
-											else
-												stageCoeff[c] = 1;
+										}
+									} else {
+										fadingType[c] = CROSS_FADE;
+										samplePos[c] = floor(loopStartPos)+1;
+										currSampleWeight[c] = sampleCoeff;
 
-											if (eocFromTrg) {
-												if (polyOuts) {
-													eoc[c] = true;
-													eocTime[c] = oneMsSamples;
-												} else {
-													if (c == currentDisplay) {
-														eoc[0] = true;
-														eocTime[0] = oneMsSamples;
+										if (eocFromLoopEnd) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = oneMsSamples;
+												}
+											}
+										}
+									}
+
+								} else if (recordingState == 0 && loop && samplePos[c] > floor(loopEndPos - (fadeSamples * distancePos[c]))) {		// *** REACHED END OF LOOP ***
+
+									fadingValue[c] = 1.f;
+									fadedPosition[c] = samplePos[c];
+									if (fadeSamples)
+										fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
+									else
+										fadeCoeff = 1;
+
+									if (pingpong) {
+										fadingType[c] = PINGPONG_FADE;
+										reversePlaying[c] = REVERSE;
+										samplePos[c] = floor(loopEndPos)-1;
+										currSampleWeight[c] = sampleCoeff;
+
+										if (eocFromPing) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = oneMsSamples;
+												}
+											}
+										}
+									} else {
+										fadingType[c] = CROSS_FADE;
+										samplePos[c] = floor(loopStartPos)+1;
+										currSampleWeight[c] = sampleCoeff;
+																
+										if (eocFromLoopEnd) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = oneMsSamples;
+												}
+											}
+										}
+									}
+
+								} else if (!fadingType[c] && floor(samplePos[c]) > (totalSamples - (fadeSamples * distancePos[c]))) {
+
+									fadingType[c] = FADE_OUT;
+									fadingValue[c] = 1.f;
+									fadedPosition[c] = samplePos[c];
+									if (fadeSamples)
+										fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
+									else
+										fadeCoeff = 1;
+
+								} else if (floor(samplePos[c]) > totalSamples) {	// *** REACHED END OF SAMPLE ***
+									if (recRearmAfter) {
+										recButton = 1;
+										params[REC_PARAM].setValue(1);
+									} else if (recordingState == 1 && !xtndRec) {
+										waitingRecEdge = true;
+										if (rearmSetting && !playOnRec) {
+											recRearmAfter = true;
+										}
+									}
+									if (eocFromCueEnd) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = oneMsSamples;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = oneMsSamples;
+											}
+										}
+									}
+									play[c] = false;
+
+								} else if (samplePos[c] > cueEndPos) {				// *** REACHED CUE END ***
+									if (recordingState == 1) {
+										
+										if (!xtndRec) {
+											waitingRecEdge = true;
+											if (stage[c] != RELEASE_STAGE) {
+												stage[c] = RELEASE_STAGE;
+												releaseNew[c] = true;
+
+												if (!recordRelease) {
+													recButton = 0;
+													params[REC_PARAM].setValue(0);
+
+													if (rearmSetting && !playOnRec) {
+														recRearm = false;
+														recRearmAfter = true;
+													}
+													startStopOnRec = false;
+												}
+
+
+												releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+												if (releaseValue > maxAdsrTime) {
+													releaseValue = maxAdsrTime;
+												} else 	if (releaseValue < minAdsrTime) {
+													releaseValue = minAdsrTime;
+												}
+
+												if (stageLevel[c] != 0)
+													stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+												else
+													stageCoeff[c] = 1;
+
+												if (eocFromCueEnd) {
+													if (polyOuts) {
+														eoc[c] = true;
+														eocTime[c] = oneMsSamples;
+													} else {
+														if (c == currentDisplay) {
+															eoc[0] = true;
+															eocTime[0] = oneMsSamples;
+														}
 													}
 												}
 											}
-										} else {
-											stage[c] = ATTACK_STAGE;
-											attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
-											if (attackValue > maxAdsrTime) {
-												attackValue = maxAdsrTime;
-											} else if (attackValue < minAdsrTime) {
-												attackValue = minAdsrTime;
-											}
-											stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
-										}
-									} else {				// START PLAYING
-										play[c] = true;
-										playPauseToStop[c] = false;
+											if (trigMode == GATE_MODE) {
+												if (pingpong) {
+													reversePlaying[c] = REVERSE;
+													samplePos[c] = floor(cueEndPos)-1;
+													currSampleWeight[c] = sampleCoeff;
 
-										replayNewRecording = false;
-										
-										if (recButton) {
-											armRec = true;
-											startPlayOnRec = false;
-										}
+													if (eocFromPing) {
+														if (polyOuts) {
+															eoc[c] = true;
+															eocTime[c] = oneMsSamples;
+														} else {
+															if (c == currentDisplay) {
+																eoc[0] = true;
+																eocTime[0] = oneMsSamples;
+															}
+														}
+													}
 
-										stage[c] = ATTACK_STAGE;
-										attackValue = convertCVToSeconds(params[ATTACK_PARAM].getValue()) + (inputs[ATTACK_INPUT].getVoltage() * params[ATTACKATNV_PARAM].getValue());
-										if (attackValue > maxAdsrTime) {
-											attackValue = maxAdsrTime;
-										} else if (attackValue < minAdsrTime) {
-											attackValue = minAdsrTime;
-										}
-										stageCoeff[c] = (1-stageLevel[c]) / (args.sampleRate * attackValue);
+												} else {
+													fadingType[c] = CROSS_FADE;
+													fadingValue[c] = 1.f;
+													fadedPosition[c] = samplePos[c];
+													samplePos[c] = floor(cueStartPos)+1;
+													currSampleWeight[c] = sampleCoeff;
 
-										if (reverseStart == FORWARD) {
-											reversePlaying[c] = FORWARD;
-											if (samplePos[c] < cueStartPos || samplePos[c] > cueEndPos) {
-												samplePos[c] = floor(cueStartPos)+1;
-												currSampleWeight[c] = sampleCoeff;
-											}
-										} else {
-											reversePlaying[c] = REVERSE;
-											if (samplePos[c] < cueStartPos || samplePos[c] > cueEndPos) {
-												samplePos[c] = floor(cueEndPos)-1;
-												currSampleWeight[c] = sampleCoeff;
+													if (eocFromCueEnd) {
+														if (polyOuts) {
+															eoc[c] = true;
+															eocTime[c] = oneMsSamples;
+														} else {
+															if (c == currentDisplay) {
+																eoc[0] = true;
+																eocTime[0] = oneMsSamples;
+															}
+														}
+													}
+												}
 											}
 										}
-									}
-								break;
-							}
-						}
-						prevTrigValue[c] = trigValue[c];
-
-						// ************************************************* STOP INPUT MANAGEMENT
-						
-						if (stopButValue || startStopOnRec) {	// **** startStopRec here handles stopRecButton when in StartRestart mode
-							stopValue[c] = 1;
-							startStopOnRec = false;
-						} else
-							stopValue[c] = inputs[STOP_INPUT].getVoltage(c);
-
-						if (stopValue[c] >= 1 && prevStopValue[c] < 1) {
-
-							if (trigMode == TRIG_MODE && trigType == PLAY_PAUSE) {
-
-								if (play[c]) {
-									playPauseToStop[c] = true;
-								} else {
-									if (reverseStart == FORWARD) {
-										samplePos[c] = floor(cueStartPos)+1;
-										currSampleWeight[c] = sampleCoeff;
 									} else {
-										samplePos[c] = floor(cueEndPos)-1;
-										currSampleWeight[c] = sampleCoeff;
-									}
-								}
-							}
-
-							if (play[c]) {
-
-								if (stage[c] != RELEASE_STAGE) {
-
-									if (recordingState == 1 && !recordRelease) {
-										recButton = 0;
-										params[REC_PARAM].setValue(0);
-										if (rearmSetting && !playOnRec) {
-											recRearm = false;
-											recRearmAfter = true;
-										}
-										startStopOnRec = false;
-										prevRecButton = 0;			// this avoids to continue playing if SOR button is ON
-									}
-
-									stage[c] = RELEASE_STAGE;
-									releaseNew[c] = true;
-									releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
-									if (releaseValue > maxAdsrTime) {
-										releaseValue = maxAdsrTime;
-									} else 	if (releaseValue < minAdsrTime) {
-										releaseValue = minAdsrTime;
-									}
-
-									if (stageLevel[c] != 0)
-										stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
-									else
-										stageCoeff[c] = 1;
-
-								}
-
-								if (eocFromStop) {
-									if (polyOuts) {
-										eoc[c] = true;
-										eocTime[c] = oneMsSamples;
-									} else {
-										if (c == currentDisplay) {
-											eoc[0] = true;
-											eocTime[0] = oneMsSamples;
-										}
-									}
-								}
-							}
-						}
-						prevStopValue[c] = stopValue[c];
-
-					break;
-				}
-
-				currentOutput = 0;
-				currentOutputR = 0;
-
-				if (play[c]) {
-					if (inputs[VO_INPUT].isConnected()) {
-						voct[c] = inputs[VO_INPUT].getVoltage(c);
-						if (voct[c] != prevVoct[c]) {
-							speedVoct[c] = pow(2,voct[c]);
-							prevVoct[c] = voct[c];
-						}
-						distancePos[c] = currentSpeed * sampleCoeff * speedVoct[c];
-					} else
-						distancePos[c] = currentSpeed * sampleCoeff;
-
-					//if (play[c] && voct[c] < voctDisplay) {
-					if (voct[c] < voctDisplay) {
-						currentDisplay = c;
-						voctDisplay = voct[c];
-					}
-
-					switch (reversePlaying[c]) {
-						case FORWARD:		// ********************************************************************************************  FORWARD PLAYBACK   ***********
-
-							if (recordingState == 1 && loop && samplePos[c] > floor(loopEndPos - distancePos[c]) && !xtndRec) {
-								waitingRecEdge = true;
-
-								// below it's the same as not recording (code in the next "if")
-								fadingValue[c] = 1.f;
-								fadedPosition[c] = samplePos[c];
-								if (fadeSamples)
-									fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
-								else
-									fadeCoeff = 1;
-
-								if (pingpong) {
-									fadingType[c] = PINGPONG_FADE;
-									reversePlaying[c] = REVERSE;
-									samplePos[c] = floor(loopEndPos)-1;
-									currSampleWeight[c] = sampleCoeff;
-
-									if (eocFromPing) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-									}
-								} else {
-									fadingType[c] = CROSS_FADE;
-									samplePos[c] = floor(loopStartPos)+1;
-									currSampleWeight[c] = sampleCoeff;
-
-									if (eocFromLoopEnd) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-									}
-								}
-
-							} else if (recordingState == 0 && loop && samplePos[c] > floor(loopEndPos - (fadeSamples * distancePos[c]))) {		// *** REACHED END OF LOOP ***
-
-								fadingValue[c] = 1.f;
-								fadedPosition[c] = samplePos[c];
-								if (fadeSamples)
-									fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
-								else
-									fadeCoeff = 1;
-
-								if (pingpong) {
-									fadingType[c] = PINGPONG_FADE;
-									reversePlaying[c] = REVERSE;
-									samplePos[c] = floor(loopEndPos)-1;
-									currSampleWeight[c] = sampleCoeff;
-
-									if (eocFromPing) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-									}
-								} else {
-									fadingType[c] = CROSS_FADE;
-									samplePos[c] = floor(loopStartPos)+1;
-									currSampleWeight[c] = sampleCoeff;
-															
-									if (eocFromLoopEnd) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-									}
-								}
-
-							} else if (!fadingType[c] && floor(samplePos[c]) > (totalSamples - (fadeSamples * distancePos[c]))) {
-
-								fadingType[c] = FADE_OUT;
-								fadingValue[c] = 1.f;
-								fadedPosition[c] = samplePos[c];
-								if (fadeSamples)
-									fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
-								else
-									fadeCoeff = 1;
-
-							} else if (floor(samplePos[c]) > totalSamples) {	// *** REACHED END OF SAMPLE ***
-								if (recRearmAfter) {
-									recButton = 1;
-									params[REC_PARAM].setValue(1);
-								} else if (recordingState == 1 && !xtndRec) {
-									waitingRecEdge = true;
-									if (rearmSetting && !playOnRec) {
-										recRearmAfter = true;
-									}
-								}
-								if (eocFromCueEnd) {
-									if (polyOuts) {
-										eoc[c] = true;
-										eocTime[c] = oneMsSamples;
-									} else {
-										if (c == currentDisplay) {
-											eoc[0] = true;
-											eocTime[0] = oneMsSamples;
-										}
-									}
-								}
-								play[c] = false;
-
-							} else if (samplePos[c] > cueEndPos) {				// *** REACHED CUE END ***
-								if (recordingState == 1) {
-									
-									if (!xtndRec) {
-										waitingRecEdge = true;
 										if (stage[c] != RELEASE_STAGE) {
 											stage[c] = RELEASE_STAGE;
 											releaseNew[c] = true;
-
-											if (!recordRelease) {
-												recButton = 0;
-												params[REC_PARAM].setValue(0);
-
-												if (rearmSetting && !playOnRec) {
-													recRearm = false;
-													recRearmAfter = true;
-												}
-												startStopOnRec = false;
-											}
-
-
 											releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
 											if (releaseValue > maxAdsrTime) {
 												releaseValue = maxAdsrTime;
 											} else 	if (releaseValue < minAdsrTime) {
 												releaseValue = minAdsrTime;
 											}
-
 											if (stageLevel[c] != 0)
 												stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
 											else
@@ -2780,7 +2848,6 @@ struct SickoSampler : Module {
 														}
 													}
 												}
-
 											} else {
 												fadingType[c] = CROSS_FADE;
 												fadingValue[c] = 1.f;
@@ -2802,22 +2869,45 @@ struct SickoSampler : Module {
 											}
 										}
 									}
-								} else {
-									if (stage[c] != RELEASE_STAGE) {
-										stage[c] = RELEASE_STAGE;
-										releaseNew[c] = true;
-										releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
-										if (releaseValue > maxAdsrTime) {
-											releaseValue = maxAdsrTime;
-										} else 	if (releaseValue < minAdsrTime) {
-											releaseValue = minAdsrTime;
-										}
-										if (stageLevel[c] != 0)
-											stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
-										else
-											stageCoeff[c] = 1;
+								} 
+							break;
 
-										if (eocFromCueEnd) {
+							case REVERSE:		// ********************************************************************************************  REVERSE PLAYBACK   ***********
+
+								if (recordingState == 1  && loop && samplePos[c] < floor(loopStartPos + distancePos[c]) && !xtndRec) {
+									waitingRecEdge = true;
+
+									// below it's the same as not recording (code in the next "if")
+									fadingValue[c] = 1.f;
+									fadedPosition[c] = samplePos[c];
+									if (fadeSamples)
+										fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
+									else
+										fadeCoeff = 1;
+
+									if (pingpong) {
+										fadingType[c] = PINGPONG_FADE;
+										reversePlaying[c] = FORWARD;
+										samplePos[c] = floor(loopStartPos)+1;
+										currSampleWeight[c] = sampleCoeff;
+
+										if (eocFromPong) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = oneMsSamples;
+												}
+											}
+										}
+									} else {
+										fadingType[c] = CROSS_FADE;
+										samplePos[c] = floor(loopEndPos)-1;
+										currSampleWeight[c] = sampleCoeff;
+
+										if (eocFromLoopStart) {
 											if (polyOuts) {
 												eoc[c] = true;
 												eocTime[c] = oneMsSamples;
@@ -2829,192 +2919,170 @@ struct SickoSampler : Module {
 											}
 										}
 									}
-									if (trigMode == GATE_MODE) {
-										if (pingpong) {
-											reversePlaying[c] = REVERSE;
-											samplePos[c] = floor(cueEndPos)-1;
-											currSampleWeight[c] = sampleCoeff;
 
-											if (eocFromPing) {
-												if (polyOuts) {
-													eoc[c] = true;
-													eocTime[c] = oneMsSamples;
-												} else {
-													if (c == currentDisplay) {
-														eoc[0] = true;
-														eocTime[0] = oneMsSamples;
-													}
-												}
-											}
-										} else {
-											fadingType[c] = CROSS_FADE;
-											fadingValue[c] = 1.f;
-											fadedPosition[c] = samplePos[c];
-											samplePos[c] = floor(cueStartPos)+1;
-											currSampleWeight[c] = sampleCoeff;
+								} else if (recordingState == 0 && loop && samplePos[c] < floor(loopStartPos + (fadeSamples * distancePos[c]))) {	// *** REACHED BEGIN OF LOOP ***
 
-											if (eocFromCueEnd) {
-												if (polyOuts) {
-													eoc[c] = true;
-													eocTime[c] = oneMsSamples;
-												} else {
-													if (c == currentDisplay) {
-														eoc[0] = true;
-														eocTime[0] = oneMsSamples;
-													}
+									fadingValue[c] = 1.f;
+									fadedPosition[c] = samplePos[c];
+									if (fadeSamples)
+										fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
+									else
+										fadeCoeff = 1;
+
+									if (pingpong) {
+										fadingType[c] = PINGPONG_FADE;
+										reversePlaying[c] = FORWARD;
+										samplePos[c] = floor(loopStartPos)+1;
+										currSampleWeight[c] = sampleCoeff;
+
+										if (eocFromPong) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = oneMsSamples;
 												}
 											}
 										}
-									}
-								}
-							} 
-						break;
-
-						case REVERSE:		// ********************************************************************************************  REVERSE PLAYBACK   ***********
-
-							if (recordingState == 1  && loop && samplePos[c] < floor(loopStartPos + distancePos[c]) && !xtndRec) {
-								waitingRecEdge = true;
-
-								// below it's the same as not recording (code in the next "if")
-								fadingValue[c] = 1.f;
-								fadedPosition[c] = samplePos[c];
-								if (fadeSamples)
-									fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
-								else
-									fadeCoeff = 1;
-
-								if (pingpong) {
-									fadingType[c] = PINGPONG_FADE;
-									reversePlaying[c] = FORWARD;
-									samplePos[c] = floor(loopStartPos)+1;
-									currSampleWeight[c] = sampleCoeff;
-
-									if (eocFromPong) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-									}
-								} else {
-									fadingType[c] = CROSS_FADE;
-									samplePos[c] = floor(loopEndPos)-1;
-									currSampleWeight[c] = sampleCoeff;
-
-									if (eocFromLoopStart) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-									}
-								}
-
-							} else if (recordingState == 0 && loop && samplePos[c] < floor(loopStartPos + (fadeSamples * distancePos[c]))) {	// *** REACHED BEGIN OF LOOP ***
-
-								fadingValue[c] = 1.f;
-								fadedPosition[c] = samplePos[c];
-								if (fadeSamples)
-									fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
-								else
-									fadeCoeff = 1;
-
-								if (pingpong) {
-									fadingType[c] = PINGPONG_FADE;
-									reversePlaying[c] = FORWARD;
-									samplePos[c] = floor(loopStartPos)+1;
-									currSampleWeight[c] = sampleCoeff;
-
-									if (eocFromPong) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-									}
-								} else {
-									fadingType[c] = CROSS_FADE;
-									samplePos[c] = floor(loopEndPos)-1;
-									currSampleWeight[c] = sampleCoeff;
-
-									if (eocFromLoopStart) {
-										if (polyOuts) {
-											eoc[c] = true;
-											eocTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eoc[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-									}
-								}
-
-							} else if (!fadingType[c] && floor(samplePos[c]) < (fadeSamples * distancePos[c])) {
-								if (recordingState == 1)
-									waitingRecEdge = true;
-
-								fadingType[c] = FADE_OUT;
-								fadingValue[c] = 1.f;
-								fadedPosition[c] = samplePos[c];
-								if (fadeSamples)
-									fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
-								else
-									fadeCoeff = 1;
-
-							} else if (floor(samplePos[c]) < 0) {				// *** REACHED START OF SAMPLE ***
-								if (recRearmAfter) {
-									recButton = 1;
-									params[REC_PARAM].setValue(1);
-								} else if (recordingState == 1) {
-									waitingRecEdge = true;
-									if (rearmSetting && !playOnRec)
-										recRearmAfter = true;
-								}
-								if (eocFromCueEnd) {
-									if (polyOuts) {
-										eoc[c] = true;
-										eocTime[c] = oneMsSamples;
 									} else {
-										if (c == currentDisplay) {
-											eoc[0] = true;
-											eocTime[0] = oneMsSamples;
+										fadingType[c] = CROSS_FADE;
+										samplePos[c] = floor(loopEndPos)-1;
+										currSampleWeight[c] = sampleCoeff;
+
+										if (eocFromLoopStart) {
+											if (polyOuts) {
+												eoc[c] = true;
+												eocTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eoc[0] = true;
+													eocTime[0] = oneMsSamples;
+												}
+											}
 										}
 									}
-								}
-								play[c] = false;
 
-							} else if (samplePos[c] < cueStartPos) {			// *** REACHED CUE START ***
-								if (recordingState == 1) {
-
-									if (!xtndRec) {
+								} else if (!fadingType[c] && floor(samplePos[c]) < (fadeSamples * distancePos[c])) {
+									if (recordingState == 1)
 										waitingRecEdge = true;
+
+									fadingType[c] = FADE_OUT;
+									fadingValue[c] = 1.f;
+									fadedPosition[c] = samplePos[c];
+									if (fadeSamples)
+										fadeCoeff = 1 / convertCVToSeconds(xFade) / args.sampleRate;
+									else
+										fadeCoeff = 1;
+
+								} else if (floor(samplePos[c]) < 0) {				// *** REACHED START OF SAMPLE ***
+									if (recRearmAfter) {
+										recButton = 1;
+										params[REC_PARAM].setValue(1);
+									} else if (recordingState == 1) {
+										waitingRecEdge = true;
+										if (rearmSetting && !playOnRec)
+											recRearmAfter = true;
+									}
+									if (eocFromCueEnd) {
+										if (polyOuts) {
+											eoc[c] = true;
+											eocTime[c] = oneMsSamples;
+										} else {
+											if (c == currentDisplay) {
+												eoc[0] = true;
+												eocTime[0] = oneMsSamples;
+											}
+										}
+									}
+									play[c] = false;
+
+								} else if (samplePos[c] < cueStartPos) {			// *** REACHED CUE START ***
+									if (recordingState == 1) {
+
+										if (!xtndRec) {
+											waitingRecEdge = true;
+											if (stage[c] != RELEASE_STAGE) {
+												stage[c] = RELEASE_STAGE;
+												releaseNew[c] = true;
+												
+												if (!recordRelease) {
+													recButton = 0;
+													params[REC_PARAM].setValue(0);
+													if (rearmSetting && !playOnRec) {
+														recRearm = false;
+														recRearmAfter = true;
+													}
+													startStopOnRec = false;
+												}
+
+												releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
+												if (releaseValue > maxAdsrTime) {
+													releaseValue = maxAdsrTime;
+												} else 	if (releaseValue < minAdsrTime) {
+													releaseValue = minAdsrTime;
+												}
+
+												if (stageLevel[c] != 0)
+													stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
+												else
+													stageCoeff[c] = 1;
+
+												if (eocFromCueStart) {
+													if (polyOuts) {
+														eoc[c] = true;
+														eocTime[c] = oneMsSamples;
+													} else {
+														if (c == currentDisplay) {
+															eoc[0] = true;
+															eocTime[0] = oneMsSamples;
+														}
+													}
+												}
+											}
+											if (trigMode == GATE_MODE) {
+												if (pingpong) {
+													reversePlaying[c] = FORWARD;
+													samplePos[c] = floor(cueStartPos)+1;
+													currSampleWeight[c] = sampleCoeff;
+
+													if (eocFromPong) {
+														if (polyOuts) {
+															eoc[c] = true;
+															eocTime[c] = oneMsSamples;
+														} else {
+															if (c == currentDisplay) {
+																eoc[0] = true;
+																eocTime[0] = oneMsSamples;
+															}
+														}
+													}
+												} else {
+													fadingType[c] = CROSS_FADE;
+													fadingValue[c] = 1.f;
+													fadedPosition[c] = samplePos[c];
+													samplePos[c] = floor(cueEndPos)-1;
+													currSampleWeight[c] = sampleCoeff;
+
+													if (eocFromCueStart) {
+														if (polyOuts) {
+															eoc[c] = true;
+															eocTime[c] = oneMsSamples;
+														} else {
+															if (c == currentDisplay) {
+																eoc[0] = true;
+																eocTime[0] = oneMsSamples;
+															}
+														}
+													}
+												}
+											}
+										}
+									} else {
 										if (stage[c] != RELEASE_STAGE) {
 											stage[c] = RELEASE_STAGE;
 											releaseNew[c] = true;
-											
-											if (!recordRelease) {
-												recButton = 0;
-												params[REC_PARAM].setValue(0);
-												if (rearmSetting && !playOnRec) {
-													recRearm = false;
-													recRearmAfter = true;
-												}
-												startStopOnRec = false;
-											}
-
 											releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
 											if (releaseValue > maxAdsrTime) {
 												releaseValue = maxAdsrTime;
@@ -3077,346 +3145,349 @@ struct SickoSampler : Module {
 											}
 										}
 									}
-								} else {
-									if (stage[c] != RELEASE_STAGE) {
-										stage[c] = RELEASE_STAGE;
-										releaseNew[c] = true;
-										releaseValue = convertCVToSeconds(params[RELEASE_PARAM].getValue()) + (inputs[RELEASE_INPUT].getVoltage() * params[RELEASEATNV_PARAM].getValue());
-										if (releaseValue > maxAdsrTime) {
-											releaseValue = maxAdsrTime;
-										} else 	if (releaseValue < minAdsrTime) {
-											releaseValue = minAdsrTime;
-										}
-
-										if (stageLevel[c] != 0)
-											stageCoeff[c] = stageLevel[c] / (args.sampleRate * releaseValue);
-										else
-											stageCoeff[c] = 1;
-
-										if (eocFromCueStart) {
-											if (polyOuts) {
-												eoc[c] = true;
-												eocTime[c] = oneMsSamples;
-											} else {
-												if (c == currentDisplay) {
-													eoc[0] = true;
-													eocTime[0] = oneMsSamples;
-												}
-											}
-										}
-									}
-									if (trigMode == GATE_MODE) {
-										if (pingpong) {
-											reversePlaying[c] = FORWARD;
-											samplePos[c] = floor(cueStartPos)+1;
-											currSampleWeight[c] = sampleCoeff;
-
-											if (eocFromPong) {
-												if (polyOuts) {
-													eoc[c] = true;
-													eocTime[c] = oneMsSamples;
-												} else {
-													if (c == currentDisplay) {
-														eoc[0] = true;
-														eocTime[0] = oneMsSamples;
-													}
-												}
-											}
-										} else {
-											fadingType[c] = CROSS_FADE;
-											fadingValue[c] = 1.f;
-											fadedPosition[c] = samplePos[c];
-											samplePos[c] = floor(cueEndPos)-1;
-											currSampleWeight[c] = sampleCoeff;
-
-											if (eocFromCueStart) {
-												if (polyOuts) {
-													eoc[c] = true;
-													eocTime[c] = oneMsSamples;
-												} else {
-													if (c == currentDisplay) {
-														eoc[0] = true;
-														eocTime[0] = oneMsSamples;
-													}
-												}
-											}
-										}
-									}
 								}
-							}
-						
-						break;
-					}
+							
+							break;
+						}
 
-					if (play[c]) {									// it's false only if end of sample has reached, see above
+						if (play[c]) {									// it's false only if end of sample has reached, see above
 
-						// *** SICKOSAMPLER USES HERMITE INTERPOLATION ONLY ***
-						if (currSampleWeight[c] == 0) {	// if no distance between samples, it means that speed is 1 and samplerates match -> no interpolation
-							currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
-							if (channels == 2)
-								currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
-						} else {
-							if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
-								/*
-								currentOutput = hermiteInterpol(playBuffer[i][antiAlias][floor(samplePos[i])-1],
-																playBuffer[i][antiAlias][floor(samplePos[i])],
-																playBuffer[i][antiAlias][floor(samplePos[i])+1],
-																playBuffer[i][antiAlias][floor(samplePos[i])+2],
-																currSampleWeight[i]);
-								*/
-								// below is translation of the above function
-								double a1 = .5F * (playBuffer[LEFT][antiAlias][floor(samplePos[c])+1] - playBuffer[LEFT][antiAlias][floor(samplePos[c])-1]);
-								double a2 = playBuffer[LEFT][antiAlias][floor(samplePos[c])-1] - (2.5F * playBuffer[LEFT][antiAlias][floor(samplePos[c])]) + (2 * playBuffer[LEFT][antiAlias][floor(samplePos[c])+1]) - (.5F * playBuffer[LEFT][antiAlias][floor(samplePos[c])+2]);
-								double a3 = (.5F * (playBuffer[LEFT][antiAlias][floor(samplePos[c])+2] - playBuffer[LEFT][antiAlias][floor(samplePos[c])-1])) + (1.5F * (playBuffer[LEFT][antiAlias][floor(samplePos[c])] - playBuffer[LEFT][antiAlias][floor(samplePos[c])+1]));
-								currentOutput = (((((a3 * currSampleWeight[c]) + a2) * currSampleWeight[c]) + a1) * currSampleWeight[c]) + playBuffer[LEFT][antiAlias][floor(samplePos[c])];
-								if (channels == 2) {
-									a1 = .5F * (playBuffer[RIGHT][antiAlias][floor(samplePos[c])+1] - playBuffer[RIGHT][antiAlias][floor(samplePos[c])-1]);
-									a2 = playBuffer[RIGHT][antiAlias][floor(samplePos[c])-1] - (2.5F * playBuffer[RIGHT][antiAlias][floor(samplePos[c])]) + (2 * playBuffer[RIGHT][antiAlias][floor(samplePos[c])+1]) - (.5F * playBuffer[RIGHT][antiAlias][floor(samplePos[c])+2]);
-									a3 = (.5F * (playBuffer[RIGHT][antiAlias][floor(samplePos[c])+2] - playBuffer[RIGHT][antiAlias][floor(samplePos[c])-1])) + (1.5F * (playBuffer[RIGHT][antiAlias][floor(samplePos[c])] - playBuffer[RIGHT][antiAlias][floor(samplePos[c])+1]));
-									currentOutputR = (((((a3 * currSampleWeight[c]) + a2) * currSampleWeight[c]) + a1) * currSampleWeight[c]) + playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
-								}
-
-							} else { // if playing sample is the first or one of the last 3 -> no interpolation
+							// *** SICKOSAMPLER USES HERMITE INTERPOLATION ONLY ***
+							if (currSampleWeight[c] == 0) {	// if no distance between samples, it means that speed is 1 and samplerates match -> no interpolation
 								currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
 								if (channels == 2)
 									currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+							} else {
+								if (floor(samplePos[c]) > 0 && floor(samplePos[c]) < totalSamples - 1) {
+									/*
+									currentOutput = hermiteInterpol(playBuffer[i][antiAlias][floor(samplePos[i])-1],
+																	playBuffer[i][antiAlias][floor(samplePos[i])],
+																	playBuffer[i][antiAlias][floor(samplePos[i])+1],
+																	playBuffer[i][antiAlias][floor(samplePos[i])+2],
+																	currSampleWeight[i]);
+									*/
+									// below is translation of the above function
+									double a1 = .5F * (playBuffer[LEFT][antiAlias][floor(samplePos[c])+1] - playBuffer[LEFT][antiAlias][floor(samplePos[c])-1]);
+									double a2 = playBuffer[LEFT][antiAlias][floor(samplePos[c])-1] - (2.5F * playBuffer[LEFT][antiAlias][floor(samplePos[c])]) + (2 * playBuffer[LEFT][antiAlias][floor(samplePos[c])+1]) - (.5F * playBuffer[LEFT][antiAlias][floor(samplePos[c])+2]);
+									double a3 = (.5F * (playBuffer[LEFT][antiAlias][floor(samplePos[c])+2] - playBuffer[LEFT][antiAlias][floor(samplePos[c])-1])) + (1.5F * (playBuffer[LEFT][antiAlias][floor(samplePos[c])] - playBuffer[LEFT][antiAlias][floor(samplePos[c])+1]));
+									currentOutput = (((((a3 * currSampleWeight[c]) + a2) * currSampleWeight[c]) + a1) * currSampleWeight[c]) + playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+									if (channels == 2) {
+										a1 = .5F * (playBuffer[RIGHT][antiAlias][floor(samplePos[c])+1] - playBuffer[RIGHT][antiAlias][floor(samplePos[c])-1]);
+										a2 = playBuffer[RIGHT][antiAlias][floor(samplePos[c])-1] - (2.5F * playBuffer[RIGHT][antiAlias][floor(samplePos[c])]) + (2 * playBuffer[RIGHT][antiAlias][floor(samplePos[c])+1]) - (.5F * playBuffer[RIGHT][antiAlias][floor(samplePos[c])+2]);
+										a3 = (.5F * (playBuffer[RIGHT][antiAlias][floor(samplePos[c])+2] - playBuffer[RIGHT][antiAlias][floor(samplePos[c])-1])) + (1.5F * (playBuffer[RIGHT][antiAlias][floor(samplePos[c])] - playBuffer[RIGHT][antiAlias][floor(samplePos[c])+1]));
+										currentOutputR = (((((a3 * currSampleWeight[c]) + a2) * currSampleWeight[c]) + a1) * currSampleWeight[c]) + playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+									}
+
+								} else { // if playing sample is the first or one of the last 3 -> no interpolation
+									currentOutput = playBuffer[LEFT][antiAlias][floor(samplePos[c])];
+									if (channels == 2)
+										currentOutputR = playBuffer[RIGHT][antiAlias][floor(samplePos[c])];
+								}
+							}
+
+							if (reversePlaying[c])
+								samplePos[c] -= distancePos[c];
+							else
+								samplePos[c] += distancePos[c];
+
+							currSampleWeight[c] = samplePos[c] - floor(samplePos[c]);
+
+							switch (stage[c]) {
+								case ATTACK_STAGE:
+									stageLevel[c] += stageCoeff[c];
+									if (stageLevel[c] > 1) {
+										stageLevel[c] = 1;
+										stage[c] = DECAY_STAGE;
+										decayValue = convertCVToSeconds(params[DECAY_PARAM].getValue()) + (inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue());
+										if (decayValue > maxAdsrTime) {
+											decayValue = maxAdsrTime;
+										} else 	if (decayValue < minAdsrTime) {
+											decayValue = minAdsrTime;
+										}
+										stageCoeff[c] = (1-sustainValue) / (args.sampleRate * decayValue);
+									}
+								break;
+
+								case DECAY_STAGE:
+									stageLevel[c] -= stageCoeff[c];
+									if (stageLevel[c] <= sustainValue) {
+										stageLevel[c] = sustainValue;
+										stage[c] = SUSTAIN_STAGE;
+									}
+								break;
+
+								case SUSTAIN_STAGE:
+									stageLevel[c] = sustainValue;
+								break;
+
+								case RELEASE_STAGE:
+									stageLevel[c] -= stageCoeff[c];
+									if (stageLevel[c] < 0) {	// Il release has ended
+										stageLevel[c] = 0;
+
+										if (recordingState == 1 && recordRelease) {
+											recButton = 0;
+											params[REC_PARAM].setValue(0);
+											prevRecButton = 0;			// this avoids to continue playing if SOR button is ON
+
+											if (rearmSetting && ((trigMode == TRIG_MODE && !playOnRec) || (trigMode == GATE_MODE)) )
+												recRearm = true;
+
+											startStopOnRec = false;
+										}
+										sorRecRelException = false;
+										
+										if (!recordingState) {		// If not recording
+
+											stage[c] = STOP_STAGE;
+											play[c] = false;
+
+											if (recRearm) {
+												recRearm = false;
+												recRearmAfter = true;
+											}
+										} else {					// if recording
+
+											if (recFadeValue <= 0) {	// if release has ended and recfade out
+												stage[c] = STOP_STAGE;
+												play[c] = false;
+												releaseNew[c] = true;
+											}
+										}
+										
+										if (releaseNew[c]) {
+											releaseNew[c] = false;
+											if (polyOuts) {
+												eor[c] = true;
+												eorTime[c] = oneMsSamples;
+											} else {
+												if (c == currentDisplay) {
+													eor[0] = true;
+													eocTime[0] = oneMsSamples;
+												}
+											}
+
+											if (playPauseToStop[c] && !recordingState) {
+												playPauseToStop[c] = false;
+												if (reversePlaying[c] == FORWARD) {
+													samplePos[c] = floor(cueStartPos)+1;
+													currSampleWeight[c] = sampleCoeff;
+												} else {
+													samplePos[c] = floor(cueEndPos)-1;
+													currSampleWeight[c] = sampleCoeff;
+												}
+											}
+											if (recRearmAfter && !recordingState) {
+												recRearmAfter = false;
+												recRearm = false;
+												params[REC_PARAM].setValue(1);
+												recButton = 1;
+											}
+										}
+									}
+								break;
+							}
+
+							if (reversePlaying[c]) {
+								currentOutput *= stageLevel[c] * masterLevel[c] * -1;
+								if (channels == 2)
+									currentOutputR *= stageLevel[c] * masterLevel[c] * -1;
+							} else {
+								currentOutput *= stageLevel[c] * masterLevel[c];
+								if (channels == 2)
+									currentOutputR *= stageLevel[c] * masterLevel[c];
+							}
+
+	/*
+																														███████╗░█████╗░██████╗░███████╗
+																														██╔════╝██╔══██╗██╔══██╗██╔════╝
+																														█████╗░░███████║██║░░██║█████╗░░
+																														██╔══╝░░██╔══██║██║░░██║██╔══╝░░
+																														██║░░░░░██║░░██║██████╔╝███████╗
+																														╚═╝░░░░░╚═╝░░╚═╝╚═════╝░╚══════╝
+	*/
+
+							switch (fadingType[c]) {
+								case NO_FADE:
+								break;
+
+								case CROSS_FADE:
+									if (fadingValue[c] > 0) {
+										fadingValue[c] -= fadeCoeff;
+										switch (reversePlaying[c]) {
+											case FORWARD:
+												currentOutput *= 1 - fadingValue[c];
+												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+												if (channels == 2) {
+													currentOutputR *= 1 - fadingValue[c];
+													currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+												}
+												fadedPosition[c] += distancePos[c];
+												if (fadedPosition[c] > totalSamples)
+													fadingType[c] = NO_FADE;
+											break;
+											case REVERSE:
+												currentOutput *= 1 - fadingValue[c];
+												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+												if (channels == 2) {
+													currentOutputR *= 1 - fadingValue[c];
+													currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+												}
+												fadedPosition[c] -= distancePos[c];
+												if (fadedPosition[c] < 0)
+													fadingType[c] = NO_FADE;
+											break;
+										}
+									} else
+										fadingType[c] = NO_FADE;
+								break;
+								
+								case FADE_OUT:
+									if (fadingValue[c] > 0) {
+										fadingValue[c] -= fadeCoeff;
+										currentOutput *= fadingValue[c];
+										if (channels == 2)
+											currentOutputR *= 1 - fadingValue[c];
+									} else
+										fadingType[c] = NO_FADE;
+								break;
+
+								case PINGPONG_FADE:
+									if (fadingValue[c] > 0) {
+										fadingValue[c] -= fadeCoeff;
+										switch (reversePlaying[c]) {
+											case FORWARD:
+												currentOutput *= 1 - fadingValue[c];
+												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+												if (channels == 2) {
+													currentOutputR *= 1 - fadingValue[c];
+													currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
+												}
+												fadedPosition[c] -= distancePos[c];
+												if (fadedPosition[c] < 0)
+													fadingType[c] = NO_FADE;
+											break;
+											case REVERSE:
+												currentOutput *= 1 - fadingValue[c];
+												currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+												if (channels == 2) {
+													currentOutputR *= 1 - fadingValue[c];
+													currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
+												}
+												fadedPosition[c] += distancePos[c];
+												if (fadedPosition[c] > totalSamples)
+													fadingType[c] = NO_FADE;
+											break;
+										}
+									} else
+										fadingType[c] = NO_FADE;
+								break;
 							}
 						}
 
-						if (reversePlaying[c])
-							samplePos[c] -= distancePos[c];
-						else
-							samplePos[c] += distancePos[c];
+					} else {
+						play[c] = false;
+						fadingType[c] = NO_FADE;
+					}
 
-						currSampleWeight[c] = samplePos[c] - floor(samplePos[c]);
+					switch (polyOuts) {
+						case MONOPHONIC:										// monophonic CABLES
+							sumOutput += currentOutput;
+							if (channels == 2)
+								sumOutputR += currentOutputR;
+						break;
 
-						switch (stage[c]) {
-							case ATTACK_STAGE:
-								stageLevel[c] += stageCoeff[c];
-								if (stageLevel[c] > 1) {
-									stageLevel[c] = 1;
-									stage[c] = DECAY_STAGE;
-									decayValue = convertCVToSeconds(params[DECAY_PARAM].getValue()) + (inputs[DECAY_INPUT].getVoltage() * params[DECAYATNV_PARAM].getValue());
-									if (decayValue > maxAdsrTime) {
-										decayValue = maxAdsrTime;
-									} else 	if (decayValue < minAdsrTime) {
-										decayValue = minAdsrTime;
-									}
-									stageCoeff[c] = (1-sustainValue) / (args.sampleRate * decayValue);
+						case POLYPHONIC:										// polyphonic CABLES
+							// *** HARD CLIP ***
+							if (limiter) {
+								if (currentOutput > 5)
+									currentOutput = 5;
+								else if (currentOutput < -5)
+									currentOutput = -5;
+								if (channels == 2) {
+									if (currentOutputR > 5)
+										currentOutputR = 5;
+									else if (currentOutputR < -5)
+										currentOutputR = -5;
 								}
-							break;
+							}
 
-							case DECAY_STAGE:
-								stageLevel[c] -= stageCoeff[c];
-								if (stageLevel[c] <= sustainValue) {
-									stageLevel[c] = sustainValue;
-									stage[c] = SUSTAIN_STAGE;
+							// *** CLIPPING LIGHT ***
+							if (currentOutput < -5 || currentOutput > 5) {
+								clipping = true;
+								clippingValue = 0;
+							}
+							if (channels == 2) {
+								if (currentOutputR < -5 || currentOutputR > 5) {
+									clipping = true;
+									clippingValue = 0;
 								}
-							break;
+							}
+							if (clipping && clippingValue < 1)
+								clippingValue += clippingCoeff;
+							else {
+								clipping = false;
+								clippingValue = 1;
+							}
 
-							case SUSTAIN_STAGE:
-								stageLevel[c] = sustainValue;
-							break;
+							if (outputs[OUT_OUTPUT].isConnected()) {
+								outputs[OUT_OUTPUT].setVoltage(currentOutput, c);
+							}
 
-							case RELEASE_STAGE:
-								stageLevel[c] -= stageCoeff[c];
-								if (stageLevel[c] < 0) {	// Il release has ended
-									stageLevel[c] = 0;
+							if (outputs[OUT_OUTPUT+1].isConnected()) {
+								if (channels == 2)
+									outputs[OUT_OUTPUT+1].setVoltage(currentOutputR, c);
+								else
+									outputs[OUT_OUTPUT+1].setVoltage(currentOutput, c);
+							}
+						break;
+					}
 
-									if (recordingState == 1 && recordRelease) {
-										recButton = 0;
-										params[REC_PARAM].setValue(0);
-										prevRecButton = 0;			// this avoids to continue playing if SOR button is ON
-
-										if (rearmSetting && ((trigMode == TRIG_MODE && !playOnRec) || (trigMode == GATE_MODE)) )
-											recRearm = true;
-
-										startStopOnRec = false;
-									}
-									sorRecRelException = false;
-									
-									if (!recordingState) {		// If not recording
-
-										stage[c] = STOP_STAGE;
-										play[c] = false;
-
-										if (recRearm) {
-											recRearm = false;
-											recRearmAfter = true;
-										}
-									} else {					// if recording
-
-										if (recFadeValue <= 0) {	// if release has ended and recfade out
-											stage[c] = STOP_STAGE;
-											play[c] = false;
-											releaseNew[c] = true;
-										}
-									}
-									
-									if (releaseNew[c]) {
-										releaseNew[c] = false;
-										if (polyOuts) {
-											eor[c] = true;
-											eorTime[c] = oneMsSamples;
-										} else {
-											if (c == currentDisplay) {
-												eor[0] = true;
-												eocTime[0] = oneMsSamples;
-											}
-										}
-
-										if (playPauseToStop[c] && !recordingState) {
-											playPauseToStop[c] = false;
-											if (reversePlaying[c] == FORWARD) {
-												samplePos[c] = floor(cueStartPos)+1;
-												currSampleWeight[c] = sampleCoeff;
-											} else {
-												samplePos[c] = floor(cueEndPos)-1;
-												currSampleWeight[c] = sampleCoeff;
-											}
-										}
-										if (recRearmAfter && !recordingState) {
-											recRearmAfter = false;
-											recRearm = false;
-											params[REC_PARAM].setValue(1);
-											recButton = 1;
-										}
-									}
-								}
-							break;
+					if (polyOuts) {
+						if (eoc[c]) {
+							eocTime[c]--;
+							if (eocTime[c] < 0) {
+								eoc[c] = false;
+								outputs[EOC_OUTPUT].setVoltage(0.f, c);
+							} else
+								outputs[EOC_OUTPUT].setVoltage(10.f, c);
 						}
 
-						if (reversePlaying[c]) {
-							currentOutput *= stageLevel[c] * masterLevel[c] * -1;
-							if (channels == 2)
-								currentOutputR *= stageLevel[c] * masterLevel[c] * -1;
-						} else {
-							currentOutput *= stageLevel[c] * masterLevel[c];
-							if (channels == 2)
-								currentOutputR *= stageLevel[c] * masterLevel[c];
-						}
-
-/*
-																													███████╗░█████╗░██████╗░███████╗
-																													██╔════╝██╔══██╗██╔══██╗██╔════╝
-																													█████╗░░███████║██║░░██║█████╗░░
-																													██╔══╝░░██╔══██║██║░░██║██╔══╝░░
-																													██║░░░░░██║░░██║██████╔╝███████╗
-																													╚═╝░░░░░╚═╝░░╚═╝╚═════╝░╚══════╝
-*/
-
-						switch (fadingType[c]) {
-							case NO_FADE:
-							break;
-
-							case CROSS_FADE:
-								if (fadingValue[c] > 0) {
-									fadingValue[c] -= fadeCoeff;
-									switch (reversePlaying[c]) {
-										case FORWARD:
-											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
-											if (channels == 2) {
-												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
-											}
-											fadedPosition[c] += distancePos[c];
-											if (fadedPosition[c] > totalSamples)
-												fadingType[c] = NO_FADE;
-										break;
-										case REVERSE:
-											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
-											if (channels == 2) {
-												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
-											}
-											fadedPosition[c] -= distancePos[c];
-											if (fadedPosition[c] < 0)
-												fadingType[c] = NO_FADE;
-										break;
-									}
-								} else
-									fadingType[c] = NO_FADE;
-							break;
-							
-							case FADE_OUT:
-								if (fadingValue[c] > 0) {
-									fadingValue[c] -= fadeCoeff;
-									currentOutput *= fadingValue[c];
-									if (channels == 2)
-										currentOutputR *= 1 - fadingValue[c];
-								} else
-									fadingType[c] = NO_FADE;
-							break;
-
-							case PINGPONG_FADE:
-								if (fadingValue[c] > 0) {
-									fadingValue[c] -= fadeCoeff;
-									switch (reversePlaying[c]) {
-										case FORWARD:
-											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
-											if (channels == 2) {
-												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c] * -1);
-											}
-											fadedPosition[c] -= distancePos[c];
-											if (fadedPosition[c] < 0)
-												fadingType[c] = NO_FADE;
-										break;
-										case REVERSE:
-											currentOutput *= 1 - fadingValue[c];
-											currentOutput += (playBuffer[LEFT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
-											if (channels == 2) {
-												currentOutputR *= 1 - fadingValue[c];
-												currentOutputR += (playBuffer[RIGHT][antiAlias][floor(fadedPosition[c])] * fadingValue[c] * masterLevel[c] * stageLevel[c]);
-											}
-											fadedPosition[c] += distancePos[c];
-											if (fadedPosition[c] > totalSamples)
-												fadingType[c] = NO_FADE;
-										break;
-									}
-								} else
-									fadingType[c] = NO_FADE;
-							break;
+						if (eor[c]) {
+							eorTime[c]--;
+							if (eorTime[c] < 0) {
+								eor[c] = false;
+								outputs[EOR_OUTPUT].setVoltage(0.f, c);
+							} else
+								outputs[EOR_OUTPUT].setVoltage(10.f, c);
 						}
 					}
 
-				} else {
-					play[c] = false;
-					fadingType[c] = NO_FADE;
-				}
+				} // END OF CHANNEL MANAGEMENT
 
 				switch (polyOuts) {
-					case MONOPHONIC:										// monophonic CABLES
-						sumOutput += currentOutput;
-						if (channels == 2)
-							sumOutputR += currentOutputR;
-					break;
-
-					case POLYPHONIC:										// polyphonic CABLES
+					case MONOPHONIC:			// monophonic CABLES
 						// *** HARD CLIP ***
 						if (limiter) {
-							if (currentOutput > 5)
-								currentOutput = 5;
-							else if (currentOutput < -5)
-								currentOutput = -5;
+							if (sumOutput > 5)
+								sumOutput = 5;
+							else if (sumOutput < -5)
+								sumOutput = -5;
 							if (channels == 2) {
-								if (currentOutputR > 5)
-									currentOutputR = 5;
-								else if (currentOutputR < -5)
-									currentOutputR = -5;
+								if (sumOutputR > 5)
+									sumOutputR = 5;
+								else if (sumOutputR < -5)
+									sumOutputR = -5;
 							}
 						}
 
 						// *** CLIPPING LIGHT ***
-						if (currentOutput < -5 || currentOutput > 5) {
+						if (sumOutput < -5 || sumOutput > 5) {
 							clipping = true;
 							clippingValue = 0;
 						}
 						if (channels == 2) {
-							if (currentOutputR < -5 || currentOutputR > 5) {
+							if (sumOutputR < -5 || sumOutputR > 5) {
 								clipping = true;
 								clippingValue = 0;
 							}
@@ -3429,94 +3500,26 @@ struct SickoSampler : Module {
 						}
 
 						if (outputs[OUT_OUTPUT].isConnected()) {
-							outputs[OUT_OUTPUT].setVoltage(currentOutput, c);
+							outputs[OUT_OUTPUT].setVoltage(sumOutput);
+							outputs[OUT_OUTPUT].setChannels(1);
 						}
-
 						if (outputs[OUT_OUTPUT+1].isConnected()) {
 							if (channels == 2)
-								outputs[OUT_OUTPUT+1].setVoltage(currentOutputR, c);
+								outputs[OUT_OUTPUT+1].setVoltage(sumOutputR);
 							else
-								outputs[OUT_OUTPUT+1].setVoltage(currentOutput, c);
+								outputs[OUT_OUTPUT+1].setVoltage(sumOutput);
+							outputs[OUT_OUTPUT+1].setChannels(1);
 						}
+
+					break;
+
+					case POLYPHONIC:			// polyphonic CABLES
+						outputs[OUT_OUTPUT].setChannels(chan);
+						outputs[OUT_OUTPUT+1].setChannels(chan);
 					break;
 				}
-
-				if (polyOuts) {
-					if (eoc[c]) {
-						eocTime[c]--;
-						if (eocTime[c] < 0) {
-							eoc[c] = false;
-							outputs[EOC_OUTPUT].setVoltage(0.f, c);
-						} else
-							outputs[EOC_OUTPUT].setVoltage(10.f, c);
-					}
-
-					if (eor[c]) {
-						eorTime[c]--;
-						if (eorTime[c] < 0) {
-							eor[c] = false;
-							outputs[EOR_OUTPUT].setVoltage(0.f, c);
-						} else
-							outputs[EOR_OUTPUT].setVoltage(10.f, c);
-					}
-				}
-
-			} // END OF CHANNEL MANAGEMENT
-
-			switch (polyOuts) {
-				case MONOPHONIC:			// monophonic CABLES
-					// *** HARD CLIP ***
-					if (limiter) {
-						if (sumOutput > 5)
-							sumOutput = 5;
-						else if (sumOutput < -5)
-							sumOutput = -5;
-						if (channels == 2) {
-							if (sumOutputR > 5)
-								sumOutputR = 5;
-							else if (sumOutputR < -5)
-								sumOutputR = -5;
-						}
-					}
-
-					// *** CLIPPING LIGHT ***
-					if (sumOutput < -5 || sumOutput > 5) {
-						clipping = true;
-						clippingValue = 0;
-					}
-					if (channels == 2) {
-						if (sumOutputR < -5 || sumOutputR > 5) {
-							clipping = true;
-							clippingValue = 0;
-						}
-					}
-					if (clipping && clippingValue < 1)
-						clippingValue += clippingCoeff;
-					else {
-						clipping = false;
-						clippingValue = 1;
-					}
-
-					if (outputs[OUT_OUTPUT].isConnected()) {
-						outputs[OUT_OUTPUT].setVoltage(sumOutput);
-						outputs[OUT_OUTPUT].setChannels(1);
-					}
-					if (outputs[OUT_OUTPUT+1].isConnected()) {
-						if (channels == 2)
-							outputs[OUT_OUTPUT+1].setVoltage(sumOutputR);
-						else
-							outputs[OUT_OUTPUT+1].setVoltage(sumOutput);
-						outputs[OUT_OUTPUT+1].setChannels(1);
-					}
-
-				break;
-
-				case POLYPHONIC:			// polyphonic CABLES
-					outputs[OUT_OUTPUT].setChannels(chan);
-					outputs[OUT_OUTPUT+1].setChannels(chan);
-				break;
 			}
-
+			prevClearTrig = clearTrig;
 		}
 
 /*
