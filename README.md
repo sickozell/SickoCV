@@ -18,6 +18,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog** 
+- added stepStation and trigStation modules
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
 - all sampler modules: improved memory allocation management
 - slewer/slewer mini: inverted shapes on shape knob
@@ -65,6 +66,7 @@ VCV Rack plugin modules
 - [simpleSeq4](#simpleseq4)
 - [slewer / slewer mini](#slewer--slewer-mini)
 - [stepSeq / stepSeq+ / stepSeq8x / trigSeq / trigSeq+ / trigSeq8x](#stepSeq--stepSeq--stepSeq8x--trigSeq--trigSeq--trigSeq8x)
+- [stepStation / trigStation](#stepStation--trigStation)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
@@ -1214,6 +1216,14 @@ Plus versions only:
 - **Copy/paste seq**: copy and paste the current sequence and the length/reset settings in the clipboard (does not work across multiple modules)
 - **Load/Save PRESET**: load or save a 'ssp' or 'tsp' preset file with all programmed sequences, including lengths, reset settings, and right-click menu settings
 - **Erase ALL progs**: resets all stored programs to default
+
+[back to top](#table-of-contents)
+
+## stepStation / trigStation
+### 8 independent track 16 step/trigger sequencer with customizable user inputs/knobs and presets
+
+#### - INSTRUCTIONS
+Instructions to come
 
 [back to top](#table-of-contents)
 

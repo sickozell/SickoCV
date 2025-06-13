@@ -1,4 +1,5 @@
-### 2.7.4 (2025-06-03)
+### 2.7.4 (2025-06-13)
+- added stepStation and trigStation modules
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
 - all sampler modules: improved memory allocation management
 - slewer/slewer mini: inverted shapes on shape knob
