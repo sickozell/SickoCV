@@ -53,7 +53,8 @@
 //#define COLOR_EGA_DARK_GRAY 	0x55, 0x55, 0x55, 0xff // Grigio scuro
 #define COLOR_EGA_DARK_GRAY 	0x80, 0x80, 0x80, 0xff // Grigio medio-scuro
 #define COLOR_EGA_DARK_DARK_GRAY 	0x60, 0x60, 0x60, 0xff // Grigio medio-scuro
-#define COLOR_EGA_LIGHT_BLUE 	0x55, 0x55, 0xff, 0xff // Blu chiaro
+//#define COLOR_EGA_LIGHT_BLUE 	0x55, 0x55, 0xff, 0xff // Blu chiaro
+#define COLOR_EGA_LIGHT_BLUE 	0x33, 0x99, 0xff, 0xff // Blu molto chiaro
 #define COLOR_EGA_LIGHT_GREEN	0x55, 0xff, 0x55, 0xff // Verde chiaro
 #define COLOR_EGA_LIGHT_CYAN 	0x55, 0xff, 0xff, 0xff // Ciano chiaro
 #define COLOR_EGA_LIGHT_RED 	0xff, 0x55, 0x55, 0xff // Rosso chiaro
@@ -75,23 +76,23 @@
 #define ALLTRACKS 9
 #define MC 8
 
-#define IN_PW 0
-#define IN_REV 1
+#define IN_FLIP 0
+#define IN_LENGTH 1
 #define IN_MODE 2
-#define IN_LENGTH 3
-#define IN_RSTSTEP 4
-#define IN_RUN 5
+#define IN_OUTSCALE 3
+#define IN_PW 4
+#define IN_RSTSTEP 5
 #define IN_RETRIG 6
-#define IN_OUTSCALE 7
-#define IN_SWING 8
-#define IN_FLIP 9
-#define KNOB_PW 10
-#define KNOB_RSTSTEP 11
-#define KNOB_MODE 12
-#define KNOB_PROB 13
-#define KNOB_OUTSCALE 14
-#define KNOB_SWING 15
-#define KNOB_FLIPPROB 16
+#define IN_REV 7
+#define IN_RUN 8
+#define IN_SWING 9
+#define KNOB_FLIPPROB 10
+#define KNOB_MODE 11
+#define KNOB_OUTSCALE 12
+#define KNOB_PW 13
+#define KNOB_RSTSTEP 14
+#define KNOB_PROB 15
+#define KNOB_SWING 16
 #define KNOB_ATN 17
 #define KNOB_ATNV 18
 

@@ -20,8 +20,10 @@ struct SickoTrigStation : Module {
 	virtual int getInputBase() const { return -1; }
 	virtual int getParamBase() const { return -1; }
 
-	const std::string userInNames[KNOB_SHIFT] = {"Pulse Width", "Reverse", "Mode", "Length", "Reset Step#", "Run", "Retrig", "Out scale", "Swing", "Flip"};
-	const std::string userKnobNames[KNOB_NR] = {"Pulse Width", "Reset Step#", "Mode", "Retrig Prob.", "Out scale", "Swing", "Flip Prob.", "Attenuator", "Attenuverter"};
+	//const std::string userInNames[KNOB_SHIFT] = {"Pulse Width", "Reverse", "Mode", "Length", "Reset Step#", "Run", "Retrig", "Out scale", "Swing", "Flip"};
+	//const std::string userKnobNames[KNOB_NR] = {"Pulse Width", "Reset Step#", "Mode", "Retrig Prob.", "Out scale", "Swing", "Flip Prob.", "Attenuator", "Attenuverter"};
+	const std::string userInNames[KNOB_SHIFT] = {"Flip", "Length", "Mode", "Out scale", "Pulse Width", "Reset Step#", "Retrig", "Reverse", "Run", "Swing"};
+	const std::string userKnobNames[KNOB_NR] = {"Flip Prob.", "Mode", "Out scale",  "Pulse Width", "Reset Step#", "Retrig Prob.", "Swing", "Attenuator", "Attenuverter"};
 
 	bool cvClockIn = false;
 	bool cvClockOut = false;
@@ -38,17 +40,16 @@ struct SickoTrigStation : Module {
 						};
 
 	int userInputs[MAXTRACKS][MAXUSER][2] = {
-//  						  IN_PW    IN_REV   IN_MODE IN_LENGTH IN_RST   IN_RUN  IN_RETRIG IN_OUTSC IN_SWING IN_FLIP  KN_PW   KN_RSTSTP KN_MODE  KN_PROB KN_OUTSC KN_SWNG KN_PRBFL KN_ATN  KN_ATNV
-							{ {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {1, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {1, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {1, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {1, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {1, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {1, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {1, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {1, 0}, {0, 0}, {0, 0} }
+//							  IN_FLIP  IN_LENGH IN_MODE  IN_OUTSC IN_PW   IN_RSTST IN_RETRIG IN_REV   IN_RUN   IN_SWING KN_FLIP  KN_MODE  KN_OUTSC KN_PW   KN_RSTST  KN_PROB KN_SWNG KN_ATN  KN_ATNV
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
 						};
-
 	void appendInputMenu(Menu *menu, engine::Port::Type type, int portId){
 
 		menu->addChild(new MenuSeparator());
@@ -4218,11 +4219,42 @@ struct TrigStationDisplayU1 : TransparentWidget {
 
 			std::string tempText;
 			switch (module->userTable[t][0]) {
+
+				case IN_FLIP:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					tempText = "FL";
+				break;
+
+				case IN_LENGTH:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_GREEN));
+					tempText = "LN";
+				break;
+
+				case IN_MODE:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
+					tempText = "MD";
+				break;
+
+				case IN_OUTSCALE:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					tempText = "SC";
+				break;
+
 				case IN_PW:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_BLUE));
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
+				break;
+
+				case IN_RSTSTEP:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_MAGENTA));
+					tempText = "RS";
+				break;
+
+				case IN_RETRIG:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_CYAN));
+					tempText = "RT";
 				break;
 
 				case IN_REV:
@@ -4230,45 +4262,16 @@ struct TrigStationDisplayU1 : TransparentWidget {
 					tempText = "RV";
 				break;
 
-				case IN_MODE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
-					tempText = "MD";
-				break;
-
-				case IN_LENGTH:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
-					tempText = "LN";
-				break;
-
-				case IN_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_MAGENTA));
-					tempText = "RS";
-				break;
-
 				case IN_RUN:
 					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_BLUE));
 					tempText = "RN";
-				break;
-
-				case IN_RETRIG:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_DARK_GRAY));
-					tempText = "RT";
-				break;
-
-				case IN_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_BROWN));
-					tempText = "SC";
 				break;
 
 				case IN_SWING:
 					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
 					tempText = "SW";
 				break;
-
-				case IN_FLIP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
-					tempText = "FL";
-				break;
+				
 			}
 			nvgTextBox(args.vg, 0, 0, 10, tempText.c_str(), NULL);
 		}
@@ -4294,11 +4297,41 @@ struct TrigStationDisplayU2 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][2]) {
 
+				case IN_FLIP:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					tempText = "FL";
+				break;
+
+				case IN_LENGTH:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_GREEN));
+					tempText = "LN";
+				break;
+				
+				case IN_MODE:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
+					tempText = "MD";
+				break;
+
+				case IN_OUTSCALE:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					tempText = "SC";
+				break;
+
 				case IN_PW:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_BLUE));
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
+				break;
+
+				case IN_RETRIG:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_CYAN));
+					tempText = "RT";
+				break;
+
+				case IN_RSTSTEP:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_MAGENTA));
+					tempText = "RS";
 				break;
 
 				case IN_REV:
@@ -4306,44 +4339,14 @@ struct TrigStationDisplayU2 : TransparentWidget {
 					tempText = "RV";
 				break;
 
-				case IN_MODE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
-					tempText = "MD";
-				break;
-
-				case IN_LENGTH:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
-					tempText = "LN";
-				break;
-
-				case IN_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_MAGENTA));
-					tempText = "RS";
-				break;
-
 				case IN_RUN:
 					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_BLUE));
 					tempText = "RN";
 				break;
 
-				case IN_RETRIG:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_DARK_GRAY));
-					tempText = "RT";
-				break;
-
-				case IN_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_BROWN));
-					tempText = "SC";
-				break;
-
 				case IN_SWING:
 					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
 					tempText = "SW";
-				break;
-
-				case IN_FLIP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
-					tempText = "FL";
 				break;
 
 			}
@@ -4371,8 +4374,23 @@ struct TrigStationDisplayK1 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][1]) {
 				
+				case KNOB_FLIPPROB:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					tempText = "FP";
+				break;
+
+				case KNOB_MODE:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
+					tempText = "MD";
+				break;
+
+				case KNOB_OUTSCALE:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					tempText = "SC";
+				break;
+
 				case KNOB_PW:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_BLUE));
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
@@ -4382,30 +4400,15 @@ struct TrigStationDisplayK1 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_MAGENTA));
 					tempText = "RS";
 				break;
-
-				case KNOB_MODE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
-					tempText = "MD";
-				break;
-
+			
 				case KNOB_PROB:
 					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RP";
 				break;
 
-				case KNOB_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
-					tempText = "SC";
-				break;
-
 				case KNOB_SWING:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
 					tempText = "SW";
-				break;
-
-				case KNOB_FLIPPROB:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
-					tempText = "FP";
 				break;
 
 				case KNOB_ATN:
@@ -4445,8 +4448,23 @@ struct TrigStationDisplayK2 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][3]) {
 
+				case KNOB_FLIPPROB:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					tempText = "FP";
+				break;
+
+				case KNOB_MODE:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
+					tempText = "MD";
+				break;
+
+				case KNOB_OUTSCALE:
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					tempText = "SC";
+				break;
+
 				case KNOB_PW:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_BLUE));
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
@@ -4457,29 +4475,14 @@ struct TrigStationDisplayK2 : TransparentWidget {
 					tempText = "RS";
 				break;
 
-				case KNOB_MODE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
-					tempText = "MD";
-				break;
-
 				case KNOB_PROB:
 					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RP";
 				break;
 
-				case KNOB_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
-					tempText = "SC";
-				break;
-
 				case KNOB_SWING:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
 					tempText = "SW";
-				break;
-
-				case KNOB_FLIPPROB:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
-					tempText = "FP";
 				break;
 
 				case KNOB_ATN:
