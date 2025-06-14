@@ -24,14 +24,7 @@
 		json_object_set_new(rootJ, "ResetPulseOnRun", json_boolean(resetPulseOnRun));
 		json_object_set_new(rootJ, "ResetOnStop", json_boolean(resetOnStop));
 		json_object_set_new(rootJ, "ResetPulseOnStop", json_boolean(resetPulseOnStop));
-		/*
-		json_object_set_new(rootJ, "Swing1", json_boolean(divSwing[0]));
-		json_object_set_new(rootJ, "Swing2", json_boolean(divSwing[1]));
-		json_object_set_new(rootJ, "Swing3", json_boolean(divSwing[2]));
-		json_object_set_new(rootJ, "Swing4", json_boolean(divSwing[3]));
-		json_object_set_new(rootJ, "Swing5", json_boolean(divSwing[4]));
-		json_object_set_new(rootJ, "Swing6", json_boolean(divSwing[5]));
-		*/
+
 		json_object_set_new(rootJ, "cvClockIn", json_boolean(cvClockIn));
 		json_object_set_new(rootJ, "cvClockOut", json_boolean(cvClockOut));
 
@@ -41,6 +34,7 @@
 		// --------- SEQUENCER
 		json_object_set_new(rootJ, "range", json_integer(range));
 		json_object_set_new(rootJ, "runType", json_integer(runType));
+		json_object_set_new(rootJ, "rstClkOnRst", json_boolean(rstClkOnRst));
 		json_object_set_new(rootJ, "rstSeqOnProgChange", json_boolean(rstSeqOnProgChange));
 
 		json_object_set_new(rootJ, "savedProgKnob", json_integer(savedProgKnob));
@@ -443,6 +437,11 @@
 			}
 		}
 		{
+			json_t* valueJ = json_object_get(rootJ, "rstClkOnRst");
+			if (valueJ)
+				rstClkOnRst = json_boolean_value(valueJ);
+		}
+		{
 			json_t* valueJ = json_object_get(rootJ, "rstSeqOnProgChange");
 			if (valueJ)
 				rstSeqOnProgChange = json_boolean_value(valueJ);
@@ -754,6 +753,11 @@
 			}
 		}
 		{
+			json_t* valueJ = json_object_get(rootJ, "rstClkOnRst");
+			if (valueJ)
+				rstClkOnRst = json_boolean_value(valueJ);
+		}
+		{
 			json_t* valueJ = json_object_get(rootJ, "rstSeqOnProgChange");
 			if (valueJ)
 				rstSeqOnProgChange = json_boolean_value(valueJ);
@@ -993,6 +997,7 @@
 
 		json_object_set_new(rootJ, "range", json_integer(range));
 		json_object_set_new(rootJ, "runType", json_integer(runType));
+		json_object_set_new(rootJ, "rstClkOnRst", json_boolean(rstClkOnRst));
 		json_object_set_new(rootJ, "rstSeqOnProgChange", json_boolean(rstSeqOnProgChange));
 
 		json_object_set_new(rootJ, "progInType", json_boolean(progInType));

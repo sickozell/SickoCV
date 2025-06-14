@@ -41,6 +41,8 @@
 		// --------- SEQUENCER
 		//json_object_set_new(rootJ, "range", json_integer(range));
 		json_object_set_new(rootJ, "runType", json_integer(runType));
+		json_object_set_new(rootJ, "rstClkOnRst", json_boolean(rstClkOnRst));
+		json_object_set_new(rootJ, "rstClkOnRst", json_boolean(rstClkOnRst));
 		json_object_set_new(rootJ, "rstSeqOnProgChange", json_boolean(rstSeqOnProgChange));
 
 		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
@@ -487,6 +489,11 @@
 			}
 		}
 		{
+			json_t* valueJ = json_object_get(rootJ, "rstClkOnRst");
+			if (valueJ)
+				rstClkOnRst = json_boolean_value(valueJ);
+		}
+		{
 			json_t* valueJ = json_object_get(rootJ, "rstSeqOnProgChange");
 			if (valueJ)
 				rstSeqOnProgChange = json_boolean_value(valueJ);
@@ -827,6 +834,11 @@
 					runType = 0;
 			}
 		}
+				{
+			json_t* valueJ = json_object_get(rootJ, "rstClkOnRst");
+			if (valueJ)
+				rstClkOnRst = json_boolean_value(valueJ);
+		}
 		{
 			json_t* valueJ = json_object_get(rootJ, "rstSeqOnProgChange");
 			if (valueJ)
@@ -1090,6 +1102,7 @@
 		// --------- SEQUENCER
 
 		json_object_set_new(rootJ, "runType", json_integer(runType));
+		json_object_set_new(rootJ, "rstClkOnRst", json_boolean(rstClkOnRst));
 		json_object_set_new(rootJ, "rstSeqOnProgChange", json_boolean(rstSeqOnProgChange));
 
 		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
