@@ -31,7 +31,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.7.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/d89bd63a-28d8-4ecd-8871-b763f57085b4)
+![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/35f1b759-2f8c-48dd-bcd1-3477db3d231a)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
