@@ -1228,9 +1228,9 @@ Plus versions only:
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
 
-Download [ENGLISH user manual](./docs/trigStation-stepStation%20user%20manual%20%5BEN%5D.pdf?raw=true)
+Download [ENGLISH user manual](./docs/trigStation-stepStation%20user%20manual%20EN.pdf?raw=true)
 
-Download [manuale utente ITALIANO](./docs/trigStation-stepStation%20manuale%20utente%20%5BIT%5D.pdf?raw=true)
+Download [manuale utente ITALIANO](./docs/trigStation-stepStation%20manuale%20utente%20IT.pdf?raw=true)
 
 
 [back to top](#table-of-contents)
