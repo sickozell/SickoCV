@@ -852,6 +852,8 @@ Download [ENGLISH user manual](./docs/sickoLooper%20user%20manual%20EN.pdf?raw=t
 
 Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20IT.pdf?raw=true)
 
+If errors occurs during download please right-click on the link above and "Save Link As"
+
 [back to top](#table-of-contents)
 
 ## sickoPlayer
@@ -1232,6 +1234,7 @@ Download [ENGLISH user manual](./docs/trigStation-stepStation%20user%20manual%20
 
 Download [manuale utente ITALIANO](./docs/trigStation-stepStation%20manuale%20utente%20IT.pdf?raw=true)
 
+If errors occurs during download please right-click on the link above and "Save Link As"
 
 [back to top](#table-of-contents)
 
