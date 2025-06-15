@@ -1222,8 +1222,16 @@ Plus versions only:
 ## stepStation / trigStation
 ### 8 independent track 16 step/trigger sequencer with configurable user inputs/knobs and presets
 
-#### - INSTRUCTIONS
-Instructions to come
+![stepStation](https://github.com/user-attachments/assets/63013eca-9585-4bfb-9b5f-7e12ef05b3d3)
+![trigStation](https://github.com/user-attachments/assets/df8c8843-ecda-498c-b849-a2eea4da06c0)
+
+#### - MANUALS
+Due to the complexity of these modules, a PDF user manual has been written
+
+Download [ENGLISH user manual](./docs/trigStation-stepStation%20user%20manual%20%5BEN%5D.pdf?raw=true)
+
+Download [manuale utente ITALIANO](./docs/trigStation-stepStation%20manuale%20utente%20%5BIT%5D.pdf?raw=true)
+
 
 [back to top](#table-of-contents)
 
