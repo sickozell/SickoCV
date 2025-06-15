@@ -1220,7 +1220,7 @@ Plus versions only:
 [back to top](#table-of-contents)
 
 ## stepStation / trigStation
-### 8 independent track 16 step/trigger sequencer with customizable user inputs/knobs and presets
+### 8 independent track 16 step/trigger sequencer with configurable user inputs/knobs and presets
 
 #### - INSTRUCTIONS
 Instructions to come

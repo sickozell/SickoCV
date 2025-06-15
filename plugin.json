@@ -564,7 +564,7 @@
     {
       "slug": "StepStation",
       "name": "stepStation",
-      "description": "8 independent track / 16 step sequencer with customizable user inputs/knobs and presets (sstation)",
+      "description": "8 independent track / 16 step sequencer with configurable user inputs/knobs and presets (sstation)",
       "tags": [
         "Sequencer"
       ]
@@ -649,7 +649,7 @@
     {
       "slug": "TrigStation",
       "name": "trigStation",
-      "description": "8 independent track / 16 step trig sequencer with customizable user inputs/knobs and presets (tstation)",
+      "description": "8 independent track / 16 step trig sequencer with configurable user inputs/knobs and presets (tstation)",
       "tags": [
         "Sequencer"
       ]
