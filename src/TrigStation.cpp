@@ -398,21 +398,11 @@ struct TrigStation : SickoTrigStation {
 	float buttRunTrig = 0.f;
 	float prevButtRunTrig = -1.f;
 
-	//int range = 9;
-
-//	bool initStart = false;
 	int recStep[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	int runType = RUN_GATE;
-/*
-	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
-	bool stepPulse[MAXTRACKS] = {false, false, false, false, false, false, false, false};
-	float stepPulseTime[MAXTRACKS] = {0,0,0,0,0,0,0,0};
-*/
-	//int maxSteps = 16;
+
 	int maxSteps[MAXTRACKS] = {0,0,0,0,0,0,0,0};
-	//int mode = CLOCK_MODE;
-	//int prevMode = -1;
 
 	int currAddr[MAXTRACKS] = {0,0,0,0,0,0,0,0};
 	int prevAddr[MAXTRACKS] = {0,0,0,0,0,0,0,0};
@@ -491,7 +481,8 @@ struct TrigStation : SickoTrigStation {
 
 	//**************************************************************
 
-							// ********* C L O C K *************
+	// ********* C L O C K *************
+
 	double sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 
 	double bpm[ALLTRACKS] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
@@ -507,14 +498,7 @@ struct TrigStation : SickoTrigStation {
 	float prevResetValue[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	bool resetStart = true;
 	bool resetStartExt = true;
-	bool resetDiv = true;
-
-	int clock_runSetting = 1;
-	int clock_prevRunSetting = 0;
-
-	//float runButton = 0;
-	//float runTrig = 0.f;
-	//float prevRunTrig = 0.f;
+	//bool resetDiv = true;
 
 	double clockSample[ALLTRACKS] = {1, 1, 1, 1, 1, 1, 1, 1, 999999999999};
 	double clockMaxSample[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -532,10 +516,7 @@ struct TrigStation : SickoTrigStation {
 	int ppqnValue = ppqnTable[ppqn];
 	int ppqnComparison = ppqnValue - 1;
 
-	//int pulseNr[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-	//int pulseSample[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int pulseNr = 0;
-	//int pulseSample = 0;	// non c'è
 
 	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
 	//float oneMsTime = (APP->engine->getSampleRate()) / 10;	// for testing purposes
@@ -806,12 +787,11 @@ struct TrigStation : SickoTrigStation {
 
 	void onReset(const ResetEvent &e) override {
 
-//		initStart = false;
-
-		//step = 0;
-
-		for (int t = 1; t < MAXTRACKS; t++) {
+		for (int t = 0; t < MAXTRACKS; t++) {
+			step[t] = 0;
 			lights[STEP_LIGHT+(t*16)].setBrightness(1);
+			lights[STEPBUT_LIGHT+(t*16)].setBrightness(0);
+			wSeq[t][0] = 0.f;
 			for (int s = 1; s < 16; s++) {
 				lights[STEP_LIGHT+(t*16+s)].setBrightness(0);
 				lights[STEPBUT_LIGHT+(t*16)+s].setBrightness(0);
@@ -826,26 +806,38 @@ struct TrigStation : SickoTrigStation {
 		// ----- clock
 		resetStart = true;
 		resetStartExt = true;
-		resetDiv = true;
+		//resetDiv = true;
 		
-		clock_runSetting = 1;
-		clock_prevRunSetting = 0;
+		//clock_runSetting = 1;
+		//clock_prevRunSetting = 0;
 
 		runButton = 0;
 		runTrig = 0.f;
 		prevRunTrig = 0.f;
 
-		resetOnRun = true;
-		resetPulseOnRun = false;
-		resetOnStop = false;
-		resetPulseOnStop = false;
+		//resetOnRun = true;
+		//resetPulseOnRun = false;
+		//resetOnStop = false;
+		//resetPulseOnStop = false;
+
+		bpm[MC] = 0;
+		clockSample[MC] = 1.0;
+		extSync[MC] = false;
+		extConn[MC] = false;
+		prevExtConn[MC] = true;
+		extBeat[MC] = false;
+
+		progKnob = 0;
+		prevProgKnob = 0;
+		savedProgKnob = 0;
+		selectedProg = 0;
+		progChanged = false;
+		workingProg = 0;
+
 
 		for (int t = 0; t < MAXTRACKS; t++) {
 			wSteps[t] = 16;
 			params[LENGTH_PARAM+t].setValue(wSteps[t]);
-			//wRst[t] = 1;
-
-			step[t] = 0;
 			bpm[t] = 0.1;
 			clockSample[t] = 1.0;
 			extSync[t] = false;
@@ -860,7 +852,19 @@ struct TrigStation : SickoTrigStation {
 			divPulseTime[t] = false;
 			divCount[t] = 1;
 			divSwing[t] = false;
+
+			if (dontAdvanceSetting[t] == 2)
+				dontAdvance[t] = dontAdvanceSetting[MC];
+			else
+				dontAdvance[t] = dontAdvanceSetting[t];
+
+			edge[t] = false;
+			prevEdge[t] = false;
+			stepAdv[t] = false;
+			clockAdv[t] = false;
 		}
+
+
 		Module::onReset(e);
 	}
 
@@ -929,7 +933,7 @@ struct TrigStation : SickoTrigStation {
 		trigStation_cbUserValuesTrack[1] = params[USER_PARAM+t+8].getValue();
 
 		trigStation_cbCurrentModeTrack = currentMode[t];
-		trigStation_cbDivMultTrack = params[DIVMULT_KNOB_PARAM+t].getValue();;
+		trigStation_cbDivMultTrack = params[DIVMULT_KNOB_PARAM+t].getValue();
 		
 		trigStation_cbXcludeFromRunTrack = xcludeFromRun[t];
 		trigStation_cbXcludeFromRstTrack = xcludeFromRst[t];
@@ -1099,7 +1103,7 @@ struct TrigStation : SickoTrigStation {
 
 			for (int t = 0; t < MAXTRACKS; t++) {
 				for (int s = 0; s < 16; s++)
-					progSeq[p][t][s] = 0.5f;
+					progSeq[p][t][s] = 0.f;
 				progSteps[p][t] = 16;
 
 				for (int u = 0; u < 4; u++)
@@ -1812,8 +1816,6 @@ struct TrigStation : SickoTrigStation {
 
 					progSteps[progKnob][t] = wSteps[t];
 
-					//progRst[progKnob][t] = wRst[t];
-
 					for (int i = 0; i < 4; i++)
 						progUserTable[progKnob][t][i] = userTable[t][i];
 
@@ -1945,6 +1947,7 @@ struct TrigStation : SickoTrigStation {
 				} else {
 					internalClock = true;
 				}			
+
 			}
 			prevButtRunTrig = buttRunTrig;
 		}
@@ -1974,6 +1977,7 @@ struct TrigStation : SickoTrigStation {
 		if (internalClock) {
 			extConn[MC] = false;
 			runSetting = 1;
+			//DEBUG("INTERNAL CLOCK TRUE");
 		} else if (externalClock) {
 			extConn[MC] = true;
 			runSetting = 1;
@@ -1995,10 +1999,20 @@ struct TrigStation : SickoTrigStation {
 			}
 		}
 
+/*
+		if (internalClock) 
+			DEBUG("1. int.Clock ON");
+		else
+			DEBUG("1. int.Clock OFF");
+*/
+
+/*
+		if (externalClock) 
+			DEBUG("1. EXT.Clock ON");
+		else
+			DEBUG("1. EXT.Clock OFF");
+*/
 		prevInternalClock = internalClock;
-
-
-
 
 		lights[RUNBUT_LIGHT].setBrightness(internalClock);
 
@@ -2018,6 +2032,7 @@ struct TrigStation : SickoTrigStation {
 					divClockSample[t] = 1.0;
 					divMaxSample[t][0] = 0.0;
 					divMaxSample[t][1] = 0.0;
+					divCount[t] = 1;
 					//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
 					//outputs[OUT_OUTPUT+t].setVoltage(0.f);
 
@@ -2031,7 +2046,7 @@ struct TrigStation : SickoTrigStation {
 		} else if (runSetting && !prevRunSetting) {
 
 			if (resetOnRun) {
-			//if (rstOnRun[MC]) {
+
 				resetStart = true;
 				if (!extConn[MC])	//             <-    DA RIVEDERE *************************
 					clockSample[MC] = 1.0;
@@ -2046,6 +2061,7 @@ struct TrigStation : SickoTrigStation {
 					divClockSample[t] = 1.0;
 					divMaxSample[t][0] = 0.0;
 					divMaxSample[t][1] = 0.0;
+					divCount[t] = 1;
 					//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
 					//outputs[OUT_OUTPUT+t].setVoltage(0.f);
 					edge[t] = false;
@@ -2065,6 +2081,9 @@ struct TrigStation : SickoTrigStation {
 		// ---------------------------------------------------------------------------------
 
 		// **********  RESET ALL
+		// **********  RESET ALL
+		// **********  RESET ALL
+		// **********  RESET ALL
 
 		resetBut = params[RSTALLBUT_PARAM].getValue();
 		if (resetBut)
@@ -2083,6 +2102,11 @@ struct TrigStation : SickoTrigStation {
 				// ******** NEW ***********
 				if (!extConn[MC])
 					clockSample[MC] = 1.0;
+				else if (cvClockIn) {
+					extClockSample = 1.0;
+					//extClockMaxSample = 0;
+					//extMaxPulseSample = 0;
+				}
 
 				if (!cvClockOut)
 					outputs[CLOCK_OUTPUT].setVoltage(0.f);
@@ -2093,6 +2117,7 @@ struct TrigStation : SickoTrigStation {
 						divClockSample[t] = 1.0;
 						divMaxSample[t][0] = 0.0;
 						divMaxSample[t][1] = 0.0;
+						divCount[t] = 1;
 						//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
 						//outputs[OUT_OUTPUT+t].setVoltage(0.f);
 						edge[t] = false;
@@ -2102,8 +2127,11 @@ struct TrigStation : SickoTrigStation {
 				resetPulse[MC] = true;
 				resetPulseTime[MC] = oneMsTime;
 
-				//resetDiv = true;
 			}
+
+
+				//resetDiv = true;
+			
 		}
 		prevResetValue[MC] = resetValue[MC];
 
@@ -2119,7 +2147,7 @@ struct TrigStation : SickoTrigStation {
 			if (cvClockOut) {
 				
 				if (bpm[MC] != prevBpm[MC])
-					cvClockOutValue = log2(bpm[MC] / 120.0f);
+					cvClockOutValue = log2(bpm[MC] / 120.f);
 				
 				outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
 				
@@ -2282,7 +2310,18 @@ struct TrigStation : SickoTrigStation {
 
 			}
 
-		} //else {
+		} 
+
+/*
+
+																						███████╗██╗░░██╗████████╗  ░█████╗░██╗░░░░░░█████╗░░█████╗░██╗░░██╗
+																						██╔════╝╚██╗██╔╝╚══██╔══╝  ██╔══██╗██║░░░░░██╔══██╗██╔══██╗██║░██╔╝
+																						█████╗░░░╚███╔╝░░░░██║░░░  ██║░░╚═╝██║░░░░░██║░░██║██║░░╚═╝█████═╝░
+																						██╔══╝░░░██╔██╗░░░░██║░░░  ██║░░██╗██║░░░░░██║░░██║██║░░██╗██╔═██╗░
+																						███████╗██╔╝╚██╗░░░██║░░░  ╚█████╔╝███████╗╚█████╔╝╚█████╔╝██║░╚██╗
+																						╚══════╝╚═╝░░╚═╝░░░╚═╝░░░  ░╚════╝░╚══════╝░╚════╝░░╚════╝░╚═╝░░╚═╝
+
+*/
 
 		if (externalClock) {
 
@@ -2297,22 +2336,21 @@ struct TrigStation : SickoTrigStation {
 
 				cvClockInValue[MC] = inputs[EXTCLOCK_INPUT].getVoltage();
 				if (cvClockInValue[MC] != prevCvClockInValue[MC]) {
-					extBpm = 120.0f * pow(2.0f, cvClockInValue[MC]);
+					extBpm = 120 * pow(2, cvClockInValue[MC]);
+					extBpm = round(extBpm * 10)/10;
 					if (extBpm > 999)
 						extBpm = 999;
 
 					if (!internalClock) {
 						bpm[MC] = extBpm;
 						if (cvClockOut) {
-							cvClockOutValue = log2(extBpm / 120.0f);
+							cvClockOutValue = log2(extBpm / 120.f);
 							outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
 						}
 					}
 				}
 				prevCvClockInValue[MC] = cvClockInValue[MC];
 
-
-				
 				//clockMaxSample[MC] = sampleRateCoeff / bpm[MC];
 				extClockMaxSample = sampleRateCoeff / extBpm;
 				
@@ -2324,13 +2362,21 @@ struct TrigStation : SickoTrigStation {
 					} else
 						extClockSample -= extClockMaxSample;
 
-					//if (runSetting) {
-						extBeat[MC] = true;
-						extClockSample = 1.0;
-					//}
+					
+					extBeat[MC] = true;
+
+					extClockSample = 1.0;
+					
 
 					// ----------------------------------------EXTERNAL MAIN CLOCK CV -> RE-INIT TRACKS 
 					if (!internalClock) {
+/*
+						if (internalClock) 
+							DEBUG("2. int.Clock ON");
+						else
+							DEBUG("2. int.Clock OFF");
+*/
+
 						for (int t = 0; t < MAXTRACKS; t++) {
 							
 							if (!extConn[t]) {
@@ -2509,10 +2555,9 @@ struct TrigStation : SickoTrigStation {
 							}
 						}
 					}
-				}
-				// ************************ EXTERNAL CLOCK ******************
 
-				if (!internalClock) {
+					// ************************ EXTERNAL CLOCK DETECTION ******************
+
 					if (extBeat[MC]) {
 
 						if (extSync[MC]) {
@@ -2579,14 +2624,16 @@ struct TrigStation : SickoTrigStation {
 						}
 					}
 				}
+
+				extClockSample++;
+
+				if (!internalClock)
+					for (int t = 0; t < MAXTRACKS; t++)
+						if (!extConn[t])
+							divClockSample[t]++;
+
 			}
 				
-			extClockSample++;
-
-			for (int t = 0; t < MAXTRACKS; t++)
-				if (!extConn[t])
-					divClockSample[t]++;
-
 		}
 
 		// *********************************************************************************************
@@ -2906,8 +2953,10 @@ struct TrigStation : SickoTrigStation {
 
 		lights[SEQRUN_LIGHT].setBrightness(seqRunSetting);
 
-		for (int t = 0; t < MAXTRACKS; t++) {
 
+		
+
+		for (int t = 0; t < MAXTRACKS; t++) {
 
 			if (turingMode[t] && !prevTuringMode[t])
 				for (int t = 0; t < 8; t++)
@@ -3037,30 +3086,43 @@ struct TrigStation : SickoTrigStation {
 			// SETUP DIRECTION
 
 			if (currentMode[t] != CVOLTAGE) {
+			//if (currentMode[t] != CVOLTAGE && !resetPulse[MC]) {
 
-				if (stepAdv[t] && (seqRunSetting == 1 || xcludeFromRun[t])) {
+				if (resetPulseTime[MC] <= 0) {
+
+					if (stepAdv[t] && (seqRunSetting == 1 || xcludeFromRun[t])) {
+
+						stepPulse[t] = false;
 
 
-					stepPulse[t] = false;
+						if (!userInputs[t][IN_RUN][0] ||
+								(userInputs[t][IN_RUN][0] &&
+									(!inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() || (inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].getVoltage() >= 1.f))
+								)
+							) {
 
+							// ********************************************************************** TO DO: CHECK USER RUN INPUT
 
-					if (!userInputs[t][IN_RUN][0] ||
-							(userInputs[t][IN_RUN][0] &&
-								(!inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() || (inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].getVoltage() >= 1.f))
-							)
-						) {
+							lights[STEP_LIGHT + (t*16+step[t])].setBrightness(0);
+											
+							switch (currentMode[t]) {
 
-						// ********************************************************************** TO DO: CHECK USER RUN INPUT
+								case FORWARD:
 
-						lights[STEP_LIGHT + (t*16+step[t])].setBrightness(0);
-										
-						switch (currentMode[t]) {
-
-							case FORWARD:
-
-								if (userInputs[t][IN_REV][0]) {
-									if (revType[t] == 2) {
-										if (revType[MC] == POSITIVE_V) {
+									if (userInputs[t][IN_REV][0]) {
+										if (revType[t] == 2) {
+											if (revType[MC] == POSITIVE_V) {
+												if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
+													direction[t] = FORWARD;
+												else
+													direction[t] = REVERSE;
+											} else {
+												if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < -1)
+													direction[t] = REVERSE;
+												else
+													direction[t] = FORWARD;
+											}
+										} else if (revType[t] == POSITIVE_V) {
 											if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
 												direction[t] = FORWARD;
 											else
@@ -3071,220 +3133,248 @@ struct TrigStation : SickoTrigStation {
 											else
 												direction[t] = FORWARD;
 										}
-									} else if (revType[t] == POSITIVE_V) {
-										if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
-											direction[t] = FORWARD;
-										else
-											direction[t] = REVERSE;
 									} else {
-										if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < -1)
-											direction[t] = REVERSE;
-										else
-											direction[t] = FORWARD;
-									}
-								} else {
-									direction[t] = FORWARD;
-								}
-
-								if (direction[t] == FORWARD) {
-
-									if (!dontAdvance[t])
-										stepForward(t);
-									else
-										dontAdvance[t] = false;
-
-									if (step[t] >= maxSteps[t])
-										step[t] = 0;
-
-								} else {
-
-									if (!dontAdvance[t])
-										stepBack(t);
-									else
-										dontAdvance[t] = false;
-
-									if (step[t] < 0)
-										step[t] = maxSteps[t] - 1;
-
-								}
-								
-							break;
-
-							case REVERSE:
-							
-								if (userInputs[t][IN_REV][0]) {
-									if (revType[t] == 2) {
-										if (revType[MC] == POSITIVE_V) {
-											if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
-												direction[t] = REVERSE;
-											else
-												direction[t] = FORWARD;
-										} else {
-											if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < -1)
-												direction[t] = FORWARD;
-											else
-												direction[t] = REVERSE;
-										}
-									} else if (revType[t] == POSITIVE_V) {
-										if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
-											direction[t] = REVERSE;
-										else
-											direction[t] = FORWARD;
-									} else {
-										if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < -1)
-											direction[t] = FORWARD;
-										else
-											direction[t] = REVERSE;
-									}
-								} else {
-									direction[t] = REVERSE;
-								}
-
-								if (direction[t] == FORWARD) {
-
-									if (!dontAdvance[t])
-										stepForward(t);
-									else
-										dontAdvance[t] = false;
-
-									if (step[t] >= maxSteps[t])
-										step[t] = 0;
-
-								} else {
-
-									if (!dontAdvance[t])
-										stepBack(t);
-									else
-										dontAdvance[t] = false;
-
-									if (step[t] < 0)
-										step[t] = maxSteps[t] - 1;
-
-								}
-
-							
-							break;
-
-							case PINGPONG:
-
-								if (userInputs[t][IN_REV][0]) {
-									revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
-									if (revType[t] == 2) {
-										if (revType[MC] == POSITIVE_V) {
-											if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
-												direction[t] = !direction[t];
-										} else {
-											if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
-												direction[t] = !direction[t];
-										}
-									} else if (revType[t] == POSITIVE_V) {
-										if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
-											direction[t] = !direction[t];
-									} else {
-										if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
-											direction[t] = !direction[t];
-									}
-									prevRevVolt[t] = revVolt[t];
-								}
-
-								if (direction[t] == FORWARD) {
-
-									if (!dontAdvance[t])
-										stepForward(t);
-									else
-										dontAdvance[t] = false;
-
-									if (step[t] >= maxSteps[t]) {
-										direction[t] = REVERSE;
-										step[t] = step[t] - 2;
-										if (step[t] < 0) {
-											step[t] = 0;
-											direction[t] = FORWARD;
-										}
-									}
-
-								} else {
-
-									if (!dontAdvance[t])
-										stepBack(t);
-									else
-										dontAdvance[t] = false;
-
-									if (step[t] < 0) {
 										direction[t] = FORWARD;
-										step[t] = 1;
-										if (step[t] >= maxSteps[t]) {
-											step[t] = 0;
-											direction[t] = REVERSE;
-										}
-
 									}
 
-								}
-							
-							break;
+									if (direction[t] == FORWARD) {
 
-							case PINGPONGEXT:
-							
-								if (userInputs[t][IN_REV][0]) {
-									revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
-									if (revType[t] == 2) {
-										if (revType[MC] == POSITIVE_V) {
-											if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
-												direction[t] = !direction[t];
-										} else {
-											if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
-												direction[t] = !direction[t];
-										}
-									} else if (revType[t] == POSITIVE_V) {
-										if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
-											direction[t] = !direction[t];
-									} else {
-										if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
-											direction[t] = !direction[t];
-									}
-									prevRevVolt[t] = revVolt[t];
-								}
+										if (!dontAdvance[t])
+											stepForward(t);
+										else
+											dontAdvance[t] = false;
 
-								if (direction[t] == FORWARD) {
-
-									if (!dontAdvance[t])
-										stepForward(t);
-									else
-										dontAdvance[t] = false;
-
-									if (step[t] >= maxSteps[t]) {
-										direction[t] = REVERSE;
-										step[t]--;
-										//stepBack(t);
-										if (step[t] < 0)
-											step[t] = 0;
-									}
-
-								} else {
-
-									if (!dontAdvance[t])
-										stepBack(t);
-									else
-										dontAdvance[t] = false;
-
-									if (step[t] < 0) {
-										direction[t] = FORWARD;
-										step[t]++;
-										//stepForward(t);
 										if (step[t] >= maxSteps[t])
-											step[t] = maxSteps[t] -1;
+											step[t] = 0;
+
+									} else {
+
+										if (!dontAdvance[t])
+											stepBack(t);
+										else
+											dontAdvance[t] = false;
+
+										if (step[t] < 0)
+											step[t] = maxSteps[t] - 1;
+
+									}
+									
+								break;
+
+								case REVERSE:
+								
+									if (userInputs[t][IN_REV][0]) {
+										if (revType[t] == 2) {
+											if (revType[MC] == POSITIVE_V) {
+												if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
+													direction[t] = REVERSE;
+												else
+													direction[t] = FORWARD;
+											} else {
+												if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < -1)
+													direction[t] = FORWARD;
+												else
+													direction[t] = REVERSE;
+											}
+										} else if (revType[t] == POSITIVE_V) {
+											if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
+												direction[t] = REVERSE;
+											else
+												direction[t] = FORWARD;
+										} else {
+											if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < -1)
+												direction[t] = FORWARD;
+											else
+												direction[t] = REVERSE;
+										}
+									} else {
+										direction[t] = REVERSE;
 									}
 
-								}
+									if (direction[t] == FORWARD) {
 
-							break;
+										if (!dontAdvance[t])
+											stepForward(t);
+										else
+											dontAdvance[t] = false;
 
-							case RANDOM1:
-								if (userInputs[t][IN_REV][0]) {
-									revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
-									if (revType[t] == 2) {
-										if (revType[MC] == POSITIVE_V) {
+										if (step[t] >= maxSteps[t])
+											step[t] = 0;
+
+									} else {
+
+										if (!dontAdvance[t])
+											stepBack(t);
+										else
+											dontAdvance[t] = false;
+
+										if (step[t] < 0)
+											step[t] = maxSteps[t] - 1;
+
+									}
+
+								
+								break;
+
+								case PINGPONG:
+
+									if (userInputs[t][IN_REV][0]) {
+										revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
+										if (revType[t] == 2) {
+											if (revType[MC] == POSITIVE_V) {
+												if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
+													direction[t] = !direction[t];
+											} else {
+												if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
+													direction[t] = !direction[t];
+											}
+										} else if (revType[t] == POSITIVE_V) {
+											if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
+												direction[t] = !direction[t];
+										} else {
+											if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
+												direction[t] = !direction[t];
+										}
+										prevRevVolt[t] = revVolt[t];
+									}
+
+									if (direction[t] == FORWARD) {
+
+										if (!dontAdvance[t])
+											stepForward(t);
+										else
+											dontAdvance[t] = false;
+
+										if (step[t] >= maxSteps[t]) {
+											direction[t] = REVERSE;
+											step[t] = step[t] - 2;
+											if (step[t] < 0) {
+												step[t] = 0;
+												direction[t] = FORWARD;
+											}
+										}
+
+									} else {
+
+										if (!dontAdvance[t])
+											stepBack(t);
+										else
+											dontAdvance[t] = false;
+
+										if (step[t] < 0) {
+											direction[t] = FORWARD;
+											step[t] = 1;
+											if (step[t] >= maxSteps[t]) {
+												step[t] = 0;
+												direction[t] = REVERSE;
+											}
+
+										}
+
+									}
+								
+								break;
+
+								case PINGPONGEXT:
+								
+									if (userInputs[t][IN_REV][0]) {
+										revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
+										if (revType[t] == 2) {
+											if (revType[MC] == POSITIVE_V) {
+												if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
+													direction[t] = !direction[t];
+											} else {
+												if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
+													direction[t] = !direction[t];
+											}
+										} else if (revType[t] == POSITIVE_V) {
+											if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
+												direction[t] = !direction[t];
+										} else {
+											if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
+												direction[t] = !direction[t];
+										}
+										prevRevVolt[t] = revVolt[t];
+									}
+
+									if (direction[t] == FORWARD) {
+
+										if (!dontAdvance[t])
+											stepForward(t);
+										else
+											dontAdvance[t] = false;
+
+										if (step[t] >= maxSteps[t]) {
+											direction[t] = REVERSE;
+											step[t]--;
+											//stepBack(t);
+											if (step[t] < 0)
+												step[t] = 0;
+										}
+
+									} else {
+
+										if (!dontAdvance[t])
+											stepBack(t);
+										else
+											dontAdvance[t] = false;
+
+										if (step[t] < 0) {
+											direction[t] = FORWARD;
+											step[t]++;
+											//stepForward(t);
+											if (step[t] >= maxSteps[t])
+												step[t] = maxSteps[t] -1;
+										}
+
+									}
+
+								break;
+
+								case RANDOM1:
+									if (userInputs[t][IN_REV][0]) {
+										revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
+										if (revType[t] == 2) {
+											if (revType[MC] == POSITIVE_V) {
+												if (revVolt[t] < 1) {
+													int tempStep = step[t];
+													step[t] = maxSteps[t] * random::uniform();
+													if (step[t] == tempStep) {
+														step[t] = maxSteps[t] * random::uniform();
+														if (step[t] == tempStep)
+															step[t] = maxSteps[t] * random::uniform();
+													}
+													if (step[t] >= maxSteps[t])
+														maxSteps[t] = maxSteps[t] - 1;
+												} else {
+													if (!dontAdvance[t])
+														stepForward(t);
+													else
+														dontAdvance[t] = false;
+													if (step[t] >= maxSteps[t])
+														step[t] = 0;
+												}
+											} else {
+												if (revVolt[t] > -1) {
+													int tempStep = step[t];
+													step[t] = maxSteps[t] * random::uniform();
+													if (step[t] == tempStep) {
+														step[t] = maxSteps[t] * random::uniform();
+														if (step[t] == tempStep)
+															step[t] = maxSteps[t] * random::uniform();
+													}
+													if (step[t] >= maxSteps[t])
+														maxSteps[t] = maxSteps[t] - 1;
+												} else {
+													if (!dontAdvance[t])
+														stepForward(t);
+													else
+														dontAdvance[t] = false;
+													if (step[t] >= maxSteps[t])
+														step[t] = 0;
+												}
+											}
+										} else if (revType[t] == POSITIVE_V) {
 											if (revVolt[t] < 1) {
 												int tempStep = step[t];
 												step[t] = maxSteps[t] * random::uniform();
@@ -3323,63 +3413,63 @@ struct TrigStation : SickoTrigStation {
 													step[t] = 0;
 											}
 										}
-									} else if (revType[t] == POSITIVE_V) {
-										if (revVolt[t] < 1) {
-											int tempStep = step[t];
-											step[t] = maxSteps[t] * random::uniform();
-											if (step[t] == tempStep) {
-												step[t] = maxSteps[t] * random::uniform();
-												if (step[t] == tempStep)
-													step[t] = maxSteps[t] * random::uniform();
-											}
-											if (step[t] >= maxSteps[t])
-												maxSteps[t] = maxSteps[t] - 1;
-										} else {
-											if (!dontAdvance[t])
-												stepForward(t);
-											else
-												dontAdvance[t] = false;
-											if (step[t] >= maxSteps[t])
-												step[t] = 0;
-										}
 									} else {
-										if (revVolt[t] > -1) {
-											int tempStep = step[t];
-											step[t] = maxSteps[t] * random::uniform();
-											if (step[t] == tempStep) {
-												step[t] = maxSteps[t] * random::uniform();
-												if (step[t] == tempStep)
-													step[t] = maxSteps[t] * random::uniform();
-											}
-											if (step[t] >= maxSteps[t])
-												maxSteps[t] = maxSteps[t] - 1;
-										} else {
-											if (!dontAdvance[t])
-												stepForward(t);
-											else
-												dontAdvance[t] = false;
-											if (step[t] >= maxSteps[t])
-												step[t] = 0;
-										}
-									}
-								} else {
-									int tempStep = step[t];
-									step[t] = maxSteps[t] * random::uniform();
-									if (step[t] == tempStep) {
+										int tempStep = step[t];
 										step[t] = maxSteps[t] * random::uniform();
-										if (step[t] == tempStep)
+										if (step[t] == tempStep) {
 											step[t] = maxSteps[t] * random::uniform();
+											if (step[t] == tempStep)
+												step[t] = maxSteps[t] * random::uniform();
+										}
+										if (step[t] >= maxSteps[t])
+											maxSteps[t] = maxSteps[t] - 1;
 									}
-									if (step[t] >= maxSteps[t])
-										maxSteps[t] = maxSteps[t] - 1;
-								}
-							break;
+								break;
 
-							case RANDOM2:
-								if (userInputs[t][IN_REV][0]) {
-									revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
-									if (revType[t] == 2) {
-										if (revType[MC] == POSITIVE_V) {
+								case RANDOM2:
+									if (userInputs[t][IN_REV][0]) {
+										revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
+										if (revType[t] == 2) {
+											if (revType[MC] == POSITIVE_V) {
+												if (revVolt[t] < 1) {
+													if (!dontAdvance[t])
+														stepForward(t);
+													else
+														dontAdvance[t] = false;
+													if (step[t] >= maxSteps[t])
+														step[t] = 0;
+												} else {
+													int tempStep = step[t];
+													step[t] = maxSteps[t] * random::uniform();
+													if (step[t] == tempStep) {
+														step[t] = maxSteps[t] * random::uniform();
+														if (step[t] == tempStep)
+															step[t] = maxSteps[t] * random::uniform();
+													}
+													if (step[t] >= maxSteps[t])
+														maxSteps[t] = maxSteps[t] - 1;
+												}
+											} else {
+												if (revVolt[t] > -1) {
+													if (!dontAdvance[t])
+														stepForward(t);
+													else
+														dontAdvance[t] = false;
+													if (step[t] >= maxSteps[t])
+														step[t] = 0;
+												} else {
+													int tempStep = step[t];
+													step[t] = maxSteps[t] * random::uniform();
+													if (step[t] == tempStep) {
+														step[t] = maxSteps[t] * random::uniform();
+														if (step[t] == tempStep)
+															step[t] = maxSteps[t] * random::uniform();
+													}
+													if (step[t] >= maxSteps[t])
+														maxSteps[t] = maxSteps[t] - 1;
+												}
+											}
+										} else if (revType[t] == POSITIVE_V) {
 											if (revVolt[t] < 1) {
 												if (!dontAdvance[t])
 													stepForward(t);
@@ -3418,121 +3508,39 @@ struct TrigStation : SickoTrigStation {
 													maxSteps[t] = maxSteps[t] - 1;
 											}
 										}
-									} else if (revType[t] == POSITIVE_V) {
-										if (revVolt[t] < 1) {
-											if (!dontAdvance[t])
-												stepForward(t);
-											else
-												dontAdvance[t] = false;
-											if (step[t] >= maxSteps[t])
-												step[t] = 0;
-										} else {
-											int tempStep = step[t];
-											step[t] = maxSteps[t] * random::uniform();
-											if (step[t] == tempStep) {
-												step[t] = maxSteps[t] * random::uniform();
-												if (step[t] == tempStep)
-													step[t] = maxSteps[t] * random::uniform();
-											}
-											if (step[t] >= maxSteps[t])
-												maxSteps[t] = maxSteps[t] - 1;
-										}
+
 									} else {
-										if (revVolt[t] > -1) {
-											if (!dontAdvance[t])
-												stepForward(t);
-											else
-												dontAdvance[t] = false;
-											if (step[t] >= maxSteps[t])
-												step[t] = 0;
-										} else {
-											int tempStep = step[t];
-											step[t] = maxSteps[t] * random::uniform();
-											if (step[t] == tempStep) {
-												step[t] = maxSteps[t] * random::uniform();
-												if (step[t] == tempStep)
-													step[t] = maxSteps[t] * random::uniform();
-											}
-											if (step[t] >= maxSteps[t])
-												maxSteps[t] = maxSteps[t] - 1;
-										}
+										if (!dontAdvance[t])
+											stepForward(t);
+										else
+											dontAdvance[t] = false;
+										if (step[t] >= maxSteps[t])
+											step[t] = 0;
 									}
-
-								} else {
-									if (!dontAdvance[t])
-										stepForward(t);
-									else
-										dontAdvance[t] = false;
-									if (step[t] >= maxSteps[t])
-										step[t] = 0;
-								}
-							break;
-						}
-/*
-						if (step[t] < 0 || step[t] > 15) {
-							DEBUG("step t %i", step[t]);
-						}
-*/
-					}
-
-					// ------------------ FLIP OPTION
-
-					calcFlip(t);
-/*
-					if (userInputs[t][IN_FLIP][0] && inputs[USER_INPUT+t+userInputs[t][IN_FLIP][1]].getVoltage() >= 1) {
-						if (wSeq[t][step[t]] == 0)
-							wSeq[t][step[t]] = 1;
-						else
-							wSeq[t][step[t]] = 0;
-						params[STEP_PARAM+(t*16)+step[t]].setValue(wSeq[t][step[t]]);
-						lights[STEPBUT_LIGHT+(t*16)+step[t]].setBrightness(wSeq[t][step[t]]);
-					}
-*/						
-
-					// **************************************** start new code for 
-
-					if (!turingMode[t]) {
-
-						if (wSeq[t][step[t]]) {
-							stepPulse[t] = true;
-							stepPulseTime[t] = oneMsTime;
-							if (outType[t] == OUT_GATE)
-								outGate[t] = true;
-						} else {
-							if (outType[t] == OUT_GATE) {
-								outGate[t] = false;
-								out[t] = 0.f;
+								break;
 							}
+	/*
+							if (step[t] < 0 || step[t] > 15) {
+								DEBUG("step t %i", step[t]);
+							}
+	*/
 						}
 
+						// ------------------ FLIP OPTION
 
+						calcFlip(t);
+	/*
+						if (userInputs[t][IN_FLIP][0] && inputs[USER_INPUT+t+userInputs[t][IN_FLIP][1]].getVoltage() >= 1) {
+							if (wSeq[t][step[t]] == 0)
+								wSeq[t][step[t]] = 1;
+							else
+								wSeq[t][step[t]] = 0;
+							params[STEP_PARAM+(t*16)+step[t]].setValue(wSeq[t][step[t]]);
+							lights[STEPBUT_LIGHT+(t*16)+step[t]].setBrightness(wSeq[t][step[t]]);
+						}
+	*/						
 
-
-					} else {
-						calcVoltage(t);
-					}
-
-
-
-				}
-			} else {	// CONTROL VOLTAGE ADVANCE
-
-				clkValue[t] = inputs[CLK_INPUT+t].getVoltage();
-
-				if (clkValue[t] > 10.f)
-					clkValue[t] = 10.f;
-				else if (clkValue[t] < 0.f)
-					clkValue[t] = 0.f;
-
-				if (clkValue[t] != prevClkValue[t]) {
-					
-					currAddr[t] = 1+int(clkValue[t] / 10 * (maxSteps)[t]);
-					if (currAddr[t] >= maxSteps[t])
-						currAddr[t] = maxSteps[t];
-					if (currAddr[t] != prevAddr[t]) {
-
-						lights[STEP_LIGHT+(t*16+step[t])].setBrightness(0);
-						step[t] = currAddr[t]-1;
+						// **************************************** start new code for 
 
 						if (!turingMode[t]) {
 
@@ -3547,16 +3555,60 @@ struct TrigStation : SickoTrigStation {
 									out[t] = 0.f;
 								}
 							}
+
+
+
+
 						} else {
-								calcVoltage(t);
+							calcVoltage(t);
 						}
-						prevAddr[t] = currAddr[t];
 
 					}
+
+			} else {	// CONTROL VOLTAGE ADVANCE
+
+				if (resetPulseTime[MC] <= 0) {
+
+					clkValue[t] = inputs[CLK_INPUT+t].getVoltage();
+
+					if (clkValue[t] > 10.f)
+						clkValue[t] = 10.f;
+					else if (clkValue[t] < 0.f)
+						clkValue[t] = 0.f;
+
+					if (clkValue[t] != prevClkValue[t]) {
+						
+						currAddr[t] = 1+int(clkValue[t] / 10 * (maxSteps)[t]);
+						if (currAddr[t] >= maxSteps[t])
+							currAddr[t] = maxSteps[t];
+						if (currAddr[t] != prevAddr[t]) {
+
+							lights[STEP_LIGHT+(t*16+step[t])].setBrightness(0);
+							step[t] = currAddr[t]-1;
+
+							if (!turingMode[t]) {
+
+								if (wSeq[t][step[t]]) {
+									stepPulse[t] = true;
+									stepPulseTime[t] = oneMsTime;
+									if (outType[t] == OUT_GATE)
+										outGate[t] = true;
+								} else {
+									if (outType[t] == OUT_GATE) {
+										outGate[t] = false;
+										out[t] = 0.f;
+									}
+								}
+							} else {
+									calcVoltage(t);
+							}
+							prevAddr[t] = currAddr[t];
+
+						}
+					}
+					prevClkValue[t] = clkValue[t];
+
 				}
-				prevClkValue[t] = clkValue[t];
-
-
 
 			}
 
@@ -3602,6 +3654,8 @@ struct TrigStation : SickoTrigStation {
 			lights[STEP_LIGHT+(t*16+step[t])].setBrightness(1);
 
 		}
+
+		}
 	
 	}
 };
@@ -3634,7 +3688,7 @@ struct TrigStationDisplay : TransparentWidget {
 				currentDisplay = to_string(module->workingProg);
 
 				if (!module->progChanged) {
-					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 2)
 						nvgTextBox(args.vg, 8, 31, 80, currentDisplay.c_str(), NULL);
@@ -3642,7 +3696,7 @@ struct TrigStationDisplay : TransparentWidget {
 						nvgTextBox(args.vg, 15, 31, 80, currentDisplay.c_str(), NULL);
 
 				} else {
-					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 26);
 					if (currentDisplay.size() == 2)
 						nvgTextBox(args.vg, 6, 21, 80, currentDisplay.c_str(), NULL);
@@ -3651,7 +3705,7 @@ struct TrigStationDisplay : TransparentWidget {
 					
 					currentDisplay = to_string(module->selectedProg);
 
-					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_LCD_RED));
 					nvgFontSize(args.vg, 20);
 					if (currentDisplay.size() == 2)
 						nvgTextBox(args.vg, 20, 36, 60, currentDisplay.c_str(), NULL);
@@ -3679,8 +3733,6 @@ struct TrigStationDisplayTempo : TransparentWidget {
 				nvgFontSize(args.vg, 13);
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
-
-				nvgFillColor(args.vg, nvgRGBA(0xdd, 0xdd, 0x33, 0xff)); 
 				
 				int tempBpmInteger;
 				std::string tempBpm;
@@ -3696,23 +3748,45 @@ struct TrigStationDisplayTempo : TransparentWidget {
 						tempBpmDec = tempBpm.substr(tempBpm.size() - 1);
 						tempBpm = tempBpmInt+"."+tempBpmDec;
 
+						nvgFillColor(args.vg, nvgRGB(BPM_YELLOW)); 
 						if (tempBpmInteger < 1000)
 							nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
 						else
 							nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
 					} else {
+						if (!module->cvClockIn) {
+							tempBpmInteger = int(module->extBpm);
+							
+							tempBpm = to_string(tempBpmInteger)+".X";
+
+							nvgFillColor(args.vg, nvgRGB(BPM_BLUE)); 
+
+							if (tempBpmInteger < 100)
+								nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
+							else
+								nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
+						} else {
+							tempBpmInteger = int(module->extBpm * 10 + .5);
+
+							tempBpm = to_string(tempBpmInteger);
+							tempBpmInt = tempBpm.substr(0, tempBpm.size()-1);
+							tempBpmDec = tempBpm.substr(tempBpm.size() - 1);
+							tempBpm = tempBpmInt+"."+tempBpmDec;
+
+							nvgFillColor(args.vg, nvgRGB(BPM_GREEN)); 
+
+							if (tempBpmInteger < 1000)
+								nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
+							else
+								nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
+						}
 						
-						//tempBpmInteger = int(module->bpm[MC]);
-						tempBpmInteger = int(module->extBpm);
-						tempBpm = to_string(tempBpmInteger)+".X";
-						if (tempBpmInteger < 100)
-							nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
-						else
-							nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
 						
 					}
 				} else {
 					tempBpm = "---.-";
+
+					nvgFillColor(args.vg, nvgRGB(BPM_YELLOW)); 
 					nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
 				}
 			}
@@ -3730,8 +3804,24 @@ struct TrigStationDisplayDiv : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
+		/*
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
+			e.consume(this);
+		}
+		*/
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+			if (tempValue + 1 <= 44)
+				tempValue++;
+			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+			e.consume(this);
+		}
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+			if (tempValue - 1 >= 0)
+				tempValue--;
+			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
 			e.consume(this);
 		}
 	}
@@ -3747,14 +3837,14 @@ struct TrigStationDisplayDiv : TransparentWidget {
 			float tempXpos = (tempValue > 1 && tempValue < 43) ? 10 : 6;
 
 			nvgFillColor(args.vg, (tempValue < 22) ?
-				nvgRGBA(0xdd, 0x33, 0x33, 0xff) :
-				nvgRGBA(0x33, 0xdd, 0x33, 0xff));
+				nvgRGB(COLOR_LCD_RED) :
+				nvgRGB(COLOR_LCD_GREEN));
 
 			nvgTextBox(args.vg, tempXpos, 15.1, 60, module->divMultDisplay[tempValue].c_str(), NULL);
 		}
 		Widget::drawLayer(args, layer);
 	}
-
+	/*
 	void createContextMenu() {
 		TrigStation *module = dynamic_cast<TrigStation *>(this->module);
 		assert(module);
@@ -3786,6 +3876,7 @@ struct TrigStationDisplayDiv : TransparentWidget {
 			}
 		}
 	}
+	*/
 };
 
 struct TrigStationDisplayMode : TransparentWidget {
@@ -3797,6 +3888,50 @@ struct TrigStationDisplayMode : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+
+			if (
+				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
+			} else {
+
+				if (module->userInputs[t][KNOB_MODE][0]) {
+					module->currentMode[t]--;
+					if (module->currentMode[t] < 0)
+						module->currentMode[t] = MAXMODES;
+					module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+				} else {
+					module->currentMode[t]--;
+					if (module->currentMode[t] < 0)
+						module->currentMode[t] = MAXMODES;
+				}
+			}
+
+			e.consume(this);
+		}
+
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+
+			if (
+				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
+			} else {
+
+				if (module->userInputs[t][KNOB_MODE][0]) {
+					module->currentMode[t]++;
+					if (module->currentMode[t] > MAXMODES)
+						module->currentMode[t] = 0;
+					module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+				} else {
+					module->currentMode[t]++;
+					if (module->currentMode[t] > MAXMODES)
+						module->currentMode[t] = 0;
+				}
+			}
+
+			e.consume(this);
+		}
+		/*
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
 
 			if (
@@ -3818,7 +3953,7 @@ struct TrigStationDisplayMode : TransparentWidget {
 
 			e.consume(this);
 		}
-		
+		*/	
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -3829,14 +3964,14 @@ struct TrigStationDisplayMode : TransparentWidget {
 			nvgTextLetterSpacing(args.vg, 0);
 
 			switch (module->currentMode[t]) {
-				case 0: nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN)); break;
-				case 1: nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_YELLOW)); break;
-				case 2: nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_RED)); break;
-				case 3: nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_VIOLET)); break;
-				case 4: nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_LBLUE)); break;
-				case 5: nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_ROSE)); break;
-				case 6: nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN)); break;
-				default: nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN)); break;
+				case 0: nvgFillColor(args.vg, nvgRGB(COLOR_LCD_GREEN)); break;
+				case 1: nvgFillColor(args.vg, nvgRGB(COLOR_LCD_YELLOW)); break;
+				case 2: nvgFillColor(args.vg, nvgRGB(COLOR_LCD_RED)); break;
+				case 3: nvgFillColor(args.vg, nvgRGB(COLOR_LCD_VIOLET)); break;
+				case 4: nvgFillColor(args.vg, nvgRGB(COLOR_LCD_LBLUE)); break;
+				case 5: nvgFillColor(args.vg, nvgRGB(COLOR_LCD_ROSE)); break;
+				case 6: nvgFillColor(args.vg, nvgRGB(COLOR_LCD_GREEN)); break;
+				default: nvgFillColor(args.vg, nvgRGB(COLOR_LCD_GREEN)); break;
 			}
 
 			nvgTextBox(args.vg, 3.5, 15.3f, 60, module->modeNameDisplay[module->currentMode[t]].c_str(), NULL);
@@ -3846,9 +3981,9 @@ struct TrigStationDisplayMode : TransparentWidget {
 			nvgFontSize(args.vg, 10);
 
 			if (!module->turingMode[t])
-				nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_WHITE));				
+				nvgFillColor(args.vg, nvgRGB(COLOR_EGA_WHITE));				
 			else
-				nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_YELLOW));				
+				nvgFillColor(args.vg, nvgRGB(COLOR_LCD_YELLOW));				
 
 			nvgTextBox(args.vg, 40.f, 15.f, 10, to_string(t+1).c_str(), NULL);
 		}
@@ -4164,7 +4299,7 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 				}
 			};
 
-			menu->addChild(createSubmenuItem("Steps Delay:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Steps DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
 				for (int i = 0; i < 7; i++) {
 					auto sampleDelayItem = new SampleDelayItem(module, i, t);
 					
@@ -4221,59 +4356,61 @@ struct TrigStationDisplayU1 : TransparentWidget {
 			switch (module->userTable[t][0]) {
 
 				case IN_FLIP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
 					tempText = "FL";
 				break;
 
 				case IN_LENGTH:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
 					tempText = "LN";
 				break;
 
 				case IN_MODE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
 					tempText = "MD";
 				break;
 
 				case IN_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
 					tempText = "SC";
 				break;
 
 				case IN_PW:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_CYAN));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
 
 				case IN_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
 					tempText = "RS";
 				break;
 
 				case IN_RETRIG:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RT";
 				break;
 
 				case IN_REV:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
 					tempText = "RV";
 				break;
 
 				case IN_RUN:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_BLUE));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_BLUE));
 					tempText = "RN";
 				break;
 
 				case IN_SWING:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "SW";
+					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
+						tempText += "*";
 				break;
 				
 			}
-			nvgTextBox(args.vg, 0, 0, 10, tempText.c_str(), NULL);
+			nvgTextBox(args.vg, 0, 0, 15, tempText.c_str(), NULL);
 		}
 		Widget::drawLayer(args, layer);
 	}
@@ -4298,59 +4435,61 @@ struct TrigStationDisplayU2 : TransparentWidget {
 			switch (module->userTable[t][2]) {
 
 				case IN_FLIP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
 					tempText = "FL";
 				break;
 
 				case IN_LENGTH:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
 					tempText = "LN";
 				break;
 				
 				case IN_MODE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
 					tempText = "MD";
 				break;
 
 				case IN_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
 					tempText = "SC";
 				break;
 
 				case IN_PW:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_CYAN));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
 
 				case IN_RETRIG:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RT";
 				break;
 
 				case IN_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
 					tempText = "RS";
 				break;
 
 				case IN_REV:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
 					tempText = "RV";
 				break;
 
 				case IN_RUN:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_BLUE));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_BLUE));
 					tempText = "RN";
 				break;
 
 				case IN_SWING:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "SW";
+					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
+						tempText += "*";
 				break;
 
 			}
-			nvgTextBox(args.vg, 0, 0, 10, tempText.c_str(), NULL);
+			nvgTextBox(args.vg, 0, 0, 15, tempText.c_str(), NULL);
 		}
 		Widget::drawLayer(args, layer);
 	}
@@ -4375,51 +4514,53 @@ struct TrigStationDisplayK1 : TransparentWidget {
 			switch (module->userTable[t][1]) {
 				
 				case KNOB_FLIPPROB:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
 					tempText = "FP";
 				break;
 
 				case KNOB_MODE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
 					tempText = "MD";
 				break;
 
 				case KNOB_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
 					tempText = "SC";
 				break;
 
 				case KNOB_PW:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_CYAN));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
 
 				case KNOB_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
 					tempText = "RS";
 				break;
 			
 				case KNOB_PROB:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RP";
 				break;
 
 				case KNOB_SWING:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "SW";
+					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
+						tempText += "*";
 				break;
 
 				case KNOB_ATN:
 					nvgFontSize(args.vg, 14);
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
 					tempText = "+";
 				break;
 
 				case KNOB_ATNV:
 					nvgFontSize(args.vg, 14);
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "±";
 				break;
 
@@ -4449,51 +4590,53 @@ struct TrigStationDisplayK2 : TransparentWidget {
 			switch (module->userTable[t][3]) {
 
 				case KNOB_FLIPPROB:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
 					tempText = "FP";
 				break;
 
 				case KNOB_MODE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
 					tempText = "MD";
 				break;
 
 				case KNOB_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
 					tempText = "SC";
 				break;
 
 				case KNOB_PW:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_CYAN));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
 
 				case KNOB_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
 					tempText = "RS";
 				break;
 
 				case KNOB_PROB:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RP";
 				break;
 
 				case KNOB_SWING:
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "SW";
+					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
+						tempText += "*";
 				break;
 
 				case KNOB_ATN:
 					nvgFontSize(args.vg, 14);
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
 					tempText = "+";
 				break;
 
 				case KNOB_ATNV:
 					nvgFontSize(args.vg, 14);
-					nvgFillColor(args.vg, nvgRGBA(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "±";
 				break;
 			}
@@ -4545,9 +4688,10 @@ struct TrigStationWidget : ModuleWidget {
 			}
 			{
 				TrigStationDisplayTrackSett *display = new TrigStationDisplayTrackSett(t);
-				display->box.pos = mm2px(Vec(98.8, 33+11.5*t));
+				//display->box.pos = mm2px(Vec(98.8, 33+11.5*t));
+				display->box.pos = mm2px(Vec(108.8, 33+11.5*t));
 				//display->box.size = mm2px(Vec(11, 6.3));
-				display->box.size = mm2px(Vec(18, 6.3));
+				display->box.size = mm2px(Vec(8, 6.3));
 				display->module = module;
 				addChild(display);
 			}
@@ -4639,7 +4783,7 @@ struct TrigStationWidget : ModuleWidget {
 		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(xExtClock, yProgLine)), module, TrigStation::EXTCLOCK_INPUT));
 		addInput(createStationClockInCentered<SickoClockInStation>(mm2px(Vec(xExtClock, yProgLine)), module, TrigStation::EXTCLOCK_INPUT));
 
-		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xRun1, yRun1)), module, TrigStation::INTCLOCKBUT_PARAM, TrigStation::RUNBUT_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xRun1, yRun1)), module, TrigStation::INTCLOCKBUT_PARAM, TrigStation::RUNBUT_LIGHT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRun2, yRun2)), module, TrigStation::RUN_INPUT));
 
 		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xSeqRunBut, yProgLine)), module, TrigStation::SEQRUN_PARAM, TrigStation::SEQRUN_LIGHT));
@@ -4792,7 +4936,7 @@ struct TrigStationWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(createSubmenuItem("Steps Delay:", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Steps DELAY:", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
 			for (int i = 0; i < 6; i++) {
 				SampleDelayItem* sampleDelayItem = createMenuItem<SampleDelayItem>(module->sampleDelayNames[i]);
 				sampleDelayItem->rightText = CHECKMARK(module->sampleDelay[MC] == i);
@@ -4809,7 +4953,7 @@ struct TrigStationWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 
-		menu->addChild(createSubmenuItem("Global settings", "", [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("GLOBAL settings", "", [=](Menu * menu) {
 		
 			struct OutTypeItem : MenuItem {
 				TrigStation* module;
@@ -4976,7 +5120,7 @@ struct TrigStationWidget : ModuleWidget {
 
 		}));
 
-		menu->addChild(createSubmenuItem("Track settings", "", [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("TRACK settings", "", [=](Menu * menu) {
 
 
 			struct UserInItem : MenuItem {
@@ -5213,7 +5357,7 @@ struct TrigStationWidget : ModuleWidget {
 						}
 					};
 
-					menu->addChild(createSubmenuItem("Steps Delay:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
+					menu->addChild(createSubmenuItem("Steps DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
 						for (int i = 0; i < 7; i++) {
 							auto sampleDelayItem = new SampleDelayItem(module, i, t);
 							if (i == 6)
@@ -5247,12 +5391,6 @@ struct TrigStationWidget : ModuleWidget {
 
 				}));
 			}
-		}));
-
-		menu->addChild(createSubmenuItem("Reset default user settings", "", [=](Menu * menu) {
-			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
-				menu->addChild(createMenuItem("RESET!", "", [=]() {module->resetUserSettings();}));
-			}));
 		}));
 
 		menu->addChild(new MenuSeparator());
@@ -5371,7 +5509,13 @@ struct TrigStationWidget : ModuleWidget {
 			}));
 		}));
 
-		menu->addChild(createSubmenuItem("Erase ALL progs", "", [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Reset default USER settings", "", [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
+				menu->addChild(createMenuItem("RESET!", "", [=]() {module->resetUserSettings();}));
+			}));
+		}));
+
+		menu->addChild(createSubmenuItem("Erase ALL PROGS", "", [=](Menu * menu) {
 			menu->addChild(createSubmenuItem("Are you Sure?", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("ERASE!", "", [=]() {module->eraseProgs();}));
 			}));
@@ -5384,14 +5528,14 @@ struct TrigStationWidget : ModuleWidget {
 		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
-			menu->addChild(createMenuLabel("Store Programs with double-click"));
+			menu->addChild(createMenuLabel("Rclick on user controls / track# to config"));
+			menu->addChild(createMenuLabel("Click or Rclick on DIV/MULT / MODE displays"));
+			menu->addChild(createMenuLabel("Adjust OUTs timing with Sample DELAY options"));
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("Store Programs with double-click on STOR"));
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createMenuLabel("Remember to store programs when"));
-			menu->addChild(createMenuLabel("importing or pasting sequences"));
-			/*menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuLabel("When switching to TURING mode Reset Knob"));
-			menu->addChild(createMenuLabel("becomes the output attenuator,"));
-			menu->addChild(createMenuLabel("so it has to be adjusted"));*/
+			menu->addChild(createMenuLabel("changing / importing / pasting sequences"));
 		}));
 
 	}

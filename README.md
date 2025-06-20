@@ -1,4 +1,4 @@
-# SickoCV v2.7.4-beta10
+# SickoCV v2.7.4-beta11
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -24,7 +24,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - slewer/slewer mini: inverted shapes on shape knob
 - sickoSampler: fixed a bug that crashes Rack when clearing the sample via trig input during playback
 - sickoSampler2: fixed a bug drawing the playhead outside the module
-- clocker2: added CV clock feature
+- clocker2: added CV clock feature, fixed clock division bug on reset, changed bpm clock color display
 - ad mini: loop status recorded in patch
 - merged repository with 4ms Metamodule repo
 
