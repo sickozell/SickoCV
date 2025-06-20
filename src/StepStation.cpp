@@ -4979,6 +4979,7 @@ struct StepStationWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Rclick on user controls / track# to config"));
+			menu->addChild(createMenuLabel("User SW + PW* = SWing only"));
 			menu->addChild(createMenuLabel("Click or Rclick on DIV/MULT / MODE displays"));
 			menu->addChild(createMenuLabel("Adjust OUTs timing with Sample DELAY options"));
 			menu->addChild(new MenuSeparator());
