@@ -18,6 +18,10 @@
 #define CLICK_STANDARD 0
 #define CLICK_CUSTOM 3
 
+#define BPM_BLUE	0x55, 0xff, 0xff
+#define BPM_YELLOW	0xdd, 0xdd, 0x33
+#define BPM_GREEN	0x33, 0xdd, 0x33
+
 #include "plugin.hpp"
 #include "osdialog.h"
 #if defined(METAMODULE)
@@ -361,6 +365,7 @@ struct Clocker : Module {
 			divClockSample[d] = 1.0;
 			divMaxSample[d][0] = 0.0;
 			divMaxSample[d][1] = 0.0;
+			divCount[d] = 1;
 			divPulse[d] = false;
 			divPulseTime[d] = false;
 			divCount[d] = 1;
@@ -922,6 +927,7 @@ struct Clocker : Module {
 					divClockSample[d] = 1.0;
 					divMaxSample[d][0] = 0.0;
 					divMaxSample[d][1] = 0.0;
+					divCount[d] = 1;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 				midBeatPlayed = false;
@@ -945,6 +951,7 @@ struct Clocker : Module {
 					divClockSample[d] = 1.0;
 					divMaxSample[d][0] = 0.0;
 					divMaxSample[d][1] = 0.0;
+					divCount[d] = 1;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 				midBeatPlayed = false;
@@ -978,6 +985,7 @@ struct Clocker : Module {
 				divClockSample[d] = 1.0;
 				divMaxSample[d][0] = 0.0;
 				divMaxSample[d][1] = 0.0;
+				divCount[d] = 1;
 				outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 			}
 			midBeatPlayed = false;
