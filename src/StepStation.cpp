@@ -549,6 +549,9 @@ struct StepStation : SickoStepStation {
 	bool clkBuff[MAXTRACKS][5] = {{false, false, false, false, false}, {false, false, false, false, false}, {false, false, false, false, false}, {false, false, false, false, false}, {false, false, false, false, false}, {false, false, false, false, false}, {false, false, false, false, false}, {false, false, false, false, false}};
 	int clkBuffPos = 0;
 
+	bool divControls = true;
+	bool modeControls = true;
+
 	StepStation() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		
@@ -3516,25 +3519,29 @@ struct StepStationDisplayDiv : TransparentWidget {
 
 	void onButton(const event::Button &e) override {
 
-		/*
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-		*/
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
-			if (tempValue + 1 <= 44)
-				tempValue++;
-			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
-			e.consume(this);
-		}
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
-			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
-			if (tempValue - 1 >= 0)
-				tempValue--;
-			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
-			e.consume(this);
+		if (module->divControls) {
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+				if (tempValue + 1 <= 44)
+					tempValue++;
+				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+				e.consume(this);
+			}
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+				if (tempValue - 1 >= 0)
+					tempValue--;
+				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+				e.consume(this);
+			}
+
+		} else {
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				createContextMenu();
+				e.consume(this);
+			}
 		}
 	}
 
@@ -3556,7 +3563,7 @@ struct StepStationDisplayDiv : TransparentWidget {
 		}
 		Widget::drawLayer(args, layer);
 	}
-	/*
+	
 	void createContextMenu() {
 		StepStation *module = dynamic_cast<StepStation *>(this->module);
 		assert(module);
@@ -3588,7 +3595,7 @@ struct StepStationDisplayDiv : TransparentWidget {
 			}
 		}
 	}
-	*/
+	
 };
 
 struct StepStationDisplayMode : TransparentWidget {
@@ -3601,55 +3608,81 @@ struct StepStationDisplayMode : TransparentWidget {
 
 	void onButton(const event::Button &e) override {
 
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+		if (module->modeControls) {
 
-			if (
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
-			} else {
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
 
-				if (module->userInputs[t][KNOB_MODE][0]) {
-					module->currentMode[t]--;
-					if (module->currentMode[t] < 0)
-						module->currentMode[t] = MAXMODES;
-					module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+				if (
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
 				} else {
-					module->currentMode[t]--;
-					if (module->currentMode[t] < 0)
-						module->currentMode[t] = MAXMODES;
+
+					if (module->userInputs[t][KNOB_MODE][0]) {
+						module->currentMode[t]--;
+						if (module->currentMode[t] < 0)
+							module->currentMode[t] = MAXMODES;
+						module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+					} else {
+						module->currentMode[t]--;
+						if (module->currentMode[t] < 0)
+							module->currentMode[t] = MAXMODES;
+					}
 				}
-			}
 
-			e.consume(this);
-		}
-
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-
-			if (
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
-			} else {
-
-				if (module->userInputs[t][KNOB_MODE][0]) {
-					module->currentMode[t]++;
-					if (module->currentMode[t] > MAXMODES)
-						module->currentMode[t] = 0;
-					module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
-				} else {
-					module->currentMode[t]++;
-					if (module->currentMode[t] > MAXMODES)
-						module->currentMode[t] = 0;
-				}
-			}
-
-			e.consume(this);
-		}
-/*
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-				createContextMenu();
 				e.consume(this);
+			}
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+
+				if (
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
+				} else {
+
+					if (module->userInputs[t][KNOB_MODE][0]) {
+						module->currentMode[t]++;
+						if (module->currentMode[t] > MAXMODES)
+							module->currentMode[t] = 0;
+						module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+					} else {
+						module->currentMode[t]++;
+						if (module->currentMode[t] > MAXMODES)
+							module->currentMode[t] = 0;
+					}
+				}
+
+				e.consume(this);
+			}
+		} else {
+			/*
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+
+				if (
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
+				} else {
+
+					if (module->userInputs[t][KNOB_MODE][0]) {
+						module->currentMode[t]++;
+						if (module->currentMode[t] > MAXMODES)
+							module->currentMode[t] = 0;
+						module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+					} else {
+						module->currentMode[t]++;
+						if (module->currentMode[t] > MAXMODES)
+							module->currentMode[t] = 0;
+					}
+				}
+
+				e.consume(this);
+			}
+			*/
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+					createContextMenu();
+					e.consume(this);
+			}
 		}
-		*/
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -3674,6 +3707,50 @@ struct StepStationDisplayMode : TransparentWidget {
 
 		}
 		Widget::drawLayer(args, layer);
+	}
+
+	void createContextMenu() {
+		StepStation *module = dynamic_cast<StepStation *>(this->module);
+		assert(module);
+
+		if (module) {
+			ui::Menu *menu = createMenu();
+
+			struct ModeTypeItem : MenuItem {
+				StepStation* module;
+				int menuValue;
+				int t;
+
+				ModeTypeItem(StepStation* m, int value, int track) {
+					module = m;
+					menuValue = value;
+					t = track;
+					text = module->modeNames[value];
+				}
+
+				void onAction(const event::Action& e) override {
+					
+					if (module->userInputs[t][KNOB_MODE][0])
+							module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)menuValue/MAXMODES);
+					module->currentMode[t] = menuValue;
+				}
+			};
+
+			if (	(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
+				for (int i = 0; i < MAXMODES+1; i++)
+					menu->addChild(createMenuLabel(module->modeNames[i]));
+			} else {
+
+				
+				for (int i = 0; i < MAXMODES+1; i++) {
+					auto modeTypeItem = new ModeTypeItem(module, i, t);
+					modeTypeItem->rightText = CHECKMARK(module->currentMode[t] == i);
+					menu->addChild(modeTypeItem);
+				}
+				
+			}
+		}
 	}
 };
 
@@ -3837,7 +3914,7 @@ struct StepStationDisplayTrackSett : TransparentWidget {
 
 			//menu->addChild(new MenuSeparator());
 
-			menu->addChild(createSubmenuItem("Track Settings", "", [=](Menu* menu) {
+			menu->addChild(createSubmenuItem("TRACK Settings", "", [=](Menu* menu) {
 
 				struct RevTypeItem : MenuItem {
 					StepStation* module;
@@ -4486,7 +4563,63 @@ struct StepStationWidget : ModuleWidget {
 		// *****************************************************************************************
 		// *****************************************************************************************
 
-		menu->addChild(new MenuSeparator());
+		//menu->addChild(new MenuSeparator());
+
+		menu->addChild(createSubmenuItem("MODULE settings", "", [=](Menu * menu) {
+
+			struct RunTypeItem : MenuItem {
+				StepStation* module;
+				int runType;
+				void onAction(const event::Action& e) override {
+					module->runType = runType;
+				}
+			};
+
+			std::string RunTypeNames[2] = {"Gate", "Trig"};
+			menu->addChild(createSubmenuItem("RUN Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+				for (int i = 0; i < 2; i++) {
+					RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+					runTypeItem->rightText = CHECKMARK(module->runType == i);
+					runTypeItem->module = module;
+					runTypeItem->runType = i;
+					menu->addChild(runTypeItem);
+				}
+			}));
+
+			menu->addChild(createBoolPtrMenuItem("Reset internal clock on RST", "", &module->rstClkOnRst));
+			menu->addChild(createBoolPtrMenuItem("Reset Seq on PROG change", "", &module->rstSeqOnProgChange));
+
+			struct PpqnItem : MenuItem {
+				StepStation* module;
+				int ppqn;
+				void onAction(const event::Action& e) override {
+					module->tempPpqn = ppqn;
+					module->ppqnChange = true;
+				}
+			};
+
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createMenuLabel("External Main Clock"));
+			std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
+			menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
+				for (int i = 0; i < 7; i++) {
+					PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
+					ppqnItem->rightText = CHECKMARK(module->ppqn == i);
+					ppqnItem->module = module;
+					ppqnItem->ppqn = i;
+					menu->addChild(ppqnItem);
+				}
+			}));
+
+			menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
+			menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
+			menu->addChild(createBoolPtrMenuItem("MODE mouse controls", "", &module->modeControls));
+
+		}));
 
 		menu->addChild(createSubmenuItem("GLOBAL settings", "", [=](Menu * menu) {
 		
@@ -4553,7 +4686,7 @@ struct StepStationWidget : ModuleWidget {
 					module->runType = runType;
 				}
 			};
-
+/*
 			menu->addChild(new MenuSeparator());
 
 			std::string RunTypeNames[2] = {"Gate", "Trig"};
@@ -4617,6 +4750,9 @@ struct StepStationWidget : ModuleWidget {
 				}
 			}));
 
+			menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
+			menu->addChild(createBoolPtrMenuItem("MODE mouse controls", "", &module->modeControls));
+*/
 		}));
 
 		menu->addChild(createSubmenuItem("TRACK settings", "", [=](Menu * menu) {

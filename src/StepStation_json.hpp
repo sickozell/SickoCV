@@ -17,6 +17,9 @@
 
 		json_t* rootJ = json_object();
 
+		json_object_set_new(rootJ, "divControls", json_boolean(divControls));
+		json_object_set_new(rootJ, "modeControls", json_boolean(modeControls));
+
 		// ---------- CLOCK
 		
 		json_object_set_new(rootJ, "ppqn", json_integer(ppqn));
@@ -273,6 +276,14 @@
 */
 	void dataFromJson(json_t* rootJ) override {
 
+		json_t* divControlsJ = json_object_get(rootJ, "divControls");
+		if (divControlsJ)
+			divControls = json_boolean_value(divControlsJ);
+
+		json_t* modeControlsJ = json_object_get(rootJ, "modeControls");
+		if (modeControlsJ)
+			modeControls = json_boolean_value(modeControlsJ);
+		
 		// ------------ CLOCK
 
 		json_t* internalClockJ = json_object_get(rootJ, "internalClock");

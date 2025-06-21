@@ -589,6 +589,9 @@ struct TrigStation : SickoTrigStation {
 
 	int outType[MAXTRACKS] = {0,0,0,0,0,0,0,0};
 
+	bool divControls = true;
+	bool modeControls = true;
+
 	TrigStation() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -3810,6 +3813,7 @@ struct TrigStationDisplayDiv : TransparentWidget {
 			e.consume(this);
 		}
 		*/
+		/*
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
 			if (tempValue + 1 <= 44)
@@ -3823,6 +3827,31 @@ struct TrigStationDisplayDiv : TransparentWidget {
 				tempValue--;
 			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
 			e.consume(this);
+		}
+		*/
+		if (module->divControls) {
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+				if (tempValue + 1 <= 44)
+					tempValue++;
+				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+				e.consume(this);
+			}
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+				if (tempValue - 1 >= 0)
+					tempValue--;
+				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+				e.consume(this);
+			}
+
+		} else {
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				createContextMenu();
+				e.consume(this);
+			}
 		}
 	}
 
@@ -3844,7 +3873,7 @@ struct TrigStationDisplayDiv : TransparentWidget {
 		}
 		Widget::drawLayer(args, layer);
 	}
-	/*
+
 	void createContextMenu() {
 		TrigStation *module = dynamic_cast<TrigStation *>(this->module);
 		assert(module);
@@ -3876,7 +3905,7 @@ struct TrigStationDisplayDiv : TransparentWidget {
 			}
 		}
 	}
-	*/
+
 };
 
 struct TrigStationDisplayMode : TransparentWidget {
@@ -3888,72 +3917,80 @@ struct TrigStationDisplayMode : TransparentWidget {
 	}
 
 	void onButton(const event::Button &e) override {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
 
-			if (
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
-			} else {
+		if (module->modeControls) {
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
 
-				if (module->userInputs[t][KNOB_MODE][0]) {
-					module->currentMode[t]--;
-					if (module->currentMode[t] < 0)
-						module->currentMode[t] = MAXMODES;
-					module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+				if (
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
 				} else {
-					module->currentMode[t]--;
-					if (module->currentMode[t] < 0)
-						module->currentMode[t] = MAXMODES;
+
+					if (module->userInputs[t][KNOB_MODE][0]) {
+						module->currentMode[t]--;
+						if (module->currentMode[t] < 0)
+							module->currentMode[t] = MAXMODES;
+						module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+					} else {
+						module->currentMode[t]--;
+						if (module->currentMode[t] < 0)
+							module->currentMode[t] = MAXMODES;
+					}
 				}
+
+				e.consume(this);
 			}
 
-			e.consume(this);
-		}
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-
-			if (
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
-			} else {
-
-				if (module->userInputs[t][KNOB_MODE][0]) {
-					module->currentMode[t]++;
-					if (module->currentMode[t] > MAXMODES)
-						module->currentMode[t] = 0;
-					module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+				if (
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
 				} else {
-					module->currentMode[t]++;
-					if (module->currentMode[t] > MAXMODES)
-						module->currentMode[t] = 0;
-				}
-			}
 
-			e.consume(this);
-		}
+					if (module->userInputs[t][KNOB_MODE][0]) {
+						module->currentMode[t]++;
+						if (module->currentMode[t] > MAXMODES)
+							module->currentMode[t] = 0;
+						module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+					} else {
+						module->currentMode[t]++;
+						if (module->currentMode[t] > MAXMODES)
+							module->currentMode[t] = 0;
+					}
+				}
+
+				e.consume(this);
+			}
+		} else {
 		/*
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
 
-			if (
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
-				(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
-			} else {
-
-				if (module->userInputs[t][KNOB_MODE][0]) {
-					module->currentMode[t]++;
-					if (module->currentMode[t] > MAXMODES)
-						module->currentMode[t] = 0;
-					module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+				if (
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
 				} else {
-					module->currentMode[t]++;
-					if (module->currentMode[t] > MAXMODES)
-						module->currentMode[t] = 0;
-				}
-			}
 
-			e.consume(this);
-		}
-		*/	
+					if (module->userInputs[t][KNOB_MODE][0]) {
+						module->currentMode[t]++;
+						if (module->currentMode[t] > MAXMODES)
+							module->currentMode[t] = 0;
+						module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)module->currentMode[t] / MAXMODES);
+					} else {
+						module->currentMode[t]++;
+						if (module->currentMode[t] > MAXMODES)
+							module->currentMode[t] = 0;
+					}
+				}
+
+				e.consume(this);
+			}
+		*/
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				createContextMenu();
+				e.consume(this);
+			}
+		}	
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
@@ -3988,6 +4025,50 @@ struct TrigStationDisplayMode : TransparentWidget {
 			nvgTextBox(args.vg, 40.f, 15.f, 10, to_string(t+1).c_str(), NULL);
 		}
 		Widget::drawLayer(args, layer);
+	}
+
+	void createContextMenu() {
+		TrigStation *module = dynamic_cast<TrigStation *>(this->module);
+		assert(module);
+
+		if (module) {
+			ui::Menu *menu = createMenu();
+
+			struct ModeTypeItem : MenuItem {
+				TrigStation* module;
+				int menuValue;
+				int t;
+
+				ModeTypeItem(TrigStation* m, int value, int track) {
+					module = m;
+					menuValue = value;
+					t = track;
+					text = module->modeNames[value];
+				}
+
+				void onAction(const event::Action& e) override {
+					
+					if (module->userInputs[t][KNOB_MODE][0])
+							module->params[module->USER_PARAM+t+module->userInputs[t][KNOB_MODE][1]].setValue((float)menuValue/MAXMODES);
+					module->currentMode[t] = menuValue;
+				}
+			};
+
+			if (	(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() ) ||
+					(module->userInputs[t][IN_MODE][0] && module->inputs[module->USER_INPUT+t+module->userInputs[t][IN_MODE][1]].isConnected() && !module->userInputs[t][KNOB_MODE][0] ) ) {
+				for (int i = 0; i < MAXMODES+1; i++)
+					menu->addChild(createMenuLabel(module->modeNames[i]));
+			} else {
+
+				
+				for (int i = 0; i < MAXMODES+1; i++) {
+					auto modeTypeItem = new ModeTypeItem(module, i, t);
+					modeTypeItem->rightText = CHECKMARK(module->currentMode[t] == i);
+					menu->addChild(modeTypeItem);
+				}
+				
+			}
+		}
 	}
 };
 
@@ -4156,7 +4237,7 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 
 			//menu->addChild(new MenuSeparator());
 
-			menu->addChild(createSubmenuItem("Track Settings", "", [=](Menu* menu) {
+			menu->addChild(createSubmenuItem("TRACK Settings", "", [=](Menu* menu) {
 
 				struct OutTypeItem : MenuItem {
 					TrigStation* module;
@@ -4951,7 +5032,102 @@ struct TrigStationWidget : ModuleWidget {
 		// *****************************************************************************************
 		// *****************************************************************************************
 
-		menu->addChild(new MenuSeparator());
+		//menu->addChild(new MenuSeparator());
+
+
+		menu->addChild(createSubmenuItem("MODULE settings", "", [=](Menu * menu) {
+
+			struct RunTypeItem : MenuItem {
+				TrigStation* module;
+				int runType;
+				void onAction(const event::Action& e) override {
+					module->runType = runType;
+				}
+			};
+
+			std::string RunTypeNames[2] = {"Gate", "Trig"};
+			menu->addChild(createSubmenuItem("RUN Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+				for (int i = 0; i < 2; i++) {
+					RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+					runTypeItem->rightText = CHECKMARK(module->runType == i);
+					runTypeItem->module = module;
+					runTypeItem->runType = i;
+					menu->addChild(runTypeItem);
+				}
+			}));
+
+			menu->addChild(createBoolPtrMenuItem("Reset internal clock on RST", "", &module->rstClkOnRst));
+			menu->addChild(createBoolPtrMenuItem("Reset Seq on PROG change", "", &module->rstSeqOnProgChange));
+
+			struct PpqnItem : MenuItem {
+				TrigStation* module;
+				int ppqn;
+				void onAction(const event::Action& e) override {
+					module->tempPpqn = ppqn;
+					module->ppqnChange = true;
+				}
+			};
+
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createMenuLabel("External Main Clock"));
+			std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
+			menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
+				for (int i = 0; i < 7; i++) {
+					PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
+					ppqnItem->rightText = CHECKMARK(module->ppqn == i);
+					ppqnItem->module = module;
+					ppqnItem->ppqn = i;
+					menu->addChild(ppqnItem);
+				}
+			}));
+
+			menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
+			menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
+			menu->addChild(createBoolPtrMenuItem("MODE mouse controls", "", &module->modeControls));
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("Turing settings"));
+
+			struct BitResTypeItem : MenuItem {
+				TrigStation* module;
+				int bitResType;
+				void onAction(const event::Action& e) override {
+					module->bitResolution = bitResType;
+				}
+			};
+			std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
+			menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
+				for (int i = 0; i < 2; i++) {
+					BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
+					bitResTypeItem->rightText = CHECKMARK(module->bitResolution == i);
+					bitResTypeItem->module = module;
+					bitResTypeItem->bitResType = i;
+					menu->addChild(bitResTypeItem);
+				}
+			}));
+
+			struct ProgressionTypeItem : MenuItem {
+				TrigStation* module;
+				int progressionType;
+				void onAction(const event::Action& e) override {
+					module->progression = progressionType;
+				}
+			};
+			std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
+			menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
+				for (int i = 0; i < 3; i++) {
+					ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
+					progressionTypeItem->rightText = CHECKMARK(module->progression == i);
+					progressionTypeItem->module = module;
+					progressionTypeItem->progressionType = i;
+					menu->addChild(progressionTypeItem);
+				}
+			}));
+		}));
 
 		menu->addChild(createSubmenuItem("GLOBAL settings", "", [=](Menu * menu) {
 		
@@ -5026,95 +5202,6 @@ struct TrigStationWidget : ModuleWidget {
 					rstStepsWhenItem->module = module;
 					rstStepsWhenItem->rstStepsWhen = i;
 					menu->addChild(rstStepsWhenItem);
-				}
-			}));
-
-			struct RunTypeItem : MenuItem {
-				TrigStation* module;
-				int runType;
-				void onAction(const event::Action& e) override {
-					module->runType = runType;
-				}
-			};
-
-			menu->addChild(new MenuSeparator());
-
-			std::string RunTypeNames[2] = {"Gate", "Trig"};
-			menu->addChild(createSubmenuItem("RUN Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
-				for (int i = 0; i < 2; i++) {
-					RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-					runTypeItem->rightText = CHECKMARK(module->runType == i);
-					runTypeItem->module = module;
-					runTypeItem->runType = i;
-					menu->addChild(runTypeItem);
-				}
-			}));
-
-			menu->addChild(createBoolPtrMenuItem("Reset internal clock on RST", "", &module->rstClkOnRst));
-			menu->addChild(createBoolPtrMenuItem("Reset Seq on PROG change", "", &module->rstSeqOnProgChange));
-
-			menu->addChild(new MenuSeparator());
-
-			struct PpqnItem : MenuItem {
-				TrigStation* module;
-				int ppqn;
-				void onAction(const event::Action& e) override {
-					module->tempPpqn = ppqn;
-					module->ppqnChange = true;
-				}
-			};
-
-			menu->addChild(createMenuLabel("External Main Clock"));
-			std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
-			menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
-				for (int i = 0; i < 7; i++) {
-					PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
-					ppqnItem->rightText = CHECKMARK(module->ppqn == i);
-					ppqnItem->module = module;
-					ppqnItem->ppqn = i;
-					menu->addChild(ppqnItem);
-				}
-			}));
-
-			menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
-			menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
-
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuLabel("Turing settings"));
-
-			struct BitResTypeItem : MenuItem {
-				TrigStation* module;
-				int bitResType;
-				void onAction(const event::Action& e) override {
-					module->bitResolution = bitResType;
-				}
-			};
-			std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
-			menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
-				for (int i = 0; i < 2; i++) {
-					BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
-					bitResTypeItem->rightText = CHECKMARK(module->bitResolution == i);
-					bitResTypeItem->module = module;
-					bitResTypeItem->bitResType = i;
-					menu->addChild(bitResTypeItem);
-				}
-			}));
-
-			struct ProgressionTypeItem : MenuItem {
-				TrigStation* module;
-				int progressionType;
-				void onAction(const event::Action& e) override {
-					module->progression = progressionType;
-				}
-			};
-			std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
-			menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
-				for (int i = 0; i < 3; i++) {
-					ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
-					progressionTypeItem->rightText = CHECKMARK(module->progression == i);
-					progressionTypeItem->module = module;
-					progressionTypeItem->progressionType = i;
-					menu->addChild(progressionTypeItem);
 				}
 			}));
 
