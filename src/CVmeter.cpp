@@ -30,12 +30,14 @@ struct CVmeter : Module {
 		MODE_A_SWITCH,
 		MODE_B_SWITCH,
 		RESET_BUT_PARAM,
+		FREEZE_PARAM,
 		NUM_PARAMS 
 	};
 	enum InputIds {
 		A_INPUT,
 		B_INPUT,
 		RESET_INPUT,
+		FREEZE_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -43,6 +45,7 @@ struct CVmeter : Module {
 	};
 	enum LightIds {
 		RESET_BUT_LIGHT,
+		FREEZE_LIGHT,
 		NUM_LIGHTS
 	};
 
@@ -144,6 +147,10 @@ struct CVmeter : Module {
 	bool toWrite = true;
 	bool firstAbsClock = true;
 
+	bool freeze = false;
+	float frzTrig = 0.f;
+	float prevFrzTrig = 0.f;
+
 	CVmeter() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		
@@ -152,7 +159,9 @@ struct CVmeter : Module {
 		configSwitch(MODE_A_SWITCH, 0.f, 1.f, 1.f, "Mode A", {"Trig mode", "CV mode"});
 		configSwitch(MODE_B_SWITCH, 0.f, 1.f, 1.f, "Mode B", {"Trig mode", "CV mode"});
 		configSwitch(RESET_BUT_PARAM, 0.f, 1.f, 0.f, "Reset", {"OFF", "ON"});
+		configSwitch(FREEZE_PARAM, 0.f, 1.f, 0.f, "Freeze", {"OFF", "ON"});
 		configInput(RESET_INPUT,"Reset");
+		configInput(FREEZE_INPUT,"Freeze");
 
 	}
 
@@ -226,51 +235,105 @@ struct CVmeter : Module {
 		modeA = (int)params[MODE_A_SWITCH].getValue();
 		modeB = (int)params[MODE_B_SWITCH].getValue();
 
-		inputA = inputs[A_INPUT].getVoltage();
-		voltA = inputA;
-		if (voltA > 10.f)
-			voltA = 10.f;
-		else if (voltA < -10.f)
-			voltA = -10.f;
-		
-		inputB = inputs[B_INPUT].getVoltage();
-		voltB = inputB;
-		if (voltB > 10.f)
-			voltB = 10.f;
-		else if (voltB < -10.f)
-			voltB = -10.f;
 
-		triggeredNow = false;
+		frzTrig = inputs[FREEZE_INPUT].getVoltage() + params[FREEZE_PARAM].getValue();
+		if (frzTrig >= 1.f && prevFrzTrig < 1.f)
+			freeze = !freeze;
 
-		if (inputA != prevInputA) {
+		prevFrzTrig = frzTrig;
 
-			midiNoteA = int((voltA + 6.041666666666667f) * 12);
-			if (midiNoteA < 0)
-				midiNoteA = 0;
-			else if (midiNoteA > 127)
-				midiNoteA = 127;
+		lights[FREEZE_LIGHT].setBrightness(freeze);
 
-			midiCcA = round((voltA * 12.7));
-			if (midiCcA > 127)
-				midiCcA = 127;
-			else if (midiCcA < 0)
-				midiCcA = 0;
 
-			switch (modeA) {
-				case TRIG_MODE:
+		if (!freeze) {
+			inputA = inputs[A_INPUT].getVoltage();
+			voltA = inputA;
+			if (voltA > 10.f)
+				voltA = 10.f;
+			else if (voltA < -10.f)
+				voltA = -10.f;
+			
+			inputB = inputs[B_INPUT].getVoltage();
+			voltB = inputB;
+			if (voltB > 10.f)
+				voltB = 10.f;
+			else if (voltB < -10.f)
+				voltB = -10.f;
 
-					if (inputA >= 1.f && prevInputA < 1.f) {
-						
-						if (statusA != IDLE) {
-							//bpmA = round(sampleRateCoeff / sampleClockA);
-							bpmA = sampleRateCoeff / sampleClockA;
-							sumBpmCountA++;
-							sumBpmA += bpmA;
-							avgBpmA = sumBpmA / sumBpmCountA;
+			triggeredNow = false;
 
+			if (inputA != prevInputA) {
+
+				midiNoteA = int((voltA + 6.041666666666667f) * 12);
+				if (midiNoteA < 0)
+					midiNoteA = 0;
+				else if (midiNoteA > 127)
+					midiNoteA = 127;
+
+				midiCcA = round((voltA * 12.7));
+				if (midiCcA > 127)
+					midiCcA = 127;
+				else if (midiCcA < 0)
+					midiCcA = 0;
+
+				switch (modeA) {
+					case TRIG_MODE:
+
+						if (inputA >= 1.f && prevInputA < 1.f) {
 							
+							if (statusA != IDLE) {
+								//bpmA = round(sampleRateCoeff / sampleClockA);
+								bpmA = sampleRateCoeff / sampleClockA;
+								sumBpmCountA++;
+								sumBpmA += bpmA;
+								avgBpmA = sumBpmA / sumBpmCountA;
+
+								
+							}
+							statusA = RUNNING;
+							switch (status) {
+								case IDLE:
+
+									status = A_BEFORE_B;
+									delayCount = 0;
+									
+								break;
+
+								case A_BEFORE_B:
+									delayCount = 0;
+								break;
+
+								case A_AFTER_B:
+									if (lastTrig == LAST_A) {
+										status = A_BEFORE_B;
+										delayCount = 0;
+									} else if (lastTrig == LAST_B) {
+										recSampleCount = delayCount;
+									}
+								break;
+
+								case A_EQUAL_B:
+									status = A_BEFORE_B;
+									delayCount = 0;
+								break;
+							}
+							lastTrig = LAST_A;
+							sampleClockA = 0;
+							triggeredNow = true;
+							warning = true;
 						}
+						
+
+					break;
+
+					case CV_MODE:
+
+						bpmA = 120 * pow (2.0f, voltA);
+						if (bpmA > 999)
+							bpmA = 999;
+							
 						statusA = RUNNING;
+						
 						switch (status) {
 							case IDLE:
 
@@ -301,83 +364,89 @@ struct CVmeter : Module {
 						sampleClockA = 0;
 						triggeredNow = true;
 						warning = true;
-					}
 					
-
-				break;
-
-				case CV_MODE:
-
-					bpmA = 120 * pow (2.0f, voltA);
-					if (bpmA > 999)
-						bpmA = 999;
 						
-					statusA = RUNNING;
-					
-					switch (status) {
-						case IDLE:
-
-							status = A_BEFORE_B;
-							delayCount = 0;
-							
-						break;
-
-						case A_BEFORE_B:
-							delayCount = 0;
-						break;
-
-						case A_AFTER_B:
-							if (lastTrig == LAST_A) {
-								status = A_BEFORE_B;
-								delayCount = 0;
-							} else if (lastTrig == LAST_B) {
-								recSampleCount = delayCount;
-							}
-						break;
-
-						case A_EQUAL_B:
-							status = A_BEFORE_B;
-							delayCount = 0;
-						break;
-					}
-					lastTrig = LAST_A;
-					sampleClockA = 0;
-					triggeredNow = true;
-					warning = true;
-				
-					
-				break;
+					break;
+				}
 			}
-		}
 
-		if (inputB != prevInputB) {
-			
-			midiNoteB = int((voltB + 6.041666666666667f) * 12);
-			if (midiNoteB < 0)
-				midiNoteB = 0;
-			else if (midiNoteB > 127)
-				midiNoteB = 127;
-			//noteB = noteNames[midiB];
-			midiCcB = round((voltB * 12.7));
-			if (midiCcB > 127)
-				midiCcB = 127;
-			else if (midiCcB < 0)
-				midiCcB = 0;
+			if (inputB != prevInputB) {
+				
+				midiNoteB = int((voltB + 6.041666666666667f) * 12);
+				if (midiNoteB < 0)
+					midiNoteB = 0;
+				else if (midiNoteB > 127)
+					midiNoteB = 127;
+				//noteB = noteNames[midiB];
+				midiCcB = round((voltB * 12.7));
+				if (midiCcB > 127)
+					midiCcB = 127;
+				else if (midiCcB < 0)
+					midiCcB = 0;
 
-			switch (modeB) {
-				case TRIG_MODE:
-					if (inputB >= 1.f && prevInputB < 1.f) {
-						if (statusB != IDLE) {
-							//bpmA = round(sampleRateCoeff / sampleClockA);
-							bpmB = sampleRateCoeff / sampleClockB;
-							sumBpmCountB++;
-							sumBpmB += bpmB;
-							avgBpmB = sumBpmB / sumBpmCountB;
+				switch (modeB) {
+					case TRIG_MODE:
+						if (inputB >= 1.f && prevInputB < 1.f) {
+							if (statusB != IDLE) {
+								//bpmA = round(sampleRateCoeff / sampleClockA);
+								bpmB = sampleRateCoeff / sampleClockB;
+								sumBpmCountB++;
+								sumBpmB += bpmB;
+								avgBpmB = sumBpmB / sumBpmCountB;
 
 
+							}
+
+							statusB = RUNNING;
+							if (triggeredNow) {
+								lastTrig = LAST_BOTH;
+								status = A_EQUAL_B;
+								delayCount = 0;
+								
+							} else {
+
+								switch (status) {
+									case IDLE:
+										status = A_AFTER_B;
+										delayCount = 0;
+										
+									break;
+
+									case A_BEFORE_B:
+										if (lastTrig == LAST_A) {
+											recSampleCount = delayCount;
+										} else if (lastTrig == LAST_B) {
+											status = A_AFTER_B;
+											delayCount = 0;
+										}
+									break;
+
+									case A_AFTER_B:
+										delayCount = 0;
+									break;
+								
+									case A_EQUAL_B:
+										status = A_AFTER_B;
+										delayCount = 0;
+									break;
+								}
+								lastTrig = LAST_B;
+								
+							}
+							sampleClockB = 0;
+							warning = true;
 						}
+						
+					break;
+
+					case CV_MODE:
+
+						bpmB = 120 * pow (2.0f, voltB);
+						if (bpmB > 999)
+							bpmB = 999;
 
 						statusB = RUNNING;
+				
 						if (triggeredNow) {
 							lastTrig = LAST_BOTH;
 							status = A_EQUAL_B;
@@ -395,7 +464,7 @@ struct CVmeter : Module {
 								case A_BEFORE_B:
 									if (lastTrig == LAST_A) {
 										recSampleCount = delayCount;
-									} else if (lastTrig == LAST_B) {
+									} else {
 										status = A_AFTER_B;
 										delayCount = 0;
 									}
@@ -413,159 +482,110 @@ struct CVmeter : Module {
 							lastTrig = LAST_B;
 							
 						}
+					
+						lastTrig = LAST_B;
 						sampleClockB = 0;
 						warning = true;
-					}
+					break;
+				}
+			}
+
+			if (status != IDLE) {
+				delayCount++;
+				if (statusA == RUNNING)
+					sampleClockA++;
+
+				if (statusB == RUNNING)
+					sampleClockB++;
+
+			}
+
+
+			if (warning) {
+				warning = false;
+
+				switch (status) {
 					
-				break;
+					case IDLE:
+						//msg[1] = "IDLE";
+					break;
+					case A_BEFORE_B:
+						delayA = 0;
+						delayB = recSampleCount;
+					break;
+					case A_AFTER_B:
+						delayA = recSampleCount;
+						delayB = 0;
+					break;
 
-				case CV_MODE:
+					case A_EQUAL_B:
+						delayA = 0;
+						delayB = 0;
+					break;
 
-					bpmB = 120 * pow (2.0f, voltB);
-					if (bpmB > 999)
-						bpmB = 999;
+				}			
+			}
 
-					statusB = RUNNING;
+			prevInputA = inputA;
+			prevInputB = inputB;
+
+			/*
 			
-					if (triggeredNow) {
-						lastTrig = LAST_BOTH;
-						status = A_EQUAL_B;
-						delayCount = 0;
-						
-					} else {
+			if (trigValue >= 1 && prevTrigValue < 1) {
 
-						switch (status) {
-							case IDLE:
-								status = A_AFTER_B;
-								delayCount = 0;
-								
-							break;
+				if (pulseNr < 24) {
 
-							case A_BEFORE_B:
-								if (lastTrig == LAST_A) {
-									recSampleCount = delayCount;
-								} else {
-									status = A_AFTER_B;
-									delayCount = 0;
-								}
-							break;
 
-							case A_AFTER_B:
-								delayCount = 0;
-							break;
-						
-							case A_EQUAL_B:
-								status = A_AFTER_B;
-								delayCount = 0;
-							break;
+						pulseSample = sampleCountClock;
+						pulseDistance[pulseNr] = pulseSample - prevPulseSample;
+
+						if (firstAbsClock) {
+							firstAbsClock = false;
+						} else {
+							if (pulseDistance[pulseNr] < minDist)
+								minDist = pulseDistance[pulseNr];
+
+							if (pulseDistance[pulseNr] > maxDist)
+								maxDist = pulseDistance[pulseNr];
 						}
-						lastTrig = LAST_B;
-						
-					}
-				
-					lastTrig = LAST_B;
-					sampleClockB = 0;
-					warning = true;
-				break;
-			}
-		}
 
-		if (status != IDLE) {
-			delayCount++;
-			if (statusA == RUNNING)
-				sampleClockA++;
+						if (toWrite) {
+							debugDisplay[pulseNr] = "Pulse: " + to_string(pulseNr) + " - " +
+														//"prev: " + to_string(prevPulseSample) + " - " +
+														"curr: " + to_string(pulseSample) + " - " +
+														"dist: " + to_string(pulseDistance[pulseNr]);
+						}
+						prevPulseSample = pulseSample;
 
-			if (statusB == RUNNING)
-				sampleClockB++;
-
-		}
+					
+					pulseNr++;
 
 
-		if (warning) {
-			warning = false;
+				}
 
-			switch (status) {
-				
-				case IDLE:
-					//msg[1] = "IDLE";
-				break;
-				case A_BEFORE_B:
-					delayA = 0;
-					delayB = recSampleCount;
-				break;
-				case A_AFTER_B:
-					delayA = recSampleCount;
-					delayB = 0;
-				break;
+				if (pulseNr > 23) {
+					toWrite = false;
+					deltaDist = maxDist - minDist;
 
-				case A_EQUAL_B:
-					delayA = 0;
-					delayB = 0;
-				break;
+					debugDisplay[pulseNr] = "dist min: " + to_string(minDist) + " - " +
+										"max: " + to_string(maxDist) + " - " +
+										"delta: " + to_string(deltaDist);
 
-			}			
-		}
-
-		prevInputA = inputA;
-		prevInputB = inputB;
-
-		/*
+					sampleCountClock = 0;
+					pulseSample = 0;
+					prevPulseSample = 0;
+					pulseNr = 0;
+				}
 		
-		if (trigValue >= 1 && prevTrigValue < 1) {
 
-			if (pulseNr < 24) {
+			} 
 
-
-					pulseSample = sampleCountClock;
-					pulseDistance[pulseNr] = pulseSample - prevPulseSample;
-
-					if (firstAbsClock) {
-						firstAbsClock = false;
-					} else {
-						if (pulseDistance[pulseNr] < minDist)
-							minDist = pulseDistance[pulseNr];
-
-						if (pulseDistance[pulseNr] > maxDist)
-							maxDist = pulseDistance[pulseNr];
-					}
-
-					if (toWrite) {
-						debugDisplay[pulseNr] = "Pulse: " + to_string(pulseNr) + " - " +
-													//"prev: " + to_string(prevPulseSample) + " - " +
-													"curr: " + to_string(pulseSample) + " - " +
-													"dist: " + to_string(pulseDistance[pulseNr]);
-					}
-					prevPulseSample = pulseSample;
-
-				
-				pulseNr++;
-
-
-			}
-
-			if (pulseNr > 23) {
-				toWrite = false;
-				deltaDist = maxDist - minDist;
-
-				debugDisplay[pulseNr] = "dist min: " + to_string(minDist) + " - " +
-									"max: " + to_string(maxDist) + " - " +
-									"delta: " + to_string(deltaDist);
-
-				sampleCountClock = 0;
-				pulseSample = 0;
-				prevPulseSample = 0;
-				pulseNr = 0;
-			}
+			prevTrigValue = trigValue;
 			
 
-		} 
-
-		prevTrigValue = trigValue;
-		
-
-		sampleCountClock++;
-		*/
-
+			sampleCountClock++;
+			*/
+		}
 	}
 };
 
@@ -829,6 +849,11 @@ struct CVmeterWidget : ModuleWidget {
 		const float yRstBut = 21;
 		const float yRstIn = 31;
 
+		const float yFrz = 100;
+		const float xFrzIn = 8;
+		const float xFrzBut = xFrzIn + 9;
+
+
 		//addInput(createInputCentered<PJ301MPort>(mm2px(Vec(85, yLine)), module, CVmeter::TRIG_INPUT));
 		//addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(95, yLine)), module, CVmeter::RESET_BUT_PARAM, CVmeter::RESET_BUT_LIGHT));
 
@@ -837,7 +862,9 @@ struct CVmeterWidget : ModuleWidget {
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xSwA, ySw)), module, CVmeter::MODE_A_SWITCH));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xSwB, ySw)), module, CVmeter::MODE_B_SWITCH));
 		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(xRst, yRstBut)), module, CVmeter::RESET_BUT_PARAM, CVmeter::RESET_BUT_LIGHT));
+		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xFrzBut, yFrz)), module, CVmeter::FREEZE_PARAM, CVmeter::FREEZE_LIGHT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRst, yRstIn)), module, CVmeter::RESET_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xFrzIn, yFrz)), module, CVmeter::FREEZE_INPUT));
 	}
 
 };
