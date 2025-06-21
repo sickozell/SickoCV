@@ -183,7 +183,7 @@ bool trigStation_cbSeqRunSetting =  1; //means seqRunSetting;
 bool trigStation_cbInternalClock = 0; //means internalClock;
 float trigStation_cbBpmKnob = 1200.f;
 float trigStation_cbUserValues[8][2] = {};
-float trigStation_cbUserInputs[8][19][2] = {};	// 19 is MAXUSER
+float trigStation_cbUserInputs[8][22][2] = {};	// 22 is MAXUSER
 float trigStation_cbUserTable[8][4] = {};
 
 bool trigStation_clipboardTrack = false;
@@ -198,5 +198,5 @@ int trigStation_cbRstStepsWhenTrack = 3;
 bool trigStation_cbXcludeFromRunTrack = false;
 bool trigStation_cbXcludeFromRstTrack = false;
 float trigStation_cbUserValuesTrack[2] = {};
-float trigStation_cbUserInputsTrack[19][2] = {};	// 19 is MAXUSER
+float trigStation_cbUserInputsTrack[22][2] = {};	// 22 is MAXUSER
 float trigStation_cbUserTableTrack[4] = {};

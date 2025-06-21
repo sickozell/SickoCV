@@ -22,8 +22,8 @@ struct SickoTrigStation : Module {
 
 	//const std::string userInNames[KNOB_SHIFT] = {"Pulse Width", "Reverse", "Mode", "Length", "Reset Step#", "Run", "Retrig", "Out scale", "Swing", "Flip"};
 	//const std::string userKnobNames[KNOB_NR] = {"Pulse Width", "Reset Step#", "Mode", "Retrig Prob.", "Out scale", "Swing", "Flip Prob.", "Attenuator", "Attenuverter"};
-	const std::string userInNames[KNOB_SHIFT] = {"Flip", "Length", "Mode", "Out scale", "Pulse Width", "Reset Step#", "Retrig", "Reverse", "Run", "Swing"};
-	const std::string userKnobNames[KNOB_NR] = {"Flip Prob.", "Mode", "Out scale",  "Pulse Width", "Reset Step#", "Retrig Prob.", "Swing", "Attenuator", "Attenuverter"};
+	const std::string userInNames[KNOB_SHIFT] = {"Flip", "Length", "Mode", "Out scale", "Pulse Width", "Reset Step#", "Retrig", "Reverse", "Run", "Skip", "Skip Prob.", "Swing"};
+	const std::string userKnobNames[KNOB_NR] = {"Flip Prob.", "Mode", "Out scale",  "Pulse Width", "Reset Step#", "Retrig Prob.", "Skip Prob.", "Swing", "Attenuator", "Attenuverter"};
 
 	bool cvClockIn = false;
 	bool cvClockOut = false;
@@ -40,15 +40,15 @@ struct SickoTrigStation : Module {
 						};
 
 	int userInputs[MAXTRACKS][MAXUSER][2] = {
-//							  IN_FLIP  IN_LENGH IN_MODE  IN_OUTSC IN_PW   IN_RSTST IN_RETRIG IN_REV   IN_RUN   IN_SWING KN_FLIP  KN_MODE  KN_OUTSC KN_PW   KN_RSTST  KN_PROB KN_SWNG KN_ATN  KN_ATNV
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+//							  IN_FLIP  IN_LENGH IN_MODE  IN_OUTSC IN_PW   IN_RSTST IN_RETRIG IN_REV   IN_RUN   IN_SKIP IN_SKIPRB IN_SWING KN_FLIP  KN_MODE  KN_OUTSC KN_PW   KN_RSTST  KN_PROB KN_SKIP KN_SWNG KN_ATN  KN_ATNV
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }
 						};
 	void appendInputMenu(Menu *menu, engine::Port::Type type, int portId){
 
@@ -636,12 +636,7 @@ struct TrigStation : SickoTrigStation {
 							return int(ParamQuantity::getDisplayValue());
 						break;
 
-				 		case KNOB_ATN:
-				 			name = "Atten. #" + to_string(t+1);
-							unit = "%";
-							displayMultiplier = 100.f;
-							displayOffset = 0.f;
-						break;
+				 		
 
 						case KNOB_PROB:
 				 			name = "Retrig Prob. #" + to_string(t+1);
@@ -657,6 +652,27 @@ struct TrigStation : SickoTrigStation {
 							displayOffset = 0.f;
 						break;
 
+						case KNOB_SKIPPROB:
+				 			name = "Skip Prob. #" + to_string(t+1);
+							unit = "%";
+							displayMultiplier = 100.f;
+							displayOffset = 0.f;
+						break;	
+
+						case KNOB_SWING:
+				 			name = "Swing #" + to_string(t+1);
+							unit = "%";
+							displayMultiplier = 100.f;
+							displayOffset = 0.f;
+						break;	
+
+						case KNOB_ATN:
+				 			name = "Atten. #" + to_string(t+1);
+							unit = "%";
+							displayMultiplier = 100.f;
+							displayOffset = 0.f;
+						break;
+
 						case KNOB_ATNV:
 				 			name = "Attenuv. #" + to_string(t+1);
 							unit = "%";
@@ -664,12 +680,7 @@ struct TrigStation : SickoTrigStation {
 							displayOffset = -100.f;
 						break;
 
-						case KNOB_SWING:
-				 			name = "Swing #" + to_string(t+1);
-							unit = "%";
-							displayMultiplier = 100.f;
-							displayOffset = 0.f;
-						break;				
+									
 		
 				 	}
 				}
@@ -695,6 +706,8 @@ struct TrigStation : SickoTrigStation {
 						case IN_OUTSCALE:	name = "Out scale #" + to_string(t+1); break;
 						case IN_RUN:		name = "Run #" + to_string(t+1); break;
 						case IN_RETRIG:		name = "Retrig #" + to_string(t+1);	break;
+						case IN_SKIP:		name = "Skip #" + to_string(t+1); break;
+						case IN_SKIPPROB:	name = "Skip Prob.#" + to_string(t+1); break;
 						case IN_SWING:		name = "Swing #" + to_string(t+1); break;
 						case IN_FLIP:		name = "Flip #" + to_string(t+1); break;
 				 	}
@@ -1433,6 +1446,71 @@ struct TrigStation : SickoTrigStation {
 
 	}
 
+	bool inline calcSkip(int t) {
+		bool skip = false;
+
+		if (userInputs[t][IN_SKIP][0]) {
+			if (userInputs[t][IN_SKIPPROB][0]) {
+				if (inputs[USER_INPUT+t+userInputs[t][IN_SKIP][1]].isConnected() && 
+					inputs[USER_INPUT+t+userInputs[t][IN_SKIPPROB][1]].getVoltage() >= 1.f) {
+
+					skip = true;
+
+				}
+			} else {
+				if (inputs[USER_INPUT+t+userInputs[t][IN_SKIP][1]].isConnected() && 
+					inputs[USER_INPUT+t+userInputs[t][IN_SKIPPROB][1]].getVoltage() >= 1.f) {
+
+					if (random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_SKIPPROB][1]].getValue())
+						skip = true;
+
+				}
+			}
+
+		} else {
+
+			if (userInputs[t][IN_SKIPPROB][0]) {
+				if (userInputs[t][KNOB_SKIPPROB][0]) {
+
+					if (inputs[USER_INPUT+t+userInputs[t][IN_SKIPPROB][1]].isConnected()) {
+
+						float tempValue = inputs[USER_INPUT+t+userInputs[t][IN_SKIPPROB][1]].getVoltage() * 0.1f + 
+							params[USER_PARAM+t+userInputs[t][KNOB_SKIPPROB][1]].getValue();
+
+						if (tempValue < 0.f)
+							tempValue = 0.f;
+						else if (tempValue > 1.f)
+							tempValue = 1.f;
+
+						if (random::uniform() <= tempValue)
+							skip = true;
+
+					} else if (userInputs[t][KNOB_SKIPPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_SKIPPROB][1]].getValue()) {
+						skip = true;
+					}
+
+				} else if (inputs[USER_INPUT+t+userInputs[t][IN_SKIPPROB][1]].isConnected()) {
+
+					float tempValue = inputs[USER_INPUT+t+userInputs[t][IN_SKIPPROB][1]].getVoltage() * 0.1f;
+					
+					if (tempValue < 0.f)
+						tempValue = 0.f;
+					else if (tempValue > 1.f)
+						tempValue = 1.f;
+
+					if (random::uniform() <= tempValue)
+						skip = true;
+				}
+			} else if (userInputs[t][KNOB_SKIPPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_SKIPPROB][1]].getValue()) {
+				skip = true;
+			}
+		}
+		/*
+		if (skip && random::uniform() > .5f)
+			skip = false;
+		*/
+		return skip;
+	}
 
 	void inline calcFlip(int t) {
 
@@ -1470,7 +1548,6 @@ struct TrigStation : SickoTrigStation {
 		
 		}
 
-		
 	}
 
 
@@ -3547,20 +3624,24 @@ struct TrigStation : SickoTrigStation {
 
 						if (!turingMode[t]) {
 
-							if (wSeq[t][step[t]]) {
-								stepPulse[t] = true;
-								stepPulseTime[t] = oneMsTime;
-								if (outType[t] == OUT_GATE)
-									outGate[t] = true;
+							if (!calcSkip(t))  {
+								if (wSeq[t][step[t]]) {
+									stepPulse[t] = true;
+									stepPulseTime[t] = oneMsTime;
+									if (outType[t] == OUT_GATE)
+										outGate[t] = true;
+								} else {
+									if (outType[t] == OUT_GATE) {
+										outGate[t] = false;
+										out[t] = 0.f;
+									}
+								}
 							} else {
 								if (outType[t] == OUT_GATE) {
 									outGate[t] = false;
 									out[t] = 0.f;
 								}
 							}
-
-
-
 
 						} else {
 							calcVoltage(t);
@@ -4483,6 +4564,16 @@ struct TrigStationDisplayU1 : TransparentWidget {
 					tempText = "RN";
 				break;
 
+				case IN_SKIP:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "SK";
+				break;
+
+				case IN_SKIPPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "SP";
+				break;
+
 				case IN_SWING:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "SW";
@@ -4562,6 +4653,16 @@ struct TrigStationDisplayU2 : TransparentWidget {
 					tempText = "RN";
 				break;
 
+				case IN_SKIP:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "SK";
+				break;
+
+				case IN_SKIPPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "SP";
+				break;
+
 				case IN_SWING:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "SW";
@@ -4624,6 +4725,11 @@ struct TrigStationDisplayK1 : TransparentWidget {
 				case KNOB_PROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RP";
+				break;
+
+				case KNOB_SKIPPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "SP";
 				break;
 
 				case KNOB_SWING:
@@ -4700,6 +4806,11 @@ struct TrigStationDisplayK2 : TransparentWidget {
 				case KNOB_PROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RP";
+				break;
+
+				case KNOB_SKIPPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "SP";
 				break;
 
 				case KNOB_SWING:

@@ -155,7 +155,7 @@ extern bool trigStation_cbSeqRunSetting;
 extern bool trigStation_cbInternalClock;
 extern float trigStation_cbBpmKnob;
 extern float trigStation_cbUserValues[8][2];
-extern float trigStation_cbUserInputs[8][19][2];	// 19 is MAXUSER
+extern float trigStation_cbUserInputs[8][22][2];	// 22 is MAXUSER
 extern float trigStation_cbUserTable[8][4];
 
 extern bool trigStation_clipboardTrack;
@@ -170,5 +170,5 @@ extern int trigStation_cbRstStepsWhenTrack;
 extern bool trigStation_cbXcludeFromRunTrack;
 extern bool trigStation_cbXcludeFromRstTrack;
 extern float trigStation_cbUserValuesTrack[2];
-extern float trigStation_cbUserInputsTrack[19][2];	// 19 is MAXUSER
+extern float trigStation_cbUserInputsTrack[22][2];	// 22 is MAXUSER
 extern float trigStation_cbUserTableTrack[4];
