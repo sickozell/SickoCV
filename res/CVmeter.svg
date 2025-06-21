@@ -32,7 +32,7 @@
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg5"
+     inkscape:current-layer="g53"
      showguides="true" /><defs
      id="defs2"><rect
        x="22.799086"
@@ -226,7 +226,7 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Etichette Testo"
-     style="display:inline"><text
+     style="display:none"><text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:inline;fill:#ffffff;stroke:none;stroke-width:0.264999;stroke-dasharray:0.264999, 0.264999;stroke-dashoffset:0;stroke-opacity:1"
        x="33.833218"
@@ -438,7 +438,7 @@
          y="101.17515">FREEZE</tspan></text></g><g
      inkscape:groupmode="layer"
      id="g53"
-     inkscape:label="Etichette Testo copia"
+     inkscape:label="Etichette Testo nere"
      style="display:inline;fill:#000000"
      transform="translate(0.2999777,0.3)"><path
        style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#000000;stroke-width:0.265;stroke-dasharray:0.264999, 0.264999"
@@ -538,7 +538,7 @@
        aria-label="FREEZE" /></g><g
      inkscape:groupmode="layer"
      id="g35"
-     inkscape:label="Etichette Testo copia"
+     inkscape:label="Etichette Testo  path"
      style="display:inline"><path
        style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#ffffff;stroke-width:0.265;stroke-dasharray:0.264999, 0.264999"
        d="M 32.444155,15.678125 V 12.9 h 1.984375 v 0.396875 h 0.396875 v 0.79375 H 34.42853 V 14.4875 h 0.396875 v 0.79375 H 34.42853 v 0.396875 z m 0.79375,-0.396875 h 0.79375 V 14.4875 h -0.79375 z m 0,-1.190625 h 0.79375 v -0.79375 h -0.79375 z"
