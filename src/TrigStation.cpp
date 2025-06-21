@@ -4572,6 +4572,8 @@ struct TrigStationDisplayU1 : TransparentWidget {
 				case IN_SKIPPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "SP";
+					if (module->userInputs[t][IN_SKIP][0])
+						tempText += "*";
 				break;
 
 				case IN_SWING:
@@ -4661,6 +4663,8 @@ struct TrigStationDisplayU2 : TransparentWidget {
 				case IN_SKIPPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "SP";
+					if (module->userInputs[t][IN_SKIP][0])
+						tempText += "*";
 				break;
 
 				case IN_SWING:
