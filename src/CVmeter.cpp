@@ -646,9 +646,11 @@ struct CVmeterDebugDisplay : TransparentWidget {
 				const float xMidiCcB = 90;
 
 				const float xBpmA = 5;
-				const float yBpmA = 214;
+				//const float yBpmA = 214;
+				const float yBpmA = 215;
 				const float xBpmB = 60;
-				const float yBpmB = 215;
+				//const float yBpmB = 215;
+				const float yBpmB = 221;
 
 				const float xDelayA = 10;
 				const float xDelayB = 70;
