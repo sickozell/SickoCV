@@ -32,7 +32,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.7.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/35f1b759-2f8c-48dd-bcd1-3477db3d231a)
+![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/9e6a89e4-2a7e-445c-ab59-f577bb6fb206)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -378,6 +378,7 @@ Please note that "On Stop/Reset bar" option sets the clock gate output to low if
 ## CvMeter
 ### Shows input voltage, v/oct note, midi values, bpm and sample distance between two triggers or cv change from two different inputs
 
+![cvmeter](https://github.com/user-attachments/assets/e486c1ed-3f0e-41d2-94e5-93673536642a)
 
 [back to top](#table-of-contents)
 
