@@ -1,4 +1,4 @@
-# SickoCV v2.7.4-beta11
+# SickoCV v2.7.4-beta12
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -19,6 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog** 
 - added stepStation and trigStation modules
+- added cvMeter module
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
 - all sampler modules: improved memory allocation management
 - slewer/slewer mini: inverted shapes on shape knob
@@ -44,6 +45,7 @@ VCV Rack plugin modules
 - [bToggler8+](#btoggler8-1)
 - [calcs](#calcs)
 - [clocker / clocker2](#clocker--clocker2)
+- [CV meter](#cvmeter)
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini](#drumplayer--drumplayer--drumplayerxtra--drumplayer-mini)
@@ -370,6 +372,12 @@ When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 - **On Stop**  
 This submenu is the same as the previous one, but when the Run Button is switched off.  
 Please note that "On Stop/Reset bar" option sets the clock gate output to low if clocker is currently sending a high gate.  
+
+[back to top](#table-of-contents)
+
+## CvMeter
+### Shows input voltage, v/oct note, midi values, bpm and sample distance between two triggers or cv change from two different inputs
+
 
 [back to top](#table-of-contents)
 

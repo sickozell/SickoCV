@@ -604,7 +604,7 @@ struct Clocker2 : Clocker2Wrapper {
 					divClockSample[d] = 1.0;
 					divMaxSample[d][0] = 0.0;
 					divMaxSample[d][1] = 0.0;
-					divCount[d] = 1;
+					divCount[d] = 999999;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 			}
@@ -629,7 +629,7 @@ struct Clocker2 : Clocker2Wrapper {
 					divClockSample[d] = 1.0;
 					divMaxSample[d][0] = 0.0;
 					divMaxSample[d][1] = 0.0;
-					divCount[d] = 1;
+					divCount[d] = 999999;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 			}
@@ -666,7 +666,7 @@ struct Clocker2 : Clocker2Wrapper {
 				divClockSample[d] = 1.0;
 				divMaxSample[d][0] = 0.0;
 				divMaxSample[d][1] = 0.0;
-				divCount[d] = 1;
+				divCount[d] = 999999;
 				outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 			}
 
@@ -863,7 +863,7 @@ struct Clocker2 : Clocker2Wrapper {
 
 					if (runSetting) {
 						extBeat = true;
-						clockSample = 1.0;
+						//clockSample = 1.0;
 					}
 
 					for (int d = 0; d < 6; d++) {

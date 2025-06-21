@@ -19,6 +19,7 @@ extern Model* modelBtogglerPlus;
 extern Model* modelCalcs;
 extern Model* modelClocker;
 extern Model* modelClocker2;
+extern Model* modelCVmeter;
 extern Model* modelCVrouter;
 extern Model* modelCVswitcher;
 extern Model* modelDrummer;

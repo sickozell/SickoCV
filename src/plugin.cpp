@@ -31,6 +31,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelCalcs);
 	p->addModel(modelClocker);
 	p->addModel(modelClocker2);
+	p->addModel(modelCVmeter);
 	p->addModel(modelCVrouter);
 	p->addModel(modelCVswitcher);
 	p->addModel(modelDrummer);

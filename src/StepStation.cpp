@@ -1825,7 +1825,7 @@ struct StepStation : SickoStepStation {
 					divClockSample[t] = 1.0;
 					divMaxSample[t][0] = 0.0;
 					divMaxSample[t][1] = 0.0;
-					divCount[t] = 1;
+					divCount[t] = 999999;
 					//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
 					//outputs[OUT_OUTPUT+t].setVoltage(0.f);
 
@@ -1853,7 +1853,7 @@ struct StepStation : SickoStepStation {
 					divClockSample[t] = 1.0;
 					divMaxSample[t][0] = 0.0;
 					divMaxSample[t][1] = 0.0;
-					divCount[t] = 1;
+					divCount[t] = 999999;
 					//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
 					//outputs[OUT_OUTPUT+t].setVoltage(0.f);
 					edge[t] = false;
@@ -1904,7 +1904,7 @@ struct StepStation : SickoStepStation {
 						divClockSample[t] = 1.0;
 						divMaxSample[t][0] = 0.0;
 						divMaxSample[t][1] = 0.0;
-						divCount[t] = 1;
+						divCount[t] = 999999;
 						//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
 						//outputs[OUT_OUTPUT+t].setVoltage(0.f);
 						edge[t] = false;
@@ -2088,7 +2088,20 @@ struct StepStation : SickoStepStation {
 
 			}
 
-		} //else {
+		}
+
+
+/*
+
+																						███████╗██╗░░██╗████████╗  ░█████╗░██╗░░░░░░█████╗░░█████╗░██╗░░██╗
+																						██╔════╝╚██╗██╔╝╚══██╔══╝  ██╔══██╗██║░░░░░██╔══██╗██╔══██╗██║░██╔╝
+																						█████╗░░░╚███╔╝░░░░██║░░░  ██║░░╚═╝██║░░░░░██║░░██║██║░░╚═╝█████═╝░
+																						██╔══╝░░░██╔██╗░░░░██║░░░  ██║░░██╗██║░░░░░██║░░██║██║░░██╗██╔═██╗░
+																						███████╗██╔╝╚██╗░░░██║░░░  ╚█████╔╝███████╗╚█████╔╝╚█████╔╝██║░╚██╗
+																						╚══════╝╚═╝░░╚═╝░░░╚═╝░░░  ░╚════╝░╚══════╝░╚════╝░░╚════╝░╚═╝░░╚═╝
+
+*/
+
 
 		if (externalClock) {
 
@@ -2133,7 +2146,7 @@ struct StepStation : SickoStepStation {
 
 					//if (runSetting) {
 						extBeat[MC] = true;
-						extClockSample = 1.0;
+						//extClockSample = 1.0;
 					//}
 
 					// ----------------------------------------EXTERNAL MAIN CLOCK CV -> RE-INIT TRACKS 
