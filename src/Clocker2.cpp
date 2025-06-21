@@ -281,6 +281,8 @@ struct Clocker2 : Clocker2Wrapper {
 	float prevCvClockInValue = 11.f;
 	float cvClockOutValue = 0.f;
 
+	bool divControls = true;
+
 	Clocker2() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		
@@ -384,7 +386,9 @@ struct Clocker2 : Clocker2Wrapper {
 	}
 
 	json_t *dataToJson() override {
+
 		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "divControls", json_boolean(divControls));
 		json_object_set_new(rootJ, "ppqn", json_integer(ppqn));
 		//json_object_set_new(rootJ, "smooth", json_integer(smooth));		// experimental: EXTERNAL CLOCK SMOOTH
 		//json_object_set_new(rootJ, "extStop", json_integer(extStop));		// expertimental: EXTERNAL CLOCK AUTO STOP
@@ -404,6 +408,11 @@ struct Clocker2 : Clocker2Wrapper {
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+
+		json_t* divControlsJ = json_object_get(rootJ, "divControls");
+		if (divControlsJ)
+			divControls = json_boolean_value(divControlsJ);
+
 		json_t* ppqnJ = json_object_get(rootJ, "ppqn");
 		if (ppqnJ) {
 			tempPpqn = json_integer_value(ppqnJ);
@@ -1233,6 +1242,7 @@ struct Clocker2DisplayDiv : TransparentWidget {
 			e.consume(this);
 		}
 		*/
+		/*
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
 			if (tempValue + 1 <= 44)
@@ -1246,6 +1256,31 @@ struct Clocker2DisplayDiv : TransparentWidget {
 				tempValue--;
 			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
 			e.consume(this);
+		}
+		*/
+		if (module->divControls) {
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+				if (tempValue + 1 <= 44)
+					tempValue++;
+				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+				e.consume(this);
+			}
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+				if (tempValue - 1 >= 0)
+					tempValue--;
+				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+				e.consume(this);
+			}
+
+		} else {
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				createContextMenu();
+				e.consume(this);
+			}
 		}
 	}
 
@@ -1267,7 +1302,7 @@ struct Clocker2DisplayDiv : TransparentWidget {
 		}
 		Widget::drawLayer(args, layer);
 	}
-/*
+
 	void createContextMenu() {
 		Clocker2 *module = dynamic_cast<Clocker2 *>(this->module);
 		assert(module);
@@ -1299,7 +1334,7 @@ struct Clocker2DisplayDiv : TransparentWidget {
 			}
 		}
 	}
-	*/
+	
 };
 
 /*
@@ -1556,6 +1591,10 @@ struct Clocker2Widget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
 		menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
+		
 	}
 };
 
