@@ -1592,6 +1592,7 @@ struct StepStation : SickoStepStation {
 
 			for (int t = 0; t < ALLTRACKS; t++) {
 				
+				nextRange[t] = progRange[selectedProg][t];
 				nextRevType[t] = progRevType[selectedProg][t];
 				nextDontAdvanceSetting[t] = progDontAdvanceSetting[selectedProg][t];
 				nextRstStepsWhen[t] = progRstStepsWhen[selectedProg][t];
@@ -1655,6 +1656,7 @@ struct StepStation : SickoStepStation {
 				}
 
 				for (int t = 0; t < ALLTRACKS; t++) {
+					range[t] = nextRange[t];
 					revType[t] = nextRevType[t];
 					dontAdvanceSetting[t] = nextDontAdvanceSetting[t];
 					rstStepsWhen[t] = nextRstStepsWhen[t];
@@ -1727,6 +1729,7 @@ struct StepStation : SickoStepStation {
 				}
 
 				for (int t = 0; t < ALLTRACKS; t++) {
+					range[t] = progRange[selectedProg][t];
 					revType[t] = progRevType[selectedProg][t];
 					dontAdvanceSetting[t] = progDontAdvanceSetting[selectedProg][t];
 					rstStepsWhen[t] = progRstStepsWhen[selectedProg][t];
