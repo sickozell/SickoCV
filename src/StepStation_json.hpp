@@ -35,7 +35,13 @@
 
 		
 		// --------- SEQUENCER
-		json_object_set_new(rootJ, "range", json_integer(range));
+		//json_object_set_new(rootJ, "range", json_integer(range));
+		{
+			json_t *this_json_array = json_array();
+			for (int t = 0; t < ALLTRACKS; t++)
+				json_array_append_new(this_json_array, json_integer(range[t]));
+			json_object_set_new(rootJ, "range", this_json_array);
+		}
 		json_object_set_new(rootJ, "runType", json_integer(runType));
 		json_object_set_new(rootJ, "rstClkOnRst", json_boolean(rstClkOnRst));
 		json_object_set_new(rootJ, "rstSeqOnProgChange", json_boolean(rstSeqOnProgChange));
@@ -131,6 +137,13 @@
 		}
 		// -------------------------- PROGRAMS
 
+		for (int p = 0; p < 32; p++) {
+			json_t *this_json_array = json_array();
+			for (int t = 0; t < ALLTRACKS; t++) {
+				json_array_append_new(this_json_array, json_integer(progRange[p][t]));
+			}
+			json_object_set_new(rootJ, ("progRange"+to_string(p)).c_str(), this_json_array);
+		}
 
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < MAXTRACKS; t++) {
@@ -431,12 +444,24 @@
 			}
 		}
 		// ---------------------------------------------------------------------- SEQUENC
+		/*
 		{ 
 			json_t* valueJ = json_object_get(rootJ, "range");
 			if (valueJ) {
 				range = json_integer_value(valueJ);
 				if (range < 0 || range > 9)
 					range = 9;
+			}
+		}
+		*/
+		{
+			json_t *json_array = json_object_get(rootJ, "range");
+			size_t jThis;
+			json_t *json_value;
+			if (json_array) {
+				json_array_foreach(json_array, jThis, json_value) {
+					range[jThis] = json_integer_value(json_value);
+				}
 			}
 		}
 		{
@@ -526,6 +551,17 @@
 		}
 
 		// ************************************ PROGRAMS
+
+		for (int p = 0; p < 32; p++) {
+			json_t *json_array = json_object_get(rootJ, ("progRange_p"+to_string(p)).c_str());
+			size_t jThis;
+			json_t *json_value;
+			if (json_array) {
+				json_array_foreach(json_array, jThis, json_value) {
+					progRange[p][jThis] = json_integer_value(json_value);
+				}
+			}
+		}
 
 		for (int p = 0; p < 32; p++) {
 			json_t *json_array = json_object_get(rootJ, ("progSteps_p"+to_string(p)).c_str());
@@ -747,12 +783,24 @@
 
 
 		// ---------------------------------------------------------------------- SEQUENC
+		/*
 		{ 
 			json_t* valueJ = json_object_get(rootJ, "range");
 			if (valueJ) {
 				range = json_integer_value(valueJ);
 				if (range < 0 || range > 9)
 					range = 9;
+			}
+		}
+		*/
+		{
+			json_t *this_json_array = json_object_get(rootJ, "range");
+			size_t jThis;
+			json_t *this_json_value;
+			if (this_json_array) {
+				json_array_foreach(this_json_array, jThis, this_json_value) {
+					range[jThis] = json_integer_value(this_json_value);
+				}
 			}
 		}
 		{
@@ -788,6 +836,17 @@
 		}
 		
 		// ************************************ PROGRAMS
+
+		for (int p = 0; p < 32; p++) {
+			json_t *json_array = json_object_get(rootJ, ("progRange_p"+to_string(p)).c_str());
+			size_t jThis;
+			json_t *json_value;
+			if (json_array) {
+				json_array_foreach(json_array, jThis, json_value) {
+					progRange[p][jThis] = json_integer_value(json_value);
+				}
+			}
+		}
 
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < MAXTRACKS; t++) {
@@ -1006,7 +1065,7 @@
 
 		// --------- SEQUENCER
 
-		json_object_set_new(rootJ, "range", json_integer(range));
+		//json_object_set_new(rootJ, "range", json_integer(range));
 		json_object_set_new(rootJ, "runType", json_integer(runType));
 		json_object_set_new(rootJ, "rstClkOnRst", json_boolean(rstClkOnRst));
 		json_object_set_new(rootJ, "rstSeqOnProgChange", json_boolean(rstSeqOnProgChange));
@@ -1015,6 +1074,13 @@
 		json_object_set_new(rootJ, "lastProg", json_integer(lastProg));
 
 		// -------------------------- PROGRAMS
+
+		for (int p = 0; p < 32; p++) {
+			json_t *this_json_array = json_array();
+			for (int t = 0; t < ALLTRACKS; t++)
+				json_array_append_new(this_json_array, json_integer(progRange[p][t]));
+			json_object_set_new(rootJ, ("progRange_p"+to_string(p)).c_str(), this_json_array);
+		}
 
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < MAXTRACKS; t++) {
@@ -1163,7 +1229,7 @@
 
 		json_t *rootJ = json_object();
 
-		json_object_set_new(rootJ, "range", json_integer(range));
+		json_object_set_new(rootJ, "range", json_integer(range[MC]));
 		json_object_set_new(rootJ, "runType", json_integer(runType));
 		json_object_set_new(rootJ, "dontAdvanceSetting", json_integer(dontAdvanceSetting[MC]));	//  <------------- OTTIMIZZARE per registrare gli 8 tweaks
 
@@ -1197,9 +1263,9 @@
 
 		json_t* rangeJ = json_object_get(rootJ, "range");
 		if (rangeJ) {
-			range = json_integer_value(rangeJ);
-			if (range < 0 || range > 9)
-				range = 9;
+			range[MC] = json_integer_value(rangeJ);
+			if (range[MC] < 0 || range[MC] > 9)
+				range[MC] = 9;
 		}
 
 		json_t* runTypeJ = json_object_get(rootJ, "runType");

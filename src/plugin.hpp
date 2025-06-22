@@ -122,7 +122,7 @@ extern bool stepStation_cbSeqRunSetting;
 extern bool stepStation_cbInternalClock;
 extern float stepStation_cbBpmKnob;
 extern float stepStation_cbUserValues[8][2];
-extern float stepStation_cbUserInputs[8][15][2];	// 16 is MAXUSER
+extern float stepStation_cbUserInputs[8][18][2];	// 18 is MAXUSER
 extern float stepStation_cbUserTable[8][4];
 
 extern bool stepStation_clipboardTrack;
@@ -135,7 +135,7 @@ extern int stepStation_cbRstStepsWhenTrack;
 extern bool stepStation_cbXcludeFromRunTrack;
 extern bool stepStation_cbXcludeFromRstTrack;
 extern float stepStation_cbUserValuesTrack[2];
-extern float stepStation_cbUserInputsTrack[15][2];	// 16 is MAXUSER
+extern float stepStation_cbUserInputsTrack[18][2];	// 18 is MAXUSER
 extern float stepStation_cbUserTableTrack[4];
 
 
@@ -155,7 +155,7 @@ extern bool trigStation_cbSeqRunSetting;
 extern bool trigStation_cbInternalClock;
 extern float trigStation_cbBpmKnob;
 extern float trigStation_cbUserValues[8][2];
-extern float trigStation_cbUserInputs[8][22][2];	// 22 is MAXUSER
+extern float trigStation_cbUserInputs[8][23][2];	// 23 is MAXUSER
 extern float trigStation_cbUserTable[8][4];
 
 extern bool trigStation_clipboardTrack;
@@ -170,5 +170,5 @@ extern int trigStation_cbRstStepsWhenTrack;
 extern bool trigStation_cbXcludeFromRunTrack;
 extern bool trigStation_cbXcludeFromRstTrack;
 extern float trigStation_cbUserValuesTrack[2];
-extern float trigStation_cbUserInputsTrack[22][2];	// 22 is MAXUSER
+extern float trigStation_cbUserInputsTrack[23][2];	// 23 is MAXUSER
 extern float trigStation_cbUserTableTrack[4];

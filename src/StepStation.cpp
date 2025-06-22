@@ -17,13 +17,19 @@ struct SickoStepStation : Module {
 	bool alive;
 
 	virtual int getInputBase() const { return -1; }
+	virtual int getOutputBase() const { return -1; }
 	virtual int getParamBase() const { return -1; }
 
 	//const std::string userInNames[KNOB_SHIFT] = {"Reverse", "Mode", "Length", "Reset Step#", "Run", "Retrig", "Out scale", "Swing"};
 	//const std::string userKnobNames[KNOB_NR] = {"Reset Step#", "Mode", "Retrig Prob.", "Out scale", "Swing", "Attenuator", "Attenuverter"};
-	const std::string userInNames[KNOB_SHIFT] = {"Length", "Mode", "Out scale", "Reset Step#", "Retrig", "Reverse", "Run", "Swing"};
-	const std::string userKnobNames[KNOB_NR] = {"Mode", "Out scale", "Reset Step#", "Retrig Prob.", "Swing", "Attenuator", "Attenuverter"};
+	const std::string userInNames[KNOB_SHIFT] = {"Change", "Change Prob.", "Length", "Mode", "Out scale", "Reset Step#", "Retrig", "Reverse", "Run", "Swing"};
+	const std::string userKnobNames[KNOB_NR] = {"Change prob.", "Mode", "Out scale", "Reset Step#", "Retrig Prob.", "Swing", "Attenuator", "Attenuverter"};
 
+	const std::string sampleDelayNames[7] = {"No Delay", "1 sample", "2 samples", "3 samples", "4 samples", "5 samples", "Default"};
+	int sampleDelay[ALLTRACKS] = {6, 6, 6, 6, 6, 6, 6, 6, 0};
+
+	const std::string rangeNames[11] = {"0/1v", "0/2v", "0/3v", "0/5v", "0/10v", "-1/+1v", "-2/+2v", "-3/+3v", "-5/+5v", "-10/+10v", "Default"};
+	
 	bool cvClockIn = false;
 	bool cvClockOut = false;
 
@@ -39,15 +45,15 @@ struct SickoStepStation : Module {
 						};
 
 	int userInputs[MAXTRACKS][MAXUSER][2] = {
-//								  IN_LENG  IN_MODE  IN_OUTSC IN_RSTST IN_RETRG IN_REV   IN_RUN   IN_SWING KN_MODE  KN_OUTSC KN_RSTST KN_RETRG KN_SWING ATTTEN  ATTENVERT 
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} }
+//								 IN_CHANG IN_CHNGPR IN_LENG  IN_MODE  IN_OUTSC IN_RSTST IN_RETRG IN_REV   IN_RUN   IN_SWING KN_CHPR KN_MODE  KN_OUTSC KN_RSTST KN_RETRG KN_SWING ATTTEN  ATTENVERT 
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} }
 							};
 
 	void appendInputMenu(Menu *menu, engine::Port::Type type, int portId){
@@ -140,6 +146,53 @@ struct SickoStepStation : Module {
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &cvClockOut));
 		
+	}
+
+	void appendOutMenu(Menu *menu, engine::Port::Type type, int portId){
+
+		menu->addChild(new MenuSeparator());
+
+		int outputBase = getOutputBase();
+
+		if (outputBase >= 0) {
+			
+			int t = portId - outputBase;
+
+			SickoStepStation* module = this;
+
+			struct SampleDelayItem : MenuItem {
+				SickoStepStation* module;
+				int menuValue;
+				int t;
+
+				SampleDelayItem(SickoStepStation* m, int value, int track) {
+					module = m;
+					menuValue = value;
+					t = track;
+					text = module->sampleDelayNames[value];
+				}
+
+				void onAction(const event::Action& e) override {
+					module->sampleDelay[t] = menuValue;
+				}
+			};
+
+			//menu->addChild(createMenuLabel("Out DELAY:"));
+			menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu* menu) {
+				for (int i = 0; i < 7; i++) {
+					auto sampleDelayItem = new SampleDelayItem(module, i, t);
+					
+					if (i == 6)
+						sampleDelayItem->rightText = module->sampleDelayNames[module->sampleDelay[MC]] + " " + CHECKMARK(module->sampleDelay[t] == i);
+					else
+						sampleDelayItem->rightText = CHECKMARK(module->sampleDelay[t] == i);
+					menu->addChild(sampleDelayItem);
+				}
+			}));
+			
+		}  else {
+			menu->addChild(createMenuLabel("Unknown output"));
+		}
 	}
 
 	void appendParamMenu(Menu* menu, int paramId) {
@@ -290,6 +343,13 @@ struct SickoClockOutStepStation : SickoOutPort {
 	}
 };
 
+struct SickoOutStation : SickoOutPort {
+	void appendContextMenu(Menu* menu) override {
+		if (this->module)
+			dynamic_cast<SickoStepStation*>(this->module)->appendOutMenu(menu, this->type, this->portId);
+	}
+};
+
 struct tpDivMult : ParamQuantity {
 	std::string getDisplayValueString() override {
 		const std::string valueDisplay[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
@@ -349,6 +409,7 @@ struct StepStation : SickoStepStation {
 	};
 
 	int getInputBase() const override { return USER_INPUT; }
+	int getOutputBase() const override { return OUT_OUTPUT; }
 	int getParamBase() const override { return USER_PARAM; }
 
 	float clkValue[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -387,7 +448,7 @@ struct StepStation : SickoStepStation {
 	float buttRunTrig = 0.f;
 	float prevButtRunTrig = -1.f;
 
-	int range = 9;
+	//int range = 9;
 
 	int recStep[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -552,54 +613,65 @@ struct StepStation : SickoStepStation {
 	bool divControls = true;
 	bool modeControls = true;
 
+	bool alreadyChanged[MAXTRACKS] = {false, false, false, false, false, false, false, false};
+
 	StepStation() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		
 		struct RangeQuantity : ParamQuantity {
+			int t = -1;  // sarà assegnato dopo la creazione
 			float getDisplayValue() override {
 				StepStation* module = reinterpret_cast<StepStation*>(this->module);
 
-				switch (module->range) {
-					case 0:	// 0/1v
-						displayMultiplier = 1.f;
-						displayOffset = 0.f;
-					break;
-					case 1:	// 0/2v
-						displayMultiplier = 2.f;
-						displayOffset = 0.f;
-					break;
-					case 2:	// 0/3v
-						displayMultiplier = 3.f;
-						displayOffset = 0.f;
-					break;
-					case 3:	// 0/5v
-						displayMultiplier = 5.f;
-						displayOffset = 0.f;
-					break;
-					case 4:	// 0/10v
-						displayMultiplier = 10.f;
-						displayOffset = 0.f;
-					break;
-					case 5:	// -1/+1v
-						displayMultiplier = 2.f;
-						displayOffset = -1.f;
-					break;
-					case 6:	// -2/+2v
-						displayMultiplier = 4.f;
-						displayOffset = -2.f;
-					break;
-					case 7:	// -3/+3v
-						displayMultiplier = 6.f;
-						displayOffset = -3.f;
-					break;
-					case 8:	// -5/+5v
-						displayMultiplier = 10.f;
-						displayOffset = -5.f;
-					break;
-					case 9:	// -10/+10v
-						displayMultiplier = 20.f;
-						displayOffset = -10.f;
-					break;
+				if (t >= 0) {
+
+					int tempRange = module->range[MC];
+
+					if (module->range[t] != 10)
+						tempRange = module->range[t];
+
+					switch (tempRange) {
+						case 0:	// 0/1v
+							displayMultiplier = 1.f;
+							displayOffset = 0.f;
+						break;
+						case 1:	// 0/2v
+							displayMultiplier = 2.f;
+							displayOffset = 0.f;
+						break;
+						case 2:	// 0/3v
+							displayMultiplier = 3.f;
+							displayOffset = 0.f;
+						break;
+						case 3:	// 0/5v
+							displayMultiplier = 5.f;
+							displayOffset = 0.f;
+						break;
+						case 4:	// 0/10v
+							displayMultiplier = 10.f;
+							displayOffset = 0.f;
+						break;
+						case 5:	// -1/+1v
+							displayMultiplier = 2.f;
+							displayOffset = -1.f;
+						break;
+						case 6:	// -2/+2v
+							displayMultiplier = 4.f;
+							displayOffset = -2.f;
+						break;
+						case 7:	// -3/+3v
+							displayMultiplier = 6.f;
+							displayOffset = -3.f;
+						break;
+						case 8:	// -5/+5v
+							displayMultiplier = 10.f;
+							displayOffset = -5.f;
+						break;
+						case 9:	// -10/+10v
+							displayMultiplier = 20.f;
+							displayOffset = -10.f;
+						break;
+					}
 				}
 				return ParamQuantity::getDisplayValue();
 			}
@@ -652,6 +724,13 @@ struct StepStation : SickoStepStation {
 							displayOffset = 0.f;
 						break;
 
+						case KNOB_CHANGEPROB:
+				 			name = "Change Prob. #" + to_string(t+1);
+							unit = "%";
+							displayMultiplier = 100.f;
+							displayOffset = 0.f;
+						break;
+
 						case KNOB_ATNV:
 				 			name = "Attenuv. #" + to_string(t+1);
 							unit = "%";
@@ -688,6 +767,8 @@ struct StepStation : SickoStepStation {
 						case IN_RUN:		name = "Run #" + to_string(t+1); break;
 						case IN_RETRIG:		name = "Retrig #" + to_string(t+1); break;
 						case IN_SWING:		name = "Swing #" + to_string(t+1); break;
+						case IN_CHANGE:		name = "Change #" + to_string(t+1); break;
+						case IN_CHANGEPROB:	name = "Change Prob.#" + to_string(t+1); break;
 				 	}
 				}
 				return PortInfo::getName();
@@ -761,8 +842,16 @@ struct StepStation : SickoStepStation {
 
 			configOutput(OUT_OUTPUT+t, ("Tr.#"+to_string(t+1)).c_str());
 
-			for (int s = 0; s < 16; s++)
+			for (int s = 0; s < 16; s++) {
 				configParam<RangeQuantity>(STEP_PARAM+(t*16)+s, 0.f, 1.f, 0.5f, ("Tr.#"+to_string(t+1)+" Step#"+to_string(s+1)).c_str());
+				if (auto rq = dynamic_cast<RangeQuantity*>(paramQuantities[STEP_PARAM+(t*16)+s])) {
+					rq->t = t;
+					//uq2->userColumn = 3;
+				}
+			}
+
+
+
 			/*	// init non funziona qui
 			for (int p = 0; t < 32; t++) {
 				for (int t = 0; t < MAXTRACKS; t++) {
@@ -840,6 +929,8 @@ struct StepStation : SickoStepStation {
 			prevEdge[t] = false;
 			stepAdv[t] = false;
 			clockAdv[t] = false;
+
+			alreadyChanged[t] = false;
 		}
 		Module::onReset(e);
 	}
@@ -1134,7 +1225,6 @@ struct StepStation : SickoStepStation {
 			if (!xcludeFromRst[t]) {
 				resetTrackSteps(t);
 			}
-
 		}
 
 		if (progInType != CV_TYPE)
@@ -1144,6 +1234,8 @@ struct StepStation : SickoStepStation {
 	void inline resetTrackSteps(int t) {
 
 		lights[STEP_LIGHT+(t*16+step[t])].setBrightness(0);
+
+		alreadyChanged[t] = false;
 
 		if (currentMode[t] != CVOLTAGE) {
 
@@ -1224,6 +1316,13 @@ struct StepStation : SickoStepStation {
 			randomizeTrack(t);
 	}
 
+	void cleanSequence(int t) {
+		for (int s = 0; s < 16; s++) {
+			wSeq[t][s] = 0.5f;
+			params[STEP_PARAM+(t*16)+s].setValue(wSeq[t][s]);
+		}
+	}
+
 	void changePpqnSetting() {
 		ppqnChange = false;
 		ppqn = tempPpqn;
@@ -1276,6 +1375,7 @@ struct StepStation : SickoStepStation {
 
 
 	void inline stepForward(int t) {
+
 		if (userInputs[t][IN_RETRIG][0]) {
 			if (userInputs[t][KNOB_PROB][0]) {
 				if (inputs[USER_INPUT+t+userInputs[t][IN_RETRIG][1]].getVoltage() < 1.f)
@@ -1312,7 +1412,6 @@ struct StepStation : SickoStepStation {
 		} else {
 			step[t]--;
 		}
-
 	}
 
 	float inline outScale(float outVal, int t) {
@@ -1352,6 +1451,63 @@ struct StepStation : SickoStepStation {
 			return outVal;
 		}
 
+	}
+
+	void inline calcChange(int t) {
+
+		if (!alreadyChanged[t]) {
+
+			bool change = false;
+
+			if (userInputs[t][IN_CHANGE][0]) {
+				if (userInputs[t][KNOB_CHANGEPROB][0]) {
+					if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].isConnected() && 
+						inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].getVoltage() >= 1.f) {
+
+						if (random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue())
+							change = true;
+						
+					}
+				} else {
+					if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].isConnected() && 
+						inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].getVoltage() >= 1.f) {
+
+						change = true;
+
+					}
+				}
+
+			} else {
+
+				if (userInputs[t][IN_CHANGEPROB][0]) {
+					if (userInputs[t][KNOB_CHANGEPROB][0]) {
+
+						if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].isConnected()) {
+
+							if(inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].getVoltage() >= 1.f &&
+								random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue())
+									change = true;
+
+						} else if (userInputs[t][KNOB_CHANGEPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue()) {
+							change = true;
+						}
+
+					} else if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].getVoltage() >= 1.f) {
+						change = true;
+					}
+				} else if (userInputs[t][KNOB_CHANGEPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue()) {
+					change = true;
+				}
+
+			}
+
+			if (change) {
+				wSeq[t][step[t]] = random::uniform();
+				params[STEP_PARAM+(t*16)+step[t]].setValue(wSeq[t][step[t]]);
+			}
+
+			alreadyChanged[t] = true;
+		}
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -3296,6 +3452,8 @@ struct StepStation : SickoStepStation {
 							break;
 						}
 
+						alreadyChanged[t] = false;
+
 					}
 				}
 			} else {	// CONTROL VOLTAGE ADVANCE
@@ -3320,6 +3478,8 @@ struct StepStation : SickoStepStation {
 						*/
 						lights[STEP_LIGHT+(t*16+step[t])].setBrightness(0);
 						step[t] = currAddr[t]-1;
+
+						alreadyChanged[t] = false;
 /*
 						if (!turingMode) {
 							for (int t = 0; t < MAXTRACKS; t++) {
@@ -3348,14 +3508,16 @@ struct StepStation : SickoStepStation {
 
 			}
 
-			/*
-			//debug
-			if (step[t] >= 16 || step[t] < 0 || t < 0 || t > 7)
-				DEBUG("step[t] out of bounds: step=%i, t=%i", step[t], t);
-			*/
+			calcChange(t);
+
 			out[t] = wSeq[t][step[t]];
 
-			switch (range) {
+			int tempRange = range[MC];
+
+			if (tempRange != 9)
+				tempRange = range[t];
+
+			switch (tempRange) {
 				case 0:	break;
 				case 1:	out[t] *= 2;	break;
 				case 2:	out[t] *= 3;	break;
@@ -4027,7 +4189,37 @@ struct StepStationDisplayTrackSett : TransparentWidget {
 				}
 			};
 
-			menu->addChild(createSubmenuItem("Steps DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
+			menu->addChild(new MenuSeparator());
+
+			struct RangeItem : MenuItem {
+				StepStation* module;
+				int menuValue;
+				int t;
+
+				RangeItem(StepStation* m, int value, int track) {
+					module = m;
+					menuValue = value;
+					t = track;
+					text = module->rangeNames[value];
+				}
+
+				void onAction(const event::Action& e) override {
+					module->range[t] = menuValue;
+				}
+			};
+
+			menu->addChild(createSubmenuItem("Knobs RANGE", (module->rangeNames[module->range[t]]), [=](Menu * menu) {
+				for (int i = 0; i < 11; i++) {
+					auto rangeItem = new RangeItem(module, i, t);
+					if (i == 10)
+						rangeItem->rightText = module->rangeNames[module->range[MC]] + " " + CHECKMARK(module->range[t] == i);
+					else
+						rangeItem->rightText = CHECKMARK(module->range[t] == i);
+					menu->addChild(rangeItem);
+				}
+			}));
+
+			menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
 				for (int i = 0; i < 7; i++) {
 					auto sampleDelayItem = new SampleDelayItem(module, i, t);
 					
@@ -4060,6 +4252,7 @@ struct StepStationDisplayTrackSett : TransparentWidget {
 			menu->addChild(new MenuSeparator());
 
 			menu->addChild(createMenuItem("Randomize Steps", "", [=]() {module->randomizeTrack(t);}));
+			menu->addChild(createMenuItem("Initialize Sequence", "", [=]() {module->cleanSequence(t);}));
 
 		}
 	}
@@ -4082,6 +4275,18 @@ struct StepStationDisplayU1 : TransparentWidget {
 
 			std::string tempText;
 			switch (module->userTable[t][0]) {
+
+				case IN_CHANGE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "CH";
+				break;
+
+				case IN_CHANGEPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "CP";
+					if (module->userInputs[t][IN_CHANGE][0])
+						tempText += "*";
+				break;
 
 				case IN_LENGTH:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
@@ -4148,6 +4353,18 @@ struct StepStationDisplayU2 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][2]) {
 
+				case IN_CHANGE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "CH";
+				break;
+
+				case IN_CHANGEPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "CP";
+					if (module->userInputs[t][IN_CHANGE][0])
+						tempText += "*";
+				break;
+
 				case IN_LENGTH:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
 					tempText = "LN";
@@ -4212,6 +4429,11 @@ struct StepStationDisplayK1 : TransparentWidget {
 
 			std::string tempText;
 			switch (module->userTable[t][1]) {
+
+				case KNOB_CHANGEPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					tempText = "CP";
+				break;
 
 				case KNOB_MODE:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
@@ -4518,7 +4740,7 @@ struct StepStationWidget : ModuleWidget {
 				
 			}
 
-			addOutput(createStepStationClockOutCentered<SickoOutPort>(mm2px(Vec(xOut, yStart+(t*yDelta))), module, StepStation::OUT_OUTPUT+t));
+			addOutput(createStepStationClockOutCentered<SickoOutStation>(mm2px(Vec(xOut, yStart+(t*yDelta))), module, StepStation::OUT_OUTPUT+t));
 		}
 		
 	}
@@ -4540,6 +4762,25 @@ struct StepStationWidget : ModuleWidget {
 			menu->addChild(createMenuItem("Track 8", "", [=]() {module->randomizeTrack(7);}));
 		}));
 
+		struct RangeItem : MenuItem {
+			StepStation* module;
+			int range;
+			void onAction(const event::Action& e) override {
+				module->range[MC] = range;
+			}
+		};
+
+		std::string rangeNames[10] = {"0/1v", "0/2v", "0/3v", "0/5v", "0/10v", "-1/+1v", "-2/+2v", "-3/+3v", "-5/+5v", "-10/+10v"};
+		menu->addChild(createSubmenuItem("Global Knobs RANGE", rangeNames[module->range[MC]], [=](Menu * menu) {
+			for (int i = 0; i < 10; i++) {
+				RangeItem* rangeItem = createMenuItem<RangeItem>(rangeNames[i]);
+				rangeItem->rightText = CHECKMARK(module->range[MC] == i);
+				rangeItem->module = module;
+				rangeItem->range = i;
+				menu->addChild(rangeItem);
+			}
+		}));
+
 		struct SampleDelayItem : MenuItem {
 			StepStation* module;
 			int sampleDelay;
@@ -4548,7 +4789,7 @@ struct StepStationWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(createSubmenuItem("Steps DELAY:", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Global OUTs DELAY:", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
 			for (int i = 0; i < 6; i++) {
 				SampleDelayItem* sampleDelayItem = createMenuItem<SampleDelayItem>(module->sampleDelayNames[i]);
 				sampleDelayItem->rightText = CHECKMARK(module->sampleDelay[MC] == i);
@@ -4558,12 +4799,11 @@ struct StepStationWidget : ModuleWidget {
 			}
 		}));
 
-
 		// *****************************************************************************************
 		// *****************************************************************************************
 		// *****************************************************************************************
 
-		//menu->addChild(new MenuSeparator());
+		menu->addChild(new MenuSeparator());
 
 		menu->addChild(createSubmenuItem("MODULE settings", "", [=](Menu * menu) {
 
@@ -4686,73 +4926,7 @@ struct StepStationWidget : ModuleWidget {
 					module->runType = runType;
 				}
 			};
-/*
-			menu->addChild(new MenuSeparator());
 
-			std::string RunTypeNames[2] = {"Gate", "Trig"};
-			menu->addChild(createSubmenuItem("RUN Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
-				for (int i = 0; i < 2; i++) {
-					RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-					runTypeItem->rightText = CHECKMARK(module->runType == i);
-					runTypeItem->module = module;
-					runTypeItem->runType = i;
-					menu->addChild(runTypeItem);
-				}
-			}));
-
-			menu->addChild(createBoolPtrMenuItem("Reset internal clock on RST", "", &module->rstClkOnRst));
-			menu->addChild(createBoolPtrMenuItem("Reset Seq on PROG change", "", &module->rstSeqOnProgChange));
-
-			menu->addChild(new MenuSeparator());
-
-			struct PpqnItem : MenuItem {
-				StepStation* module;
-				int ppqn;
-				void onAction(const event::Action& e) override {
-					module->tempPpqn = ppqn;
-					module->ppqnChange = true;
-				}
-			};
-
-			menu->addChild(createMenuLabel("External Main Clock"));
-			std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
-			menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
-				for (int i = 0; i < 7; i++) {
-					PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
-					ppqnItem->rightText = CHECKMARK(module->ppqn == i);
-					ppqnItem->module = module;
-					ppqnItem->ppqn = i;
-					menu->addChild(ppqnItem);
-				}
-			}));
-
-			menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
-			menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
-
-			menu->addChild(new MenuSeparator());
-
-			struct RangeItem : MenuItem {
-				StepStation* module;
-				int range;
-				void onAction(const event::Action& e) override {
-					module->range = range;
-				}
-			};
-
-			std::string rangeNames[10] = {"0/1v", "0/2v", "0/3v", "0/5v", "0/10v", "-1/+1v", "-2/+2v", "-3/+3v", "-5/+5v", "-10/+10v"};
-			menu->addChild(createSubmenuItem("Knobs RANGE", rangeNames[module->range], [=](Menu * menu) {
-				for (int i = 0; i < 10; i++) {
-					RangeItem* rangeItem = createMenuItem<RangeItem>(rangeNames[i]);
-					rangeItem->rightText = CHECKMARK(module->range == i);
-					rangeItem->module = module;
-					rangeItem->range = i;
-					menu->addChild(rangeItem);
-				}
-			}));
-
-			menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
-			menu->addChild(createBoolPtrMenuItem("MODE mouse controls", "", &module->modeControls));
-*/
 		}));
 
 		menu->addChild(createSubmenuItem("TRACK settings", "", [=](Menu * menu) {
@@ -4956,7 +5130,37 @@ struct StepStationWidget : ModuleWidget {
 						}
 					};
 
-					menu->addChild(createSubmenuItem("Steps DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
+					menu->addChild(new MenuSeparator());
+
+					struct RangeItem : MenuItem {
+						StepStation* module;
+						int menuValue;
+						int t;
+
+						RangeItem(StepStation* m, int value, int track) {
+							module = m;
+							menuValue = value;
+							t = track;
+							text = module->rangeNames[value];
+						}
+
+						void onAction(const event::Action& e) override {
+							module->range[t] = menuValue;
+						}
+					};
+
+					menu->addChild(createSubmenuItem("Knobs RANGE", (module->rangeNames[module->range[t]]), [=](Menu * menu) {
+						for (int i = 0; i < 11; i++) {
+							auto rangeItem = new RangeItem(module, i, t);
+							if (i == 10)
+								rangeItem->rightText = module->rangeNames[module->range[MC]] + " " + CHECKMARK(module->range[t] == i);
+							else
+								rangeItem->rightText = CHECKMARK(module->range[t] == i);
+							menu->addChild(rangeItem);
+						}
+					}));
+
+					menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
 						for (int i = 0; i < 7; i++) {
 							auto sampleDelayItem = new SampleDelayItem(module, i, t);
 							if (i == 6)
@@ -4966,6 +5170,10 @@ struct StepStationWidget : ModuleWidget {
 							menu->addChild(sampleDelayItem);
 						}
 					}));
+
+
+					menu->addChild(new MenuSeparator());
+
 
 					menu->addChild(createBoolPtrMenuItem("Exclude from MASTER RST", "", &module->xcludeFromRst[t]));
 					menu->addChild(createBoolPtrMenuItem("Exclude from RUN", "", &module->xcludeFromRun[t]));

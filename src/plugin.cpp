@@ -150,7 +150,7 @@ bool stepStation_cbSeqRunSetting =  1; //means seqRunSetting;
 bool stepStation_cbInternalClock = 0; //means internalClock;
 float stepStation_cbBpmKnob = 1200.f;
 float stepStation_cbUserValues[8][2] = {};
-float stepStation_cbUserInputs[8][15][2] = {};	// 15 is MAXUSER
+float stepStation_cbUserInputs[8][18][2] = {};	// 18 is MAXUSER
 float stepStation_cbUserTable[8][4] = {};
 
 bool stepStation_clipboardTrack = false;
@@ -163,7 +163,7 @@ int stepStation_cbRstStepsWhenTrack = 3;
 bool stepStation_cbXcludeFromRunTrack = false;
 bool stepStation_cbXcludeFromRstTrack = false;
 float stepStation_cbUserValuesTrack[2] = {};
-float stepStation_cbUserInputsTrack[15][2] = {};	// 15 is MAXUSER
+float stepStation_cbUserInputsTrack[18][2] = {};	// 18 is MAXUSER
 float stepStation_cbUserTableTrack[4] = {};
 
 
@@ -183,7 +183,7 @@ bool trigStation_cbSeqRunSetting =  1; //means seqRunSetting;
 bool trigStation_cbInternalClock = 0; //means internalClock;
 float trigStation_cbBpmKnob = 1200.f;
 float trigStation_cbUserValues[8][2] = {};
-float trigStation_cbUserInputs[8][22][2] = {};	// 22 is MAXUSER
+float trigStation_cbUserInputs[8][23][2] = {};	// 23 is MAXUSER
 float trigStation_cbUserTable[8][4] = {};
 
 bool trigStation_clipboardTrack = false;
@@ -198,5 +198,5 @@ int trigStation_cbRstStepsWhenTrack = 3;
 bool trigStation_cbXcludeFromRunTrack = false;
 bool trigStation_cbXcludeFromRstTrack = false;
 float trigStation_cbUserValuesTrack[2] = {};
-float trigStation_cbUserInputsTrack[22][2] = {};	// 22 is MAXUSER
+float trigStation_cbUserInputsTrack[23][2] = {};	// 23 is MAXUSER
 float trigStation_cbUserTableTrack[4] = {};
