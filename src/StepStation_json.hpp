@@ -62,12 +62,12 @@
 				json_array_append_new(this_json_array, json_integer(currentMode[t]));
 			json_object_set_new(rootJ, "currentMode", this_json_array);
 		}
-		{
+/*		{
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++)
 				json_array_append_new(this_json_array, json_integer(revType[t]));
 			json_object_set_new(rootJ, "currRevType", this_json_array);
-		}
+		}*/
 		{
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++)
@@ -178,7 +178,7 @@
 			}
 			json_object_set_new(rootJ, ("progCurrentMode_p"+to_string(p)).c_str(), this_json_array);
 		}
-
+/*
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++) {
@@ -186,7 +186,7 @@
 			}
 			json_object_set_new(rootJ, ("progRevType_p"+to_string(p)).c_str(), this_json_array);
 		}
-
+*/
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++)
@@ -377,7 +377,7 @@
 		}
 
 		// ---------------- tweaks
-
+/*
 		{
 			json_t *json_array = json_object_get(rootJ, "currRevType");
 			size_t jThis;
@@ -388,7 +388,7 @@
 				}
 			}
 		}
-
+*/
 		{
 			json_t *json_array = json_object_get(rootJ, "currDontAdvanceSetting");
 			size_t jThis;
@@ -595,7 +595,7 @@
 				}
 			}
 		}
-
+/*
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progRevType_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -606,7 +606,7 @@
 				}
 			}
 		}
-
+*/
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progDontAdvanceSetting_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -893,7 +893,7 @@
 				}
 			}
 		}
-
+/*
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progRevType_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -904,7 +904,7 @@
 				}
 			}
 		}
-
+*/
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progDontAdvanceSetting_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -1115,7 +1115,7 @@
 			}
 			json_object_set_new(rootJ, ("progCurrentMode_p"+to_string(p)).c_str(), this_json_array);
 		}
-
+/*
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++) {
@@ -1123,7 +1123,7 @@
 			}
 			json_object_set_new(rootJ, ("progRevType_p"+to_string(p)).c_str(), this_json_array);
 		}
-
+*/
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++)
@@ -1274,22 +1274,6 @@
 			if (runType < 0 || runType > 1)
 				runType = 0;
 		}
-/*
-		json_t* revTypeJ = json_object_get(rootJ, "revType");
-		if (revTypeJ) {
-			revType[MC] = json_integer_value(revTypeJ);
-			if (revType[MC] < 0 || revType[MC] > 1)
-				revType[MC] = 0;
-		}
-		*/
-/*
-		json_t* outTypeJ = json_object_get(rootJ, "outType");
-		if (outTypeJ) {
-			outType = json_integer_value(outTypeJ);
-			if (outType < 0 || outType > 2)
-				outType = 0;
-		}
-*/
 
 		json_t* rstStepsWhenJ = json_object_get(rootJ, "rstStepsWhen");
 		if (rstStepsWhenJ) {

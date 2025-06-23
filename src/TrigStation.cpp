@@ -22,8 +22,8 @@ struct SickoTrigStation : Module {
 
 	//const std::string userInNames[KNOB_SHIFT] = {"Pulse Width", "Reverse", "Mode", "Length", "Reset Step#", "Run", "Retrig", "Out scale", "Swing", "Flip"};
 	//const std::string userKnobNames[KNOB_NR] = {"Pulse Width", "Reset Step#", "Mode", "Retrig Prob.", "Out scale", "Swing", "Flip Prob.", "Attenuator", "Attenuverter"};
-	const std::string userInNames[KNOB_SHIFT] = {"Flip", "Flip Prob.", "Length", "Mode", "Out scale", "Pulse Width", "Reset Step#", "Retrig", "Reverse", "Run", "Skip", "Skip Prob.", "Swing"};
-	const std::string userKnobNames[KNOB_NR] = {"Flip Prob.", "Mode", "Out scale",  "Pulse Width", "Reset Step#", "Retrig Prob.", "Skip Prob.", "Swing", "Attenuator", "Attenuverter"};
+	const std::string userInNames[KNOB_SHIFT] = {"Change", "Change Prob.", "Length", "Mode", "Out scale", "Pulse Width", "Reset Step#", "Retrig", "Reverse", "Run", "Skip", "Skip Prob.", "Swing"};
+	const std::string userKnobNames[KNOB_NR] = {"Change Prob.", "Mode", "Out scale",  "Pulse Width", "Reset Step#", "Retrig Prob.", "Skip Prob.", "Swing", "Attenuator", "Attenuverter"};
 
 	const std::string sampleDelayNames[7] = {"No Delay", "1 sample", "2 samples", "3 samples", "4 samples", "5 samples", "Default"};
 
@@ -32,18 +32,18 @@ struct SickoTrigStation : Module {
 	bool cvClockOut = false;
 
 	int userTable[MAXTRACKS][4] = {
-							{IN_RUN, KNOB_FLIPPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_FLIPPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_FLIPPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_FLIPPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_FLIPPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_FLIPPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_FLIPPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_FLIPPROB, IN_REV, KNOB_MODE}
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE}
 						};
 
 	int userInputs[MAXTRACKS][MAXUSER][2] = {
-//							  IN_FLIP IN_FLPPRB IN_LENGH IN_MODE  IN_OUTSC IN_PW   IN_RSTST IN_RETRIG IN_REV   IN_RUN   IN_SKIP IN_SKIPRB IN_SWING KN_FLIP  KN_MODE  KN_OUTSC KN_PW   KN_RSTST  KN_PROB KN_SKIP KN_SWNG KN_ATN  KN_ATNV
+//							  IN_CHANGE IN_FLPPRB IN_LENGH IN_MODE  IN_OUTSC IN_PW   IN_RSTST IN_RETRIG IN_REV   IN_RUN   IN_SKIP IN_SKIPRB IN_SWING KN_FLIP  KN_MODE  KN_OUTSC KN_PW   KN_RSTST  KN_PROB KN_SKIP KN_SWNG KN_ATN  KN_ATNV
 							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
 							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
 							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
@@ -698,14 +698,14 @@ struct TrigStation : SickoTrigStation {
 
 				 		
 
-						case KNOB_PROB:
+						case KNOB_RETRIGPROB:
 				 			name = "Retrig Prob. #" + to_string(t+1);
 							unit = "%";
 							displayMultiplier = 100.f;
 							displayOffset = 0.f;
 						break;
 
-						case KNOB_FLIPPROB:
+						case KNOB_CHANGEPROB:
 				 			name = "Flip Prob. #" + to_string(t+1);
 							unit = "%";
 							displayMultiplier = 100.f;
@@ -769,8 +769,8 @@ struct TrigStation : SickoTrigStation {
 						case IN_SKIP:		name = "Skip #" + to_string(t+1); break;
 						case IN_SKIPPROB:	name = "Skip Prob.#" + to_string(t+1); break;
 						case IN_SWING:		name = "Swing #" + to_string(t+1); break;
-						case IN_FLIP:		name = "Flip #" + to_string(t+1); break;
-						case IN_FLIPPROB:	name = "Flip Prob.#" + to_string(t+1); break;
+						case IN_CHANGE:		name = "Flip #" + to_string(t+1); break;
+						case IN_CHANGEPROB:	name = "Flip Prob.#" + to_string(t+1); break;
 				 	}
 				}
 				return PortInfo::getName();
@@ -1017,7 +1017,7 @@ struct TrigStation : SickoTrigStation {
 
 		trigStation_cbTuringModeTrack = turingMode[t];
 		trigStation_cbOutTypeSettingTrack = outTypeSetting[t];
-		trigStation_cbRevTypeTrack = revType[t];
+		//trigStation_cbRevTypeTrack = revType[t];
 		trigStation_cbDontAdvanceSettingTrack = dontAdvanceSetting[t];
 		trigStation_cbRstStepsWhenTrack = rstStepsWhen[t];
 
@@ -1049,7 +1049,7 @@ struct TrigStation : SickoTrigStation {
 		}
 
 		for (int t = 0; t < ALLTRACKS; t++) {
-			trigStation_cbRevType[t] = revType[t];
+			//trigStation_cbRevType[t] = revType[t];
 			trigStation_cbDontAdvanceSetting[t] = dontAdvanceSetting[t];
 			trigStation_cbRstStepsWhen[t] = rstStepsWhen[t];
 		}
@@ -1123,7 +1123,7 @@ struct TrigStation : SickoTrigStation {
 		turingMode[t] = trigStation_cbTuringModeTrack;
 		outTypeSetting[t] = trigStation_cbOutTypeSettingTrack;
 
-		revType[t] = trigStation_cbRevTypeTrack;
+		//revType[t] = trigStation_cbRevTypeTrack;
 		dontAdvanceSetting[t] = trigStation_cbDontAdvanceSettingTrack;
 		rstStepsWhen[t] = trigStation_cbRstStepsWhenTrack;
 
@@ -1156,7 +1156,7 @@ struct TrigStation : SickoTrigStation {
 
 		for (int t = 0; t < ALLTRACKS; t++) {
 			outTypeSetting[t] = trigStation_cbOutTypeSetting[t];
-			revType[t] = trigStation_cbRevType[t];
+			//revType[t] = trigStation_cbRevType[t];
 			dontAdvanceSetting[t] = trigStation_cbDontAdvanceSetting[t];
 			rstStepsWhen[t] = trigStation_cbRstStepsWhen[t];
 		}
@@ -1209,14 +1209,14 @@ struct TrigStation : SickoTrigStation {
 				progUserValues[p][t][1] = 0.f;
 				progTuringMode[p][t] = 2;
 				progOutTypeSetting[p][t] = 3;
-				progRevType[p][t] = 2;
+				//progRevType[p][t] = 2;
 				progDontAdvanceSetting[p][t] = 2;
 				progRstStepsWhen[p][t] = 3;	
 				progSampleDelay[p][t] = 6;
 			}
 
 			progOutTypeSetting[p][MC] = 0;
-			progRevType[p][MC] = POSITIVE_V;
+			//progRevType[p][MC] = POSITIVE_V;
 			progDontAdvanceSetting[p][MC] = 1;
 			progRstStepsWhen[p][MC] = 1;
 			progSampleDelay[p][MC] = 0;
@@ -1362,14 +1362,19 @@ struct TrigStation : SickoTrigStation {
 		}
 	}
 
-	void cleanSequence(int t) {
+	void initializeSequence(int t) {
 		for (int s = 0; s < 16; s++) {
 			wSeq[t][s] = 0.f;
 			params[STEP_PARAM+(t*16)+s].setValue(wSeq[t][s]);
 		}
 	}
 
-	void randomizeTrack(int t) {
+	void initializeAll() {
+		for (int t = 0; t < MAXTRACKS; t++)
+			initializeSequence(t);
+	}
+
+	void randomizeSequence(int t) {
 
 		for (int s = 0; s < 16; s++) {
 			if (random::uniform() > .5f)
@@ -1381,7 +1386,7 @@ struct TrigStation : SickoTrigStation {
 
 	void randomizeAll() {
 		for (int t = 0; t < MAXTRACKS; t++)
-			randomizeTrack(t);
+			randomizeSequence(t);
 	}
 
 	void changePpqnSetting() {
@@ -1437,17 +1442,17 @@ struct TrigStation : SickoTrigStation {
 
 	void inline stepForward(int t) {
 		if (userInputs[t][IN_RETRIG][0]) {
-			if (userInputs[t][KNOB_PROB][0]) {
+			if (userInputs[t][KNOB_RETRIGPROB][0]) {
 				if (inputs[USER_INPUT+t+userInputs[t][IN_RETRIG][1]].getVoltage() < 1.f)
 					step[t]++;
-				else if (random::uniform() >= params[USER_PARAM+t+userInputs[t][KNOB_PROB][1]].getValue())
+				else if (random::uniform() >= params[USER_PARAM+t+userInputs[t][KNOB_RETRIGPROB][1]].getValue())
 					step[t]++;
 			} else {
 				if (inputs[USER_INPUT+t+userInputs[t][IN_RETRIG][1]].getVoltage() < 1.f)
 					step[t]++;
 			}
-		} else if (userInputs[t][KNOB_PROB][0]) {
-			if (random::uniform() >= params[USER_PARAM+t+userInputs[t][KNOB_PROB][1]].getValue())
+		} else if (userInputs[t][KNOB_RETRIGPROB][0]) {
+			if (random::uniform() >= params[USER_PARAM+t+userInputs[t][KNOB_RETRIGPROB][1]].getValue())
 				step[t]++;
 		} else {
 			step[t]++;
@@ -1457,17 +1462,17 @@ struct TrigStation : SickoTrigStation {
 
 	void inline stepBack(int t) {
 		if (userInputs[t][IN_RETRIG][0]) {
-			if (userInputs[t][KNOB_PROB][0]) {
+			if (userInputs[t][KNOB_RETRIGPROB][0]) {
 				if (inputs[USER_INPUT+t+userInputs[t][IN_RETRIG][1]].getVoltage() < 1.f)
 					step[t]--;
-				else if (random::uniform() >= params[USER_PARAM+t+userInputs[t][KNOB_PROB][1]].getValue())
+				else if (random::uniform() >= params[USER_PARAM+t+userInputs[t][KNOB_RETRIGPROB][1]].getValue())
 					step[t]--;
 			} else {
 				if (inputs[USER_INPUT+t+userInputs[t][IN_RETRIG][1]].getVoltage() < 1.f)
 					step[t]--;
 			}
-		} else if (userInputs[t][KNOB_PROB][0]) {
-			if (random::uniform() >= params[USER_PARAM+t+userInputs[t][KNOB_PROB][1]].getValue())
+		} else if (userInputs[t][KNOB_RETRIGPROB][0]) {
+			if (random::uniform() >= params[USER_PARAM+t+userInputs[t][KNOB_RETRIGPROB][1]].getValue())
 				step[t]--;
 		} else {
 			step[t]--;
@@ -1611,18 +1616,18 @@ struct TrigStation : SickoTrigStation {
 
 		bool flip = false;
 
-		if (userInputs[t][IN_FLIP][0]) {
-			if (userInputs[t][KNOB_FLIPPROB][0]) {
-				if (inputs[USER_INPUT+t+userInputs[t][IN_FLIP][1]].isConnected() && 
-					inputs[USER_INPUT+t+userInputs[t][IN_FLIP][1]].getVoltage() >= 1.f) {
+		if (userInputs[t][IN_CHANGE][0]) {
+			if (userInputs[t][KNOB_CHANGEPROB][0]) {
+				if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].isConnected() && 
+					inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].getVoltage() >= 1.f) {
 
-					if (random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_FLIPPROB][1]].getValue())
+					if (random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue())
 						flip = true;
 					
 				}
 			} else {
-				if (inputs[USER_INPUT+t+userInputs[t][IN_FLIP][1]].isConnected() && 
-					inputs[USER_INPUT+t+userInputs[t][IN_FLIP][1]].getVoltage() >= 1.f) {
+				if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].isConnected() && 
+					inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].getVoltage() >= 1.f) {
 
 					flip = true;
 
@@ -1631,23 +1636,23 @@ struct TrigStation : SickoTrigStation {
 
 		} else {
 
-			if (userInputs[t][IN_FLIPPROB][0]) {
-				if (userInputs[t][KNOB_FLIPPROB][0]) {
+			if (userInputs[t][IN_CHANGEPROB][0]) {
+				if (userInputs[t][KNOB_CHANGEPROB][0]) {
 
-					if (inputs[USER_INPUT+t+userInputs[t][IN_FLIPPROB][1]].isConnected()) {
+					if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].isConnected()) {
 
-						if(inputs[USER_INPUT+t+userInputs[t][IN_FLIPPROB][1]].getVoltage() >= 1.f &&
-							random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_FLIPPROB][1]].getValue())
+						if(inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].getVoltage() >= 1.f &&
+							random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue())
 								flip = true;
 
-					} else if (userInputs[t][KNOB_FLIPPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_FLIPPROB][1]].getValue()) {
+					} else if (userInputs[t][KNOB_CHANGEPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue()) {
 						flip = true;
 					}
 
-				} else if (inputs[USER_INPUT+t+userInputs[t][IN_FLIPPROB][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_FLIPPROB][1]].getVoltage() >= 1.f) {
+				} else if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].getVoltage() >= 1.f) {
 					flip = true;
 				}
-			} else if (userInputs[t][KNOB_FLIPPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_FLIPPROB][1]].getValue()) {
+			} else if (userInputs[t][KNOB_CHANGEPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue()) {
 				flip = true;
 			}
 
@@ -1808,7 +1813,7 @@ struct TrigStation : SickoTrigStation {
 			for (int t = 0; t < ALLTRACKS; t++) {
 				
 				nextOutTypeSetting[t] = progOutTypeSetting[selectedProg][t];
-				nextRevType[t] = progRevType[selectedProg][t];
+				//nextRevType[t] = progRevType[selectedProg][t];
 				nextDontAdvanceSetting[t] = progDontAdvanceSetting[selectedProg][t];
 				nextRstStepsWhen[t] = progRstStepsWhen[selectedProg][t];
 				nextSampleDelay[t] = progSampleDelay[selectedProg][t];
@@ -1876,7 +1881,7 @@ struct TrigStation : SickoTrigStation {
 
 				for (int t = 0; t < ALLTRACKS; t++) {
 					outTypeSetting[t] = nextOutTypeSetting[t];
-					revType[t] = nextRevType[t];
+					//revType[t] = nextRevType[t];
 					dontAdvanceSetting[t] = nextDontAdvanceSetting[t];
 					rstStepsWhen[t] = nextRstStepsWhen[t];
 					sampleDelay[t] = nextSampleDelay[t];
@@ -1953,7 +1958,7 @@ struct TrigStation : SickoTrigStation {
 
 				for (int t = 0; t < ALLTRACKS; t++) {
 					outTypeSetting[t] = progOutTypeSetting[selectedProg][t];
-					revType[t] = progRevType[selectedProg][t];
+					//revType[t] = progRevType[selectedProg][t];
 					dontAdvanceSetting[t] = progDontAdvanceSetting[selectedProg][t];
 					rstStepsWhen[t] = progRstStepsWhen[selectedProg][t];
 					sampleDelay[t] = progSampleDelay[selectedProg][t];
@@ -2032,7 +2037,7 @@ struct TrigStation : SickoTrigStation {
 
 				for (int t = 0; t < ALLTRACKS; t++) {
 					progOutTypeSetting[progKnob][t] = outTypeSetting[t];
-					progRevType[progKnob][t] = revType[t];
+					//progRevType[progKnob][t] = revType[t];
 					progDontAdvanceSetting[progKnob][t] = dontAdvanceSetting[t];
 					progRstStepsWhen[progKnob][t] = rstStepsWhen[t];
 					progSampleDelay[progKnob][t] = sampleDelay[t];
@@ -3306,6 +3311,7 @@ struct TrigStation : SickoTrigStation {
 								case FORWARD:
 
 									if (userInputs[t][IN_REV][0]) {
+										/*
 										if (revType[t] == 2) {
 											if (revType[MC] == POSITIVE_V) {
 												if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
@@ -3329,6 +3335,11 @@ struct TrigStation : SickoTrigStation {
 											else
 												direction[t] = FORWARD;
 										}
+										*/
+										if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
+											direction[t] = FORWARD;
+										else
+											direction[t] = REVERSE;
 									} else {
 										direction[t] = FORWARD;
 									}
@@ -3360,6 +3371,7 @@ struct TrigStation : SickoTrigStation {
 								case REVERSE:
 								
 									if (userInputs[t][IN_REV][0]) {
+										/*
 										if (revType[t] == 2) {
 											if (revType[MC] == POSITIVE_V) {
 												if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
@@ -3383,6 +3395,11 @@ struct TrigStation : SickoTrigStation {
 											else
 												direction[t] = REVERSE;
 										}
+										*/
+										if (inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage() < 1)
+											direction[t] = REVERSE;
+										else
+											direction[t] = FORWARD;
 									} else {
 										direction[t] = REVERSE;
 									}
@@ -3416,6 +3433,7 @@ struct TrigStation : SickoTrigStation {
 
 									if (userInputs[t][IN_REV][0]) {
 										revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
+										/*
 										if (revType[t] == 2) {
 											if (revType[MC] == POSITIVE_V) {
 												if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
@@ -3431,6 +3449,10 @@ struct TrigStation : SickoTrigStation {
 											if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
 												direction[t] = !direction[t];
 										}
+										*/
+										if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
+													direction[t] = !direction[t];
+
 										prevRevVolt[t] = revVolt[t];
 									}
 
@@ -3475,6 +3497,7 @@ struct TrigStation : SickoTrigStation {
 								
 									if (userInputs[t][IN_REV][0]) {
 										revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
+										/*
 										if (revType[t] == 2) {
 											if (revType[MC] == POSITIVE_V) {
 												if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
@@ -3490,6 +3513,10 @@ struct TrigStation : SickoTrigStation {
 											if ((revVolt[t] <= -1 && prevRevVolt[t] > -1) || (revVolt[t] > -1 && prevRevVolt[t] <= -1))
 												direction[t] = !direction[t];
 										}
+										*/
+										if ((revVolt[t] >= 1 && prevRevVolt[t] < 1) || (revVolt[t] < 1 && prevRevVolt[t] >= 1))
+											direction[t] = !direction[t];
+
 										prevRevVolt[t] = revVolt[t];
 									}
 
@@ -3530,6 +3557,7 @@ struct TrigStation : SickoTrigStation {
 								case RANDOM1:
 									if (userInputs[t][IN_REV][0]) {
 										revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
+										/*
 										if (revType[t] == 2) {
 											if (revType[MC] == POSITIVE_V) {
 												if (revVolt[t] < 1) {
@@ -3608,6 +3636,25 @@ struct TrigStation : SickoTrigStation {
 												if (step[t] >= maxSteps[t])
 													step[t] = 0;
 											}
+										}
+										*/
+										if (revVolt[t] < 1) {
+											int tempStep = step[t];
+											step[t] = maxSteps[t] * random::uniform();
+											if (step[t] == tempStep) {
+												step[t] = maxSteps[t] * random::uniform();
+												if (step[t] == tempStep)
+													step[t] = maxSteps[t] * random::uniform();
+											}
+											if (step[t] >= maxSteps[t])
+												maxSteps[t] = maxSteps[t] - 1;
+										} else {
+											if (!dontAdvance[t])
+												stepForward(t);
+											else
+												dontAdvance[t] = false;
+											if (step[t] >= maxSteps[t])
+												step[t] = 0;
 										}
 									} else {
 										int tempStep = step[t];
@@ -3625,6 +3672,7 @@ struct TrigStation : SickoTrigStation {
 								case RANDOM2:
 									if (userInputs[t][IN_REV][0]) {
 										revVolt[t] = inputs[USER_INPUT+t+userInputs[t][IN_REV][1]].getVoltage();
+										/*
 										if (revType[t] == 2) {
 											if (revType[MC] == POSITIVE_V) {
 												if (revVolt[t] < 1) {
@@ -3703,6 +3751,25 @@ struct TrigStation : SickoTrigStation {
 												if (step[t] >= maxSteps[t])
 													maxSteps[t] = maxSteps[t] - 1;
 											}
+										}
+										*/
+										if (revVolt[t] < 1) {
+											if (!dontAdvance[t])
+												stepForward(t);
+											else
+												dontAdvance[t] = false;
+											if (step[t] >= maxSteps[t])
+												step[t] = 0;
+										} else {
+											int tempStep = step[t];
+											step[t] = maxSteps[t] * random::uniform();
+											if (step[t] == tempStep) {
+												step[t] = maxSteps[t] * random::uniform();
+												if (step[t] == tempStep)
+													step[t] = maxSteps[t] * random::uniform();
+											}
+											if (step[t] >= maxSteps[t])
+												maxSteps[t] = maxSteps[t] - 1;
 										}
 
 									} else {
@@ -4321,10 +4388,6 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 
 			menu->addChild(new MenuSeparator());
 
-			menu->addChild(createBoolPtrMenuItem("Turing mode", "", &module->turingMode[t]));
-
-			menu->addChild(new MenuSeparator());
-
 			menu->addChild(createSubmenuItem("User U1 U2", "", [=](Menu* menu) {
 
 				struct UserInItem : MenuItem {
@@ -4419,7 +4482,7 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 				}));
 			}));
 
-			//menu->addChild(new MenuSeparator());
+			menu->addChild(new MenuSeparator());
 
 			menu->addChild(createSubmenuItem("TRACK Settings", "", [=](Menu* menu) {
 
@@ -4452,7 +4515,7 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 				}));
 
 				//----------------------------------------
-
+/*
 				struct RevTypeItem : MenuItem {
 					TrigStation* module;
 					int menuValue;
@@ -4480,7 +4543,7 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 						menu->addChild(revTypeItem);
 					}
 				}));
-
+*/
 				//----------------------------------------
 
 				struct DontAdvanceItem : MenuItem {
@@ -4540,12 +4603,33 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 						menu->addChild(rstStepsWhenItem);
 					}
 				}));
+
+				menu->addChild(new MenuSeparator());
+
 				menu->addChild(createBoolPtrMenuItem("Exclude from MASTER RST", "", &module->xcludeFromRst[t]));
 				menu->addChild(createBoolPtrMenuItem("Exclude from RUN", "", &module->xcludeFromRun[t]));
 		
 			}));
 
-			//menu->addChild(new MenuSeparator());
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createMenuItem("Copy Sequence + User", "", [=]() {module->copyUser(t);module->copyTrack(t);}));
+
+			if (trigStation_clipboardTrack) {
+				menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
+				menu->addChild(createMenuItem("Paste User", "", [=]() {module->pasteUser(t);}));
+				menu->addChild(createMenuItem("Paste Sequence + User", "", [=]() {module->pasteUser(t);module->pasteToTrack(t);}));
+			} else if (stepSeq_clipboard) {
+				menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
+				menu->addChild(createMenuLabel("Paste User"));
+				menu->addChild(createMenuLabel("Paste Sequence + User"));
+			} else {
+				menu->addChild(createMenuLabel("Paste Sequence"));
+				menu->addChild(createMenuLabel("Paste User"));
+				menu->addChild(createMenuLabel("Paste Sequence + User"));
+			}
+
+			menu->addChild(new MenuSeparator());
 
 			struct SampleDelayItem : MenuItem {
 				TrigStation* module;
@@ -4576,28 +4660,12 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 				}
 			}));
 
-			menu->addChild(new MenuSeparator());
-
-			menu->addChild(createMenuItem("Copy Sequence + User", "", [=]() {module->copyUser(t);module->copyTrack(t);}));
-
-			if (trigStation_clipboardTrack) {
-				menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
-				menu->addChild(createMenuItem("Paste User", "", [=]() {module->pasteUser(t);}));
-				menu->addChild(createMenuItem("Paste Sequence + User", "", [=]() {module->pasteUser(t);module->pasteToTrack(t);}));
-			} else if (stepSeq_clipboard) {
-				menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
-				menu->addChild(createMenuLabel("Paste User"));
-				menu->addChild(createMenuLabel("Paste Sequence + User"));
-			} else {
-				menu->addChild(createMenuLabel("Paste Sequence"));
-				menu->addChild(createMenuLabel("Paste User"));
-				menu->addChild(createMenuLabel("Paste Sequence + User"));
-			}
+			menu->addChild(createBoolPtrMenuItem("TURING mode", "", &module->turingMode[t]));
 
 			menu->addChild(new MenuSeparator());
 
-			menu->addChild(createMenuItem("Randomize Steps", "", [=]() {module->randomizeTrack(t);}));
-			menu->addChild(createMenuItem("Initialize Sequence", "", [=]() {module->cleanSequence(t);}));
+			menu->addChild(createMenuItem("Randomize Steps", "", [=]() {module->randomizeSequence(t);}));
+			menu->addChild(createMenuItem("Initialize Steps", "", [=]() {module->initializeSequence(t);}));
 
 		}
 	}
@@ -4621,15 +4689,15 @@ struct TrigStationDisplayU1 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][0]) {
 
-				case IN_FLIP:
+				case IN_CHANGE:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
-					tempText = "FL";
+					tempText = "CH";
 				break;
 
-				case IN_FLIPPROB:
+				case IN_CHANGEPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
-					tempText = "FP";
-					if (module->userInputs[t][IN_FLIP][0])
+					tempText = "CP";
+					if (module->userInputs[t][IN_CHANGE][0])
 						tempText += "*";
 				break;
 
@@ -4719,15 +4787,15 @@ struct TrigStationDisplayU2 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][2]) {
 
-				case IN_FLIP:
+				case IN_CHANGE:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
-					tempText = "FL";
+					tempText = "CH";
 				break;
 
-				case IN_FLIPPROB:
+				case IN_CHANGEPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
-					tempText = "FP";
-					if (module->userInputs[t][IN_FLIP][0])
+					tempText = "CP";
+					if (module->userInputs[t][IN_CHANGE][0])
 						tempText += "*";
 				break;
 
@@ -4817,9 +4885,9 @@ struct TrigStationDisplayK1 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][1]) {
 				
-				case KNOB_FLIPPROB:
+				case KNOB_CHANGEPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
-					tempText = "FP";
+					tempText = "CH";
 				break;
 
 				case KNOB_MODE:
@@ -4844,7 +4912,7 @@ struct TrigStationDisplayK1 : TransparentWidget {
 					tempText = "RS";
 				break;
 			
-				case KNOB_PROB:
+				case KNOB_RETRIGPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RP";
 				break;
@@ -4898,9 +4966,9 @@ struct TrigStationDisplayK2 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][3]) {
 
-				case KNOB_FLIPPROB:
+				case KNOB_CHANGEPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
-					tempText = "FP";
+					tempText = "CH";
 				break;
 
 				case KNOB_MODE:
@@ -4925,7 +4993,7 @@ struct TrigStationDisplayK2 : TransparentWidget {
 					tempText = "RS";
 				break;
 
-				case KNOB_PROB:
+				case KNOB_RETRIGPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
 					tempText = "RP";
 				break;
@@ -5232,17 +5300,31 @@ struct TrigStationWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 
+		menu->addChild(createSubmenuItem("Initialize Steps", "", [=](Menu * menu) {
+			menu->addChild(createMenuItem("All tracks", "", [=]() {module->initializeAll();}));
+			menu->addChild(createMenuItem("Track 1", "", [=]() {module->initializeSequence(0);}));
+			menu->addChild(createMenuItem("Track 2", "", [=]() {module->initializeSequence(1);}));
+			menu->addChild(createMenuItem("Track 3", "", [=]() {module->initializeSequence(2);}));
+			menu->addChild(createMenuItem("Track 4", "", [=]() {module->initializeSequence(3);}));
+			menu->addChild(createMenuItem("Track 5", "", [=]() {module->initializeSequence(4);}));
+			menu->addChild(createMenuItem("Track 6", "", [=]() {module->initializeSequence(5);}));
+			menu->addChild(createMenuItem("Track 7", "", [=]() {module->initializeSequence(6);}));
+			menu->addChild(createMenuItem("Track 8", "", [=]() {module->initializeSequence(7);}));
+		}));
+
 		menu->addChild(createSubmenuItem("Randomize Steps", "", [=](Menu * menu) {
 			menu->addChild(createMenuItem("All tracks", "", [=]() {module->randomizeAll();}));
-			menu->addChild(createMenuItem("Track 1", "", [=]() {module->randomizeTrack(0);}));
-			menu->addChild(createMenuItem("Track 2", "", [=]() {module->randomizeTrack(1);}));
-			menu->addChild(createMenuItem("Track 3", "", [=]() {module->randomizeTrack(2);}));
-			menu->addChild(createMenuItem("Track 4", "", [=]() {module->randomizeTrack(3);}));
-			menu->addChild(createMenuItem("Track 5", "", [=]() {module->randomizeTrack(4);}));
-			menu->addChild(createMenuItem("Track 6", "", [=]() {module->randomizeTrack(5);}));
-			menu->addChild(createMenuItem("Track 7", "", [=]() {module->randomizeTrack(6);}));
-			menu->addChild(createMenuItem("Track 8", "", [=]() {module->randomizeTrack(7);}));
+			menu->addChild(createMenuItem("Track 1", "", [=]() {module->randomizeSequence(0);}));
+			menu->addChild(createMenuItem("Track 2", "", [=]() {module->randomizeSequence(1);}));
+			menu->addChild(createMenuItem("Track 3", "", [=]() {module->randomizeSequence(2);}));
+			menu->addChild(createMenuItem("Track 4", "", [=]() {module->randomizeSequence(3);}));
+			menu->addChild(createMenuItem("Track 5", "", [=]() {module->randomizeSequence(4);}));
+			menu->addChild(createMenuItem("Track 6", "", [=]() {module->randomizeSequence(5);}));
+			menu->addChild(createMenuItem("Track 7", "", [=]() {module->randomizeSequence(6);}));
+			menu->addChild(createMenuItem("Track 8", "", [=]() {module->randomizeSequence(7);}));
 		}));
+
+		menu->addChild(new MenuSeparator());
 
 		struct SampleDelayItem : MenuItem {
 			TrigStation* module;
@@ -5252,7 +5334,7 @@ struct TrigStationWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(createSubmenuItem("Global OUTs DELAY:", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Default OUT DELAY:", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
 			for (int i = 0; i < 6; i++) {
 				SampleDelayItem* sampleDelayItem = createMenuItem<SampleDelayItem>(module->sampleDelayNames[i]);
 				sampleDelayItem->rightText = CHECKMARK(module->sampleDelay[MC] == i);
@@ -5270,102 +5352,10 @@ struct TrigStationWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator());
 
 
-		menu->addChild(createSubmenuItem("MODULE settings", "", [=](Menu * menu) {
-
-			struct RunTypeItem : MenuItem {
-				TrigStation* module;
-				int runType;
-				void onAction(const event::Action& e) override {
-					module->runType = runType;
-				}
-			};
-
-			std::string RunTypeNames[2] = {"Gate", "Trig"};
-			menu->addChild(createSubmenuItem("RUN Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
-				for (int i = 0; i < 2; i++) {
-					RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
-					runTypeItem->rightText = CHECKMARK(module->runType == i);
-					runTypeItem->module = module;
-					runTypeItem->runType = i;
-					menu->addChild(runTypeItem);
-				}
-			}));
-
-			menu->addChild(createBoolPtrMenuItem("Reset internal clock on RST", "", &module->rstClkOnRst));
-			menu->addChild(createBoolPtrMenuItem("Reset Seq on PROG change", "", &module->rstSeqOnProgChange));
-
-			struct PpqnItem : MenuItem {
-				TrigStation* module;
-				int ppqn;
-				void onAction(const event::Action& e) override {
-					module->tempPpqn = ppqn;
-					module->ppqnChange = true;
-				}
-			};
-
-			menu->addChild(new MenuSeparator());
-
-			menu->addChild(createMenuLabel("External Main Clock"));
-			std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
-			menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
-				for (int i = 0; i < 7; i++) {
-					PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
-					ppqnItem->rightText = CHECKMARK(module->ppqn == i);
-					ppqnItem->module = module;
-					ppqnItem->ppqn = i;
-					menu->addChild(ppqnItem);
-				}
-			}));
-
-			menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
-			menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
-
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
-			menu->addChild(createBoolPtrMenuItem("MODE mouse controls", "", &module->modeControls));
-
-			menu->addChild(new MenuSeparator());
-			menu->addChild(createMenuLabel("Turing settings"));
-
-			struct BitResTypeItem : MenuItem {
-				TrigStation* module;
-				int bitResType;
-				void onAction(const event::Action& e) override {
-					module->bitResolution = bitResType;
-				}
-			};
-			std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
-			menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
-				for (int i = 0; i < 2; i++) {
-					BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
-					bitResTypeItem->rightText = CHECKMARK(module->bitResolution == i);
-					bitResTypeItem->module = module;
-					bitResTypeItem->bitResType = i;
-					menu->addChild(bitResTypeItem);
-				}
-			}));
-
-			struct ProgressionTypeItem : MenuItem {
-				TrigStation* module;
-				int progressionType;
-				void onAction(const event::Action& e) override {
-					module->progression = progressionType;
-				}
-			};
-			std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
-			menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
-				for (int i = 0; i < 3; i++) {
-					ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
-					progressionTypeItem->rightText = CHECKMARK(module->progression == i);
-					progressionTypeItem->module = module;
-					progressionTypeItem->progressionType = i;
-					menu->addChild(progressionTypeItem);
-				}
-			}));
-		}));
-
 		menu->addChild(createSubmenuItem("GLOBAL settings", "", [=](Menu * menu) {
-		
+
+			menu->addChild(createMenuLabel("Track Defaults"));
+
 			struct OutTypeItem : MenuItem {
 				TrigStation* module;
 				int outType;
@@ -5384,6 +5374,7 @@ struct TrigStationWidget : ModuleWidget {
 				}
 			}));
 
+			/*
 			struct RevTypeItem : MenuItem {
 				TrigStation* module;
 				int revType;
@@ -5391,6 +5382,7 @@ struct TrigStationWidget : ModuleWidget {
 					module->revType[MC] = revType;
 				}
 			};
+
 			std::string RevTypeNames[2] = {"Positive", "Negative"};
 			menu->addChild(createSubmenuItem("Reverse Input Voltage", (RevTypeNames[module->revType[MC]]), [=](Menu * menu) {
 				for (int i = 0; i < 2; i++) {
@@ -5401,7 +5393,7 @@ struct TrigStationWidget : ModuleWidget {
 					menu->addChild(revTypeItem);
 				}
 			}));
-
+*/
 			struct DontAdvanceItem : MenuItem {
 				TrigStation* module;
 				int dontAdvanceSetting;
@@ -5440,6 +5432,104 @@ struct TrigStationWidget : ModuleWidget {
 				}
 			}));
 
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createMenuLabel("Module Settings"));
+
+			struct RunTypeItem : MenuItem {
+				TrigStation* module;
+				int runType;
+				void onAction(const event::Action& e) override {
+					module->runType = runType;
+				}
+			};
+
+			std::string RunTypeNames[2] = {"Gate", "Trig"};
+			menu->addChild(createSubmenuItem("RUN Input", (RunTypeNames[module->runType]), [=](Menu * menu) {
+				for (int i = 0; i < 2; i++) {
+					RunTypeItem* runTypeItem = createMenuItem<RunTypeItem>(RunTypeNames[i]);
+					runTypeItem->rightText = CHECKMARK(module->runType == i);
+					runTypeItem->module = module;
+					runTypeItem->runType = i;
+					menu->addChild(runTypeItem);
+				}
+			}));
+
+			menu->addChild(createBoolPtrMenuItem("Reset internal clock on RST", "", &module->rstClkOnRst));
+			menu->addChild(createBoolPtrMenuItem("Reset Seq on PROG change", "", &module->rstSeqOnProgChange));
+
+			struct PpqnItem : MenuItem {
+				TrigStation* module;
+				int ppqn;
+				void onAction(const event::Action& e) override {
+					module->tempPpqn = ppqn;
+					module->ppqnChange = true;
+				}
+			};
+
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createMenuLabel("Turing settings"));
+
+			struct BitResTypeItem : MenuItem {
+				TrigStation* module;
+				int bitResType;
+				void onAction(const event::Action& e) override {
+					module->bitResolution = bitResType;
+				}
+			};
+			std::string BitResTypeNames[2] = {"8 bit", "16 bit"};
+			menu->addChild(createSubmenuItem("Bit Resolution", (BitResTypeNames[module->bitResolution]), [=](Menu * menu) {
+				for (int i = 0; i < 2; i++) {
+					BitResTypeItem* bitResTypeItem = createMenuItem<BitResTypeItem>(BitResTypeNames[i]);
+					bitResTypeItem->rightText = CHECKMARK(module->bitResolution == i);
+					bitResTypeItem->module = module;
+					bitResTypeItem->bitResType = i;
+					menu->addChild(bitResTypeItem);
+				}
+			}));
+
+			struct ProgressionTypeItem : MenuItem {
+				TrigStation* module;
+				int progressionType;
+				void onAction(const event::Action& e) override {
+					module->progression = progressionType;
+				}
+			};
+			std::string ProgressionTypeNames[3] = {"2x (std.)", "1.3x", "Fibonacci"};
+			menu->addChild(createSubmenuItem("Voltage progression", (ProgressionTypeNames[module->progression]), [=](Menu * menu) {
+				for (int i = 0; i < 3; i++) {
+					ProgressionTypeItem* progressionTypeItem = createMenuItem<ProgressionTypeItem>(ProgressionTypeNames[i]);
+					progressionTypeItem->rightText = CHECKMARK(module->progression == i);
+					progressionTypeItem->module = module;
+					progressionTypeItem->progressionType = i;
+					menu->addChild(progressionTypeItem);
+				}
+			}));
+
+			menu->addChild(new MenuSeparator());
+
+			menu->addChild(createMenuLabel("External Main Clock"));
+			std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
+			menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
+				for (int i = 0; i < 7; i++) {
+					PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
+					ppqnItem->rightText = CHECKMARK(module->ppqn == i);
+					ppqnItem->module = module;
+					ppqnItem->ppqn = i;
+					menu->addChild(ppqnItem);
+				}
+			}));
+
+			menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
+			menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
+
+			menu->addChild(new MenuSeparator());
+			menu->addChild(createMenuLabel("User Interface"));
+			menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
+			menu->addChild(createBoolPtrMenuItem("MODE mouse controls", "", &module->modeControls));
+
+			
 		}));
 
 		menu->addChild(createSubmenuItem("TRACK settings", "", [=](Menu * menu) {
@@ -5536,12 +5626,6 @@ struct TrigStationWidget : ModuleWidget {
 
 					menu->addChild(new MenuSeparator());
 
-					menu->addChild(createBoolPtrMenuItem("Turing mode", "", &module->turingMode[t]));
-
-					menu->addChild(new MenuSeparator());
-				
-					//menu->addChild(createMenuLabel("Tweaks"));
-
 					// **********************************************************************
 
 					struct OutTypeItem : MenuItem {
@@ -5573,7 +5657,7 @@ struct TrigStationWidget : ModuleWidget {
 					}));
 
 					//----------------------------------------
-
+/*
 					struct RevTypeItem : MenuItem {
 						TrigStation* module;
 						int menuValue;
@@ -5601,7 +5685,7 @@ struct TrigStationWidget : ModuleWidget {
 							menu->addChild(revTypeItem);
 						}
 					}));
-
+*/
 					//----------------------------------------
 
 					struct DontAdvanceItem : MenuItem {
@@ -5662,6 +5746,31 @@ struct TrigStationWidget : ModuleWidget {
 						}
 					}));
 
+					menu->addChild(new MenuSeparator());
+
+					menu->addChild(createBoolPtrMenuItem("Exclude from MASTER RST", "", &module->xcludeFromRst[t]));
+					menu->addChild(createBoolPtrMenuItem("Exclude from RUN", "", &module->xcludeFromRun[t]));
+			
+					menu->addChild(new MenuSeparator());
+
+					menu->addChild(createMenuItem("Copy Sequence + User", "", [=]() {module->copyUser(t);module->copyTrack(t);}));
+
+					if (trigStation_clipboardTrack) {
+						menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
+						menu->addChild(createMenuItem("Paste User", "", [=]() {module->pasteUser(t);}));
+						menu->addChild(createMenuItem("Paste Sequence + User", "", [=]() {module->pasteUser(t);module->pasteToTrack(t);}));
+					} else if (stepSeq_clipboard) {
+						menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
+						menu->addChild(createMenuLabel("Paste User"));
+						menu->addChild(createMenuLabel("Paste Sequence + User"));
+					} else {
+						menu->addChild(createMenuLabel("Paste Sequence"));
+						menu->addChild(createMenuLabel("Paste User"));
+						menu->addChild(createMenuLabel("Paste Sequence + User"));
+					}
+
+					menu->addChild(new MenuSeparator());
+
 					struct SampleDelayItem : MenuItem {
 						TrigStation* module;
 						int menuValue;
@@ -5690,26 +5799,12 @@ struct TrigStationWidget : ModuleWidget {
 						}
 					}));
 
-					menu->addChild(createBoolPtrMenuItem("Exclude from MASTER RST", "", &module->xcludeFromRst[t]));
-					menu->addChild(createBoolPtrMenuItem("Exclude from RUN", "", &module->xcludeFromRun[t]));
-			
+					menu->addChild(createBoolPtrMenuItem("TURING mode", "", &module->turingMode[t]));
+
 					menu->addChild(new MenuSeparator());
 
-					menu->addChild(createMenuItem("Copy Sequence + User", "", [=]() {module->copyUser(t);module->copyTrack(t);}));
-
-					if (trigStation_clipboardTrack) {
-						menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
-						menu->addChild(createMenuItem("Paste User", "", [=]() {module->pasteUser(t);}));
-						menu->addChild(createMenuItem("Paste Sequence + User", "", [=]() {module->pasteUser(t);module->pasteToTrack(t);}));
-					} else if (stepSeq_clipboard) {
-						menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
-						menu->addChild(createMenuLabel("Paste User"));
-						menu->addChild(createMenuLabel("Paste Sequence + User"));
-					} else {
-						menu->addChild(createMenuLabel("Paste Sequence"));
-						menu->addChild(createMenuLabel("Paste User"));
-						menu->addChild(createMenuLabel("Paste Sequence + User"));
-					}
+					menu->addChild(createMenuItem("Randomize Steps", "", [=]() {module->randomizeSequence(t);}));
+					menu->addChild(createMenuItem("Initialize Steps", "", [=]() {module->initializeSequence(t);}));
 
 				}));
 			}
@@ -5850,9 +5945,9 @@ struct TrigStationWidget : ModuleWidget {
 		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
-			menu->addChild(createMenuLabel("Rclick on user controls / track# to config"));
-			menu->addChild(createMenuLabel("Click or Rclick on DIV/MULT / MODE displays"));
-			menu->addChild(createMenuLabel("Adjust OUTs timing with Sample DELAY options"));
+			menu->addChild(createMenuLabel("Rclick on user controls (U1/U2) or Track# to config"));
+			menu->addChild(createMenuLabel("Click or Rclick on DIV/MULT or MODE displays"));
+			menu->addChild(createMenuLabel("Adjust OUTs timing with 'Out DELAY' options"));
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createMenuLabel("Store Programs with double-click on STOR"));
 			menu->addChild(new MenuSeparator());

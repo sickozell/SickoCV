@@ -17,8 +17,8 @@
 #define REVERSE 1
 //#define CLOCK_MODE 1
 //#define CV_MODE 0
-#define POSITIVE_V 0
-#define NEGATIVE_V 1
+//#define POSITIVE_V 0
+//#define NEGATIVE_V 1
 #define RUN_GATE 0
 #define RUN_TRIG 1
 #define CV_TYPE 0
@@ -93,7 +93,7 @@
 #define KNOB_MODE 11
 #define KNOB_OUTSCALE 12
 #define KNOB_RSTSTEP 13
-#define KNOB_PROB 14
+#define KNOB_RETRIGPROB 14
 #define KNOB_SWING 15
 #define KNOB_ATN 16
 #define KNOB_ATNV 17

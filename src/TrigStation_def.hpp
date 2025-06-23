@@ -17,8 +17,8 @@
 #define REVERSE 1
 //#define CLOCK_MODE 1
 //#define CV_MODE 0
-#define POSITIVE_V 0
-#define NEGATIVE_V 1
+//#define POSITIVE_V 0
+//#define NEGATIVE_V 1
 #define RUN_GATE 0
 #define RUN_TRIG 1
 #define CV_TYPE 0
@@ -79,8 +79,8 @@
 #define ALLTRACKS 9
 #define MC 8
 
-#define IN_FLIP 0
-#define IN_FLIPPROB 1
+#define IN_CHANGE 0
+#define IN_CHANGEPROB 1
 #define IN_LENGTH 2
 #define IN_MODE 3
 #define IN_OUTSCALE 4
@@ -92,12 +92,12 @@
 #define IN_SKIP 10
 #define IN_SKIPPROB 11
 #define IN_SWING 12
-#define KNOB_FLIPPROB 13
+#define KNOB_CHANGEPROB 13
 #define KNOB_MODE 14
 #define KNOB_OUTSCALE 15
 #define KNOB_PW 16
 #define KNOB_RSTSTEP 17
-#define KNOB_PROB 18
+#define KNOB_RETRIGPROB 18
 #define KNOB_SKIPPROB 19
 #define KNOB_SWING 20
 #define KNOB_ATN 21

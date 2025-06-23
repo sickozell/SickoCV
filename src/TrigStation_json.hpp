@@ -79,12 +79,12 @@
 				json_array_append_new(this_json_array, json_integer(turingMode[t]));
 			json_object_set_new(rootJ, "currTuringMode", this_json_array);
 		}
-		{
+		/*{
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++)
 				json_array_append_new(this_json_array, json_integer(revType[t]));
 			json_object_set_new(rootJ, "currRevType", this_json_array);
-		}
+		}*/
 		{
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++)
@@ -196,7 +196,7 @@
 			}
 			json_object_set_new(rootJ, ("progOutType_p"+to_string(p)).c_str(), this_json_array);
 		}
-
+/*
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++) {
@@ -204,7 +204,7 @@
 			}
 			json_object_set_new(rootJ, ("progRevType_p"+to_string(p)).c_str(), this_json_array);
 		}
-
+*/
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < MAXTRACKS; t++)
@@ -423,7 +423,7 @@
 		}
 
 		// ---------------- tweaks
-
+/*
 		{
 			json_t *json_array = json_object_get(rootJ, "currRevType");
 			size_t jThis;
@@ -434,7 +434,7 @@
 				}
 			}
 		}
-
+*/
 		{
 			json_t *json_array = json_object_get(rootJ, "currDontAdvanceSetting");
 			size_t jThis;
@@ -649,7 +649,7 @@
 				}
 			}
 		}
-
+/*
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progRevType_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -660,7 +660,7 @@
 				}
 			}
 		}
-
+*/
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progDontAdvanceSetting_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -940,7 +940,7 @@
 				}
 			}
 		}
-
+/*
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progRevType_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -951,7 +951,7 @@
 				}
 			}
 		}
-
+*/
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progDontAdvanceSetting_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -1165,7 +1165,7 @@
 			}
 			json_object_set_new(rootJ, ("progTuringMode_p"+to_string(p)).c_str(), this_json_array);
 		}
-
+/*
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++) {
@@ -1173,7 +1173,7 @@
 			}
 			json_object_set_new(rootJ, ("progRevType_p"+to_string(p)).c_str(), this_json_array);
 		}
-
+*/
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++)
