@@ -1,4 +1,4 @@
-### 2.7.4 (2025-06-22)
+### 2.7.4 (2025-06-24)
 - added stepStation and trigStation modules
 - added cvMeter module
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement

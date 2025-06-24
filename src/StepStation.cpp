@@ -34,26 +34,26 @@ struct SickoStepStation : Module {
 	bool cvClockOut = false;
 
 	int userTable[MAXTRACKS][4] = {
-							{IN_RUN, KNOB_RETRIGPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_RETRIGPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_RETRIGPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_RETRIGPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_RETRIGPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_RETRIGPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_RETRIGPROB, IN_REV, KNOB_MODE},
-							{IN_RUN, KNOB_RETRIGPROB, IN_REV, KNOB_MODE}
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
+							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE}
 						};
 
 	int userInputs[MAXTRACKS][MAXUSER][2] = {
 //								 IN_CHANG IN_CHNGPR IN_LENG  IN_MODE  IN_OUTSC IN_RSTST IN_RETRG IN_REV   IN_RUN   IN_SWING KN_CHPR KN_MODE  KN_OUTSC KN_RSTST KN_RETRG KN_SWING ATTTEN  ATTENVERT 
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} },
-								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0}, {1, 8} , {0, 0} , {0, 0} , {1, 0} , {0, 0} , {0, 0}, {0, 0} }
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0}, {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0}, {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0}, {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0}, {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0}, {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0}, {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0}, {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0} },
+								{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {1, 0}, {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0} }
 							};
 
 	void appendInputMenu(Menu *menu, engine::Port::Type type, int portId){
@@ -4020,7 +4020,7 @@ struct StepStationDisplayTrackSett : TransparentWidget {
 			ui::Menu *menu = createMenu();
 
 			menu->addChild(createMenuLabel(("Track " + to_string(t+1)).c_str()));
-
+/*
 			menu->addChild(new MenuSeparator());
 
 			struct ModeTypeItem : MenuItem {
@@ -4057,7 +4057,7 @@ struct StepStationDisplayTrackSett : TransparentWidget {
 				}
 				
 			}
-
+*/
 			menu->addChild(new MenuSeparator());
 
 			menu->addChild(createSubmenuItem("User U1 U2", "", [=](Menu* menu) {
@@ -4357,6 +4357,62 @@ struct StepStationDisplayU1 : TransparentWidget {
 			switch (module->userTable[t][0]) {
 
 				case IN_CHANGE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
+					tempText = "CH";
+				break;
+
+				case IN_CHANGEPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREEN));
+					tempText = "CP";
+					if (module->userInputs[t][IN_CHANGE][0])
+						tempText += "*";
+				break;
+
+				case IN_LENGTH:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
+					tempText = "LN";
+				break;
+				
+				case IN_MODE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_CYAN));
+					tempText = "MD";
+				break;
+
+				case IN_OUTSCALE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
+					tempText = "SC";
+				break;
+
+				case IN_RSTSTEP:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BROWN));
+					tempText = "RS";
+				break;
+
+				case IN_RETRIG:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREY));
+					tempText = "RT";
+				break;
+
+				case IN_REV:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
+					tempText = "RV";
+				break;
+
+				case IN_RUN:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BLUE));
+					tempText = "RN";
+				break;
+
+				case IN_SWING:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_PURPLE));
+					tempText = "SW";
+					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
+						tempText += "*";
+				break;
+				/*
+				// ***********
+
+				case IN_CHANGE:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
 					tempText = "CH";
 				break;
@@ -4409,7 +4465,7 @@ struct StepStationDisplayU1 : TransparentWidget {
 				break;
 				if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
-
+				*/
 			}
 			nvgTextBox(args.vg, 0, 0, 10, tempText.c_str(), NULL);
 		}
@@ -4436,59 +4492,58 @@ struct StepStationDisplayU2 : TransparentWidget {
 			switch (module->userTable[t][2]) {
 
 				case IN_CHANGE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
 					tempText = "CH";
 				break;
 
 				case IN_CHANGEPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREEN));
 					tempText = "CP";
 					if (module->userInputs[t][IN_CHANGE][0])
 						tempText += "*";
 				break;
 
 				case IN_LENGTH:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
 					tempText = "LN";
 				break;
-
+				
 				case IN_MODE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_CYAN));
 					tempText = "MD";
 				break;
 
 				case IN_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
 					tempText = "SC";
 				break;
 
 				case IN_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BROWN));
 					tempText = "RS";
 				break;
 
 				case IN_RETRIG:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREY));
 					tempText = "RT";
 				break;
 
 				case IN_REV:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
 					tempText = "RV";
 				break;
 
 				case IN_RUN:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_BLUE));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BLUE));
 					tempText = "RN";
 				break;
 
 				case IN_SWING:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
 				break;
-
 			}
 			nvgTextBox(args.vg, 0, 0, 10, tempText.c_str(), NULL);
 		}
@@ -4514,6 +4569,51 @@ struct StepStationDisplayK1 : TransparentWidget {
 			std::string tempText;
 			switch (module->userTable[t][1]) {
 
+
+				case KNOB_CHANGEPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREEN));
+					tempText = "CH";
+				break;
+
+				case KNOB_MODE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BLUE));
+					tempText = "MD";
+				break;
+
+				case KNOB_OUTSCALE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_YELLOW));
+					tempText = "SC";
+				break;
+
+				case KNOB_RSTSTEP:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BROWN));
+					tempText = "RS";
+				break;
+
+				case KNOB_RETRIGPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREY));
+					tempText = "RP";
+				break;
+
+				case KNOB_SWING:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_PURPLE));
+					tempText = "SW";
+					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
+						tempText += "*";
+				break;
+
+				case KNOB_ATN:
+					nvgFontSize(args.vg, 14);
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
+					tempText = "+";
+				break;
+
+				case KNOB_ATNV:
+					nvgFontSize(args.vg, 14);
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_RED));
+					tempText = "±";
+				break;
+/*
 				case KNOB_CHANGEPROB:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
 					tempText = "CP";
@@ -4557,7 +4657,7 @@ struct StepStationDisplayK1 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "±";
 				break;
-
+*/
 			}
 			nvgTextBox(args.vg, 0, 0, 15, tempText.c_str(), NULL);
 		}
@@ -4582,7 +4682,52 @@ struct StepStationDisplayK2 : TransparentWidget {
 
 			std::string tempText;
 			switch (module->userTable[t][3]) {
-				
+
+				case KNOB_CHANGEPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREEN));
+					tempText = "CH";
+				break;
+
+				case KNOB_MODE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BLUE));
+					tempText = "MD";
+				break;
+
+				case KNOB_OUTSCALE:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_YELLOW));
+					tempText = "SC";
+				break;
+
+				case KNOB_RSTSTEP:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BROWN));
+					tempText = "RS";
+				break;
+
+				case KNOB_RETRIGPROB:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREY));
+					tempText = "RP";
+				break;
+
+				case KNOB_SWING:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_PURPLE));
+					tempText = "SW";
+					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
+						tempText += "*";
+				break;
+
+				case KNOB_ATN:
+					nvgFontSize(args.vg, 14);
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
+					tempText = "+";
+				break;
+
+				case KNOB_ATNV:
+					nvgFontSize(args.vg, 14);
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_RED));
+					tempText = "±";
+				break;
+
+				/*
 				case KNOB_MODE:
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
 					tempText = "MD";
@@ -4621,7 +4766,7 @@ struct StepStationDisplayK2 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
 					tempText = "±";
 				break;
-				
+				*/
 			}
 			nvgTextBox(args.vg, 0, 0, 15, tempText.c_str(), NULL);
 		}

@@ -706,7 +706,7 @@ struct TrigStation : SickoTrigStation {
 						break;
 
 						case KNOB_CHANGEPROB:
-				 			name = "Flip Prob. #" + to_string(t+1);
+				 			name = "Change Prob. #" + to_string(t+1);
 							unit = "%";
 							displayMultiplier = 100.f;
 							displayOffset = 0.f;
@@ -769,8 +769,8 @@ struct TrigStation : SickoTrigStation {
 						case IN_SKIP:		name = "Skip #" + to_string(t+1); break;
 						case IN_SKIPPROB:	name = "Skip Prob.#" + to_string(t+1); break;
 						case IN_SWING:		name = "Swing #" + to_string(t+1); break;
-						case IN_CHANGE:		name = "Flip #" + to_string(t+1); break;
-						case IN_CHANGEPROB:	name = "Flip Prob.#" + to_string(t+1); break;
+						case IN_CHANGE:		name = "Change #" + to_string(t+1); break;
+						case IN_CHANGEPROB:	name = "Change Prob.#" + to_string(t+1); break;
 				 	}
 				}
 				return PortInfo::getName();
@@ -1612,9 +1612,9 @@ struct TrigStation : SickoTrigStation {
 		return skip;
 	}
 
-	void inline calcFlip(int t) {
+	void inline calcChange(int t) {
 
-		bool flip = false;
+		bool change = false;
 
 		if (userInputs[t][IN_CHANGE][0]) {
 			if (userInputs[t][KNOB_CHANGEPROB][0]) {
@@ -1622,14 +1622,14 @@ struct TrigStation : SickoTrigStation {
 					inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].getVoltage() >= 1.f) {
 
 					if (random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue())
-						flip = true;
+						change = true;
 					
 				}
 			} else {
 				if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].isConnected() && 
 					inputs[USER_INPUT+t+userInputs[t][IN_CHANGE][1]].getVoltage() >= 1.f) {
 
-					flip = true;
+					change = true;
 
 				}
 			}
@@ -1643,22 +1643,22 @@ struct TrigStation : SickoTrigStation {
 
 						if(inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].getVoltage() >= 1.f &&
 							random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue())
-								flip = true;
+								change = true;
 
 					} else if (userInputs[t][KNOB_CHANGEPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue()) {
-						flip = true;
+						change = true;
 					}
 
 				} else if (inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_CHANGEPROB][1]].getVoltage() >= 1.f) {
-					flip = true;
+					change = true;
 				}
 			} else if (userInputs[t][KNOB_CHANGEPROB][0] && random::uniform() <= params[USER_PARAM+t+userInputs[t][KNOB_CHANGEPROB][1]].getValue()) {
-				flip = true;
+				change = true;
 			}
 
 		}
 					
-		if (flip && random::uniform() > .5f) {
+		if (change && random::uniform() > .5f) {
 			
 			if (wSeq[t][step[t]] == 0)
 				wSeq[t][step[t]] = 1;
@@ -3785,9 +3785,9 @@ struct TrigStation : SickoTrigStation {
 
 						}
 
-						// ------------------ FLIP OPTION
+						// ------------------ CHANGE OPTION
 
-						calcFlip(t);
+						calcChange(t);
 		
 
 						// **************************************** 
@@ -4348,7 +4348,7 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 			ui::Menu *menu = createMenu();
 
 			menu->addChild(createMenuLabel(("Track " + to_string(t+1)).c_str()));
-
+/*
 			menu->addChild(new MenuSeparator());
 
 			struct ModeTypeItem : MenuItem {
@@ -4385,7 +4385,7 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 				}
 				
 			}
-
+*/
 			menu->addChild(new MenuSeparator());
 
 			menu->addChild(createSubmenuItem("User U1 U2", "", [=](Menu* menu) {
@@ -4690,73 +4690,73 @@ struct TrigStationDisplayU1 : TransparentWidget {
 			switch (module->userTable[t][0]) {
 
 				case IN_CHANGE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
 					tempText = "CH";
 				break;
 
 				case IN_CHANGEPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREEN));
 					tempText = "CP";
 					if (module->userInputs[t][IN_CHANGE][0])
 						tempText += "*";
 				break;
 
 				case IN_LENGTH:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
 					tempText = "LN";
 				break;
-
+				
 				case IN_MODE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_CYAN));
 					tempText = "MD";
 				break;
 
 				case IN_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
 					tempText = "SC";
 				break;
 
 				case IN_PW:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_MAGENTA));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
 
 				case IN_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BROWN));
 					tempText = "RS";
 				break;
 
 				case IN_RETRIG:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREY));
 					tempText = "RT";
 				break;
 
 				case IN_REV:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
 					tempText = "RV";
 				break;
 
 				case IN_RUN:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_BLUE));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BLUE));
 					tempText = "RN";
 				break;
 
 				case IN_SKIP:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_RED));
 					tempText = "SK";
 				break;
 
 				case IN_SKIPPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_RED));
 					tempText = "SP";
 					if (module->userInputs[t][IN_SKIP][0])
 						tempText += "*";
 				break;
 
 				case IN_SWING:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
@@ -4788,73 +4788,73 @@ struct TrigStationDisplayU2 : TransparentWidget {
 			switch (module->userTable[t][2]) {
 
 				case IN_CHANGE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
 					tempText = "CH";
 				break;
 
 				case IN_CHANGEPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREEN));
 					tempText = "CP";
 					if (module->userInputs[t][IN_CHANGE][0])
 						tempText += "*";
 				break;
 
 				case IN_LENGTH:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
 					tempText = "LN";
 				break;
 				
 				case IN_MODE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_CYAN));
 					tempText = "MD";
 				break;
 
 				case IN_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
 					tempText = "SC";
 				break;
 
 				case IN_PW:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_MAGENTA));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
 
-				case IN_RETRIG:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
-					tempText = "RT";
-				break;
-
 				case IN_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BROWN));
 					tempText = "RS";
 				break;
 
+				case IN_RETRIG:
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREY));
+					tempText = "RT";
+				break;
+
 				case IN_REV:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
 					tempText = "RV";
 				break;
 
 				case IN_RUN:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_BLUE));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BLUE));
 					tempText = "RN";
 				break;
 
 				case IN_SKIP:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_RED));
 					tempText = "SK";
 				break;
 
 				case IN_SKIPPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_RED));
 					tempText = "SP";
 					if (module->userInputs[t][IN_SKIP][0])
 						tempText += "*";
 				break;
 
 				case IN_SWING:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
@@ -4886,44 +4886,44 @@ struct TrigStationDisplayK1 : TransparentWidget {
 			switch (module->userTable[t][1]) {
 				
 				case KNOB_CHANGEPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREEN));
 					tempText = "CH";
 				break;
 
 				case KNOB_MODE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BLUE));
 					tempText = "MD";
 				break;
 
 				case KNOB_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_YELLOW));
 					tempText = "SC";
 				break;
 
 				case KNOB_PW:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_MAGENTA));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
 
 				case KNOB_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BROWN));
 					tempText = "RS";
 				break;
-			
+
 				case KNOB_RETRIGPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREY));
 					tempText = "RP";
 				break;
 
 				case KNOB_SKIPPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_RED));
 					tempText = "SP";
 				break;
 
 				case KNOB_SWING:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
@@ -4931,13 +4931,13 @@ struct TrigStationDisplayK1 : TransparentWidget {
 
 				case KNOB_ATN:
 					nvgFontSize(args.vg, 14);
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
 					tempText = "+";
 				break;
 
 				case KNOB_ATNV:
 					nvgFontSize(args.vg, 14);
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_RED));
 					tempText = "±";
 				break;
 
@@ -4967,44 +4967,44 @@ struct TrigStationDisplayK2 : TransparentWidget {
 			switch (module->userTable[t][3]) {
 
 				case KNOB_CHANGEPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREEN));
 					tempText = "CH";
 				break;
 
 				case KNOB_MODE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BLUE));
 					tempText = "MD";
 				break;
 
 				case KNOB_OUTSCALE:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_YELLOW));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_YELLOW));
 					tempText = "SC";
 				break;
 
 				case KNOB_PW:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_MAGENTA));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
 
 				case KNOB_RSTSTEP:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_MAGENTA));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BROWN));
 					tempText = "RS";
 				break;
 
 				case KNOB_RETRIGPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_GREY));
 					tempText = "RP";
 				break;
 
 				case KNOB_SKIPPROB:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_LIGHT_CYAN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_RED));
 					tempText = "SP";
 				break;
 
 				case KNOB_SWING:
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
@@ -5012,13 +5012,13 @@ struct TrigStationDisplayK2 : TransparentWidget {
 
 				case KNOB_ATN:
 					nvgFontSize(args.vg, 14);
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_GREEN));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
 					tempText = "+";
 				break;
 
 				case KNOB_ATNV:
 					nvgFontSize(args.vg, 14);
-					nvgFillColor(args.vg, nvgRGB(COLOR_EGA_RED));
+					nvgFillColor(args.vg, nvgRGB(COLOR_USER_RED));
 					tempText = "±";
 				break;
 			}
