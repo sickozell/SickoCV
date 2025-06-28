@@ -366,14 +366,16 @@ struct RandMod7 : Module {
 			else if (out[t] < -10.f)
 				out[t] = -10.f;
 
+
 			if (t != 6)
 				outputs[OUT_OUTPUT + t].setVoltage(out[t]);
-			
+			else if (polyChans == 1)
+				outputs[OUT_OUTPUT + t].setVoltage(out[t]);
+
 			if (polyChans > 1) {
 				outputs[OUT_OUTPUT + 6].setVoltage(out[t], t);
 			}
 			
-		
 			currSample[t]++;
 
 		}

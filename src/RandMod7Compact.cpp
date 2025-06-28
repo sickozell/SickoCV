@@ -321,15 +321,9 @@ struct RandMod7compact : Module {
 			else if (y[t] < 0.f)
 				y[t] = 0.f;
 
-			//minOut[t] = params[MIN_PARAM+t].getValue();
-			//maxOut[t] = params[MAX_PARAM+t].getValue();
-			
-			//out[t] = (y[t] * (maxOut - minOut)) + minOut;
-
 			float unipolarOut = y[t] * 10.f;
 			float bipolarOut = (y[t] - 0.5f) * 10.f;
 			out[t] = (1.f - polarityBlend) * unipolarOut + polarityBlend * bipolarOut;
-
 
 			if (out[t] > 10.f)
 				out[t] = 10.f;
