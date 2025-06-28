@@ -1,4 +1,4 @@
-# SickoCV v2.7.4-beta18
+# SickoCV v2.7.4-beta19
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -20,6 +20,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog** 
 - added stepStation and trigStation modules
 - added cvMeter module
+. added randMod7 and randMod7compact modules
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
 - all sampler modules: improved memory allocation management
 - slewer/slewer mini: inverted shapes on shape knob
@@ -57,6 +58,7 @@ VCV Rack plugin modules
 - [parking](#parking)
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [randLoops / randLoops8](#randLoops--randLoops8)
+- [randMod7 / randMod7Compact](#randMod7--randMod7Compact)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
 - [sickoCrosser / sickoCrosser4](#sickocrosser--sickocrosser4)
@@ -781,8 +783,14 @@ randLoops8 is basically a 8-track randomLoops with limited functions, but with a
 
 [back to top](#table-of-contents)
 
+## randMod7 / randMod7Compact
+### 7 random smooth cv generator
+
+[back to top](#table-of-contents)
+
+
 ## shifter
-### 64 selectable stages shift register
+### 64 selectable stages shift registers
 #### - DESCRIPTION
 - 64 stages shift register that outputs only the selected stage controlled by knob/CV with attenuverter
 - Trigger delay to adjust the 1-sample latency of VCV cables
