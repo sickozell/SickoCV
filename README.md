@@ -20,7 +20,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog** 
 - added stepStation and trigStation modules
 - added cvMeter module
-. added randMod7 and randMod7compact modules
+- added randMod7 and randMod7compact modules
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
 - all sampler modules: improved memory allocation management
 - slewer/slewer mini: inverted shapes on shape knob
