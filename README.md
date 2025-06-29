@@ -1,4 +1,4 @@
-# SickoCV v2.7.4-beta22
+# SickoCV v2.7.4-beta23
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -19,6 +19,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 
 ## **changelog** 
 - added stepStation and trigStation modules
+- added sampleDelay module
 - added cvMeter module
 - added randMod7 and randMod7compact modules
 - stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement

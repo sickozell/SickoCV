@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.7.4-beta22",
+  "version": "2.7.4-beta23",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -418,6 +418,14 @@
       "description": "7 random smooth cv generators in a compact form",
       "tags": [
         "Random"
+      ]
+    },
+    {
+      "slug": "SampleDelay",
+      "name": "sampleDelay",
+      "description": "a simple signal delay up to 5 samples",
+      "tags": [
+        "Utility"
       ]
     },
     {

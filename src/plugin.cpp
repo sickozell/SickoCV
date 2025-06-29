@@ -64,6 +64,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelRandLoops8);
 	p->addModel(modelRandMod7);
 	p->addModel(modelRandMod7compact);
+	p->addModel(modelSampleDelay);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
 	p->addModel(modelSickoCrosser);
