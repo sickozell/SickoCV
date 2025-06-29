@@ -1082,6 +1082,28 @@ struct TrigStation : SickoTrigStation {
 
 	}
 
+	void pasteToTrackRandLoops(int t) {
+/*
+		for (int s = 0; s < 16; s++) {
+			wSeq[t][s] = stepSeq_cbSeq[s];
+			params[STEP_PARAM+(t*16)+s].setValue(wSeq[t][s]);
+		}
+		wSteps[t] = stepSeq_cbSteps;
+		params[LENGTH_PARAM+t].setValue(wSteps[t]);
+
+		if (userInputs[t][KNOB_RSTSTEP][0])
+			params[USER_PARAM+t+userInputs[t][KNOB_RSTSTEP][1]].setValue((float)stepSeq_cbRst / 15);
+*/
+		for (int st = 0; st < 16; st++) {
+			wSeq[t][st] = randLoops_cbSeq[st];
+			params[STEP_PARAM+(t*16)+st].setValue(wSeq[t][st]);
+		}
+		
+		wSteps[t] = randLoops_cbSteps;
+		params[LENGTH_PARAM].setValue(wSteps[t]);
+
+	}
+
 	void pasteAllTracks() {
 
 		for (int t = 0; t < MAXTRACKS; t++) {
@@ -4619,8 +4641,8 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 				menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
 				menu->addChild(createMenuItem("Paste User", "", [=]() {module->pasteUser(t);}));
 				menu->addChild(createMenuItem("Paste Sequence + User", "", [=]() {module->pasteUser(t);module->pasteToTrack(t);}));
-			} else if (stepSeq_clipboard) {
-				menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrack(t);}));
+			} else if (randLoops_clipboard) {
+				menu->addChild(createMenuItem("Paste Sequence", "", [=]() {module->pasteToTrackRandLoops(t);}));
 				menu->addChild(createMenuLabel("Paste User"));
 				menu->addChild(createMenuLabel("Paste Sequence + User"));
 			} else {

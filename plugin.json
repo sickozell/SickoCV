@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.7.4-beta21",
+  "version": "2.7.4-beta22",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -588,7 +588,7 @@
     {
       "slug": "StepStation",
       "name": "stepStation",
-      "description": "8 independent track / 16 step sequencer with configurable user inputs/knobs and presets (sstation)",
+      "description": "8 independent track / 16 step sequencer with configurable user inputs/knobs and presets (stst)",
       "tags": [
         "Sequencer"
       ]
@@ -673,7 +673,7 @@
     {
       "slug": "TrigStation",
       "name": "trigStation",
-      "description": "8 independent track / 16 step trig sequencer with configurable user inputs/knobs and presets (tstation)",
+      "description": "8 independent track / 16 step trig sequencer with configurable user inputs/knobs and presets (trst)",
       "tags": [
         "Sequencer"
       ]
