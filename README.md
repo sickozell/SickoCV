@@ -786,7 +786,7 @@ randLoops8 is basically a 8-track randomLoops with limited functions, but with a
 ## randMod7 / randMod7Compact
 ### 7 random smooth cv generator
 
-![randmod](https://github.com/user-attachments/assets/fb38bff7-6112-4554-9798-5524d857c767)
+![randmod](https://github.com/user-attachments/assets/da3733a4-9981-454b-b18d-fd4625decf08)
 
 #### - INSTRUCTIONS
 randMod modules outputs 7 smoothed random voltages based on a common rate knob and a divider/multiplier each track.
