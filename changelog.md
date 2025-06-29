@@ -1,4 +1,4 @@
-### 2.7.4 (2025-06-28)
+### 2.7.4 (2025-06-29)
 - added stepStation and trigStation modules
 - added cvMeter module
 - added randMod7 and randMod7compact modules

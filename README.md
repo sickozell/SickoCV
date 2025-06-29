@@ -1,4 +1,4 @@
-# SickoCV v2.7.4-beta20
+# SickoCV v2.7.4-beta21
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -787,6 +787,14 @@ randLoops8 is basically a 8-track randomLoops with limited functions, but with a
 ### 7 random smooth cv generator
 
 ![randmod](https://github.com/user-attachments/assets/fb38bff7-6112-4554-9798-5524d857c767)
+
+#### - INSTRUCTIONS
+randMod modules outputs 7 smoothed random voltages based on a common rate knob and a divider/multiplier each track.
+On each track it is possible to set a min and max voltage range, the default is 0/10v.
+
+The magnet point switch (Lower, Middle, Upper) sets the point where the randomness will tend to, in combination with the magnet strength knob and CV input
+
+The compact version of randMod7 has only the div/mult knob on each track. You can set the output voltage range via the Uni/Bipolar button. Common Magnet point and Strength are set via context menu.
 
 [back to top](#table-of-contents)
 

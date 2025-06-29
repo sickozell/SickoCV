@@ -55,9 +55,9 @@ struct RandMod7compact : Module {
 	double maxSamples[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
 	double currSample[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
 
-	int magnet = 1;
+	int magnet = 0;
 
-	int strength = 1;
+	int strength = 0;
 
 	float rateAtten = 0.f;
 
@@ -389,21 +389,21 @@ struct RandMod7compactWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		RandMod7compact* module = dynamic_cast<RandMod7compact*>(this->module);
 
-		const std::string magnetNames[3] = {"Base", "Middle", "Top"};
+		const std::string magnetNames[3] = {"Lower", "Middle", "Upper"};
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Magnet to (Uni/Bi):", magnetNames[module->magnet], [=](Menu * menu) {
-			menu->addChild(createMenuItem("Base (0v/-5v)", CHECKMARK(module->magnet == 0), [=]() {module->magnet = 0;}));
+		menu->addChild(createSubmenuItem("Magnet point (Uni/Bi):", magnetNames[module->magnet], [=](Menu * menu) {
+			menu->addChild(createMenuItem("Lower (0v/-5v)", CHECKMARK(module->magnet == 0), [=]() {module->magnet = 0;}));
 			menu->addChild(createMenuItem("Middle (5v / 0v)", CHECKMARK(module->magnet == 1), [=]() {module->magnet = 1;}));
-			menu->addChild(createMenuItem("Top (10v/5v)", CHECKMARK(module->magnet == 2), [=]() {module->magnet = 2;}));
+			menu->addChild(createMenuItem("Upper (10v/5v)", CHECKMARK(module->magnet == 2), [=]() {module->magnet = 2;}));
 		}));
 
-		const std::string strengthNames[3] = {"Weak", "Average", "Strong"};
+		const std::string strengthNames[3] = {"weak", "Average", "STRONG"};
 
 		menu->addChild(createSubmenuItem("Magnet Strength:", strengthNames[module->strength], [=](Menu * menu) {
-			menu->addChild(createMenuItem("LOW", CHECKMARK(module->strength == 0), [=]() {module->strength = 0;}));
-			menu->addChild(createMenuItem("MEDIUM", CHECKMARK(module->strength == 1), [=]() {module->strength = 1;}));
-			menu->addChild(createMenuItem("HIGH", CHECKMARK(module->strength == 2), [=]() {module->strength = 2;}));
+			menu->addChild(createMenuItem("weak", CHECKMARK(module->strength == 0), [=]() {module->strength = 0;}));
+			menu->addChild(createMenuItem("Average", CHECKMARK(module->strength == 1), [=]() {module->strength = 1;}));
+			menu->addChild(createMenuItem("STRONG", CHECKMARK(module->strength == 2), [=]() {module->strength = 2;}));
 		}));
 
 		//menu->addChild(new MenuSeparator());

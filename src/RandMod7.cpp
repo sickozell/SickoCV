@@ -118,7 +118,7 @@ struct RandMod7 : Module {
 			configParam(XRATE_PARAM+i, 0.f, 1.f, 0.5f, "xRate", "x", maxXrate / minXrate, minXrate);
 			configParam(MIN_PARAM+i, -10.f, 10.f, 0.f, "Min", "v");
 			configParam(MAX_PARAM+i, -10.f, 10.f, 10.f, "Max", "v");
-			configSwitch(MAGNET_PARAM+i, 0.f, 2.f, 0.f, "Magnet", {"Base", "Middle", "Top"});
+			configSwitch(MAGNET_PARAM+i, 0.f, 2.f, 0.f, "Magnet point", {"Lower", "Middle", "Upper"});
 			configParam(STRENGTH_PARAM+i, 0.f, 1.f, 0.5f, "Strength", "%", 0, 100);
 			configInput(STRENGTH_INPUT+i, ("Strength #"+to_string(i+1)).c_str());
 			configOutput(OUT_OUTPUT+i, ("#"+to_string(i+1)).c_str());
