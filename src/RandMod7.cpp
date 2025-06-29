@@ -399,9 +399,9 @@ struct RandMod7Widget : ModuleWidget {
 
 
 		const float xRtKnob = 12;
-		const float yRtKnob = 21;
-		const float xRateAtnv = 18.8;
-		const float yRateAtnv = 32;
+		const float yRtKnob = 22;
+		const float xRateAtnv = 20.3;
+		const float yRateAtnv = 33;
 
 		const float xRateIn = 11;
 		const float yRateIn = 39;
@@ -424,7 +424,7 @@ struct RandMod7Widget : ModuleWidget {
 		const float xStr = 52.8f;
 		const float xOut   = 63.7f;
 
-		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, RandMod7::RATE_PARAM));
+		addParam(createParamCentered<SickoLargeKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, RandMod7::RATE_PARAM));
 
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, RandMod7::RATE_ATTENUV_PARAM));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRateIn, yRateIn)), module, RandMod7::RATE_INPUT));

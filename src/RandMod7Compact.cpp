@@ -392,7 +392,7 @@ struct RandMod7compactWidget : ModuleWidget {
 		const std::string magnetNames[3] = {"Lower", "Middle", "Upper"};
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Magnet point (Uni/Bi):", magnetNames[module->magnet], [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Magnet Point (Uni/Bi):", magnetNames[module->magnet], [=](Menu * menu) {
 			menu->addChild(createMenuItem("Lower (0v/-5v)", CHECKMARK(module->magnet == 0), [=]() {module->magnet = 0;}));
 			menu->addChild(createMenuItem("Middle (5v / 0v)", CHECKMARK(module->magnet == 1), [=]() {module->magnet = 1;}));
 			menu->addChild(createMenuItem("Upper (10v/5v)", CHECKMARK(module->magnet == 2), [=]() {module->magnet = 2;}));
