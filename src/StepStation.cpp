@@ -3946,6 +3946,14 @@ struct StepStationDisplayMode : TransparentWidget {
 
 			nvgTextBox(args.vg, 3.5, 15.3f, 60, module->modeNameDisplay[module->currentMode[t]].c_str(), NULL);
 
+			font = APP->window->loadFont(asset::plugin(pluginInstance, "res/c64.ttf"));
+			nvgFontFaceId(args.vg, font->handle);
+			nvgFontSize(args.vg, 10);
+
+			nvgFillColor(args.vg, nvgRGB(COLOR_EGA_WHITE));				
+
+			nvgTextBox(args.vg, 40.f, 15.f, 10, to_string(t+1).c_str(), NULL);
+
 		}
 		Widget::drawLayer(args, layer);
 	}
