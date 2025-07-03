@@ -18,6 +18,9 @@
 //using namespace std;	// this is for debug
 
 struct RandMod7compact : Module {
+
+	#include "randModTable.hpp"
+
 	enum ParamId {
 		RATE_PARAM,
 		RATE_ATTENUV_PARAM,
@@ -42,7 +45,7 @@ struct RandMod7compact : Module {
 
 	int bipolar = 0;
 
-	double rateKnob = 0.5f;
+	double rateKnob = 0.0f;
 
 	double xRateKnob[7] = {1, 1, 1, 1, 1, 1, 1};
 	double prevXrateKnob[7] = {0, 0, 0, 0, 0, 0, 0};
@@ -64,8 +67,6 @@ struct RandMod7compact : Module {
 	float y[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
 	float out[MAXTRACKS];
 
-	int direction[MAXTRACKS] = {BASE, BASE, BASE, BASE, BASE, BASE, BASE};
-
 	//float minOut = 10.f;
 	//float maxOut = 0.f;
 
@@ -74,17 +75,23 @@ struct RandMod7compact : Module {
 
 	float masterRateCv = 0.f;
 
+	float targetRateCv = 0;
+	float prevTargetRateCv = -11;
+
 	float factor[MAXTRACKS] = {};
 
-	bool alert = false;;
+	bool alert = false;
 
 	const float magnetTarget[3] = {0.0f, 0.5f, 1.0f};
 
 	float polarityBlend = 0.f;
 	bool prevBipolar = false;
 
-	float smoothedMasterRateCv = 0.f;
+	float smoothedMasterRateCv = 1.f;
+	//float smoothedMasterRateCv = 0.0001f;
 	const float rateSmoothing = 0.01f; // regola la velocità di smoothing
+
+	const float blendSpeed = 0.00005f;  // oppure 0.01f per più veloce
 
 	static constexpr float minRate = 0.1f;  // in milliseconds
 	static constexpr float maxRate = 500.f;  // in milliseconds
@@ -92,9 +99,22 @@ struct RandMod7compact : Module {
 	static constexpr float minXrate = 0.047619f;  // in milliseconds
 	static constexpr float maxXrate = 21.f;  // in milliseconds
 
+	static constexpr float minFreq = 2.f;       // 500 ms
+	static constexpr float maxFreq = 10000.f;   // 0.1 ms
+
+	//static constexpr int LUT_SIZE = 512;
+	//float rateLUT[LUT_SIZE];
+
+	//float masterRateCvSnapshot = -1.f;  // inizializzazione
+
+	//static constexpr float UPDATE_EPSILON = 1e-6f;
+
+	bool firstRun = true;
+
 	RandMod7compact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(RATE_PARAM, 0.f, 1.f, 1.f, "Rate", "ms", maxRate / minRate, minRate);
+		//configParam(RATE_PARAM, 0.f, 1.f, 1.f, "Rate", "ms", maxRate / minRate, minRate);
+		configParam(RATE_PARAM, 0.f, 1.f, 0.f, "Rate", "hz", maxFreq / minFreq, minFreq);
 		configInput(RATE_INPUT, "Rate");
 		configParam(RATE_ATTENUV_PARAM, -1.f, 1.f, 0.f, "Rate CV", "%", 0, 100);
 		for (int i = 0; i < 7; i++) {
@@ -102,10 +122,11 @@ struct RandMod7compact : Module {
 			configOutput(OUT_OUTPUT+i, "");
 		}
 		configSwitch(BIPOLAR_PARAM, 0.f, 1.f, 0.f, "Bipolar", {"Off", "On"});
+
 	}
 
 	void onReset(const ResetEvent &e) override {
-		rateKnob = 0.5;
+		rateKnob = 0.0;
 
 		for (int i = 0; i < 7; i++) {
 
@@ -251,37 +272,67 @@ struct RandMod7compact : Module {
 
 	}
 
+	static float convertRateParamToMs(float param) {
+		// Exponential interpolation in Hz
+		float freq = minFreq * std::pow(maxFreq / minFreq, param);
+		return 1000.f / freq; // Convert Hz to ms
+	}
+
 	static float getXrateFactor(float cv) {
 		return minXrate * std::pow(maxXrate / minXrate, cv);
 	}
-
+/*
 	static float convertRateToMilliseconds(float cv) {
 		return minRate * std::pow(maxRate / minRate, cv);
+	}
+*/
+
+	float lookupRateParamToMs(float param) const {
+
+	    //float p = clamp(param, 0.f, 1.f) * (LUT_SIZE - 1);
+	    float p = param * (LUT_SIZE -1);
+	    int i = static_cast<int>(p);
+	    float frac = p - i;
+	    float a = randModTable[i];
+	    float b = randModTable[std::min(i + 1, LUT_SIZE - 1)];
+	    return a + frac * (b - a);  // Interpolazione lineare
+
 	}
 
 	void process(const ProcessArgs& args) override {
 
-		bipolar = params[BIPOLAR_PARAM].getValue() > 0.5f;
-		lights[BIPOLAR_LIGHT].setBrightness(bipolar ? 1.f : 0.f);
-
-		float targetBlend = bipolar ? 1.f : 0.f;
 		
-		float blendSpeed = 0.00005f;  // oppure 0.01f per più veloce
 
+		bipolar = params[BIPOLAR_PARAM].getValue();
+		lights[BIPOLAR_LIGHT].setBrightness(bipolar);
+
+		float targetBlend = bipolar;
+		
 		polarityBlend += (targetBlend - polarityBlend) * blendSpeed;
 
-		polarityBlend += (targetBlend - polarityBlend) * blendSpeed;
-		
 		rateKnob = params[RATE_PARAM].getValue();
 
 		rateAtten =  params[RATE_ATTENUV_PARAM].getValue();
 
-		float targetRateCv = clamp(params[RATE_PARAM].getValue() + (inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f), 0.f, 1.f);
+		targetRateCv = clamp(params[RATE_PARAM].getValue() + (inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f), 0.f, 1.f);
 
-		if (abs(targetRateCv - smoothedMasterRateCv) > 1e-6) {
-			smoothedMasterRateCv += (targetRateCv - smoothedMasterRateCv) * rateSmoothing;
+		if (firstRun) {
+			firstRun = false;
+			float initialCvInput = inputs[RATE_INPUT].isConnected() ? inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f : 0.f;
+			smoothedMasterRateCv = clamp(params[RATE_PARAM].getValue() + initialCvInput, 0.f, 1.f);
 			alert = true;
-			masterRate = convertRateToMilliseconds(smoothedMasterRateCv);
+			//masterRate = convertRateParamToMs(smoothedMasterRateCv);
+			masterRate = lookupRateParamToMs(smoothedMasterRateCv);
+		} else {
+			if (targetRateCv != prevTargetRateCv) {
+				if (abs(targetRateCv - smoothedMasterRateCv) > 1e-6) {
+					smoothedMasterRateCv += (targetRateCv - smoothedMasterRateCv) * rateSmoothing;
+					alert = true;
+					//masterRate = convertRateParamToMs(smoothedMasterRateCv);
+					masterRate = lookupRateParamToMs(smoothedMasterRateCv);
+				}
+				prevTargetRateCv = targetRateCv;
+			}
 		}
 
 		for (int t = 0; t < MAXTRACKS; t++) {
@@ -293,7 +344,7 @@ struct RandMod7compact : Module {
 				prevXrateKnob[t] = xRateKnob[t];
 			}
 
-			rate[t] = masterRate * factor[t];
+			rate[t] = masterRate / factor[t];
 			
 			if (rate[t] < minRate)
 				rate[t] = minRate;

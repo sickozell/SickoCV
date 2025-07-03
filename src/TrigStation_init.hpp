@@ -22,6 +22,9 @@
 	int rstStepsWhen[ALLTRACKS] = {3, 3, 3, 3, 3, 3, 3, 3, 1};
 	bool xcludeFromRun[MAXTRACKS] = {false, false, false, false, false, false, false, false};
 	bool xcludeFromRst[MAXTRACKS] = {false, false, false, false, false, false, false, false};
+
+	int wait2RstSetting = 1;
+
 //	int sampleDelay[ALLTRACKS] = {6, 6, 6, 6, 6, 6, 6, 6, 0};
 
 	float nextSeq[MAXTRACKS][16] = {	{0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
@@ -51,6 +54,11 @@
 	bool nextSeqRunSetting = seqRunSetting;
 	bool nextInternalClock = internalClock;
 	float nextBpmKnob = 1200.f;
+
+	int nextWait2RstSetting = 1;
+
+	int progWait2RstSetting[32] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+							
 
 //	float nextRst[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
 	// --------------workingSeq

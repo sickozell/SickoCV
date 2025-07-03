@@ -18,6 +18,9 @@
 using namespace std;	// this is for debug
 
 struct RandMod7 : Module {
+
+	#include "randModTable.hpp"
+
 	enum ParamId {
 		RATE_PARAM,
 		RATE_ATTENUV_PARAM,
@@ -94,6 +97,9 @@ struct RandMod7 : Module {
 
 	bool alert = false;;
 
+	float targetRateCv = 0;
+	float prevTargetRateCv = -11;
+
 	const float magnetTarget[3] = {0.0f, 0.5f, 1.0f};
 
 	int polyChans = 1;
@@ -104,13 +110,18 @@ struct RandMod7 : Module {
 	static constexpr float minRate = 0.1f;  // in milliseconds
 	static constexpr float maxRate = 500.f;  // in milliseconds
 
-
 	static constexpr float minXrate = 0.047619f;  // in milliseconds
 	static constexpr float maxXrate = 21.f;  // in milliseconds
 
+	static constexpr float minFreq = 2.f;       // 500 ms
+	static constexpr float maxFreq = 10000.f;   // 0.1 ms
+
+	bool firstRun = true;
+
 	RandMod7() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(RATE_PARAM, 0.f, 1.f, 1.f, "Rate", "ms", maxRate / minRate, minRate);
+		//configParam(RATE_PARAM, 0.f, 1.f, 0.f, "Rate", "ms", maxRate / minRate, minRate);
+		configParam(RATE_PARAM, 0.f, 1.f, 0.f, "Rate", "hz", maxFreq / minFreq, minFreq);
 		configInput(RATE_INPUT, "Rate");
 		configParam(RATE_ATTENUV_PARAM, -1.f, 1.f, 0.f, "Rate CV", "%", 0, 100);
 
@@ -275,12 +286,20 @@ struct RandMod7 : Module {
 
 	}
 
-	static float getXrateFactor(float cv) {
-		return minXrate * std::pow(maxXrate / minXrate, cv);
+	float lookupRateParamToMs(float param) const {
+
+	    //float p = clamp(param, 0.f, 1.f) * (LUT_SIZE - 1);
+	    float p = param * (LUT_SIZE -1);
+	    int i = static_cast<int>(p);
+	    float frac = p - i;
+	    float a = randModTable[i];
+	    float b = randModTable[std::min(i + 1, LUT_SIZE - 1)];
+	    return a + frac * (b - a);  // Interpolazione lineare
+
 	}
 
-	static float convertRateToMilliseconds(float cv) {
-		return minRate * std::pow(maxRate / minRate, cv);
+	static float getXrateFactor(float cv) {
+		return minXrate * std::pow(maxXrate / minXrate, cv);
 	}
 
 	inline float mix(float a, float b, float f) {
@@ -294,12 +313,23 @@ struct RandMod7 : Module {
 
 		rateAtten =  params[RATE_ATTENUV_PARAM].getValue();
 
-		float targetRateCv = clamp(params[RATE_PARAM].getValue() + (inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f), 0.f, 1.f);
+		targetRateCv = clamp(params[RATE_PARAM].getValue() + (inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f), 0.f, 1.f);
 
-		if (abs(targetRateCv - smoothedMasterRateCv) > 1e-6) {
-			smoothedMasterRateCv += (targetRateCv - smoothedMasterRateCv) * rateSmoothing;
+		if (firstRun) {
+			firstRun = false;
+			float initialCvInput = inputs[RATE_INPUT].isConnected() ? inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f : 0.f;
+			smoothedMasterRateCv = clamp(params[RATE_PARAM].getValue() + initialCvInput, 0.f, 1.f);
 			alert = true;
-			masterRate = convertRateToMilliseconds(smoothedMasterRateCv);
+			masterRate = lookupRateParamToMs(smoothedMasterRateCv);
+		} else {
+			if (targetRateCv != prevTargetRateCv) {
+				if (abs(targetRateCv - smoothedMasterRateCv) > 1e-6) {
+					smoothedMasterRateCv += (targetRateCv - smoothedMasterRateCv) * rateSmoothing;
+					alert = true;
+					masterRate = lookupRateParamToMs(smoothedMasterRateCv);
+				}
+				prevTargetRateCv = targetRateCv;
+			}
 		}
 
 		for (int t = 0; t < MAXTRACKS; t++) {
@@ -332,10 +362,10 @@ struct RandMod7 : Module {
 				rawStrength = clamp(rawStrength, 0.f, 1.f);
 
 				float center      = magnetTarget[magnet[t]];
-				float centerBias  = 1.f - std::abs(center - 0.5f) * 2.f;  // 1 in centro, 0 ai lati
+				float centerBias  = 1.f - abs(center - 0.5f) * 2.f;  // 1 in centro, 0 ai lati
 				float strength    = rawStrength * centerBias;
 
-				float distance    = std::abs(startY[t] - center);
+				float distance    = abs(startY[t] - center);
 				float spread      = mix(0.5f, 0.01f, strength * (1.f - distance));
 
 				targetY[t] = clamp(center + random::normal() * spread, 0.f, 1.f);
@@ -430,10 +460,10 @@ struct RandMod7Widget : ModuleWidget {
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRateIn, yRateIn)), module, RandMod7::RATE_INPUT));
 
 		for (int i = 0; i < 3; i++)
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart1 + (i * 5.5), yRow1 + (yShift * i))), module, RandMod7::STRENGTH_INPUT+i));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart1 + (i * 5.5), yRow1 + (yShift * i))), module, RandMod7::STRENGTH_INPUT+i+4));
 
 		for (int i = 0; i < 4; i++)
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart2 + (i * 5.5), yRow2 + (yShift * i))), module, RandMod7::STRENGTH_INPUT+i+3));
+			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xStart2 + (i * 5.5), yRow2 + (yShift * i))), module, RandMod7::STRENGTH_INPUT+i));
 
 
 		for (int i = 0; i < 7; i++) {

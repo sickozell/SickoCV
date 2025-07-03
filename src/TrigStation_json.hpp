@@ -19,6 +19,7 @@
 
 		json_object_set_new(rootJ, "divControls", json_boolean(divControls));
 		json_object_set_new(rootJ, "modeControls", json_boolean(modeControls));
+		json_object_set_new(rootJ, "wait2RstSetting", json_integer(wait2RstSetting));
 
 		// ---------- CLOCK
 		
@@ -312,6 +313,11 @@
 														╚═╝░░░░░╚═╝░╚════╝░╚═════╝░░╚═════╝░╚══════╝╚══════╝╚═╝╚═╝╚═╝╚══════╝░╚════╝░╚═╝░░╚═╝╚═════╝░
 */
 	void dataFromJson(json_t* rootJ) override {
+
+		json_t* wait2RstSettingJ = json_object_get(rootJ, "wait2RstSetting");
+		if (wait2RstSettingJ)
+			wait2RstSetting = json_boolean_value(wait2RstSettingJ);
+
 
 		json_t* divControlsJ = json_object_get(rootJ, "divControls");
 		if (divControlsJ)
@@ -814,6 +820,10 @@
 				changePpqnSetting();
 		}
 
+		json_t* wait2RstSettingJ = json_object_get(rootJ, "wait2RstSetting");
+		if (wait2RstSettingJ)
+			wait2RstSetting = json_boolean_value(wait2RstSettingJ);
+
 		json_t* resetOnRunJ = json_object_get(rootJ, "resetOnRun");
 		if (resetOnRunJ)
 			resetOnRun = json_boolean_value(resetOnRunJ);
@@ -1098,6 +1108,8 @@
 			recStep[t] = step[t];
 
 		json_t* rootJ = json_object();
+
+		json_object_set_new(rootJ, "wait2RstSetting", json_integer(wait2RstSetting));
 
 		// ---------- CLOCK
 		

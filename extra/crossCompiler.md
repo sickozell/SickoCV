@@ -1,4 +1,4 @@
-git tag v2.7.4-beta23 -m "create v2.7.4-beta23"  
+git tag v2.7.4-beta24 -m "create v2.7.4-beta24"  
 git push origin --tags  
 
 delete local tag  

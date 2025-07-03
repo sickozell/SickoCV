@@ -420,6 +420,8 @@ struct TrigStation : SickoTrigStation {
 	int getOutputBase() const override { return OUT_OUTPUT; }
 	int getParamBase() const override { return USER_PARAM; }
 
+	bool waitClock2RstSeq[MAXTRACKS] = {false, false, false, false, false, false, false, false};
+
 	float clkValue[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
 	float prevClkValue[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -564,9 +566,9 @@ struct TrigStation : SickoTrigStation {
 	double clockMaxSample[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double maxPulseSample[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	double extClockSample = 999999999999;
-	double extClockMaxSample = 0;
-	double extMaxPulseSample = 0;
+	double extClockSample[ALLTRACKS] = {999999999999, 999999999999,  999999999999,  999999999999,  999999999999,  999999999999,  999999999999,  999999999999,  999999999999};
+	double extClockMaxSample[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+	double extMaxPulseSample[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	
 	int ppqnTable[7] = {1, 2, 4, 8, 12, 16, 24}; // 1 2 4 8 12 16 24
 	int ppqn = PPQN1;
@@ -2318,7 +2320,11 @@ struct TrigStation : SickoTrigStation {
 
 		if (resetValue[MC] >= 1 && prevResetValue[MC] < 1) {
 
-			resetAllSteps();
+			if (!wait2RstSetting)
+				resetAllSteps();
+			else
+				for (int t = 0; t < MAXTRACKS; t++)
+					waitClock2RstSeq[t] = true;
 
 			if (rstClkOnRst) {
 
@@ -2326,7 +2332,7 @@ struct TrigStation : SickoTrigStation {
 				if (!extConn[MC])
 					clockSample[MC] = 1.0;
 				else if (cvClockIn) {
-					extClockSample = 1.0;
+					extClockSample[MC] = 1.0;
 					//extClockMaxSample = 0;
 					//extMaxPulseSample = 0;
 				}
@@ -2575,15 +2581,15 @@ struct TrigStation : SickoTrigStation {
 				prevCvClockInValue[MC] = cvClockInValue[MC];
 
 				//clockMaxSample[MC] = sampleRateCoeff / bpm[MC];
-				extClockMaxSample = sampleRateCoeff / extBpm;
+				extClockMaxSample[MC] = sampleRateCoeff / extBpm;
 				
-				if (extClockSample > extClockMaxSample || resetStartExt)  {
+				if (extClockSample[MC] > extClockMaxSample[MC] || resetStartExt)  {
 
 					if (resetStartExt) {
-						extClockSample = 1.0;
+						extClockSample[MC] = 1.0;
 						resetStartExt = false;		/// <---- cambiato con il nuovo extBpm, controllare
 					} else
-						extClockSample -= extClockMaxSample;
+						extClockSample[MC] -= extClockMaxSample[MC];
 
 					
 					extBeat[MC] = true;
@@ -2608,7 +2614,7 @@ struct TrigStation : SickoTrigStation {
 									if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
 										// ***** CLOCK MULTIPLIER *****
 										//divMaxSample[t][0] = clockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][0] = extClockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
+										divMaxSample[t][0] = extClockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
 										divMaxSample[t][1] = divMaxSample[t][0];
 										divClockSample[t] = 1.0;
 										//outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
@@ -2617,7 +2623,7 @@ struct TrigStation : SickoTrigStation {
 									} else {
 										// ***** CLOCK DIVIDER *****
 										//divMaxSample[t][0] = clockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][0] = extClockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
+										divMaxSample[t][0] = extClockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
 										divMaxSample[t][1] = divMaxSample[t][0];
 										divCount[t]++;
 										if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
@@ -2633,7 +2639,7 @@ struct TrigStation : SickoTrigStation {
 									if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
 										// ***** CLOCK MULTIPLIER *****
 										//divMaxSample[t][0] = clockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][0] = extClockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
+										divMaxSample[t][0] = extClockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
 										//divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * params[DIVPW_KNOB_PARAM+t].getValue());
 										//divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * 0.5);
 										divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * swingCalc(t));
@@ -2646,7 +2652,7 @@ struct TrigStation : SickoTrigStation {
 									} else {
 										// ***** CLOCK DIVIDER *****
 										//divMaxSample[t][0] = clockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][0] = extClockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
+										divMaxSample[t][0] = extClockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
 										divMaxSample[t][1] = divMaxSample[t][0];
 										divCount[t]++;
 										if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
@@ -2683,14 +2689,14 @@ struct TrigStation : SickoTrigStation {
 						if (pulseNr > ppqnComparison) {
 							pulseNr = 0;
 							//clockMaxSample[MC] = clockSample[MC];
-							extClockMaxSample = extClockSample;
-							extClockSample = 0.0;
+							extClockMaxSample[MC] = extClockSample[MC];
+							extClockSample[MC] = 0.0;
 							
 							//if (runSetting)
 								extBeat[MC] = true;
 
 							// calculate bpms
-							extBpm = round(sampleRateCoeff / extClockMaxSample);
+							extBpm = round(sampleRateCoeff / extClockMaxSample[MC]);
 							if (extBpm > 999)
 								extBpm = 999;
 
@@ -2709,7 +2715,7 @@ struct TrigStation : SickoTrigStation {
 						extBpm = 0.0;
 						extSync[MC] = true;
 						//clockSample[MC] = 1.0;
-						extClockSample = 1.0;
+						extClockSample[MC] = 1.0;
 						pulseNr = 0;
 
 						//if (runSetting)
@@ -2730,11 +2736,11 @@ struct TrigStation : SickoTrigStation {
 
 				// ****** CLOCK PULSE WIDTH
 
-				extMaxPulseSample = extClockMaxSample * 0.5;	// <<<<<<<<<<------------------ OTTIMIZZARE POSIZIONE
+				extMaxPulseSample[MC] = extClockMaxSample[MC] * 0.5;	// <<<<<<<<<<------------------ OTTIMIZZARE POSIZIONE
 				
 				if (!internalClock) {
 
-					if (extClockSample > extMaxPulseSample)
+					if (extClockSample[MC] > extMaxPulseSample[MC])
 						if (!cvClockOut)
 							outputs[CLOCK_OUTPUT].setVoltage(0.f);
 
@@ -2795,14 +2801,14 @@ struct TrigStation : SickoTrigStation {
 
 										if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
 											// ***** CLOCK MULTIPLIER *****
-											divMaxSample[t][0] = extClockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
+											divMaxSample[t][0] = extClockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
 											divMaxSample[t][1] = divMaxSample[t][0];
 											divClockSample[t] = 1.0;
 											divPulse[t] = true;
 											edge[t] = true;
 										} else {
 											// ***** CLOCK DIVIDER *****
-											divMaxSample[t][0] = extClockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
+											divMaxSample[t][0] = extClockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
 											divMaxSample[t][1] = divMaxSample[t][1];
 											divCount[t]++;
 											if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
@@ -2816,7 +2822,7 @@ struct TrigStation : SickoTrigStation {
 
 										if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
 											// ***** CLOCK MULTIPLIER *****
-											divMaxSample[t][0] = extClockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
+											divMaxSample[t][0] = extClockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
 											divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * swingCalc(t));
 											divOddCounter[t] = 1;
 											divClockSample[t] = 1.0;
@@ -2825,7 +2831,7 @@ struct TrigStation : SickoTrigStation {
 											edge[t] = true;
 										} else {
 											// ***** CLOCK DIVIDER *****
-											divMaxSample[t][0] = extClockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
+											divMaxSample[t][0] = extClockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
 											divMaxSample[t][1] = divMaxSample[t][0];
 											divCount[t]++;
 											if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
@@ -2848,7 +2854,7 @@ struct TrigStation : SickoTrigStation {
 					}
 				}
 
-				extClockSample++;
+				extClockSample[MC]++;
 
 				if (!internalClock)
 					for (int t = 0; t < MAXTRACKS; t++)
@@ -2908,39 +2914,44 @@ struct TrigStation : SickoTrigStation {
 					// ****** CLOCK PULSE WIDTH
 					maxPulseSample[t] = clockMaxSample[t] * 0.5;		// ---------------------------------- DA OTTIMIZZARE
 				
-					// ************ DIV / MULT OLD OLD OLD
+					if (clockSample[t] <= clockMaxSample[t]) {
+						// ************ DIV / MULT OLD OLD OLD
 
-					if(!divSwing[t]) {
+						if(!divSwing[t]) {
 
-						if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][0]) {
-							// ***** CLOCK MULTIPLIER *****
-							divClockSample[t] = 1.0;
-							divPulse[t] = true;
-							edge[t] = true;
-						}
-
-						// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
-						if (divPulse[t] && divClockSample[t] > divMaxSample[t][0] * 0.5) {
-							divPulse[t] = false;
-							edge[t] = false;
-						}
-
-					} else {
-
-						if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][divOddCounter[t]]) {
-							// ***** CLOCK MULTIPLIER *****
-							divPulseTime[t] = oneMsTime;
-							divPulse[t] = true;
-							edge[t] = true;
-
-							if (divOddCounter[t] == 0) {
+							if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][0]) {
+								// ***** CLOCK MULTIPLIER *****
 								divClockSample[t] = 1.0;
-								divOddCounter[t] = 1;
-							}	else {
-								divClockSample[t] = 1.0 + divMaxSample[t][1] - divMaxSample[t][0];
-								divOddCounter[t] = 0;
+								divPulse[t] = true;
+								edge[t] = true;
+							}
+
+							// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
+							if (divPulse[t] && divClockSample[t] > divMaxSample[t][0] * 0.5) {
+								divPulse[t] = false;
+								edge[t] = false;
+							}
+
+						} else {
+
+							if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][divOddCounter[t]]) {
+								// ***** CLOCK MULTIPLIER *****
+								divPulseTime[t] = oneMsTime;
+								divPulse[t] = true;
+								edge[t] = true;
+
+								if (divOddCounter[t] == 0) {
+									divClockSample[t] = 1.0;
+									divOddCounter[t] = 1;
+								}	else {
+									divClockSample[t] = 1.0 + divMaxSample[t][1] - divMaxSample[t][0];
+									divOddCounter[t] = 0;
+								}
 							}
 						}
+					} else {
+						//extSync[t] = false;
+
 					}
 				}
 
@@ -3164,13 +3175,24 @@ struct TrigStation : SickoTrigStation {
 		}
 
 		if (seqRunSetting && !prevSeqRunSetting) {
-			for (int t = 0; t < MAXTRACKS; t++)
-				if (rstStepsWhen[t] == RST_ONRUN || (rstStepsWhen[t] == RST_DEFAULT && rstStepsWhen[MC] == RST_ONRUN))
-					resetTrackSteps(t);
+			for (int t = 0; t < MAXTRACKS; t++) {
+				if (rstStepsWhen[t] == RST_ONRUN || (rstStepsWhen[t] == RST_DEFAULT && rstStepsWhen[MC] == RST_ONRUN)) {
+					if (!wait2RstSetting)
+						resetTrackSteps(t);
+					else
+						waitClock2RstSeq[t] = true;	// NUOVO CAMBIO
+				}
+			}
+
 		} else if (!seqRunSetting && prevSeqRunSetting) {
-			for (int t = 0; t < MAXTRACKS; t++)
-				if (rstStepsWhen[t] == RST_ONSTOP || (rstStepsWhen[t] == RST_DEFAULT && rstStepsWhen[MC] == RST_ONSTOP))
-					resetTrackSteps(t);
+			for (int t = 0; t < MAXTRACKS; t++) {
+				if (rstStepsWhen[t] == RST_ONSTOP || (rstStepsWhen[t] == RST_DEFAULT && rstStepsWhen[MC] == RST_ONSTOP)) {
+					if (!wait2RstSetting)
+						resetTrackSteps(t);
+					else
+						waitClock2RstSeq[t] = true;	// NUOVO CAMBIO
+				}
+			}
 		}
 		prevSeqRunSetting = seqRunSetting;
 
@@ -3317,7 +3339,11 @@ struct TrigStation : SickoTrigStation {
 
 						stepPulse[t] = false;
 
+					if (wait2RstSetting && waitClock2RstSeq[t]) {	// NUOVO CAMBIO
+						resetTrackSteps(t);
+						waitClock2RstSeq[t] = false;
 
+					} else {
 						if (!userInputs[t][IN_RUN][0] ||
 								(userInputs[t][IN_RUN][0] &&
 									(!inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() || (inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].getVoltage() >= 1.f))
@@ -3838,6 +3864,7 @@ struct TrigStation : SickoTrigStation {
 						} else {
 							calcVoltage(t);
 						}
+					}
 
 					}
 
@@ -5451,6 +5478,25 @@ struct TrigStationWidget : ModuleWidget {
 					rstStepsWhenItem->module = module;
 					rstStepsWhenItem->rstStepsWhen = i;
 					menu->addChild(rstStepsWhenItem);
+				}
+			}));
+
+			struct WaitClockItem : MenuItem {
+				TrigStation* module;
+				int wait2RstSetting;
+				void onAction(const event::Action& e) override {
+					module->wait2RstSetting = wait2RstSetting;
+				}
+			};
+
+			std::string WaitClockNames[3] = {"No", "Yes"};
+			menu->addChild(createSubmenuItem("Wait 1st clock to reset seq:", (WaitClockNames[module->wait2RstSetting]), [=](Menu * menu) {
+				for (int i = 0; i < 2; i++) {
+					WaitClockItem* waitClockItem = createMenuItem<WaitClockItem>(WaitClockNames[i]);
+					waitClockItem->rightText = CHECKMARK(module->wait2RstSetting == i);
+					waitClockItem->module = module;
+					waitClockItem->wait2RstSetting = i;
+					menu->addChild(waitClockItem);
 				}
 			}));
 
