@@ -341,7 +341,7 @@ struct RandMod7 : Module {
 				prevXrateKnob[t] = xRateKnob[t];
 			}
 
-			rate[t] = masterRate * factor[t];
+			rate[t] = masterRate / factor[t];
 			
 			magnet[t] = params[MAGNET_PARAM+t].getValue();
 			

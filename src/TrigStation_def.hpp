@@ -103,29 +103,25 @@
 #define IN_LENGTH 2
 #define IN_MODE 3
 #define IN_OUTSCALE 4
-#define IN_PW 5
-#define IN_RSTSTEP 6
-#define IN_RETRIG 7
-#define IN_REV 8
-#define IN_RUN 9
-#define IN_SKIP 10
-#define IN_SKIPPROB 11
-#define IN_SWING 12
-#define KNOB_CHANGEPROB 13
-#define KNOB_MODE 14
-#define KNOB_OUTSCALE 15
-#define KNOB_PW 16
-#define KNOB_RSTSTEP 17
-#define KNOB_RETRIGPROB 18
-#define KNOB_SKIPPROB 19
-#define KNOB_SWING 20
-#define KNOB_ATN 21
-#define KNOB_ATNV 22
+#define IN_RSTSTEP 5
+#define IN_RETRIG 6
+#define IN_REV 7
+#define IN_RUN 8
+#define IN_SKIP 9
+#define IN_SKIPPROB 10
+#define KNOB_CHANGEPROB 11
+#define KNOB_MODE 12
+#define KNOB_OUTSCALE 13
+#define KNOB_RSTSTEP 14
+#define KNOB_RETRIGPROB 15
+#define KNOB_SKIPPROB 16
+#define KNOB_ATN 17
+#define KNOB_ATNV 18
 
-#define KNOB_SHIFT 13
-#define KNOB_NR 10
-#define MAXUSER 23
-#define FIRST_ATN 7
+#define KNOB_SHIFT 11
+#define KNOB_NR 8
+#define MAXUSER 19
+#define FIRST_ATN 5
 
 #define RST_NONE 0
 #define RST_ONRUN 1
@@ -134,7 +130,7 @@
 
 #define OUT_TRIG 0
 #define OUT_GATE 1
-//#define OUT_CLOCK 2
+#define OUT_CLOCK 2
 
 #define STD2x_PROGRESSION 0
 #define P_1_3_PROGRESSION 2 // 1.3x

@@ -1,17 +1,3 @@
-#define PPQN1 0
-#define PPQN2 1
-#define PPQN4 2
-#define PPQN8 3
-#define PPQN12 4
-#define PPQN16 5
-#define PPQN24 6
-#define REGISTER_SIZE 168
-
-#define NO_SMOOTH 0
-#define LOW_SMOOTH 1
-#define MEDIUM_SMOOTH 2
-#define HIGH_SMOOTH 3
-
 //-----------
 #define FORWARD 0
 #define REVERSE 1
@@ -107,20 +93,18 @@
 #define IN_RETRIG 6
 #define IN_REV 7
 #define IN_RUN 8
-#define IN_SWING 9
-#define KNOB_CHANGEPROB 10
-#define KNOB_MODE 11
-#define KNOB_OUTSCALE 12
-#define KNOB_RSTSTEP 13
-#define KNOB_RETRIGPROB 14
-#define KNOB_SWING 15
-#define KNOB_ATN 16
-#define KNOB_ATNV 17
+#define KNOB_CHANGEPROB 9
+#define KNOB_MODE 10
+#define KNOB_OUTSCALE 11
+#define KNOB_RSTSTEP 12
+#define KNOB_RETRIGPROB 13
+#define KNOB_ATN 14
+#define KNOB_ATNV 15
 
-#define KNOB_SHIFT 10
-#define KNOB_NR 8
-#define MAXUSER 18
-#define FIRST_ATN 5
+#define KNOB_SHIFT 9
+#define KNOB_NR 7
+#define MAXUSER 16
+#define FIRST_ATN 4
 
 #define RST_NONE 0
 #define RST_ONRUN 1

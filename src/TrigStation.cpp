@@ -14,22 +14,18 @@ using namespace std;
 
 struct SickoTrigStation : Module {
 
-	bool alive;
+	//bool alive;
 
 	virtual int getInputBase() const { return -1; }
 	virtual int getOutputBase() const { return -1; }
 	virtual int getParamBase() const { return -1; }
 
-	//const std::string userInNames[KNOB_SHIFT] = {"Pulse Width", "Reverse", "Mode", "Length", "Reset Step#", "Run", "Retrig", "Out scale", "Swing", "Flip"};
-	//const std::string userKnobNames[KNOB_NR] = {"Pulse Width", "Reset Step#", "Mode", "Retrig Prob.", "Out scale", "Swing", "Flip Prob.", "Attenuator", "Attenuverter"};
-	const std::string userInNames[KNOB_SHIFT] = {"Change", "Change Prob.", "Length", "Mode", "Out scale", "Pulse Width", "Reset Step#", "Retrig", "Reverse", "Run", "Skip", "Skip Prob.", "Swing"};
-	const std::string userKnobNames[KNOB_NR] = {"Change Prob.", "Mode", "Out scale",  "Pulse Width", "Reset Step#", "Retrig Prob.", "Skip Prob.", "Swing", "Attenuator", "Attenuverter"};
+	const std::string userInNames[KNOB_SHIFT] = {"Change", "Change Prob.", "Length", "Mode", "Out scale", "Reset Step#", "Retrig", "Reverse", "Run", "Skip", "Skip Prob."};
+	const std::string userKnobNames[KNOB_NR] = {"Change Prob.", "Mode", "Out scale", "Reset Step#", "Retrig Prob.", "Skip Prob.", "Attenuator", "Attenuverter"};
 
 	const std::string sampleDelayNames[7] = {"No Delay", "1 sample", "2 samples", "3 samples", "4 samples", "5 samples", "Default"};
 
 	int sampleDelay[ALLTRACKS] = {6, 6, 6, 6, 6, 6, 6, 6, 0};
-	bool cvClockIn = false;
-	bool cvClockOut = false;
 
 	int userTable[MAXTRACKS][4] = {
 							{IN_RUN, KNOB_CHANGEPROB, IN_REV, KNOB_MODE},
@@ -43,16 +39,17 @@ struct SickoTrigStation : Module {
 						};
 
 	int userInputs[MAXTRACKS][MAXUSER][2] = {
-//							  IN_CHANGE IN_FLPPRB IN_LENGH IN_MODE  IN_OUTSC IN_PW   IN_RSTST IN_RETRIG IN_REV   IN_RUN   IN_SKIP IN_SKIPRB IN_SWING KN_FLIP  KN_MODE  KN_OUTSC KN_PW   KN_RSTST  KN_PROB KN_SKIP KN_SWNG KN_ATN  KN_ATNV
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} },
-							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }
+//						    IN_CHANGE IN_FLPPRB IN_LENGH IN_MODE IN_OUTSC IN_RSTST IN_RETRIG IN_REV   IN_RUN   IN_SKIP IN_SKIPRB KN_FLIP  KN_MODE KN_OUTSC KN_RSTST  KN_PROB KN_SKIP KN_ATN  KN_ATNV
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} },
+							{ {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {0, 0} , {1, 8} , {1, 0} , {0, 0} , {0, 0} , {1, 0} , {1, 8} , {0, 0} , {0, 0} , {0, 0}, {0, 0}, {0, 0}, {0, 0} }
 						};
+
 	void appendInputMenu(Menu *menu, engine::Port::Type type, int portId){
 
 		menu->addChild(new MenuSeparator());
@@ -138,7 +135,7 @@ struct SickoTrigStation : Module {
 			menu->addChild(createMenuLabel("Unknown input"));
 		}
 	}
-
+/*
 	void appendClockInMenu(Menu *menu, engine::Port::Type type, int portId){
 
 		menu->addChild(new MenuSeparator());
@@ -153,7 +150,7 @@ struct SickoTrigStation : Module {
 		menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &cvClockOut));
 		
 	}
-
+*/
 	void appendOutMenu(Menu *menu, engine::Port::Type type, int portId){
 
 		menu->addChild(new MenuSeparator());
@@ -294,25 +291,21 @@ struct SickoTrigStation : Module {
 
 template <class TWidget>
 TWidget* createStationParamCentered(math::Vec pos, engine::Module* module, int paramId){
-	//SickoTrigStation* mod = dynamic_cast<SickoTrigStation*>(module);
-	//mod->alive = true;
   return createParamCentered<TWidget>(pos, module, paramId);
 }
 
 template <class TWidget>
 TWidget* createStationInputCentered(math::Vec pos, engine::Module* module, int paramId){
-	//SickoTrigStation* mod = dynamic_cast<SickoTrigStation*>(module);
-	//mod->alive = true;
   return createInputCentered<TWidget>(pos, module, paramId);
 }
-
+/*
 template <class TWidget>
 TWidget* createStationClockInCentered(math::Vec pos, engine::Module* module, int paramId){
 	//SickoTrigStation* mod = dynamic_cast<SickoTrigStation*>(module);
 	//mod->alive = true;
   return createInputCentered<TWidget>(pos, module, paramId);
 }
-
+*/
 template <class TWidget>
 TWidget* createStationClockOutCentered(math::Vec pos, engine::Module* module, int paramId){
 	//SickoTrigStation* mod = dynamic_cast<SickoTrigStation*>(module);
@@ -335,7 +328,7 @@ struct SickoInputStation : SickoInPort {
 			dynamic_cast<SickoTrigStation*>(this->module)->appendInputMenu(menu, this->type, this->portId);
 	}
 };
-
+/*
 struct SickoClockInStation : SickoInPort {
 	void appendContextMenu(Menu* menu) override {
 		if (this->module)
@@ -349,7 +342,7 @@ struct SickoClockOutStation : SickoOutPort {
 			dynamic_cast<SickoTrigStation*>(this->module)->appendClockOutMenu(menu, this->type, this->portId);
 	}
 };
-
+*/
 struct SickoTrigOutStation : SickoOutPort {
 	void appendContextMenu(Menu* menu) override {
 		if (this->module)
@@ -357,6 +350,8 @@ struct SickoTrigOutStation : SickoOutPort {
 	}
 };
 
+
+/*
 struct tpDivMult : ParamQuantity {
 	std::string getDisplayValueString() override {
 		const std::string valueDisplay[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
@@ -364,12 +359,13 @@ struct tpDivMult : ParamQuantity {
 		return valueDisplay[int(getValue())];
 	}
 };
+*/
 
 //struct TrigStation : Module {
 struct TrigStation : SickoTrigStation {
 	enum ParamId {
-		BPM_KNOB_PARAM,
-		INTCLOCKBUT_PARAM,
+		//BPM_KNOB_PARAM,
+		//INTCLOCKBUT_PARAM,
 		SEQRUN_PARAM,
 		RSTALLBUT_PARAM,
 		PROG_PARAM,
@@ -377,7 +373,7 @@ struct TrigStation : SickoTrigStation {
 		AUTO_PARAM,
 		RECALL_PARAM,
 		STORE_PARAM,
-		ENUMS(DIVMULT_KNOB_PARAM, 8),
+		//ENUMS(DIVMULT_KNOB_PARAM, 8),
 		ENUMS(LENGTH_PARAM, 8),
 		ENUMS(USER_PARAM, 16),
 		ENUMS(STEP_PARAM, 128),
@@ -386,7 +382,7 @@ struct TrigStation : SickoTrigStation {
 	};
 	enum InputId {
 		EXTCLOCK_INPUT,
-		RUN_INPUT,
+		//RUN_INPUT,
 		SEQRUN_INPUT,
 		RSTALL_INPUT,
 		PROG_INPUT,
@@ -399,13 +395,13 @@ struct TrigStation : SickoTrigStation {
 	enum OutputId {
 		ENUMS(OUT_OUTPUT, 8),
 		RST_OUTPUT,
-		CLOCK_OUTPUT,
+		//CLOCK_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
 		ENUMS(STEPBUT_LIGHT, 128),
 		ENUMS(STEP_LIGHT, 128),
-		RUNBUT_LIGHT,
+		//RUNBUT_LIGHT,
 		SEQRUN_LIGHT,
 		RSTALLBUT_LIGHT,
 		RECALL_LIGHT,
@@ -420,7 +416,7 @@ struct TrigStation : SickoTrigStation {
 	int getOutputBase() const override { return OUT_OUTPUT; }
 	int getParamBase() const override { return USER_PARAM; }
 
-	bool waitClock2RstSeq[MAXTRACKS] = {false, false, false, false, false, false, false, false};
+	//bool waitClock2RstSeq[MAXTRACKS] = {false, false, false, false, false, false, false, false};
 
 	float clkValue[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
 	float prevClkValue[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -452,6 +448,7 @@ struct TrigStation : SickoTrigStation {
 	float runTrig = 0.f;
 	float prevRunTrig = 0.f;
 
+/*
 	bool internalClock = false;
 	bool prevInternalClock = false;
 	bool externalClock = false;
@@ -459,7 +456,7 @@ struct TrigStation : SickoTrigStation {
 
 	float buttRunTrig = 0.f;
 	float prevButtRunTrig = -1.f;
-
+*/
 	int recStep[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	int runType = RUN_GATE;
@@ -469,7 +466,7 @@ struct TrigStation : SickoTrigStation {
 	int currAddr[MAXTRACKS] = {0,0,0,0,0,0,0,0};
 	int prevAddr[MAXTRACKS] = {0,0,0,0,0,0,0,0};
 
-	bool rstClkOnRst = true;
+//	bool rstClkOnRst = true;
 	bool rstSeqOnProgChange = true;
 
 	bool dontAdvance[MAXTRACKS] = {false, false, false, false, false, false, false, false};
@@ -534,24 +531,25 @@ struct TrigStation : SickoTrigStation {
 
  	//**************************************************************
 	//   
-
+/*
 	const std::string divMultDisplay[45] = {"/ 256", "/ 128", "/ 64", "/ 48", "/ 32", "/ 24", "/ 17", "/ 16", "/ 15", "/ 14", "/ 13", "/ 12", "/ 11", "/ 10", "/ 9", "/ 8", "/ 7", "/ 6", "/ 5", "/ 4", "/ 3", "/ 2",
 	 					"X 1", "X 2", "X 3", "X 4", "X 5", "X 6", "X 7", "X 8", "X 9", "X 10", "X 11", "X 12", "X 13", "X 14", "X 15", "X 16", "X 17", "X 24", "X 32", "X 48", "X 64", "X 128", "X 256"};
 
 	const float divMult[45] = {256, 128, 64, 48, 32, 24, 17, 16, 15, 14, 13, 12, 11, 10, 9 , 8, 7, 6, 5, 4, 3, 2, 1,
 							2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24, 32, 48, 64, 128, 256};
-
+*/
 	//**************************************************************
 
 	// ********* C L O C K *************
 
 	double sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 
+/*
 	double bpm[ALLTRACKS] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
 	double extBpm = 0.1;
 	double prevBpm[ALLTRACKS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1};
 	double prevExtBpm = -1;
-
+*/
 	float extTrigValue[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevExtTrigValue[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -561,7 +559,7 @@ struct TrigStation : SickoTrigStation {
 	bool resetStart = true;
 	bool resetStartExt = true;
 	//bool resetDiv = true;
-
+/*
 	double clockSample[ALLTRACKS] = {1, 1, 1, 1, 1, 1, 1, 1, 999999999999};
 	double clockMaxSample[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	double maxPulseSample[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -579,7 +577,7 @@ struct TrigStation : SickoTrigStation {
 	int ppqnComparison = ppqnValue - 1;
 
 	int pulseNr = 0;
-
+*/
 	float oneMsTime = (APP->engine->getSampleRate()) / 1000;
 	//float oneMsTime = (APP->engine->getSampleRate()) / 10;	// for testing purposes
 	bool resetPulse[ALLTRACKS] = {false, false, false, false, false, false, false, false, false};
@@ -589,7 +587,7 @@ struct TrigStation : SickoTrigStation {
 	bool resetPulseOnRun = false;
 	bool resetOnStop = false;
 	bool resetPulseOnStop = false;
-
+/*
 	bool extSync[ALLTRACKS] = {false, false, false, false, false, false, false, false, false};
 	bool extConn[ALLTRACKS] = {false, false, false, false, false, false, false, false, false};
 	bool prevExtConn[ALLTRACKS] = {true, true, true, true, true, true, true, true, true};
@@ -609,13 +607,14 @@ struct TrigStation : SickoTrigStation {
 	float cvClockInValue[ALLTRACKS] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevCvClockInValue[ALLTRACKS] = {11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f};
 	float cvClockOutValue = 0.f;
-
+*/
+	bool extConn[MAXTRACKS] = {false, false, false, false, false, false, false, false};
 	bool clockAdv[ALLTRACKS] = {false, false, false, false, false, false, false, false, false};
 	bool prevClockAdv[ALLTRACKS] = {false, false, false, false, false, false, false, false, false};
-
+/*
 	bool edge[ALLTRACKS] = {false, false, false, false, false, false, false, false, false};
 	bool prevEdge[ALLTRACKS] = {false, false, false, false, false, false, false, false, false};
-
+*/
 	bool stepAdv[MAXTRACKS] = {false, false, false, false, false, false, false, false};
 	int delayReadPos;
 
@@ -651,7 +650,7 @@ struct TrigStation : SickoTrigStation {
 
 	int outType[MAXTRACKS] = {0,0,0,0,0,0,0,0};
 
-	bool divControls = true;
+//	bool divControls = true;
 	bool modeControls = true;
 
 	TrigStation() {
@@ -666,14 +665,14 @@ struct TrigStation : SickoTrigStation {
 
 				if (t >= 0) {
 					switch (module->userTable[t][userColumn]) {
-
+/*
 						case KNOB_PW:
 				 			name = "Pulse Width #" + to_string(t+1);
 							unit = "%";
 							displayMultiplier = 99.f;
 							displayOffset = 0.f;
 						break;
-
+*/
 				 		case KNOB_RSTSTEP:
 				 			name = "Reset Step# #" + to_string(t+1);
 							unit = "";
@@ -698,8 +697,6 @@ struct TrigStation : SickoTrigStation {
 							return int(ParamQuantity::getDisplayValue());
 						break;
 
-				 		
-
 						case KNOB_RETRIGPROB:
 				 			name = "Retrig Prob. #" + to_string(t+1);
 							unit = "%";
@@ -720,14 +717,14 @@ struct TrigStation : SickoTrigStation {
 							displayMultiplier = 100.f;
 							displayOffset = 0.f;
 						break;	
-
+/*
 						case KNOB_SWING:
 				 			name = "Swing #" + to_string(t+1);
 							unit = "%";
 							displayMultiplier = 100.f;
 							displayOffset = 0.f;
 						break;	
-
+*/
 						case KNOB_ATN:
 				 			name = "Atten. #" + to_string(t+1);
 							unit = "%";
@@ -760,7 +757,7 @@ struct TrigStation : SickoTrigStation {
 				if (t >= 0) {
 					switch (module->userTable[t][userColumn]) {
 
-						case IN_PW:			name = "Pulse Width #" + to_string(t+1); break;
+//						case IN_PW:			name = "Pulse Width #" + to_string(t+1); break;
 				 		case IN_REV:		name = "Reverse #" + to_string(t+1); break;
 				 		case IN_MODE:		name = "Mode #" + to_string(t+1); break;
 						case IN_LENGTH:		name = "Length #" + to_string(t+1);	break;
@@ -770,7 +767,7 @@ struct TrigStation : SickoTrigStation {
 						case IN_RETRIG:		name = "Retrig #" + to_string(t+1);	break;
 						case IN_SKIP:		name = "Skip #" + to_string(t+1); break;
 						case IN_SKIPPROB:	name = "Skip Prob.#" + to_string(t+1); break;
-						case IN_SWING:		name = "Swing #" + to_string(t+1); break;
+//						case IN_SWING:		name = "Swing #" + to_string(t+1); break;
 						case IN_CHANGE:		name = "Change #" + to_string(t+1); break;
 						case IN_CHANGEPROB:	name = "Change Prob.#" + to_string(t+1); break;
 				 	}
@@ -779,16 +776,15 @@ struct TrigStation : SickoTrigStation {
 			}
 		};
 
-		configParam(BPM_KNOB_PARAM, 300.f, 3000.f, 1200.f, "Int.Clk", " bpm", 0, 0.1);
-		paramQuantities[BPM_KNOB_PARAM]->snapEnabled = true;
+		//configParam(BPM_KNOB_PARAM, 300.f, 3000.f, 1200.f, "Int.Clk", " bpm", 0, 0.1);
+		//paramQuantities[BPM_KNOB_PARAM]->snapEnabled = true;
 
 		configInput(EXTCLOCK_INPUT,"External Clock");
 
-		configSwitch(INTCLOCKBUT_PARAM, 0.f, 1.f, 0.f, "Int.Clock Run", {"0", "1"});
-		configInput(RUN_INPUT, "Int.Clock");
+		//configSwitch(INTCLOCKBUT_PARAM, 0.f, 1.f, 0.f, "Int.Clock Run", {"0", "1"});
+		//configInput(RUN_INPUT, "Int.Clock");
 		
 		configSwitch(SEQRUN_PARAM, 0.f, 1.f, 0.f, "Seq. run", {"0", "1"});
-		//configSwitch(SEQRUN_PARAM, 0.f, 1.f, 0.f, "Seq. run");
 		configInput(SEQRUN_INPUT, "Seq.run");
 
 		configInput(RSTALL_INPUT, "Reset");
@@ -803,14 +799,14 @@ struct TrigStation : SickoTrigStation {
 		configSwitch(RECALL_PARAM, 0, 1.f, 0.f, "Recall", {"0", "1"});
 		configSwitch(STORE_PARAM, 0, 1.f, 0.f, "Store", {"0", "1"});
 
-		configOutput(CLOCK_OUTPUT,"Clock");
+//		configOutput(CLOCK_OUTPUT,"Clock");
 
 		for (int t = 0; t < MAXTRACKS; t++) {
 			
 			configInput(CLK_INPUT+t, ("Clock#"+to_string(t+1)).c_str());
 
-			configParam<tpDivMult>(DIVMULT_KNOB_PARAM+t, 0.f, 44.f, 22.f, ("Mult/Div #"+to_string(t+1)).c_str());
-			paramQuantities[DIVMULT_KNOB_PARAM+t]->snapEnabled = true;
+			//configParam<tpDivMult>(DIVMULT_KNOB_PARAM+t, 0.f, 44.f, 22.f, ("Mult/Div #"+to_string(t+1)).c_str());
+			//paramQuantities[DIVMULT_KNOB_PARAM+t]->snapEnabled = true;
 
 			configInput(RST_INPUT+t, ("Rst.#"+to_string(t+1)).c_str());
 			
@@ -898,14 +894,14 @@ struct TrigStation : SickoTrigStation {
 		//resetPulseOnRun = false;
 		//resetOnStop = false;
 		//resetPulseOnStop = false;
-
+/*
 		bpm[MC] = 0;
 		clockSample[MC] = 1.0;
 		extSync[MC] = false;
 		extConn[MC] = false;
 		prevExtConn[MC] = true;
 		extBeat[MC] = false;
-
+*/
 		progKnob = 0;
 		prevProgKnob = 0;
 		savedProgKnob = 0;
@@ -917,6 +913,7 @@ struct TrigStation : SickoTrigStation {
 		for (int t = 0; t < MAXTRACKS; t++) {
 			wSteps[t] = 16;
 			params[LENGTH_PARAM+t].setValue(wSteps[t]);
+/*			
 			bpm[t] = 0.1;
 			clockSample[t] = 1.0;
 			extSync[t] = false;
@@ -931,14 +928,15 @@ struct TrigStation : SickoTrigStation {
 			divPulseTime[t] = false;
 			divCount[t] = 1;
 			divSwing[t] = false;
-
+*/
 			if (dontAdvanceSetting[t] == 2)
 				dontAdvance[t] = dontAdvanceSetting[MC];
 			else
 				dontAdvance[t] = dontAdvanceSetting[t];
-
+/*
 			edge[t] = false;
 			prevEdge[t] = false;
+*/
 			stepAdv[t] = false;
 			clockAdv[t] = false;
 		}
@@ -1012,7 +1010,7 @@ struct TrigStation : SickoTrigStation {
 		trigStation_cbUserValuesTrack[1] = params[USER_PARAM+t+8].getValue();
 
 		trigStation_cbCurrentModeTrack = currentMode[t];
-		trigStation_cbDivMultTrack = params[DIVMULT_KNOB_PARAM+t].getValue();
+		//trigStation_cbDivMultTrack = params[DIVMULT_KNOB_PARAM+t].getValue();
 		
 		trigStation_cbXcludeFromRunTrack = xcludeFromRun[t];
 		trigStation_cbXcludeFromRstTrack = xcludeFromRst[t];
@@ -1040,7 +1038,7 @@ struct TrigStation : SickoTrigStation {
 			trigStation_cbUserValues[t][1] = params[USER_PARAM+t+8].getValue();
 
 			trigStation_cbCurrentMode[t] = currentMode[t];
-			trigStation_cbDivMult[t] = params[DIVMULT_KNOB_PARAM+t].getValue();;
+			//trigStation_cbDivMult[t] = params[DIVMULT_KNOB_PARAM+t].getValue();;
 
 			trigStation_cbTuringMode[t] = turingMode[t];
 			trigStation_cbOutTypeSetting[t] = outTypeSetting[t];
@@ -1056,8 +1054,8 @@ struct TrigStation : SickoTrigStation {
 			trigStation_cbRstStepsWhen[t] = rstStepsWhen[t];
 		}
 		trigStation_cbSeqRunSetting = seqRunSetting;
-		trigStation_cbInternalClock = internalClock;
-		trigStation_cbBpmKnob = params[BPM_KNOB_PARAM].getValue();
+//		trigStation_cbInternalClock = internalClock;
+//		trigStation_cbBpmKnob = params[BPM_KNOB_PARAM].getValue();
 
 		trigStation_userClipboard = true;
 	}
@@ -1139,7 +1137,7 @@ struct TrigStation : SickoTrigStation {
 		params[USER_PARAM+t+8].setValue(trigStation_cbUserValuesTrack[1]);
 
 		currentMode[t] = trigStation_cbCurrentModeTrack;
-		params[DIVMULT_KNOB_PARAM+t].setValue(trigStation_cbDivMultTrack);
+		//params[DIVMULT_KNOB_PARAM+t].setValue(trigStation_cbDivMultTrack);
 		
 		xcludeFromRun[t] = trigStation_cbXcludeFromRunTrack;
 		xcludeFromRst[t] = trigStation_cbXcludeFromRstTrack;
@@ -1171,7 +1169,7 @@ struct TrigStation : SickoTrigStation {
 			turingMode[t] = trigStation_cbTuringMode[t];
 
 			currentMode[t] = trigStation_cbCurrentMode[t];
-			params[DIVMULT_KNOB_PARAM+t].setValue(trigStation_cbDivMult[t]);
+			//params[DIVMULT_KNOB_PARAM+t].setValue(trigStation_cbDivMult[t]);
 			
 			xcludeFromRun[t] = trigStation_cbXcludeFromRun[t];
 			xcludeFromRst[t] = trigStation_cbXcludeFromRst[t];
@@ -1186,8 +1184,8 @@ struct TrigStation : SickoTrigStation {
 		}
 
 		seqRunSetting = trigStation_cbSeqRunSetting;
-		internalClock = trigStation_cbInternalClock;
-		params[BPM_KNOB_PARAM].setValue(trigStation_cbBpmKnob);
+//		internalClock = trigStation_cbInternalClock;
+//		params[BPM_KNOB_PARAM].setValue(trigStation_cbBpmKnob);
 	}
 
 	void pastePanel() {
@@ -1226,7 +1224,7 @@ struct TrigStation : SickoTrigStation {
 
 				progSteps[p][t] = 16;
 				progCurrentMode[p][t] = 0;
-				progDivMult[p][t] = 22;
+				//progDivMult[p][t] = 22;
 				progXcludeFromRun[p][t] = false;
 				progXcludeFromRst[p][t] = false;
 				progUserValues[p][t][0] = 0.f;
@@ -1246,8 +1244,8 @@ struct TrigStation : SickoTrigStation {
 			progSampleDelay[p][MC] = 0;
 
 			progSeqRunSetting[p] = 1;
-			progInternalClock[p] = 1;
-			progBpmKnob[p] = 1200.f;
+//			progInternalClock[p] = 1;
+//			progBpmKnob[p] = 1200.f;
 
 		}
 		lastProg = 0;
@@ -1412,7 +1410,7 @@ struct TrigStation : SickoTrigStation {
 		for (int t = 0; t < MAXTRACKS; t++)
 			randomizeSequence(t);
 	}
-
+/*
 	void changePpqnSetting() {
 		ppqnChange = false;
 		ppqn = tempPpqn;
@@ -1463,7 +1461,7 @@ struct TrigStation : SickoTrigStation {
 		return swing;
 	}
 
-
+*/
 	void inline stepForward(int t) {
 		if (userInputs[t][IN_RETRIG][0]) {
 			if (userInputs[t][KNOB_RETRIGPROB][0]) {
@@ -1695,7 +1693,7 @@ struct TrigStation : SickoTrigStation {
 		}
 
 	}
-
+/*
 	float inline calcPw(int t) {
 
 		float val = 0.f;
@@ -1750,7 +1748,7 @@ struct TrigStation : SickoTrigStation {
 
 		return val;
 	}
-
+*/
 	void process(const ProcessArgs& args) override {
 
 
@@ -1825,7 +1823,7 @@ struct TrigStation : SickoTrigStation {
 				nextUserValues[t][1] = progUserValues[selectedProg][t][1];
 
 				nextCurrentMode[t] = progCurrentMode[selectedProg][t];
-				nextDivMult[t] = progDivMult[selectedProg][t];
+				//nextDivMult[t] = progDivMult[selectedProg][t];
 
 				nextTuringMode[t] = progTuringMode[selectedProg][t];
 
@@ -1844,8 +1842,8 @@ struct TrigStation : SickoTrigStation {
 			}
 
 			nextSeqRunSetting = progSeqRunSetting[selectedProg];
-			nextInternalClock = progInternalClock[selectedProg];
-			nextBpmKnob = progBpmKnob[selectedProg];
+			//nextInternalClock = progInternalClock[selectedProg];
+			//nextBpmKnob = progBpmKnob[selectedProg];
 
 			setButLight = true;
 			setButLightValue = 0.f;
@@ -1895,7 +1893,7 @@ struct TrigStation : SickoTrigStation {
 					turingMode[t] = nextTuringMode[t];
 					
 					currentMode[t] = nextCurrentMode[t];
-					params[DIVMULT_KNOB_PARAM+t].setValue(nextDivMult[t]);
+					//params[DIVMULT_KNOB_PARAM+t].setValue(nextDivMult[t]);
 					
 					xcludeFromRun[t] = nextXcludeFromRun[t];
 					xcludeFromRst[t] = nextXcludeFromRst[t];
@@ -1912,8 +1910,8 @@ struct TrigStation : SickoTrigStation {
 				}
 
 				seqRunSetting = nextSeqRunSetting;
-				internalClock = nextInternalClock;
-				params[BPM_KNOB_PARAM].setValue(nextBpmKnob);
+				//internalClock = nextInternalClock;
+				//params[BPM_KNOB_PARAM].setValue(nextBpmKnob);
 
 				workingProg = selectedProg;
 				if (progInType == CV_TYPE)
@@ -1974,7 +1972,7 @@ struct TrigStation : SickoTrigStation {
 
 					turingMode[t] = progTuringMode[selectedProg][t];
 					currentMode[t] = progCurrentMode[selectedProg][t];
-					params[DIVMULT_KNOB_PARAM+t].setValue(progDivMult[selectedProg][t]);
+					//params[DIVMULT_KNOB_PARAM+t].setValue(progDivMult[selectedProg][t]);
 					
 					xcludeFromRun[t] = progXcludeFromRun[selectedProg][t];
 					xcludeFromRst[t] = progXcludeFromRst[selectedProg][t];
@@ -1989,8 +1987,8 @@ struct TrigStation : SickoTrigStation {
 				}
 
 				seqRunSetting = progSeqRunSetting[selectedProg];
-				internalClock = progInternalClock[selectedProg];
-				params[BPM_KNOB_PARAM].setValue(progBpmKnob[selectedProg]);
+				//internalClock = progInternalClock[selectedProg];
+				//params[BPM_KNOB_PARAM].setValue(progBpmKnob[selectedProg]);
 
 				workingProg = selectedProg;
 				if (progInType == CV_TYPE)
@@ -2053,7 +2051,7 @@ struct TrigStation : SickoTrigStation {
 
 					progTuringMode[progKnob][t] = turingMode[t];
 					progCurrentMode[progKnob][t] = currentMode[t];
-					progDivMult[progKnob][t] = params[DIVMULT_KNOB_PARAM+t].getValue();
+					//progDivMult[progKnob][t] = params[DIVMULT_KNOB_PARAM+t].getValue();
 					
 					progXcludeFromRun[progKnob][t] = xcludeFromRun[t];
 					progXcludeFromRst[progKnob][t] = xcludeFromRst[t];
@@ -2068,8 +2066,8 @@ struct TrigStation : SickoTrigStation {
 				}
 
 				progSeqRunSetting[progKnob] = seqRunSetting;
-				progInternalClock[progKnob] = internalClock;
-				progBpmKnob[progKnob] = params[BPM_KNOB_PARAM].getValue();
+				//progInternalClock[progKnob] = internalClock;
+				//progBpmKnob[progKnob] = params[BPM_KNOB_PARAM].getValue();
 
 				if (progKnob > lastProg)
 					lastProg = progKnob;
@@ -2106,204 +2104,19 @@ struct TrigStation : SickoTrigStation {
 
 		lights[SET_LIGHT].setBrightness(setButLightValue);
 
+
+
+
 /*
 
-																										░█████╗░██╗░░░░░░█████╗░░█████╗░██╗░░██╗
-																										██╔══██╗██║░░░░░██╔══██╗██╔══██╗██║░██╔╝
-																										██║░░╚═╝██║░░░░░██║░░██║██║░░╚═╝█████═╝░
-																										██║░░██╗██║░░░░░██║░░██║██║░░██╗██╔═██╗░
-																										╚█████╔╝███████╗╚█████╔╝╚█████╔╝██║░╚██╗
-																										░╚════╝░╚══════╝░╚════╝░░╚════╝░╚═╝░░╚═╝
+																		░██████╗███████╗░██████╗░██╗░░░██╗███████╗███╗░░██╗░█████╗░███████╗██████╗░
+																		██╔════╝██╔════╝██╔═══██╗██║░░░██║██╔════╝████╗░██║██╔══██╗██╔════╝██╔══██╗
+																		╚█████╗░█████╗░░██║██╗██║██║░░░██║█████╗░░██╔██╗██║██║░░╚═╝█████╗░░██████╔╝
+																		░╚═══██╗██╔══╝░░╚██████╔╝██║░░░██║██╔══╝░░██║╚████║██║░░██╗██╔══╝░░██╔══██╗
+																		██████╔╝███████╗░╚═██╔═╝░╚██████╔╝███████╗██║░╚███║╚█████╔╝███████╗██║░░██║
+																		╚═════╝░╚══════╝░░░╚═╝░░░░╚═════╝░╚══════╝╚═╝░░╚══╝░╚════╝░╚══════╝╚═╝░░╚═╝
 */
-
-		// ---------------------- initialize clockAdv & swing
-
-		clockAdv[MC] = false;
-
-		for (int t = 0; t < MAXTRACKS; t++) {
-			clockAdv[t] = false;
-			stepAdv[t] = false;
-
-			if (userInputs[t][KNOB_SWING][0] || userInputs[t][IN_SWING][0])
-				divSwing[t] = true;
-			else
-				divSwing[t] = false;
-
-			// get external clock from each track // copiato da sotto per ottimizzare
-			extConn[t] = inputs[CLK_INPUT+t].isConnected();
-			if (extConn[t] && !prevExtConn[t]) {
-				extSync[t] = false;
-			}
-			prevExtConn[t] = extConn[t];
-		}
-
-		// ---------------------- check PPQN
-
-		if (ppqnChange)
-			changePpqnSetting();
-
-		// ********* EXTERNAL CONNECTION
-
-		if (inputs[RUN_INPUT].isConnected()) {
-			runTrig = inputs[RUN_INPUT].getVoltage();
-			if (runType == RUN_GATE) {
-				if (runTrig > 1.f) {
-					internalClock = true;
-				} else {
-					internalClock = false;
-				}
-			} else {	// runType == RUN_TRIG
-				buttRunTrig = params[INTCLOCKBUT_PARAM].getValue();
-				if ((runTrig >= 1 && prevRunTrig < 1.f) || (buttRunTrig >= 1.f && prevButtRunTrig < 1.f)) {
-					if (internalClock) {
-						internalClock = false;
-					} else {
-						internalClock = true;
-					}			
-				}
-				prevButtRunTrig = buttRunTrig;
-			}
-			prevRunTrig = runTrig;
-		} else {
-			buttRunTrig = params[INTCLOCKBUT_PARAM].getValue();
-			if ((runTrig >= 1 && prevRunTrig < 1.f) || (buttRunTrig >= 1.f && prevButtRunTrig < 1.f)) {
-				if (internalClock) {
-					internalClock = false;
-				} else {
-					internalClock = true;
-				}			
-
-			}
-			prevButtRunTrig = buttRunTrig;
-		}
-
-		if (inputs[EXTCLOCK_INPUT].isConnected()) {
-			externalClock = true;
-			if (externalClock && !prevExternalClock) {
-				if (cvClockIn) {
-					extSync[MC] = true;
-					prevCvClockInValue[MC] = 11;
-				} else {
-					extSync[MC] = false;
-					//bpm[MC] = 0.0;
-					extBpm = 0.0;
-					pulseNr = 0;
-				}
-			}
-		} else {
-			externalClock = false;
-			extSync[MC] = false;
-			//bpm[MC] = 0.0;
-			extBpm = 0.0;
-			pulseNr = 0;
-		}
-		prevExternalClock = externalClock;
-
-		if (internalClock) {
-			extConn[MC] = false;
-			runSetting = 1;
-			//DEBUG("INTERNAL CLOCK TRUE");
-		} else if (externalClock) {
-			extConn[MC] = true;
-			runSetting = 1;
-		} else {
-			extConn[MC] = false;
-			runSetting = 0;
-		}
 		
-		if (cvClockOut) {
-			if (internalClock && !prevInternalClock) {
-				bpm[MC] = (double)params[BPM_KNOB_PARAM].getValue()/10;
-				cvClockOutValue = log2(bpm[MC] / 120.0f);
-				outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-			} else if (!internalClock && prevInternalClock) {
-				if (extConn[MC]) {
-					cvClockOutValue = log2(extBpm / 120.0f);
-					outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-				}
-			}
-		}
-
-/*
-		if (internalClock) 
-			DEBUG("1. int.Clock ON");
-		else
-			DEBUG("1. int.Clock OFF");
-*/
-
-/*
-		if (externalClock) 
-			DEBUG("1. EXT.Clock ON");
-		else
-			DEBUG("1. EXT.Clock OFF");
-*/
-		prevInternalClock = internalClock;
-
-		lights[RUNBUT_LIGHT].setBrightness(internalClock);
-
-		if (!runSetting && prevRunSetting) {
-
-			if (resetOnStop) {
-				resetStart = true;
-				//if (!extConn[MC])
-				if (internalClock)
-					clockSample[MC] = 1.0;
-				
-				if (!cvClockOut)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				
-				for (int t = 0; t < MAXTRACKS; t++) {
-					divPulse[t] = false;
-					divClockSample[t] = 1.0;
-					divMaxSample[t][0] = 0.0;
-					divMaxSample[t][1] = 0.0;
-					divCount[t] = 999999;
-					//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
-					//outputs[OUT_OUTPUT+t].setVoltage(0.f);
-
-				}
-			}
-			if (resetPulseOnStop) {
-				resetPulse[MC] = true;
-				resetPulseTime[MC] = oneMsTime;
-			}
-			
-		} else if (runSetting && !prevRunSetting) {
-
-			if (resetOnRun) {
-
-				resetStart = true;
-				if (!extConn[MC])	//             <-    DA RIVEDERE *************************
-					clockSample[MC] = 1.0;
-				else
-					extSync[MC] = false;
-				
-				if (!cvClockOut)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				
-				for (int t = 0; t < MAXTRACKS; t++) {
-					divPulse[t] = false;
-					divClockSample[t] = 1.0;
-					divMaxSample[t][0] = 0.0;
-					divMaxSample[t][1] = 0.0;
-					divCount[t] = 999999;
-					//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
-					//outputs[OUT_OUTPUT+t].setVoltage(0.f);
-					edge[t] = false;
-				}
-			}
-
-			if (resetPulseOnRun) {
-				resetPulse[MC] = true;
-				resetPulseTime[MC] = oneMsTime;
-			}
-			
-		
-		}
-
-		prevRunSetting = runSetting;
-
-		// ---------------------------------------------------------------------------------
 
 		// **********  RESET ALL
 		// **********  RESET ALL
@@ -2318,827 +2131,25 @@ struct TrigStation : SickoTrigStation {
 
 		lights[RSTALLBUT_LIGHT].setBrightness(resetValue[MC]);
 
-		if (resetValue[MC] >= 1 && prevResetValue[MC] < 1) {
+		if (resetValue[MC] >= 1 && prevResetValue[MC] < 1)
+			resetAllSteps();
 
-			if (!wait2RstSetting)
-				resetAllSteps();
-			else
-				for (int t = 0; t < MAXTRACKS; t++)
-					waitClock2RstSeq[t] = true;
-
-			if (rstClkOnRst) {
-
-				// ******** NEW ***********
-				if (!extConn[MC])
-					clockSample[MC] = 1.0;
-				else if (cvClockIn) {
-					extClockSample[MC] = 1.0;
-					//extClockMaxSample = 0;
-					//extMaxPulseSample = 0;
-				}
-
-				if (!cvClockOut)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
-
-				for (int t = 0; t < MAXTRACKS; t++) {
-					if (!extConn[t]) {
-						divPulse[t] = false;
-						divClockSample[t] = 1.0;
-						divMaxSample[t][0] = 0.0;
-						divMaxSample[t][1] = 0.0;
-						divCount[t] = 999999;
-						//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
-						//outputs[OUT_OUTPUT+t].setVoltage(0.f);
-						edge[t] = false;
-					}
-				}
-
-				resetPulse[MC] = true;
-				resetPulseTime[MC] = oneMsTime;
-
-			}
-
-
-				//resetDiv = true;
-			
-		}
 		prevResetValue[MC] = resetValue[MC];
 
-		//if (!extConn[MC]) {
-		if (internalClock) {
+		// initialize clocks
 
-			// ************************* INTERNAL MAIN CLOCK
+		clockAdv[MC] = false;
 
-			// *********** BPM CALC - INTERNAL MAIN CLOCK
-			
-			bpm[MC] = (double)params[BPM_KNOB_PARAM].getValue()/10;
-			
-			if (cvClockOut) {
-				
-				if (bpm[MC] != prevBpm[MC])
-					cvClockOutValue = log2(bpm[MC] / 120.f);
-				
-				outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-				
-			}
-			prevBpm[MC] = bpm[MC];
-
-			if (runSetting && resetPulseTime[MC] <= 0) {
-
-				// ****** CLOCK PULSE WIDTH - INTERNAL MAIN CLOCK
-
-				//maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
-				maxPulseSample[MC] = clockMaxSample[MC] * 0.5;
-				if (clockSample[MC] > maxPulseSample[MC])
-					if (!cvClockOut)
-						outputs[CLOCK_OUTPUT].setVoltage(0.f);
-
-				// ************ DIV / MULT - INTERNAL MC TRACKS
-
-				for (int t = 0; t < MAXTRACKS; t++) {
-
-					if (!extConn[t]) {
-
-						if (!divSwing[t]) {
-
-							if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][0]) {
-								// ***** CLOCK MULTIPLIER *****
-								divClockSample[t] = 1.0;
-								//outputs[DIVMULT_OUTPUT+t].setVoltage(10.f);
-								//outputs[OUT_OUTPUT+t].setVoltage(10.f);
-								divPulse[t] = true;
-								edge[t] = true;
-							}
-
-							// ***** CLOCK MULTIPLIER/DIVIDER - PULSE WIDTH OFF
-							//if (divPulse[t] && divClockSample[t] > divMaxSample[t][0] * params[DIVPW_KNOB_PARAM+t].getValue()) {
-							float pw = calcPw(t);
-
-							if (divPulse[t] && divClockSample[t] > divMaxSample[t][0] * pw) {
-								//outputs[DIVMULT_OUTPUT+t].setVoltage(0.f);
-								//outputs[OUT_OUTPUT+t].setVoltage(0.f);
-								divPulse[t] = false;
-								edge[t] = false;
-							}
-							
-						} else {
-
-							if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][divOddCounter[t]]) {
-								// ***** CLOCK MULTIPLIER *****
-								divPulseTime[t] = oneMsTime;
-								//outputs[DIVMULT_OUTPUT+t].setVoltage(10.f);
-								//outputs[OUT_OUTPUT+t].setVoltage(10.f);
-								divPulse[t] = true;
-								edge[t] = true;
-
-								if (divOddCounter[t] == 0) {
-									divClockSample[t] = 1.0;
-									divOddCounter[t] = 1;
-								} else {
-									divClockSample[t] = 1.0 + divMaxSample[t][1] - divMaxSample[t][0];
-									divOddCounter[t] = 0;
-								}
-							}
-						}
-					}
-				}
-
-				// ---------------------------------	INTERNAL CLOCK - MAX SAMPLES CONTROL & TRACKS RE-INIT
-
-				clockMaxSample[MC] = sampleRateCoeff / bpm[MC];
-				
-				if (clockSample[MC] > clockMaxSample[MC] || resetStart)  {
-
-					clockAdv[MC] = true;
-
-					if (resetStart) {
-						clockSample[MC] = 1.0;
-						resetStart = false;
-					} else
-
-						clockSample[MC] -= clockMaxSample[MC];
+		extTrigValue[MC] = inputs[EXTCLOCK_INPUT].getVoltage();
 					
-					for (int t = 0; t < MAXTRACKS; t++) {
-						
-						if (!extConn[t]) {
-
-							if (!divSwing[t]) {
-
-								if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
-									// ***** CLOCK MULTIPLIER *****
-									divMaxSample[t][0] = clockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-									divMaxSample[t][1] = divMaxSample[t][0];
-									divClockSample[t] = 1.0;
-									//outputs[DIVMULT_OUTPUT+t].setVoltage(10.f);
-									//outputs[OUT_OUTPUT+t].setVoltage(10.f);
-									divPulse[t] = true;
-									edge[t] = true;
-								} else {
-									// ***** CLOCK DIVIDER *****
-									divMaxSample[t][0] = clockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-									divMaxSample[t][1] = divMaxSample[t][0];
-									divCount[t]++;
-									if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
-										divClockSample[t] = 1.0;
-										divCount[t] = 1;
-										//outputs[DIVMULT_OUTPUT+t].setVoltage(10.f);
-										//outputs[OUT_OUTPUT+t].setVoltage(10.f);
-										divPulse[t] = true;
-										edge[t] = true;
-									}
-								}
-							} else {
-
-								if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
-									// ***** CLOCK MULTIPLIER *****
-									divMaxSample[t][0] = clockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-									
-									//float pw = calcPw(t);
-									//divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * pw);
-
-									//divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * 0.5);
-
-									divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * swingCalc(t));
-									divOddCounter[t] = 1;
-									divClockSample[t] = 1.0;
-									divPulseTime[t] = oneMsTime;
-									//outputs[DIVMULT_OUTPUT+t].setVoltage(10.f);
-									//outputs[OUT_OUTPUT+t].setVoltage(10.f);
-									divPulse[t] = true;
-									edge[t] = true;
-								} else {
-									// ***** CLOCK DIVIDER *****
-									divMaxSample[t][0] = clockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-									divMaxSample[t][1] = divMaxSample[t][0];
-									divCount[t]++;
-									if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
-										divOddCounter[t] = 1;
-										divClockSample[t] = 1.0;
-										divCount[t] = 1;
-										divPulseTime[t] = oneMsTime;
-										//outputs[DIVMULT_OUTPUT+t].setVoltage(10.f);
-										//outputs[OUT_OUTPUT+t].setVoltage(10.f);
-										divPulse[t] = true;
-										edge[t] = true;
-									}
-								}
-							}
-						}
-					}
-
-					if (!cvClockOut)
-						outputs[CLOCK_OUTPUT].setVoltage(10.f);
-					
-				}
-
-				clockSample[MC]++;
-				for (int t = 0; t < 8; t++) {
-					if (!extConn[t])
-						divClockSample[t]++;
-				}
-
-			}
-
-		} 
-
-/*
-
-																						███████╗██╗░░██╗████████╗  ░█████╗░██╗░░░░░░█████╗░░█████╗░██╗░░██╗
-																						██╔════╝╚██╗██╔╝╚══██╔══╝  ██╔══██╗██║░░░░░██╔══██╗██╔══██╗██║░██╔╝
-																						█████╗░░░╚███╔╝░░░░██║░░░  ██║░░╚═╝██║░░░░░██║░░██║██║░░╚═╝█████═╝░
-																						██╔══╝░░░██╔██╗░░░░██║░░░  ██║░░██╗██║░░░░░██║░░██║██║░░██╗██╔═██╗░
-																						███████╗██╔╝╚██╗░░░██║░░░  ╚█████╔╝███████╗╚█████╔╝╚█████╔╝██║░╚██╗
-																						╚══════╝╚═╝░░╚═╝░░░╚═╝░░░  ░╚════╝░╚══════╝░╚════╝░░╚════╝░╚═╝░░╚═╝
-
-*/
-
-		if (externalClock) {
-
-
-			// ************************************************ EXTERNAL MAIN CLOCK
-
-			// ********** EXTERNAL MAIN CLOCK SYNC
-
-			// ************** EXTERNAL MAIN CLOCK CV CV CV
-
-			if (cvClockIn) {
-
-				cvClockInValue[MC] = inputs[EXTCLOCK_INPUT].getVoltage();
-				if (cvClockInValue[MC] != prevCvClockInValue[MC]) {
-					extBpm = 120 * pow(2, cvClockInValue[MC]);
-					extBpm = round(extBpm * 10)/10;
-					if (extBpm > 999)
-						extBpm = 999;
-
-					if (!internalClock) {
-						bpm[MC] = extBpm;
-						if (cvClockOut) {
-							cvClockOutValue = log2(extBpm / 120.f);
-							outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-						}
-					}
-				}
-				prevCvClockInValue[MC] = cvClockInValue[MC];
-
-				//clockMaxSample[MC] = sampleRateCoeff / bpm[MC];
-				extClockMaxSample[MC] = sampleRateCoeff / extBpm;
-				
-				if (extClockSample[MC] > extClockMaxSample[MC] || resetStartExt)  {
-
-					if (resetStartExt) {
-						extClockSample[MC] = 1.0;
-						resetStartExt = false;		/// <---- cambiato con il nuovo extBpm, controllare
-					} else
-						extClockSample[MC] -= extClockMaxSample[MC];
-
-					
-					extBeat[MC] = true;
-
-					//extClockSample = 1.0;
-					
-
-					// ----------------------------------------EXTERNAL MAIN CLOCK CV -> RE-INIT TRACKS 
-					if (!internalClock) {
-/*
-						if (internalClock) 
-							DEBUG("2. int.Clock ON");
-						else
-							DEBUG("2. int.Clock OFF");
-*/
-
-						for (int t = 0; t < MAXTRACKS; t++) {
-							
-							if (!extConn[t]) {
-								if (!divSwing[t]) {
-
-									if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
-										// ***** CLOCK MULTIPLIER *****
-										//divMaxSample[t][0] = clockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][0] = extClockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][1] = divMaxSample[t][0];
-										divClockSample[t] = 1.0;
-										//outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-										divPulse[t] = true;
-										edge[t] = true;
-									} else {
-										// ***** CLOCK DIVIDER *****
-										//divMaxSample[t][0] = clockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][0] = extClockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][1] = divMaxSample[t][0];
-										divCount[t]++;
-										if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
-											divClockSample[t] = 1.0;
-											divCount[t] = 1;
-											//outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-											divPulse[t] = true;
-											edge[t] = true;
-										}
-									}
-								} else {
-									
-									if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
-										// ***** CLOCK MULTIPLIER *****
-										//divMaxSample[t][0] = clockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][0] = extClockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										//divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * params[DIVPW_KNOB_PARAM+t].getValue());
-										//divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * 0.5);
-										divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * swingCalc(t));
-										divOddCounter[t] = 1;
-										divClockSample[t] = 1.0;
-										divPulseTime[t] = oneMsTime;
-										//outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-										divPulse[t] = true;
-										edge[t] = true;
-									} else {
-										// ***** CLOCK DIVIDER *****
-										//divMaxSample[t][0] = clockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][0] = extClockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-										divMaxSample[t][1] = divMaxSample[t][0];
-										divCount[t]++;
-										if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
-											divOddCounter[t] = 1;
-											divClockSample[t] = 1.0;
-											divCount[t] = 1;
-											divPulseTime[t] = oneMsTime;
-											//outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-											divPulse[t] = true;
-											edge[t] = true;
-										}
-									}
-								}
-							}
-						}
-
-						if (!cvClockOut)
-							outputs[CLOCK_OUTPUT].setVoltage(10.f);
-					}
-				} else {
-
-					extBeat[MC] = false;
-				}
-
-			} else { 	// ************** EXTERNAL MAIN CLOCK WITH PULSES
-			
-				extTrigValue[MC] = inputs[EXTCLOCK_INPUT].getVoltage();
-					
-				if (extTrigValue[MC] >= 1 && prevExtTrigValue[MC] < 1) {
-
-					pulseNr++;
-					if (extSync[MC]) {
-
-						if (pulseNr > ppqnComparison) {
-							pulseNr = 0;
-							//clockMaxSample[MC] = clockSample[MC];
-							extClockMaxSample[MC] = extClockSample[MC];
-							extClockSample[MC] = 0.0;
-							
-							//if (runSetting)
-								extBeat[MC] = true;
-
-							// calculate bpms
-							extBpm = round(sampleRateCoeff / extClockMaxSample[MC]);
-							if (extBpm > 999)
-								extBpm = 999;
-
-							if (!internalClock) {
-								bpm[MC] = extBpm;
-								if (cvClockOut) {
-									cvClockOutValue = log2(extBpm / 120.0f);
-									outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
-								}
-							}
-						}
-
-					} else {
-
-						//bpm[MC] = 0.0;
-						extBpm = 0.0;
-						extSync[MC] = true;
-						//clockSample[MC] = 1.0;
-						extClockSample[MC] = 1.0;
-						pulseNr = 0;
-
-						//if (runSetting)
-							extBeat[MC] = true;
-					}
-
-				} else {
-					extBeat[MC] = false;
-				}
-				prevExtTrigValue[MC] = extTrigValue[MC];
-			
-			}
-
-			// **************   RUN PROCESS   ***************  EXTERNAL CLOCK CV & PULSES
-
-			//if (runSetting && resetPulseTime[MC] <= 0) {
-			if (resetPulseTime[MC] <= 0) {
-
-				// ****** CLOCK PULSE WIDTH
-
-				extMaxPulseSample[MC] = extClockMaxSample[MC] * 0.5;	// <<<<<<<<<<------------------ OTTIMIZZARE POSIZIONE
-				
-				if (!internalClock) {
-
-					if (extClockSample[MC] > extMaxPulseSample[MC])
-						if (!cvClockOut)
-							outputs[CLOCK_OUTPUT].setVoltage(0.f);
-
-					// ************ DIV / MULT
-
-					for (int t = 0; t < MAXTRACKS; t++) {
-
-						if (!extConn[t]) {
-							if(!divSwing[t]) {
-
-
-								if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][0]) {
-									// ***** CLOCK MULTIPLIER *****
-									divClockSample[t] = 1.0;
-									edge[t] = true;
-									divPulse[t] = true;
-								}
-
-								// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
-								if (divPulse[t] && divClockSample[t] > divMaxSample[t][0] * 0.5) {
-									divPulse[t] = false;
-									edge[t] = false;
-								}
-
-							} else {
-
-								if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][divOddCounter[t]]) {
-									// ***** CLOCK MULTIPLIER *****
-									divPulseTime[t] = oneMsTime;
-									divPulse[t] = true;
-									edge[t] = true;
-			
-									if (divOddCounter[t] == 0) {
-										divClockSample[t] = 1.0;
-										divOddCounter[t] = 1;
-									}	else {
-										divClockSample[t] = 1.0 + divMaxSample[t][1] - divMaxSample[t][0];
-										divOddCounter[t] = 0;
-									}
-								}
-							}
-						}
-					}
-
-					// ************************ EXTERNAL CLOCK DETECTION ******************
-
-					if (extBeat[MC]) {
-
-						if (extSync[MC]) {
-
-							// ********** SYNCED BEAT
-							
-							for (int t = 0; t < MAXTRACKS; t++) {
-
-								if (!extConn[t]) {
-
-									if (!divSwing[t]) {
-
-										if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
-											// ***** CLOCK MULTIPLIER *****
-											divMaxSample[t][0] = extClockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-											divMaxSample[t][1] = divMaxSample[t][0];
-											divClockSample[t] = 1.0;
-											divPulse[t] = true;
-											edge[t] = true;
-										} else {
-											// ***** CLOCK DIVIDER *****
-											divMaxSample[t][0] = extClockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-											divMaxSample[t][1] = divMaxSample[t][1];
-											divCount[t]++;
-											if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
-												divClockSample[t] = 1.0;
-												divCount[t] = 1;
-												divPulse[t] = true;
-												edge[t] = true;
-											}
-										}
-									} else {
-
-										if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
-											// ***** CLOCK MULTIPLIER *****
-											divMaxSample[t][0] = extClockMaxSample[MC] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-											divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * swingCalc(t));
-											divOddCounter[t] = 1;
-											divClockSample[t] = 1.0;
-											divPulseTime[t] = oneMsTime;
-											divPulse[t] = true;
-											edge[t] = true;
-										} else {
-											// ***** CLOCK DIVIDER *****
-											divMaxSample[t][0] = extClockMaxSample[MC] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-											divMaxSample[t][1] = divMaxSample[t][0];
-											divCount[t]++;
-											if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
-												divOddCounter[t] = 1;
-												divClockSample[t] = 1.0;
-												divCount[t] = 1;
-												divPulseTime[t] = oneMsTime;
-												divPulse[t] = true;
-												edge[t] = true;
-											}
-										}
-									}
-								}
-							}
-							
-							if (!cvClockOut)
-								outputs[CLOCK_OUTPUT].setVoltage(10.f);
-						
-						}
-					}
-				}
-
-				extClockSample[MC]++;
-
-				if (!internalClock)
-					for (int t = 0; t < MAXTRACKS; t++)
-						if (!extConn[t])
-							divClockSample[t]++;
-
-			}
-				
+		if (extTrigValue[MC] >= 1.f && prevExtTrigValue[MC] < 1.f) {
+			clockAdv[MC] = true;
 		}
+		prevExtTrigValue[MC] = extTrigValue[MC];
 
-		// *********************************************************************************************
-		// *********************************************************************************************
-		// *********************************************************************************************
-		// *********************************************************************************************
-		// *********************************************************************************************
-		
-		// ********************************************************** SINGLE TRACKS WITH EXTERNAL CLOCK
-
-		for (int t = 0; t < MAXTRACKS; t++) {
-			extConn[t] = inputs[CLK_INPUT+t].isConnected();
-			if (extConn[t] && !prevExtConn[t]) {
-				extSync[t] = false;
-				//bpm[t] = 0.0;
-				//pulseNr[t] = 0;
-			}
-			prevExtConn[t] = extConn[t];
-
-			if (extConn[t]) {
-
-				extTrigValue[t] = inputs[CLK_INPUT+t].getVoltage();
-					
-				if (extTrigValue[t] >= 1 && prevExtTrigValue[t] < 1) {
-
-					if (extSync[t]) {
-
-							clockMaxSample[t] = clockSample[t];
-							clockSample[t] = 0.0;
-
-							extBeat[t] = true;
-
-					} else {
-
-						extSync[t] = true;
-						clockSample[t] = 1.0;
-						extBeat[t] = true;
-					}
-
-				} else {
-					extBeat[t] = false;
-				}
-				prevExtTrigValue[t] = extTrigValue[t];
-
-				// **************   RUN PROCESS   ***************  ON SINGLE TRACKS WITH EXTERNAL CLOCK
-
-				if (resetPulseTime[MC] <= 0) {
-
-					// ****** CLOCK PULSE WIDTH
-					maxPulseSample[t] = clockMaxSample[t] * 0.5;		// ---------------------------------- DA OTTIMIZZARE
-				
-					if (clockSample[t] <= clockMaxSample[t]) {
-						// ************ DIV / MULT OLD OLD OLD
-
-						if(!divSwing[t]) {
-
-							if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][0]) {
-								// ***** CLOCK MULTIPLIER *****
-								divClockSample[t] = 1.0;
-								divPulse[t] = true;
-								edge[t] = true;
-							}
-
-							// ***** CLOCK MULTIPLIER/DIVIDER   PULSE WIDTH OFF
-							if (divPulse[t] && divClockSample[t] > divMaxSample[t][0] * 0.5) {
-								divPulse[t] = false;
-								edge[t] = false;
-							}
-
-						} else {
-
-							if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22 && divClockSample[t] > divMaxSample[t][divOddCounter[t]]) {
-								// ***** CLOCK MULTIPLIER *****
-								divPulseTime[t] = oneMsTime;
-								divPulse[t] = true;
-								edge[t] = true;
-
-								if (divOddCounter[t] == 0) {
-									divClockSample[t] = 1.0;
-									divOddCounter[t] = 1;
-								}	else {
-									divClockSample[t] = 1.0 + divMaxSample[t][1] - divMaxSample[t][0];
-									divOddCounter[t] = 0;
-								}
-							}
-						}
-					} else {
-						//extSync[t] = false;
-
-					}
-				}
-
-				// ************************ EXTERNAL CLOCK ************   ON SINGLE TRACKS WITH EXTERNAL CLOCK
-
-				if (extBeat[t]) {
-
-					if (extSync[t]) {
-
-						// ********** SYNCED BEAT
-
-						if (!divSwing[t]) {
-
-							if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[t][0] = clockMaxSample[t] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-								divMaxSample[t][1] = divMaxSample[t][0];
-								divClockSample[t] = 1.0;
-								divPulse[t] = true;
-								edge[t] = true;
-							} else {
-								// ***** CLOCK DIVIDER *****
-								divMaxSample[t][0] = clockMaxSample[t] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-								divMaxSample[t][1] = divMaxSample[t][1];
-								divCount[t]++;
-								if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
-									divClockSample[t] = 1.0;
-									divCount[t] = 1;
-									divPulse[t] = true;
-									edge[t] = true;
-								}
-							}
-						} else {
-
-							if (params[DIVMULT_KNOB_PARAM+t].getValue() > 22) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[t][0] = clockMaxSample[t] / (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-								divMaxSample[t][1] = divMaxSample[t][0] + (divMaxSample[t][0] * swingCalc(t));
-								divOddCounter[t] = 1;
-								divClockSample[t] = 1.0;
-								divPulseTime[t] = oneMsTime;
-								divPulse[t] = true;
-								edge[t] = true;
-							} else {
-								// ***** CLOCK DIVIDER *****
-								divMaxSample[t][0] = clockMaxSample[t] * (divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]);
-								divMaxSample[t][1] = divMaxSample[t][0];
-								divCount[t]++;
-								if (divCount[t] > divMult[int(params[DIVMULT_KNOB_PARAM+t].getValue())]) {
-									divOddCounter[t] = 1;
-									divClockSample[t] = 1.0;
-									divCount[t] = 1;
-									divPulseTime[t] = oneMsTime;
-									divPulse[t] = true;
-									edge[t] = true;
-								}
-							}
-						}
-					}
-				}
-
-				clockSample[t]++;
-				divClockSample[t]++;
-				
-			}
-		}
-
-		// ***************************** COMMON CLOCK PROCESS
-
-		//	********** RESET AND DIV PULSES
-
-		if (resetPulse[MC]) {
-			resetPulseTime[MC]--;
-			if (resetPulseTime[MC] < 0) {
-				resetPulse[MC] = false;
-				outputs[RST_OUTPUT].setVoltage(0.f);
-			} else
-				outputs[RST_OUTPUT].setVoltage(10.f);
-		}
-/*
-		// SWING SWITCH OFF ON SINGLE TRACKS  		<--------------------------------- spostato poco sotto
-		for (int t = 0; t < MAXTRACKS; t++) {
-			if (divSwing[t] && divPulse[t]) {
-				divPulseTime[t]--;
-				if (divPulseTime[t] < 0) {
-					divPulse[t] = false;
-					edge[t] = false;
-				} 
-			}
-		}
-*/		
-
-
-/*
-
-																		░██████╗███████╗░██████╗░██╗░░░██╗███████╗███╗░░██╗░█████╗░███████╗██████╗░
-																		██╔════╝██╔════╝██╔═══██╗██║░░░██║██╔════╝████╗░██║██╔══██╗██╔════╝██╔══██╗
-																		╚█████╗░█████╗░░██║██╗██║██║░░░██║█████╗░░██╔██╗██║██║░░╚═╝█████╗░░██████╔╝
-																		░╚═══██╗██╔══╝░░╚██████╔╝██║░░░██║██╔══╝░░██║╚████║██║░░██╗██╔══╝░░██╔══██╗
-																		██████╔╝███████╗░╚═██╔═╝░╚██████╔╝███████╗██║░╚███║╚█████╔╝███████╗██║░░██║
-																		╚═════╝░╚══════╝░░░╚═╝░░░░╚═════╝░╚══════╝╚═╝░░╚══╝░╚════╝░╚══════╝╚═╝░░╚═╝
-*/
-		
 		clkBuffPos++;	
 		if (clkBuffPos > 4)
 			clkBuffPos = 0;
-/*
- // SPOSTATO IN BLOCCO PIU' SOTTO
-		for (int t = 0; t < MAXTRACKS; t++) {
-
-			// SWING SWITCH OFF ON SINGLE TRACKS  		<--------------------------------- spostato DA SOPRA PER OTTIMIZZARE
-			if (divSwing[t] && divPulse[t]) {
-				divPulseTime[t]--;
-				if (divPulseTime[t] < 0) {
-					divPulse[t] = false;
-					edge[t] = false;
-				} 
-			}
-
-			// -------------------------------- CLOCK EDGE DETECTION and x SAMPLE DELAY
-			if (edge[t] && !prevEdge[t]) {
-				clockAdv[t] = true;
-			}
-			prevEdge[t] = edge[t];
-
-			int tempDelay;
-			if (sampleDelay[t] == 6)
-				tempDelay = sampleDelay[MC];
-			else
-				tempDelay = sampleDelay[t];
-
-			clkBuff[t][clkBuffPos] = clockAdv[t];
-
-			delayReadPos = clkBuffPos - tempDelay;
-
-			if (delayReadPos < 0)
-				delayReadPos = 5 + clkBuffPos - tempDelay;
-
-			if (clkBuff[t][delayReadPos])
-				stepAdv[t] = true;
-				//clockAdv[t] = true;
-
-			// --------------------------------MODE SELECTION
-
-			if (userInputs[t][IN_MODE][0]) {
-				int tempUserIn = userInputs[t][IN_MODE][1];  // 0 oppure 8 a seconda che l'input sia U1 o U2
-				float tempMode = inputs[USER_INPUT+t+tempUserIn].getVoltage() * 0.1;
-
-				if (tempUserIn == 0) {
-					if (userTable[t][1] == KNOB_ATN)
-						tempMode *= params[USER_PARAM+t].getValue();
-					else if (userTable[t][1] == KNOB_ATNV)
-						tempMode *= params[USER_PARAM+t].getValue() * 2 - 1;
-				} else { // altrimenti è 8
-					if (userTable[t][3] == KNOB_ATN)
-						tempMode *= params[USER_PARAM+t+8].getValue();
-					else if (userTable[t][3] == KNOB_ATNV)
-						tempMode *= params[USER_PARAM+t+8].getValue() * 2 - 1;
-				}
-
-				tempMode *= MAXMODES;
-
-				if (userInputs[t][KNOB_MODE][0])
-					tempMode += params[USER_PARAM+t+userInputs[t][KNOB_MODE][1]].getValue() * MAXMODES;
-
-				if (tempMode < 0)
-					tempMode = 0;
-				else if (tempMode > MAXMODES)
-					tempMode = MAXMODES;
-
-				currentMode[t] = tempMode;
-
-			} else if (userInputs[t][KNOB_MODE][0]) {
-				currentMode[t] = params[USER_PARAM+t+userInputs[t][KNOB_MODE][1]].getValue() * MAXMODES;
-			}
-
-			out[t] = 0.f;
-		}
-*/
-
-	/*
-		if (turingMode && !prevTuringMode)
-			for (int t = 0; t < 8; t++)
-				calcVoltage(t);
-
-		prevTuringMode = turingMode;
-	*/
 
 		// *******************SETUP SEQUENCER RUN
 
@@ -3177,20 +2188,17 @@ struct TrigStation : SickoTrigStation {
 		if (seqRunSetting && !prevSeqRunSetting) {
 			for (int t = 0; t < MAXTRACKS; t++) {
 				if (rstStepsWhen[t] == RST_ONRUN || (rstStepsWhen[t] == RST_DEFAULT && rstStepsWhen[MC] == RST_ONRUN)) {
-					if (!wait2RstSetting)
+					//if (!wait2RstSetting)
 						resetTrackSteps(t);
-					else
-						waitClock2RstSeq[t] = true;	// NUOVO CAMBIO
+					//else
+					//	waitClock2RstSeq[t] = true;	// NUOVO CAMBIO
 				}
 			}
 
 		} else if (!seqRunSetting && prevSeqRunSetting) {
 			for (int t = 0; t < MAXTRACKS; t++) {
 				if (rstStepsWhen[t] == RST_ONSTOP || (rstStepsWhen[t] == RST_DEFAULT && rstStepsWhen[MC] == RST_ONSTOP)) {
-					if (!wait2RstSetting)
-						resetTrackSteps(t);
-					else
-						waitClock2RstSeq[t] = true;	// NUOVO CAMBIO
+					resetTrackSteps(t);
 				}
 			}
 		}
@@ -3198,8 +2206,15 @@ struct TrigStation : SickoTrigStation {
 
 		lights[SEQRUN_LIGHT].setBrightness(seqRunSetting);
 
+/*
 
-		
+																								████████╗██████╗░░█████╗░░█████╗░██╗░░██╗░██████╗
+																								╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██║░██╔╝██╔════╝
+																								░░░██║░░░██████╔╝███████║██║░░╚═╝█████═╝░╚█████╗░
+																								░░░██║░░░██╔══██╗██╔══██║██║░░██╗██╔═██╗░░╚═══██╗
+																								░░░██║░░░██║░░██║██║░░██║╚█████╔╝██║░╚██╗██████╔╝
+																								░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚═╝░╚════╝░╚═╝░░╚═╝╚═════╝░
+*/
 
 		for (int t = 0; t < MAXTRACKS; t++) {
 
@@ -3209,26 +2224,26 @@ struct TrigStation : SickoTrigStation {
 			prevTuringMode[t] = turingMode[t];
 
 
-			if (outTypeSetting[t] == 2) 
+			if (outTypeSetting[t] == 3) 
 				outType[t] = outTypeSetting[MC];
 			else
 				outType[t] = outTypeSetting[t];
 
-// -------------- INIZIO INIT TRACK (SPOSTATO DA SOPRA)
-			// SWING SWITCH OFF ON SINGLE TRACKS  		<--------------------------------- spostato DA SOPRA PER OTTIMIZZARE
-			if (divSwing[t] && divPulse[t]) {
-				divPulseTime[t]--;
-				if (divPulseTime[t] < 0) {
-					divPulse[t] = false;
-					edge[t] = false;
-				} 
-			}
+			clockAdv[t] = false;
+			stepAdv[t] = false;
 
-			// -------------------------------- CLOCK EDGE DETECTION and x SAMPLE DELAY
-			if (edge[t] && !prevEdge[t]) {
-				clockAdv[t] = true;
+			if (inputs[CLK_INPUT+t].isConnected()) {
+				extConn[t] = true;
+				extTrigValue[t] = inputs[CLK_INPUT+t].getVoltage();
+				if (extTrigValue[t] >= 1.f && prevExtTrigValue[t] < 1.f) {
+					clockAdv[t] = true;
+				}
+				prevExtTrigValue[t] = extTrigValue[t];
+
+			} else {
+				extConn[t] = false;
+				clockAdv[t] = clockAdv[MC];
 			}
-			prevEdge[t] = edge[t];
 
 			int tempDelay;
 			if (sampleDelay[t] == 6)
@@ -3330,25 +2345,16 @@ struct TrigStation : SickoTrigStation {
 
 			// SETUP DIRECTION
 
-			if (currentMode[t] != CVOLTAGE) {
 			//if (currentMode[t] != CVOLTAGE && !resetPulse[MC]) {
+			if (currentMode[t] != CVOLTAGE) {
+			
 
 				if (resetPulseTime[MC] <= 0) {
 
 					if (stepAdv[t] && (seqRunSetting == 1 || xcludeFromRun[t])) {
 
-						stepPulse[t] = false;
 
-					if (wait2RstSetting && waitClock2RstSeq[t]) {	// NUOVO CAMBIO
-						resetTrackSteps(t);
-						waitClock2RstSeq[t] = false;
-
-					} else {
-						if (!userInputs[t][IN_RUN][0] ||
-								(userInputs[t][IN_RUN][0] &&
-									(!inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() || (inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].getVoltage() >= 1.f))
-								)
-							) {
+						if (!userInputs[t][IN_RUN][0] || (userInputs[t][IN_RUN][0] && (!inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() || (inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].isConnected() && inputs[USER_INPUT+t+userInputs[t][IN_RUN][1]].getVoltage() >= 1.f)))) {
 
 							// ********************************************************************** TO DO: CHECK USER RUN INPUT
 
@@ -3864,9 +2870,10 @@ struct TrigStation : SickoTrigStation {
 						} else {
 							calcVoltage(t);
 						}
-					}
+	
 
 					}
+				}
 
 			} else {	// CONTROL VOLTAGE ADVANCE
 
@@ -3903,7 +2910,7 @@ struct TrigStation : SickoTrigStation {
 									}
 								}
 							} else {
-									calcVoltage(t);
+								calcVoltage(t);
 							}
 							prevAddr[t] = currAddr[t];
 
@@ -3919,7 +2926,7 @@ struct TrigStation : SickoTrigStation {
 			if (!turingMode[t]) {
 
 				if (stepPulse[t]) {
-
+/*
 					if (userInputs[t][KNOB_PW][0] && currentMode[t] != CVOLTAGE) { 
 						if (divPulse[t] < 1) {
 							stepPulse[t] = false;
@@ -3927,7 +2934,7 @@ struct TrigStation : SickoTrigStation {
 						} else {
 							out[t] = 10.f;
 						}
-					} else {
+					} else {*/
 						//if ( (currentMode[t] != CVOLTAGE && outType[t] == OUT_TRIG) || (currentMode[t] == CVOLTAGE && (outType[t] == OUT_TRIG || outType[t] == OUT_CLOCK) ) ) {
 						if (outType[t] == OUT_TRIG) {
 							stepPulseTime[t]--;
@@ -3937,6 +2944,16 @@ struct TrigStation : SickoTrigStation {
 							} else {
 								out[t] = 10.f;
 							}
+						} else if (outType[t] == OUT_CLOCK) {
+							if (!extConn[t])
+								out[t] = inputs[EXTCLOCK_INPUT].getVoltage();
+							else
+								out[t] = inputs[CLK_INPUT+t].getVoltage();
+
+							if (out[t] < 1.f) {
+								out[t] = 0.f;
+								stepPulse[t] = false;
+							}
 
 						} else {
 							if (outGate[t]) 
@@ -3944,12 +2961,12 @@ struct TrigStation : SickoTrigStation {
 							else
 								out[t] = 0.f;
 						}
-					}
+					//}
 
 				}
 
 			} else {
-					out[t] = outScale(volt[t], t);
+				out[t] = outScale(volt[t], t);
 			}
 
 			outputs[OUT_OUTPUT+t].setVoltage(out[t]);
@@ -3957,9 +2974,15 @@ struct TrigStation : SickoTrigStation {
 			lights[STEP_LIGHT+(t*16+step[t])].setBrightness(1);
 
 		}
-
+		
+		if (resetPulse[MC]) {
+			resetPulseTime[MC]--;
+			if (resetPulseTime[MC] < 0) {
+				resetPulse[MC] = false;
+				outputs[RST_OUTPUT].setVoltage(0.f);
+			} else
+				outputs[RST_OUTPUT].setVoltage(10.f);
 		}
-	
 	}
 };
 
@@ -4020,192 +3043,6 @@ struct TrigStationDisplay : TransparentWidget {
 		}
 		Widget::drawLayer(args, layer);
 	}
-};
-
-
-struct TrigStationDisplayTempo : TransparentWidget {
-	TrigStation *module;
-	int frame = 0;
-	TrigStationDisplayTempo() {
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 13);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-				
-				int tempBpmInteger;
-				std::string tempBpm;
-				std::string tempBpmInt;
-				std::string tempBpmDec;
-
-				if (module->internalClock || module->externalClock) {
-					if (!module->extConn[MC]) {
-						tempBpmInteger = int(module->bpm[MC] * 10 + .5);
-
-						tempBpm = to_string(tempBpmInteger);
-						tempBpmInt = tempBpm.substr(0, tempBpm.size()-1);
-						tempBpmDec = tempBpm.substr(tempBpm.size() - 1);
-						tempBpm = tempBpmInt+"."+tempBpmDec;
-
-						nvgFillColor(args.vg, nvgRGB(BPM_YELLOW)); 
-						if (tempBpmInteger < 1000)
-							nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
-						else
-							nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
-					} else {
-						if (!module->cvClockIn) {
-							tempBpmInteger = int(module->extBpm);
-							
-							tempBpm = to_string(tempBpmInteger)+".X";
-
-							nvgFillColor(args.vg, nvgRGB(BPM_BLUE)); 
-
-							if (tempBpmInteger < 100)
-								nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
-							else
-								nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
-						} else {
-							tempBpmInteger = int(module->extBpm * 10 + .5);
-
-							tempBpm = to_string(tempBpmInteger);
-							tempBpmInt = tempBpm.substr(0, tempBpm.size()-1);
-							tempBpmDec = tempBpm.substr(tempBpm.size() - 1);
-							tempBpm = tempBpmInt+"."+tempBpmDec;
-
-							nvgFillColor(args.vg, nvgRGB(BPM_GREEN)); 
-
-							if (tempBpmInteger < 1000)
-								nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
-							else
-								nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
-						}
-						
-						
-					}
-				} else {
-					tempBpm = "---.-";
-
-					nvgFillColor(args.vg, nvgRGB(BPM_YELLOW)); 
-					nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
-				}
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-};
-
-struct TrigStationDisplayDiv : TransparentWidget {
-	TrigStation *module;
-	int frame = 0;
-	int t;
-
-	TrigStationDisplayDiv(int tIndex) : t(tIndex) {
-	}
-
-	void onButton(const event::Button &e) override {
-		/*
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-		*/
-		/*
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
-			if (tempValue + 1 <= 44)
-				tempValue++;
-			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
-			e.consume(this);
-		}
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
-			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
-			if (tempValue - 1 >= 0)
-				tempValue--;
-			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
-			e.consume(this);
-		}
-		*/
-		if (module->divControls) {
-
-			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
-				if (tempValue + 1 <= 44)
-					tempValue++;
-				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
-				e.consume(this);
-			}
-			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
-				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
-				if (tempValue - 1 >= 0)
-					tempValue--;
-				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
-				e.consume(this);
-			}
-
-		} else {
-
-			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-				createContextMenu();
-				e.consume(this);
-			}
-		}
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module && layer == 1) {
-			shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/vgatrue.ttf"));
-			nvgFontSize(args.vg, 16);
-			nvgFontFaceId(args.vg, font->handle);
-			nvgTextLetterSpacing(args.vg, 0);
-
-			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
-			float tempXpos = (tempValue > 1 && tempValue < 43) ? 10 : 6;
-
-			nvgFillColor(args.vg, (tempValue < 22) ?
-				nvgRGB(COLOR_LCD_RED) :
-				nvgRGB(COLOR_LCD_GREEN));
-
-			nvgTextBox(args.vg, tempXpos, 15.1, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-		}
-		Widget::drawLayer(args, layer);
-	}
-
-	void createContextMenu() {
-		TrigStation *module = dynamic_cast<TrigStation *>(this->module);
-		assert(module);
-
-		if (module) {
-			ui::Menu *menu = createMenu();
-
-			static const std::string menuNames[45] = {
-				"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-				"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"
-			};
-
-			struct ThisItem : MenuItem {
-				TrigStation* module;
-				int valueNr;
-				int t;
-				void onAction(const event::Action& e) override {
-					module->params[module->DIVMULT_KNOB_PARAM + t].setValue(float(valueNr));
-				}
-			};
-
-			for (int i = 0; i < 45; i++) {
-				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
-				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue()) == i);
-				thisItem->module = module;
-				thisItem->valueNr = i;
-				thisItem->t = t;
-				menu->addChild(thisItem);
-			}
-		}
-	}
-
 };
 
 struct TrigStationDisplayMode : TransparentWidget {
@@ -4553,9 +3390,9 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 				};
 
 				menu->addChild(createSubmenuItem("Out Type", (module->outTypeNames[module->outTypeSetting[t]]), [=](Menu * menu) {
-					for (int i = 0; i < 3; i++) {
+					for (int i = 0; i < 4; i++) {
 						auto outTypeItem = new OutTypeItem(module, i, t);
-						if (i == 2)
+						if (i == 3)
 							outTypeItem->rightText = module->outTypeNames[module->outTypeSetting[MC]] + " " + CHECKMARK(module->outTypeSetting[t] == i);
 						else
 							outTypeItem->rightText = CHECKMARK(module->outTypeSetting[t] == i);
@@ -4764,14 +3601,14 @@ struct TrigStationDisplayU1 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
 					tempText = "SC";
 				break;
-
+/*
 				case IN_PW:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_MAGENTA));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
-
+*/
 				case IN_RSTSTEP:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BROWN));
 					tempText = "RS";
@@ -4803,14 +3640,14 @@ struct TrigStationDisplayU1 : TransparentWidget {
 					if (module->userInputs[t][IN_SKIP][0])
 						tempText += "*";
 				break;
-
+/*
 				case IN_SWING:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
 				break;
-				
+*/				
 			}
 			nvgTextBox(args.vg, 0, 0, 15, tempText.c_str(), NULL);
 		}
@@ -4862,14 +3699,14 @@ struct TrigStationDisplayU2 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_YELLOW));
 					tempText = "SC";
 				break;
-
+/*
 				case IN_PW:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_MAGENTA));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
-
+*/
 				case IN_RSTSTEP:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_BROWN));
 					tempText = "RS";
@@ -4901,14 +3738,14 @@ struct TrigStationDisplayU2 : TransparentWidget {
 					if (module->userInputs[t][IN_SKIP][0])
 						tempText += "*";
 				break;
-
+/*
 				case IN_SWING:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
 				break;
-
+*/
 			}
 			nvgTextBox(args.vg, 0, 0, 15, tempText.c_str(), NULL);
 		}
@@ -4948,14 +3785,14 @@ struct TrigStationDisplayK1 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_YELLOW));
 					tempText = "SC";
 				break;
-
+/*
 				case KNOB_PW:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_MAGENTA));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
-
+*/
 				case KNOB_RSTSTEP:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BROWN));
 					tempText = "RS";
@@ -4970,14 +3807,14 @@ struct TrigStationDisplayK1 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_RED));
 					tempText = "SP";
 				break;
-
+/*
 				case KNOB_SWING:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
 				break;
-
+*/
 				case KNOB_ATN:
 					nvgFontSize(args.vg, 14);
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
@@ -5029,14 +3866,14 @@ struct TrigStationDisplayK2 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_YELLOW));
 					tempText = "SC";
 				break;
-
+/*
 				case KNOB_PW:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_MAGENTA));
 					tempText = "PW";
 					if (module->userInputs[t][KNOB_SWING][0] || module->userInputs[t][IN_SWING][0])
 						tempText += "*";
 				break;
-
+*/
 				case KNOB_RSTSTEP:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_BROWN));
 					tempText = "RS";
@@ -5051,14 +3888,14 @@ struct TrigStationDisplayK2 : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_RED));
 					tempText = "SP";
 				break;
-
+/*
 				case KNOB_SWING:
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_PURPLE));
 					tempText = "SW";
 					if (module->params[module->DIVMULT_KNOB_PARAM+t].getValue() < 23)
 						tempText += "*";
 				break;
-
+*/
 				case KNOB_ATN:
 					nvgFontSize(args.vg, 14);
 					nvgFillColor(args.vg, nvgRGB(COLOR_USER_GREEN));
@@ -5081,7 +3918,7 @@ struct TrigStationWidget : ModuleWidget {
 	TrigStationWidget(TrigStation* module) {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/TrigStation.svg")));
-
+/*
 		{
 			TrigStationDisplayTempo *display = new TrigStationDisplayTempo();
 			display->box.pos = mm2px(Vec(22.2 - 5 - 3, 14.8));
@@ -5089,10 +3926,10 @@ struct TrigStationWidget : ModuleWidget {
 			display->module = module;
 			addChild(display);
 		}
-
+*/
 		{
 			TrigStationDisplay *display = new TrigStationDisplay();
-			display->box.pos = mm2px(Vec(126 + 5.7, 9.1));
+			display->box.pos = mm2px(Vec(126 - 14 + 5.7 + 1.7 - 38 + 4, 9.1));
 			display->box.size = mm2px(Vec(8, 8));
 			display->module = module;
 			addChild(display);
@@ -5102,7 +3939,7 @@ struct TrigStationWidget : ModuleWidget {
 		const float xTemp = 0.3;
 
 		for (int t = 0; t < MAXTRACKS; t++) {
-
+/*
 			{
 				TrigStationDisplayDiv *display = new TrigStationDisplayDiv(t);
 				display->box.pos = mm2px(Vec(22.5, 33+11.5*t));
@@ -5110,46 +3947,45 @@ struct TrigStationWidget : ModuleWidget {
 				display->module = module;
 				addChild(display);
 			}
+*/
 			{
 				TrigStationDisplayMode *display = new TrigStationDisplayMode(t);
-				display->box.pos = mm2px(Vec(98.8, 33+11.5*t));
+				display->box.pos = mm2px(Vec(98.8 - 27, 33+11.5*t));
 				display->box.size = mm2px(Vec(11, 6.3));
 				display->module = module;
 				addChild(display);
 			}
 			{
 				TrigStationDisplayTrackSett *display = new TrigStationDisplayTrackSett(t);
-				//display->box.pos = mm2px(Vec(98.8, 33+11.5*t));
-				display->box.pos = mm2px(Vec(108.8, 33+11.5*t));
-				//display->box.size = mm2px(Vec(11, 6.3));
+				display->box.pos = mm2px(Vec(108.8 - 27, 33+11.5*t));
 				display->box.size = mm2px(Vec(8, 6.3));
 				display->module = module;
 				addChild(display);
 			}
 			{
 				TrigStationDisplayU1 *display = new TrigStationDisplayU1(t);
-				display->box.pos = mm2px(Vec(61-xTemp, yLine+11.5*t));
+				display->box.pos = mm2px(Vec(61-27-xTemp, yLine+11.5*t));
 				display->box.size = mm2px(Vec(4, 5));
 				display->module = module;
 				addChild(display);
 			}
 			{
 				TrigStationDisplayK1 *display = new TrigStationDisplayK1(t);
-				display->box.pos = mm2px(Vec(70-xTemp, 33+11.5*t));
+				display->box.pos = mm2px(Vec(70-27-xTemp, 33+11.5*t));
 				display->box.size = mm2px(Vec(4, 5));
 				display->module = module;
 				addChild(display);
 			}
 			{
 				TrigStationDisplayU2 *display = new TrigStationDisplayU2(t);
-				display->box.pos = mm2px(Vec(80-xTemp, yLine+11.5*t));
+				display->box.pos = mm2px(Vec(80-27-xTemp, yLine+11.5*t));
 				display->box.size = mm2px(Vec(4, 5));
 				display->module = module;
 				addChild(display);
 			}
 			{
 				TrigStationDisplayK2 *display = new TrigStationDisplayK2(t);
-				display->box.pos = mm2px(Vec(89-xTemp, yLine+11.5*t));
+				display->box.pos = mm2px(Vec(89-27-xTemp, yLine+11.5*t));
 				display->box.size = mm2px(Vec(4, 5));
 				display->module = module;
 				addChild(display);
@@ -5165,57 +4001,46 @@ struct TrigStationWidget : ModuleWidget {
 
 		const float xExtClock = 11.5f - 1.5f - 2.f - 1.f;
 
-		const float xRun1 = 61.5f;
-		const float yRun1 = yProgLine + 1.3f;
-		const float xRun2 = 69.f;
-		const float yRun2 = yProgLine - 5.2f;
+		const float xSeqRunBut = 56.5f + 20 + 6 - 14 + 1.7 - 49.5 + 1 + 1;
+		const float xSeqRunIn = xSeqRunBut + 10.f + 2 + 1;
 
+		const float xRst = 100.f + 5.7 - 14 + 1.7 - 44.9 + 1 + 3;
+		const float xRstB = xRst + 9.8f + 2;
+		const float xRstOut = xRstB + 9.8f + 2;
 		
-		const float xSeqRunBut = 56.5f + 20 + 6;
-		const float xSeqRunIn = xSeqRunBut + 10.f;
+		const float xProgIn = 149.f + 5 - 14 + 1.7 - 37.2 + 3 + 5; 
 
-		const float xBpmKnob = 85.5f - 27.f - 5.f - 0.5f - 3.f;
-		const float yBpmKnob =  16.3f;
-
-		const float xRst = 100.f + 5.7;
-		const float xRstB = xRst + 9.8f;
-		const float xRstOut = xRstB + 9.8f;
-		
-		const float xProgIn = 149.f + 5; 
-
-		const float xProgKnob = 163.5f +5; 
+		const float xProgKnob = 163.5f + 5 -14 +1.7 -37.2 + 6 + 5; 
 		const float yProgKnob = 16.3f;
 		
-		const float xSet = 181.f + 4;
-		const float xAuto = 193.2f + 3;
+		const float xSet = 181.f + 4 - 14 + 1.7 - 27.2 + 2 + 6;
+		const float xAuto = 193.2f + 3 - 14 + 1.7 - 27.2 + 4 + 6;
 
-		const float xRecallBut = 209.f + 2;
-		const float xRecallIn = 219.f + 2;
+		const float xRecallBut = 209.f + 2 - 14 + 1.7 - 15 + 4;
+		const float xRecallIn = 219.f + 2 - 14 + 1.7 - 15 + 7;
 
-		const float xStore = 231.4f + 1;
-
-		const float xClkOut = 247.f;
+		const float xStore = 231.4f + 1 - 14 + 1.7 - 15 + 12;
 
 		const float yStart = 36.5f;
 		const float yDelta = 11.5f;
 
-		const float xStart = 120.5f;
+		const float xStart = 120.5f - 27.f;
 		const float xDelta = 7.45f;
 		const float xBlockShift = 1.5f;
 
-		//const float yLight = -5.f;
-		const float yLight = -4.f;
+		const float yLight = -5.f;
 		const float xLight = 2.2f;
 
-		const float xOut = 247.f;
+		const float xOut = 247.f - 27 + 1.7;
 
-		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xBpmKnob, yBpmKnob)), module, TrigStation::BPM_KNOB_PARAM));
 
-		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(xExtClock, yProgLine)), module, TrigStation::EXTCLOCK_INPUT));
-		addInput(createStationClockInCentered<SickoClockInStation>(mm2px(Vec(xExtClock, yProgLine)), module, TrigStation::EXTCLOCK_INPUT));
+//		addParam(createParamCentered<SickoKnob>(mm2px(Vec(xBpmKnob, yBpmKnob)), module, TrigStation::BPM_KNOB_PARAM));
 
-		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xRun1, yRun1)), module, TrigStation::INTCLOCKBUT_PARAM, TrigStation::RUNBUT_LIGHT));
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRun2, yRun2)), module, TrigStation::RUN_INPUT));
+		//addInput(createStationClockInCentered<SickoClockInStation>(mm2px(Vec(xExtClock, yProgLine)), module, TrigStation::EXTCLOCK_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xExtClock, yProgLine)), module, TrigStation::EXTCLOCK_INPUT));
+
+//		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xRun1, yRun1)), module, TrigStation::INTCLOCKBUT_PARAM, TrigStation::RUNBUT_LIGHT));
+//		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRun2, yRun2)), module, TrigStation::RUN_INPUT));
 
 		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xSeqRunBut, yProgLine)), module, TrigStation::SEQRUN_PARAM, TrigStation::SEQRUN_LIGHT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xSeqRunIn, yProgLine)), module, TrigStation::SEQRUN_INPUT));
@@ -5231,17 +4056,18 @@ struct TrigStationWidget : ModuleWidget {
 		addParam(createLightParamCentered<VCVLightBezel<BlueLight>>(mm2px(Vec(xRecallBut, yProgLine)), module, TrigStation::RECALL_PARAM, TrigStation::RECALL_LIGHT));
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRecallIn, yProgLine)), module, TrigStation::RECALL_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<RedLight>>(mm2px(Vec(xStore, yProgLine)), module, TrigStation::STORE_PARAM, TrigStation::STORE_LIGHT));
-		addOutput(createStationClockOutCentered<SickoClockOutStation>(mm2px(Vec(xClkOut, yProgLine)), module, TrigStation::CLOCK_OUTPUT));
+//		addOutput(createStationClockOutCentered<SickoClockOutStation>(mm2px(Vec(xClkOut, yProgLine)), module, TrigStation::CLOCK_OUTPUT));
 		
 		int shiftCont = 0;
 		int shiftGroup = 0;
 		float xShift = 0;
 		
 		const float xClock = 7.5f;
-		const float xDivMul = xClock + 9.5f;
+		//const float xDivMul = xClock + 9.5f;
 		
-		const float xRstIn = xDivMul + 27.f;
-		const float xLen = xRstIn + 10.f;
+		//const float xRstIn = xDivMul + 27.f;
+		const float xRstIn = xClock + 9.3f;
+		const float xLen = xRstIn + 10.2f;
 
 		const float xU1 = xLen + 11.f;
 		const float xK1 = xU1 + 9.f;
@@ -5252,40 +4078,16 @@ struct TrigStationWidget : ModuleWidget {
 			
 			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xClock, yStart+(t*yDelta))), module, TrigStation::CLK_INPUT+t));
 			
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xDivMul, yStart+(t*yDelta))), module, TrigStation::DIVMULT_KNOB_PARAM+t));
-
 			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRstIn, yStart+(t*yDelta))), module, TrigStation::RST_INPUT+t));
 
 			addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xLen, yStart+(t*yDelta))), module, TrigStation::LENGTH_PARAM+t));
-/*
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xU1, yStart+(t*yDelta))), module, TrigStation::USER_INPUT+t));
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xK1, yStart+(t*yDelta))), module, TrigStation::USER_PARAM+t));
-			addInput(createInputCentered<SickoInPort>(mm2px(Vec(xU2, yStart+(t*yDelta))), module, TrigStation::USER_INPUT+t+8));
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xK2, yStart+(t*yDelta))), module, TrigStation::USER_PARAM+t+8));
-*/
+
 			addInput(createStationInputCentered<SickoInputStation>(mm2px(Vec(xU1, yStart+(t*yDelta))), module, TrigStation::USER_INPUT+t));
 			addParam(createStationParamCentered<SickoKnobStation>(mm2px(Vec(xK1, yStart+(t*yDelta))), module, TrigStation::USER_PARAM+t));
 			addInput(createStationInputCentered<SickoInputStation>(mm2px(Vec(xU2, yStart+(t*yDelta))), module, TrigStation::USER_INPUT+t+8));
 			addParam(createStationParamCentered<SickoKnobStation>(mm2px(Vec(xK2, yStart+(t*yDelta))), module, TrigStation::USER_PARAM+t+8));
 
-/*
-			shiftCont = 0;
-			shiftGroup = 0;
-			xShift = 0;
 
-			for (int st = 0; st < 16; st++) {
-
-				addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xStart + (xDelta*st) + xShift, yStart+(t*yDelta))), module, TrigStation::STEP_PARAM+(t*16)+st));
-				addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xStart + (xDelta*st) + xShift + xLight, yStart+(t*yDelta)+yLight)), module, TrigStation::STEP_LIGHT+(t*16)+st));
-				shiftCont++;
-				if (shiftCont > 3) {
-					shiftGroup++;
-					xShift = xBlockShift * shiftGroup;
-					shiftCont = 0;
-				}
-				
-			}
-*/
 			shiftCont = 0;
 			shiftGroup = 0;
 			xShift = 0;
@@ -5337,8 +4139,8 @@ struct TrigStationWidget : ModuleWidget {
 				
 			}
 
-			//addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart+(t*yDelta))), module, TrigStation::OUT_OUTPUT+t));
 			addOutput(createStationClockOutCentered<SickoTrigOutStation>(mm2px(Vec(xOut, yStart+(t*yDelta))), module, TrigStation::OUT_OUTPUT+t));
+			//addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart+(t*yDelta))), module, TrigStation::OUT_OUTPUT+t));
 
 		}
 		
@@ -5412,9 +4214,9 @@ struct TrigStationWidget : ModuleWidget {
 					module->outTypeSetting[MC] = outType;
 				}
 			};
-			std::string OutTypeNames[2] = {"Trig", "Gate"};
+			std::string OutTypeNames[3] = {"Trig", "Gate", "Clock Width"};
 			menu->addChild(createSubmenuItem("Out Type", (OutTypeNames[module->outTypeSetting[MC]]), [=](Menu * menu) {
-				for (int i = 0; i < 2; i++) {
+				for (int i = 0; i < 3; i++) {
 					OutTypeItem* outTypeItem = createMenuItem<OutTypeItem>(OutTypeNames[i]);
 					outTypeItem->rightText = CHECKMARK(module->outTypeSetting[MC] == i);
 					outTypeItem->module = module;
@@ -5480,7 +4282,7 @@ struct TrigStationWidget : ModuleWidget {
 					menu->addChild(rstStepsWhenItem);
 				}
 			}));
-
+/*
 			struct WaitClockItem : MenuItem {
 				TrigStation* module;
 				int wait2RstSetting;
@@ -5499,7 +4301,7 @@ struct TrigStationWidget : ModuleWidget {
 					menu->addChild(waitClockItem);
 				}
 			}));
-
+*/
 			menu->addChild(new MenuSeparator());
 
 			menu->addChild(createMenuLabel("Module Settings"));
@@ -5523,17 +4325,8 @@ struct TrigStationWidget : ModuleWidget {
 				}
 			}));
 
-			menu->addChild(createBoolPtrMenuItem("Reset internal clock on RST", "", &module->rstClkOnRst));
+//			menu->addChild(createBoolPtrMenuItem("Reset internal clock on RST", "", &module->rstClkOnRst));
 			menu->addChild(createBoolPtrMenuItem("Reset Seq on PROG change", "", &module->rstSeqOnProgChange));
-
-			struct PpqnItem : MenuItem {
-				TrigStation* module;
-				int ppqn;
-				void onAction(const event::Action& e) override {
-					module->tempPpqn = ppqn;
-					module->ppqnChange = true;
-				}
-			};
 
 			menu->addChild(new MenuSeparator());
 
@@ -5574,7 +4367,7 @@ struct TrigStationWidget : ModuleWidget {
 					menu->addChild(progressionTypeItem);
 				}
 			}));
-
+/*
 			menu->addChild(new MenuSeparator());
 
 			menu->addChild(createMenuLabel("External Main Clock"));
@@ -5591,10 +4384,10 @@ struct TrigStationWidget : ModuleWidget {
 
 			menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
 			menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
-
+*/
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createMenuLabel("User Interface"));
-			menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
+//			menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
 			menu->addChild(createBoolPtrMenuItem("MODE mouse controls", "", &module->modeControls));
 
 			
@@ -5714,9 +4507,9 @@ struct TrigStationWidget : ModuleWidget {
 					};
 
 					menu->addChild(createSubmenuItem("Out Type", (module->outTypeNames[module->outTypeSetting[t]]), [=](Menu * menu) {
-						for (int i = 0; i < 3; i++) {
+						for (int i = 0; i < 4; i++) {
 							auto outTypeItem = new OutTypeItem(module, i, t);
-							if (i == 2)
+							if (i == 3)
 								outTypeItem->rightText = module->outTypeNames[module->outTypeSetting[MC]] + " " + CHECKMARK(module->outTypeSetting[t] == i);
 							else
 								outTypeItem->rightText = CHECKMARK(module->outTypeSetting[t] == i);
@@ -6006,11 +4799,6 @@ struct TrigStationWidget : ModuleWidget {
 			}));
 		}));
 
-/*
-		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
-*/
-		
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Rclick on user controls (U1/U2) or Track# to config"));
