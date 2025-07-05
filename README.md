@@ -34,7 +34,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 # SickoCV v2.7.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/b27e835e-3676-41b9-836b-36ed908a52ec)
+![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/29f84130-ed55-4bd0-bb62-0d67f4682ae0)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -60,6 +60,7 @@ VCV Rack plugin modules
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [randLoops / randLoops8](#randLoops--randLoops8)
 - [randMod7 / randMod7Compact](#randMod7--randMod7Compact)
+- [sampleDelay](#sampleDelay)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
 - [sickoCrosser / sickoCrosser4](#sickocrosser--sickocrosser4)
@@ -799,6 +800,12 @@ The compact version of randMod7 has only the div/mult knob on each track. You ca
 
 [back to top](#table-of-contents)
 
+## sampleDelay
+### 3 signal delay up to 5 samples
+
+![sampledelay](https://github.com/user-attachments/assets/d7ca49e3-5658-4036-923c-d5f70246ff5d)
+
+[back to top](#table-of-contents)
 
 ## shifter
 ### 64 selectable stages shift registers
