@@ -796,7 +796,10 @@ struct CVmeterDebugDisplay : TransparentWidget {
 								shiftCol = colWidth;
 							else
 								shiftCol = 0;
-							nvgTextBox(args.vg, xDelayA + shiftCol, yDelay,400, to_string(delayA).c_str(), NULL);
+							if (delayA < 100000)
+								nvgTextBox(args.vg, xDelayA + shiftCol, yDelay,400, to_string(delayA).c_str(), NULL);
+							else
+								nvgTextBox(args.vg, xDelayA + shiftCol, yDelay,400, ">100,000", NULL);
 						}
 						if (module->delayB > 0) {
 							if (delayB < 10)
@@ -809,7 +812,10 @@ struct CVmeterDebugDisplay : TransparentWidget {
 								shiftCol = colWidth;
 							else 
 								shiftCol = 0;
-							nvgTextBox(args.vg, xDelayB + shiftCol, yDelay,400, to_string(delayB).c_str(), NULL);
+							if (delayB < 100000)
+								nvgTextBox(args.vg, xDelayB + shiftCol, yDelay,400, to_string(delayB).c_str(), NULL);
+							else
+								nvgTextBox(args.vg, xDelayB + shiftCol - 10, yDelay,400, ">100,000", NULL);
 						}
 					}
 				}
