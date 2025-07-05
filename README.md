@@ -1266,9 +1266,9 @@ Plus versions only:
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
 
-Download [ENGLISH user manual](./docs/trigStation-stepStation%20user%20manual%20EN.pdf?raw=true)
+![stepStation](https://github.com/user-attachments/assets/f1383ba1-7600-4458-9605-8657d57906c0)
 
-Download [manuale utente ITALIANO](./docs/trigStation-stepStation%20manuale%20utente%20IT.pdf?raw=true)
+![trigStation](https://github.com/user-attachments/assets/0c4d9988-4dc3-4d43-9d2e-dcc595c9952f)
 
 If errors occurs during download please right-click on the link above and "Save Link As"
 
