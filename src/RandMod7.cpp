@@ -1,10 +1,4 @@
-#define RAMPUP 0
-#define TRIANGLE 1
-#define RAMPDOWN 2
-
 #define MAXTRACKS 7
-#define ALLTRACKS 8
-#define MR 7
 
 #define DIR_UP 0
 #define DIR_DOWN 1
@@ -65,7 +59,7 @@ struct RandMod7 : Module {
 	double xRateKnob[7] = {0, 0, 0, 0, 0, 0, 0};
 	double prevXrateKnob[7] = {-11.f, -11.f, -11.f, -11.f, -11.f, -11.f, -11.f};
 
-	float rate[ALLTRACKS] = {}; // 
+	float rate[MAXTRACKS] = {}; // 
 	float masterRate = 0.f;
 
 	double sampleRate = APP->engine->getSampleRate();
@@ -76,11 +70,9 @@ struct RandMod7 : Module {
 
 	double currSample[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
 
-	float strength[MAXTRACKS] = {};
+	//float strength[MAXTRACKS] = {};
 
-	//int sign[2] = {1, -1};
 	int magnet[MAXTRACKS]= {};
-	int prevMagnet[MAXTRACKS] = {};
 
 	float rateAtten = 0.f;
 
@@ -120,7 +112,6 @@ struct RandMod7 : Module {
 
 	RandMod7() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		//configParam(RATE_PARAM, 0.f, 1.f, 0.f, "Rate", "ms", maxRate / minRate, minRate);
 		configParam(RATE_PARAM, 0.f, 1.f, 0.f, "Rate", "hz", maxFreq / minFreq, minFreq);
 		configInput(RATE_INPUT, "Rate");
 		configParam(RATE_ATTENUV_PARAM, -1.f, 1.f, 0.f, "Rate CV", "%", 0, 100);
@@ -157,7 +148,7 @@ struct RandMod7 : Module {
 
 	void onReset(const ResetEvent &e) override {
 		rateKnob = 1;
-		//prevRateKnob = 1;
+
 		for (int t = 0; t < 7; t++) {
 			startY[t] = y[t] = targetY[t] = random::uniform();
 			currSample[t] = 0;
@@ -170,12 +161,8 @@ struct RandMod7 : Module {
 	void onSampleRateChange() override {
 		sampleRate = APP->engine->getSampleRate();
 		sampleRateMs = sampleRate / 1000;
-		//sampleCount = sampleRate;
 		sampleRateCoeff = 1 / sampleRate;
 		sampleRateCoeffMs = 1 / sampleRateMs;
-		//waveCoeff = rate / sampleRateCoeff;
-		//
-		//oneMsTime = (APP->engine->getSampleRate()) / 1000;
 
 	}
 
@@ -288,13 +275,12 @@ struct RandMod7 : Module {
 
 	float lookupRateParamToMs(float param) const {
 
-	    //float p = clamp(param, 0.f, 1.f) * (LUT_SIZE - 1);
 	    float p = param * (LUT_SIZE -1);
 	    int i = static_cast<int>(p);
 	    float frac = p - i;
 	    float a = randModTable[i];
 	    float b = randModTable[std::min(i + 1, LUT_SIZE - 1)];
-	    return a + frac * (b - a);  // Interpolazione lineare
+	    return a + frac * (b - a);
 
 	}
 
@@ -308,28 +294,26 @@ struct RandMod7 : Module {
 
 	void process(const ProcessArgs& args) override {
 
+		//rateKnob = params[RATE_PARAM].getValue();
 
-		rateKnob = params[RATE_PARAM].getValue();
+		//rateAtten =  params[RATE_ATTENUV_PARAM].getValue();
 
-		rateAtten =  params[RATE_ATTENUV_PARAM].getValue();
+		//targetRateCv = clamp(params[RATE_PARAM].getValue() + (inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f), 0.f, 1.f);
 
-		targetRateCv = clamp(params[RATE_PARAM].getValue() + (inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f), 0.f, 1.f);
+		targetRateCv = params[RATE_PARAM].getValue() + inputs[RATE_INPUT].getVoltage() * params[RATE_ATTENUV_PARAM].getValue() / 10.f;
 
-		if (firstRun) {
-			firstRun = false;
-			float initialCvInput = inputs[RATE_INPUT].isConnected() ? inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f : 0.f;
-			smoothedMasterRateCv = clamp(params[RATE_PARAM].getValue() + initialCvInput, 0.f, 1.f);
+		if (targetRateCv > 1.f)
+			targetRateCv = 1.f;
+		else if (targetRateCv < 0.f)
+			targetRateCv = 0.f;
+
+		if (targetRateCv != prevTargetRateCv) {
+
 			alert = true;
-			masterRate = lookupRateParamToMs(smoothedMasterRateCv);
-		} else {
-			if (targetRateCv != prevTargetRateCv) {
-				if (abs(targetRateCv - smoothedMasterRateCv) > 1e-6) {
-					smoothedMasterRateCv += (targetRateCv - smoothedMasterRateCv) * rateSmoothing;
-					alert = true;
-					masterRate = lookupRateParamToMs(smoothedMasterRateCv);
-				}
-				prevTargetRateCv = targetRateCv;
-			}
+			masterRate = lookupRateParamToMs(targetRateCv);
+
+			prevTargetRateCv = targetRateCv;
+
 		}
 
 		for (int t = 0; t < MAXTRACKS; t++) {
@@ -352,41 +336,44 @@ struct RandMod7 : Module {
 
 			if (currSample[t] > maxSamples[t]) {
 
-				currSample[t] = maxSamples[t] - currSample[t];
-				//currSample[t] = 0;
+				//currSample[t] = maxSamples[t] - currSample[t];
+				currSample[t] = 0;
 
-			    startY[t] = targetY[t];  // IMPORTANTE: continua da dove eravamo
+				startY[t] = targetY[t];
 
-				float rawStrength = params[STRENGTH_PARAM + t].getValue() + (inputs[STRENGTH_INPUT + t].getVoltage() / 10);
+				float magnetPoint;
+				switch ((int)magnet[t]) {
+					case 0: magnetPoint = 0.f; break;
+					case 1: magnetPoint = 0.5f; break;
+					case 2: magnetPoint = 1.f; break;
+					default: magnetPoint = 0.f; break;
+				}
 
-				rawStrength = clamp(rawStrength, 0.f, 1.f);
+				float strength = params[STRENGTH_PARAM+t].getValue() + inputs[STRENGTH_INPUT + t].getVoltage() / 10.f;
+				if (strength > 1.f)
+					strength = 1.f;
+				else if (strength < 0.f)
+					strength = 0.f;
 
-				float center      = magnetTarget[magnet[t]];
-				float centerBias  = 1.f - abs(center - 0.5f) * 2.f;  // 1 in centro, 0 ai lati
-				float strength    = rawStrength * centerBias;
-
-				float distance    = abs(startY[t] - center);
-				float spread      = mix(0.5f, 0.01f, strength * (1.f - distance));
-
-				targetY[t] = clamp(center + random::normal() * spread, 0.f, 1.f);
-
+				targetY[t] = mix(random::uniform(), magnetPoint, strength);
 			}
 
-			float phase  = (float)currSample[t] / maxSamples[t];     // 0 → 1
-			float eased  = phase * phase * (3.f - 2.f * phase);      // smoothstep
-			y[t] = startY[t] + (targetY[t] - startY[t]) * eased;
-			
+			float progress = currSample[t] / maxSamples[t];
+			progress = progress * progress * (3.f - 2.f * progress);
+			y[t] = startY[t] + progress * (targetY[t] - startY[t]);
+
 			if (y[t] > 1.f)
 				y[t] = 1.f;
 			else if (y[t] < 0.f)
 				y[t] = 0.f;
 
-
 			float minVal = params[MIN_PARAM + t].getValue();
 			float maxVal = params[MAX_PARAM + t].getValue();
 
 			if (minVal > maxVal) {
-				std::swap(minVal, maxVal);
+				float tempVal = minVal;
+				minVal = maxVal;
+				maxVal = tempVal;
 			}
 
 			out[t] = y[t] * (maxVal - minVal) + minVal;
@@ -395,7 +382,6 @@ struct RandMod7 : Module {
 				out[t] = 10.f;
 			else if (out[t] < -10.f)
 				out[t] = -10.f;
-
 
 			if (t != 6)
 				outputs[OUT_OUTPUT + t].setVoltage(out[t]);

@@ -1,19 +1,14 @@
 #include "plugin.hpp"
 
-#define RAMPUP 0
-#define TRIANGLE 1
-#define RAMPDOWN 2
-
 #define MAXTRACKS 7
-#define ALLTRACKS 8
-#define MR 7
 
-#define DIR_UP 0
-#define DIR_DOWN 1
+#define LOWER 0.f
+#define MIDDLE 0.5f
+#define UPPER 1.f
 
-#define BASE 0
-#define MIDDLE 1
-#define TOP 2
+#define WEAK 0.3f
+#define AVERAGE 0.5f
+#define STRONG 0.7f
 
 //using namespace std;	// this is for debug
 
@@ -45,24 +40,26 @@ struct RandMod7compact : Module {
 
 	int bipolar = 0;
 
-	double rateKnob = 0.0f;
+	//float rateKnob = 0.f;
 
-	double xRateKnob[7] = {1, 1, 1, 1, 1, 1, 1};
-	double prevXrateKnob[7] = {0, 0, 0, 0, 0, 0, 0};
+	float xRateKnob[7] = {1, 1, 1, 1, 1, 1, 1};
+	float prevXrateKnob[7] = {0, 0, 0, 0, 0, 0, 0};
 
-	float rate[MAXTRACKS] = {}; // 
+	float rate[MAXTRACKS] = {};
 	float masterRate = 0.f;
 
-	double sampleRate = APP->engine->getSampleRate();
-	double sampleRateMs = sampleRate / 1000;
-	double maxSamples[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
-	double currSample[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
+	float sampleRate = APP->engine->getSampleRate();
+	float sampleRateMs = sampleRate / 1000;
+	float maxSamples[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
+	float currSample[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
 
-	int magnet = 0;
+	int magnetPoint = 0;
+	float magnetValue = 0.f;
 
 	int strength = 0;
+	float strengthValue = WEAK;
 
-	float rateAtten = 0.f;
+	//float rateAtten = 0.f;
 
 	float y[MAXTRACKS] = {0, 0, 0, 0, 0, 0, 0};
 	float out[MAXTRACKS];
@@ -82,17 +79,6 @@ struct RandMod7compact : Module {
 
 	bool alert = false;
 
-	const float magnetTarget[3] = {0.0f, 0.5f, 1.0f};
-
-	float polarityBlend = 0.f;
-	bool prevBipolar = false;
-
-	float smoothedMasterRateCv = 1.f;
-	//float smoothedMasterRateCv = 0.0001f;
-	const float rateSmoothing = 0.01f; // regola la velocità di smoothing
-
-	const float blendSpeed = 0.00005f;  // oppure 0.01f per più veloce
-
 	static constexpr float minRate = 0.1f;  // in milliseconds
 	static constexpr float maxRate = 500.f;  // in milliseconds
 
@@ -102,18 +88,8 @@ struct RandMod7compact : Module {
 	static constexpr float minFreq = 2.f;       // 500 ms
 	static constexpr float maxFreq = 10000.f;   // 0.1 ms
 
-	//static constexpr int LUT_SIZE = 512;
-	//float rateLUT[LUT_SIZE];
-
-	//float masterRateCvSnapshot = -1.f;  // inizializzazione
-
-	//static constexpr float UPDATE_EPSILON = 1e-6f;
-
-	bool firstRun = true;
-
 	RandMod7compact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		//configParam(RATE_PARAM, 0.f, 1.f, 1.f, "Rate", "ms", maxRate / minRate, minRate);
 		configParam(RATE_PARAM, 0.f, 1.f, 0.f, "Rate", "hz", maxFreq / minFreq, minFreq);
 		configInput(RATE_INPUT, "Rate");
 		configParam(RATE_ATTENUV_PARAM, -1.f, 1.f, 0.f, "Rate CV", "%", 0, 100);
@@ -126,7 +102,7 @@ struct RandMod7compact : Module {
 	}
 
 	void onReset(const ResetEvent &e) override {
-		rateKnob = 0.0;
+		//rateKnob = 0.0;
 
 		for (int i = 0; i < 7; i++) {
 
@@ -146,7 +122,7 @@ struct RandMod7compact : Module {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "polyChans", json_integer(polyChans));
-		json_object_set_new(rootJ, "magnet", json_integer(magnet));
+		json_object_set_new(rootJ, "magnetPoint", json_integer(magnetPoint));
 		json_object_set_new(rootJ, "strength", json_integer(strength));
 		return rootJ;
 	}
@@ -156,13 +132,25 @@ struct RandMod7compact : Module {
 		if (polyChansJ)
 			polyChans = json_integer_value(polyChansJ);
 
-		json_t* magnetJ = json_object_get(rootJ, "magnet");
-		if (magnetJ)
-			magnet = json_integer_value(magnetJ);
+		json_t* magnetPointJ = json_object_get(rootJ, "magnetPoint");
+		if (magnetPointJ)
+			magnetPoint = json_integer_value(magnetPointJ);
+
+		switch (magnetPoint) {
+			case 0: magnetValue = LOWER;   break;
+			case 1: magnetValue = MIDDLE; break;
+			case 2: magnetValue = UPPER;   break;
+		}
 
 		json_t* strengthJ = json_object_get(rootJ, "strength");
 		if (strengthJ)
 			strength = json_integer_value(strengthJ);
+
+		switch (strength) {
+			case 0: strengthValue = WEAK;   break;
+			case 1: strengthValue = AVERAGE; break;
+			case 2: strengthValue = STRONG;   break;
+		}
 	}
 
 
@@ -273,66 +261,55 @@ struct RandMod7compact : Module {
 	}
 
 	static float convertRateParamToMs(float param) {
-		// Exponential interpolation in Hz
 		float freq = minFreq * std::pow(maxFreq / minFreq, param);
-		return 1000.f / freq; // Convert Hz to ms
+		return 1000.f / freq;
 	}
 
 	static float getXrateFactor(float cv) {
 		return minXrate * std::pow(maxXrate / minXrate, cv);
 	}
-/*
-	static float convertRateToMilliseconds(float cv) {
-		return minRate * std::pow(maxRate / minRate, cv);
-	}
-*/
+
 
 	float lookupRateParamToMs(float param) const {
 
-	    //float p = clamp(param, 0.f, 1.f) * (LUT_SIZE - 1);
 	    float p = param * (LUT_SIZE -1);
 	    int i = static_cast<int>(p);
 	    float frac = p - i;
 	    float a = randModTable[i];
 	    float b = randModTable[std::min(i + 1, LUT_SIZE - 1)];
-	    return a + frac * (b - a);  // Interpolazione lineare
+	    return a + frac * (b - a);
 
+	}
+
+	inline float mix(float a, float b, float f) {
+		return a + f * (b - a);
 	}
 
 	void process(const ProcessArgs& args) override {
 
-		
-
 		bipolar = params[BIPOLAR_PARAM].getValue();
 		lights[BIPOLAR_LIGHT].setBrightness(bipolar);
 
-		float targetBlend = bipolar;
-		
-		polarityBlend += (targetBlend - polarityBlend) * blendSpeed;
+//		rateKnob = params[RATE_PARAM].getValue();
 
-		rateKnob = params[RATE_PARAM].getValue();
+//		rateAtten =  params[RATE_ATTENUV_PARAM].getValue();
 
-		rateAtten =  params[RATE_ATTENUV_PARAM].getValue();
+//		targetRateCv = clamp(params[RATE_PARAM].getValue() + (inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f), 0.f, 1.f);
 
-		targetRateCv = clamp(params[RATE_PARAM].getValue() + (inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f), 0.f, 1.f);
+		targetRateCv = params[RATE_PARAM].getValue() + inputs[RATE_INPUT].getVoltage() * params[RATE_ATTENUV_PARAM].getValue() / 10.f;
 
-		if (firstRun) {
-			firstRun = false;
-			float initialCvInput = inputs[RATE_INPUT].isConnected() ? inputs[RATE_INPUT].getVoltage() * rateAtten / 10.f : 0.f;
-			smoothedMasterRateCv = clamp(params[RATE_PARAM].getValue() + initialCvInput, 0.f, 1.f);
+		if (targetRateCv > 1.f)
+			targetRateCv = 1.f;
+		else if (targetRateCv < 0.f)
+			targetRateCv = 0.f;
+
+		if (targetRateCv != prevTargetRateCv) {
+
 			alert = true;
-			//masterRate = convertRateParamToMs(smoothedMasterRateCv);
-			masterRate = lookupRateParamToMs(smoothedMasterRateCv);
-		} else {
-			if (targetRateCv != prevTargetRateCv) {
-				if (abs(targetRateCv - smoothedMasterRateCv) > 1e-6) {
-					smoothedMasterRateCv += (targetRateCv - smoothedMasterRateCv) * rateSmoothing;
-					alert = true;
-					//masterRate = convertRateParamToMs(smoothedMasterRateCv);
-					masterRate = lookupRateParamToMs(smoothedMasterRateCv);
-				}
-				prevTargetRateCv = targetRateCv;
-			}
+			masterRate = lookupRateParamToMs(targetRateCv);
+
+			prevTargetRateCv = targetRateCv;
+			
 		}
 
 		for (int t = 0; t < MAXTRACKS; t++) {
@@ -353,28 +330,27 @@ struct RandMod7compact : Module {
 
 			if (currSample[t] > maxSamples[t]) {
 
-				currSample[t] = maxSamples[t] - currSample[t];
-				//currSample[t] = 0;
-				startY[t] = y[t];
+				//currSample[t] = maxSamples[t] - currSample[t];
+				currSample[t] = 0;
 
-				float center = magnetTarget[magnet];
-				float stdDev = 0.4f / (strength + 1);  // strength: 0 -> più largo
-				float next = center + random::normal() * stdDev;
-				targetY[t] = clamp(next, 0.f, 1.f);
+				startY[t] = targetY[t];
+
+				targetY[t] = mix(random::uniform(), magnetValue, strengthValue);
 			}
 
-			float phase = currSample[t] / maxSamples[t];
-			float eased = phase * phase * (3.f - 2.f * phase);  // Smoothstep
-			y[t] = startY[t] + (targetY[t] - startY[t]) * eased;
+			float progress = currSample[t] / maxSamples[t];
+			progress = progress * progress * (3.f - 2.f * progress);
+			y[t] = startY[t] + progress * (targetY[t] - startY[t]);
 			
 			if (y[t] > 1.f)
 				y[t] = 1.f;
 			else if (y[t] < 0.f)
 				y[t] = 0.f;
 
-			float unipolarOut = y[t] * 10.f;
-			float bipolarOut = (y[t] - 0.5f) * 10.f;
-			out[t] = (1.f - polarityBlend) * unipolarOut + polarityBlend * bipolarOut;
+			if (!bipolar)
+				out[t] = y[t] * 10;
+			else
+				out[t] = (y[t] - 0.5f) * 10;
 
 			if (out[t] > 10.f)
 				out[t] = 10.f;
@@ -443,18 +419,18 @@ struct RandMod7compactWidget : ModuleWidget {
 		const std::string magnetNames[3] = {"Lower", "Middle", "Upper"};
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createSubmenuItem("Magnet Point (Uni/Bi):", magnetNames[module->magnet], [=](Menu * menu) {
-			menu->addChild(createMenuItem("Lower (0v/-5v)", CHECKMARK(module->magnet == 0), [=]() {module->magnet = 0;}));
-			menu->addChild(createMenuItem("Middle (5v / 0v)", CHECKMARK(module->magnet == 1), [=]() {module->magnet = 1;}));
-			menu->addChild(createMenuItem("Upper (10v/5v)", CHECKMARK(module->magnet == 2), [=]() {module->magnet = 2;}));
+		menu->addChild(createSubmenuItem("Magnet Point (Uni/Bi):", magnetNames[module->magnetPoint], [=](Menu * menu) {
+			menu->addChild(createMenuItem("Lower (0v/-5v)", CHECKMARK(module->magnetPoint == 0), [=]() {module->magnetPoint = 0; module->magnetValue = LOWER;}));
+			menu->addChild(createMenuItem("Middle (5v / 0v)", CHECKMARK(module->magnetPoint == 1), [=]() {module->magnetPoint = 1; module->magnetValue = MIDDLE;}));
+			menu->addChild(createMenuItem("Upper (10v/5v)", CHECKMARK(module->magnetPoint == 2), [=]() {module->magnetPoint = 2; module->magnetValue = UPPER;}));
 		}));
 
 		const std::string strengthNames[3] = {"weak", "Average", "STRONG"};
 
 		menu->addChild(createSubmenuItem("Magnet Strength:", strengthNames[module->strength], [=](Menu * menu) {
-			menu->addChild(createMenuItem("weak", CHECKMARK(module->strength == 0), [=]() {module->strength = 0;}));
-			menu->addChild(createMenuItem("Average", CHECKMARK(module->strength == 1), [=]() {module->strength = 1;}));
-			menu->addChild(createMenuItem("STRONG", CHECKMARK(module->strength == 2), [=]() {module->strength = 2;}));
+			menu->addChild(createMenuItem("weak", CHECKMARK(module->strength == 0), [=]() {module->strength = 0; module->strengthValue = WEAK;}));
+			menu->addChild(createMenuItem("Average", CHECKMARK(module->strength == 1), [=]() {module->strength = 1; module->strengthValue = AVERAGE;}));
+			menu->addChild(createMenuItem("STRONG", CHECKMARK(module->strength == 2), [=]() {module->strength = 2; module->strengthValue = STRONG;}));
 		}));
 
 		//menu->addChild(new MenuSeparator());
