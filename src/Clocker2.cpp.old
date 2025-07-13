@@ -42,9 +42,6 @@ struct Clocker2Wrapper : Module {
 	bool cvClockIn = false;
 	bool cvClockOut = false;
 
-	float prevCvClockInValue = 11.f;
-	float cvClockOutValue = 0.f;
-
 	void appendClockInMenu(Menu *menu, engine::Port::Type type, int portId){
 
 		menu->addChild(new MenuSeparator());
@@ -55,8 +52,7 @@ struct Clocker2Wrapper : Module {
 	void appendClockOutMenu(Menu *menu, engine::Port::Type type, int portId){
 
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &cvClockOut));
-				menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(cvClockOut), [=]() {cvClockOut = !cvClockOut; prevCvClockInValue = 11.f;}));
+		menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &cvClockOut));
 		
 	}
 
@@ -258,7 +254,6 @@ struct Clocker2 : Clocker2Wrapper {
 	//float oneMsTime = (APP->engine->getSampleRate()) / 10;	// for testing purposes
 	bool resetPulse = false;
 	float resetPulseTime = 0.f;
-	float syncPulseTime = 0.f;
 
 	bool resetOnRun = true;
 	bool resetPulseOnRun = false;
@@ -283,17 +278,10 @@ struct Clocker2 : Clocker2Wrapper {
 	//bool cvClockOut = false;
 
 	float cvClockInValue = 0.f;
-	//float prevCvClockInValue = 11.f;
-	//float cvClockOutValue = 0.f;
+	float prevCvClockInValue = 11.f;
+	float cvClockOutValue = 0.f;
 
 	bool divControls = true;
-
-	bool outPulseOnReset = false;
-	bool pulseOutProcedure = false;
-	bool secondPartPulse = false;
-	bool thirdPartPulse = false;
-	float pulseOutTime = 0.f;
-
 
 	Clocker2() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -370,8 +358,6 @@ struct Clocker2 : Clocker2Wrapper {
 		resetOnStop = false;
 		resetPulseOnStop = false;
 
-		outPulseOnReset = false;
-
 		bpm = 0.1;
 
 		for (int d = 0; d < 6; d++) {
@@ -402,7 +388,6 @@ struct Clocker2 : Clocker2Wrapper {
 	json_t *dataToJson() override {
 
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "outPulseOnReset", json_boolean(outPulseOnReset));
 		json_object_set_new(rootJ, "divControls", json_boolean(divControls));
 		json_object_set_new(rootJ, "ppqn", json_integer(ppqn));
 		//json_object_set_new(rootJ, "smooth", json_integer(smooth));		// experimental: EXTERNAL CLOCK SMOOTH
@@ -423,10 +408,6 @@ struct Clocker2 : Clocker2Wrapper {
 	}
 
 	void dataFromJson(json_t *rootJ) override {
-
-		json_t* outPulseOnResetJ = json_object_get(rootJ, "outPulseOnReset");
-		if (outPulseOnResetJ)
-			outPulseOnReset = json_boolean_value(outPulseOnResetJ);
 
 		json_t* divControlsJ = json_object_get(rootJ, "divControls");
 		if (divControlsJ)
@@ -639,7 +620,6 @@ struct Clocker2 : Clocker2Wrapper {
 			if (resetPulseOnStop) {
 				resetPulse = true;
 				resetPulseTime = oneMsTime;
-				syncPulseTime = 1;
 			}
 		} else if (runSetting && !prevRunSetting) {
 			runSetting = 1;
@@ -665,7 +645,6 @@ struct Clocker2 : Clocker2Wrapper {
 			if (resetPulseOnRun) {
 				resetPulse = true;
 				resetPulseTime = oneMsTime;
-				syncPulseTime = 1;
 			}
 		}
 
@@ -702,55 +681,11 @@ struct Clocker2 : Clocker2Wrapper {
 
 			resetPulse = true;
 			resetPulseTime = oneMsTime;
-			//resetPulseTime = 1;
-			syncPulseTime = 1;
-
-/*
-			if (outPulseOnReset) {
-				pulseOutProcedure = true;
-				secondPartPulse = false;
-				thirdPartPulse = false;
-				pulseOutTime = oneMsTime / 2;
-			}
-*/
 		}
 		prevResetValue = resetValue;
 
-	// indentazione rientrata per semplicità temporanea, da risistemare quando ok
-/*	if (pulseOutProcedure) {
 
-		pulseOutTime--;
-
-		if (pulseOutTime < 0) {
-
-			if (secondPartPulse) {
-				secondPartPulse = false;
-				thirdPartPulse = true;
-				pulseOutTime = oneMsTime;
-
-				if (!cvClockOut)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
-				for (int d = 0; d < 6; d++)
-					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
-
-			} else if (thirdPartPulse) {
-				pulseOutProcedure = false;
-			} else {
-
-				secondPartPulse = true;
-				if (!cvClockOut)
-					outputs[CLOCK_OUTPUT].setVoltage(10.f);
-				for (int d = 0; d < 6; d++)
-					outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-				pulseOutTime = oneMsTime;
-			}
-		}
-
-	} else {
-
-*/
 		// ************************* INTERNAL CLOCK
-
 
 		if (!extConn) {
 
@@ -760,7 +695,7 @@ struct Clocker2 : Clocker2Wrapper {
 
 			if (cvClockOut) {
 				
-				if (bpm != prevBpm)
+				//if (bpm != prevBpm)
 					cvClockOutValue = log2(bpm / 120.0f);
 				
 				outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
@@ -770,8 +705,7 @@ struct Clocker2 : Clocker2Wrapper {
 
 			// **************   RUN PROCESS   ***************
 
-			//if (runSetting && resetPulseTime <= 0) {
-			if (runSetting && syncPulseTime <= 0) {
+			if (runSetting && resetPulseTime <= 0) {
 
 				// ****** CLOCK PULSE WIDTH
 
@@ -1073,8 +1007,7 @@ struct Clocker2 : Clocker2Wrapper {
 			}
 			// **************   RUN PROCESS   ***************
 
-			//if (runSetting && resetPulseTime <= 0) {
-			if (runSetting && syncPulseTime <= 0) {
+			if (runSetting && resetPulseTime <= 0) {
 
 				// ****** CLOCK PULSE WIDTH
 
@@ -1203,9 +1136,6 @@ struct Clocker2 : Clocker2Wrapper {
 		//	********** RESET AND DIV PULSES
 
 		if (resetPulse) {
-
-			syncPulseTime--;
-
 			resetPulseTime--;
 			if (resetPulseTime < 0) {
 				resetPulse = false;
@@ -1224,9 +1154,6 @@ struct Clocker2 : Clocker2Wrapper {
 					outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
 			}
 		}
-
-//	}	// fine if pulseOutProcedure, da re indentare quando ok
-
 	}
 };
 
@@ -1661,12 +1588,9 @@ struct Clocker2Widget : ModuleWidget {
 			menu->addChild(createBoolPtrMenuItem("Pulse to RST out", "", &module->resetPulseOnStop));
 		}));
 
-//		menu->addChild(createBoolPtrMenuItem("OUTs Pulse on RST", "", &module->outPulseOnReset));
-
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
-		//menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
-		menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(module->cvClockOut), [=]() {module->cvClockOut = !module->cvClockOut; module->prevCvClockInValue = 11.f;}));
+		menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
