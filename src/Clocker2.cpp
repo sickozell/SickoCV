@@ -8,6 +8,7 @@
 #define PPQN12 4
 #define PPQN16 5
 #define PPQN24 6
+#define PPQN48 7
 #define REGISTER_SIZE 168
 
 #define NO_SMOOTH 0
@@ -37,13 +38,15 @@ using namespace std;
 
 struct Clocker2Wrapper : Module {
 
-//	bool alive;
+	virtual int getParamBase() const { return -1; }
 
 	bool cvClockIn = false;
 	bool cvClockOut = false;
 
 	float prevCvClockInValue = 11.f;
 	float cvClockOutValue = 0.f;
+
+	bool divSwing[6] = {false, false, false, false, false, false};
 
 	void appendClockInMenu(Menu *menu, engine::Port::Type type, int portId){
 
@@ -56,11 +59,35 @@ struct Clocker2Wrapper : Module {
 
 		menu->addChild(new MenuSeparator());
 		//menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &cvClockOut));
-				menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(cvClockOut), [=]() {cvClockOut = !cvClockOut; prevCvClockInValue = 11.f;}));
+		menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(cvClockOut), [=]() {cvClockOut = !cvClockOut; prevCvClockInValue = 11.f;}));
 		
 	}
 
+	void appendSwingMenu(Menu* menu, int paramId) {
+
+		int paramBase = getParamBase();
+		
+		menu->addChild(new MenuSeparator());
+
+		if (paramBase >= 0) {
+			
+			int knobIndex = paramId - paramBase;
+
+			menu->addChild(createBoolPtrMenuItem("Trig/Swing", "", &divSwing[knobIndex]));
+
+		} else {
+
+			menu->addChild(createMenuLabel("Unknown param"));
+
+		}
+
+	}
 };
+
+template <class TWidget>
+TWidget* createClocker2ParamCentered(math::Vec pos, engine::Module* module, int paramId){
+  return createParamCentered<TWidget>(pos, module, paramId);
+}
 
 template <class TWidget>
 TWidget* createClocker2ClockInCentered(math::Vec pos, engine::Module* module, int paramId){
@@ -78,6 +105,14 @@ struct SickoClockInClocker2 : SickoInPort {
 		if (this->module)
 			dynamic_cast<Clocker2Wrapper*>(this->module)->appendClockInMenu(menu, this->type, this->portId);
 	}
+};
+
+struct SickoKnobClocker2 : SickoTrimpot {
+	void appendContextMenu(Menu* menu) override {
+	    if (module) {
+	      dynamic_cast<Clocker2Wrapper*>(this->module)->appendSwingMenu(menu, this->paramId);
+	    }
+	  }
 };
 
 struct SickoClockOutClocker2 : SickoOutPort {
@@ -143,6 +178,8 @@ struct Clocker2 : Clocker2Wrapper {
  	//**************************************************************
 	//   
 
+	int getParamBase() const override { return DIVPW_KNOB_PARAM; }
+
 	const std::string divMultDisplay[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
 								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
 
@@ -192,7 +229,7 @@ struct Clocker2 : Clocker2Wrapper {
 
 	double maxPulseSample = 0.0;
 
-	int ppqnTable[7] = {1, 2, 4, 8, 12, 16, 24}; // 1 2 4 8 12 16 24
+	int ppqnTable[8] = {1, 2, 4, 8, 12, 16, 24, 48}; // 1 2 4 8 12 16 24 48
 	int ppqn = PPQN1;
 	int tempPpqn = ppqn;
 	bool ppqnChange = false;
@@ -258,7 +295,7 @@ struct Clocker2 : Clocker2Wrapper {
 	//float oneMsTime = (APP->engine->getSampleRate()) / 10;	// for testing purposes
 	bool resetPulse = false;
 	float resetPulseTime = 0.f;
-	float syncPulseTime = 0.f;
+	int syncPulseTime = 0.f;
 
 	bool resetOnRun = true;
 	bool resetPulseOnRun = false;
@@ -277,7 +314,7 @@ struct Clocker2 : Clocker2Wrapper {
 	float divPulseTime[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	int divCount[6] = {1, 1, 1, 1, 1, 1};
 
-	bool divSwing[6] = {false, false, false, false, false, false};
+	//bool divSwing[6] = {false, false, false, false, false, false};
 
 	//bool cvClockIn = false;
 	//bool cvClockOut = false;
@@ -288,15 +325,34 @@ struct Clocker2 : Clocker2Wrapper {
 
 	bool divControls = true;
 
-	bool outPulseOnReset = false;
-	bool pulseOutProcedure = false;
-	bool secondPartPulse = false;
-	bool thirdPartPulse = false;
-	float pulseOutTime = 0.f;
+	//bool outPulseOnReset = false;
+	//bool pulseOutProcedure = false;
+	//bool secondPartPulse = false;
+	//bool thirdPartPulse = false;
+	//float pulseOutTime = 0.f;
+
+	float rstLightValue = 0.f;
+	float lightDecayPerSample = 1.f / (APP->engine->getSampleRate() * 0.2f);
 
 
 	Clocker2() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+
+		struct UserQuantity : ParamQuantity {
+			int t = -1;
+
+			float getDisplayValue() override {
+				Clocker2* module = reinterpret_cast<Clocker2*>(this->module);
+
+				if (t >= 0) {
+					if (module->divSwing[t])
+			 			name = "Swing #" + to_string(t+1);
+					else
+			 			name = "Pulse Width #" + to_string(t+1);
+				}
+				return ParamQuantity::getDisplayValue();
+			}
+		};
 		
 		configInput(EXTCLOCK_INPUT,"External Clock");
 
@@ -310,8 +366,18 @@ struct Clocker2 : Clocker2Wrapper {
 		configParam(BPM_KNOB_PARAM, 300.f, 3000.f, 1200.f, "Tempo", " bpm", 0, 0.1);
 		paramQuantities[BPM_KNOB_PARAM]->snapEnabled = true;
 
-		configParam(PW_KNOB_PARAM, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
+		configParam(PW_KNOB_PARAM, 0.f, 1.0f, 0.5f, "Pulse Width", "%", 0, 100);
 
+		for (int t = 0; t < 6; t++) {
+			configParam<tpDivMult>(DIVMULT_KNOB_PARAM+t, 0.f, 44.f, 22.f, "Mult/Div " + to_string(t+1));
+			paramQuantities[DIVMULT_KNOB_PARAM+t]->snapEnabled = true;
+
+			configParam<UserQuantity>(DIVPW_KNOB_PARAM+t, 0.f, 1.0f, 0.5f, ("PW/Swing Level" + to_string(t+1)).c_str(), "%", 0, 100);		
+			if (auto uq1 = dynamic_cast<UserQuantity*>(paramQuantities[DIVPW_KNOB_PARAM + t])) {
+				uq1->t = t;
+			}	
+		}
+/*
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 44.f, 22.f, "Mult/Div #1");
 		paramQuantities[DIVMULT_KNOB_PARAM+0]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+0, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
@@ -335,7 +401,15 @@ struct Clocker2 : Clocker2Wrapper {
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+5, 0.f, 44.f, 22.f, "Mult/Div #6");
 		paramQuantities[DIVMULT_KNOB_PARAM+5]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+5, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
-
+	*/
+/*
+		configParam<UserQuantity>(USER_PARAM+t, 0.f, 1.f, 0.f, ("K1 #"+to_string(t+1)).c_str());
+		// Setta `t` manualmente
+		if (auto uq1 = dynamic_cast<UserQuantity*>(paramQuantities[USER_PARAM + t])) {
+			uq1->t = t;
+			uq1->userColumn = 1;
+		}
+*/
 		configOutput(DIVMULT_OUTPUT+0,"Div/Mult #1");
 		configOutput(DIVMULT_OUTPUT+1,"Div/Mult #2");
 		configOutput(DIVMULT_OUTPUT+2,"Div/Mult #3");
@@ -370,7 +444,7 @@ struct Clocker2 : Clocker2Wrapper {
 		resetOnStop = false;
 		resetPulseOnStop = false;
 
-		outPulseOnReset = false;
+		//outPulseOnReset = false;
 
 		bpm = 0.1;
 
@@ -396,13 +470,14 @@ struct Clocker2 : Clocker2Wrapper {
 		sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 		oneMsTime = (APP->engine->getSampleRate()) / 1000;
 		//oneMsTime = (APP->engine->getSampleRate()) / 10; // for testing purposes
+		lightDecayPerSample = 1.f / (APP->engine->getSampleRate() * 0.2f);
 
 	}
 
 	json_t *dataToJson() override {
 
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "outPulseOnReset", json_boolean(outPulseOnReset));
+		//json_object_set_new(rootJ, "outPulseOnReset", json_boolean(outPulseOnReset));
 		json_object_set_new(rootJ, "divControls", json_boolean(divControls));
 		json_object_set_new(rootJ, "ppqn", json_integer(ppqn));
 		//json_object_set_new(rootJ, "smooth", json_integer(smooth));		// experimental: EXTERNAL CLOCK SMOOTH
@@ -424,9 +499,11 @@ struct Clocker2 : Clocker2Wrapper {
 
 	void dataFromJson(json_t *rootJ) override {
 
+		/*
 		json_t* outPulseOnResetJ = json_object_get(rootJ, "outPulseOnReset");
 		if (outPulseOnResetJ)
 			outPulseOnReset = json_boolean_value(outPulseOnResetJ);
+		*/
 
 		json_t* divControlsJ = json_object_get(rootJ, "divControls");
 		if (divControlsJ)
@@ -681,7 +758,10 @@ struct Clocker2 : Clocker2Wrapper {
 		else
 			resetValue = inputs[RESET_INPUT].getVoltage();
 
-		lights[RESET_BUT_LIGHT].setBrightness(resetValue);
+		//lights[RESET_BUT_LIGHT].setBrightness(resetValue);
+
+
+
 
 		if (resetValue >= 1 && prevResetValue < 1) {
 
@@ -703,8 +783,9 @@ struct Clocker2 : Clocker2Wrapper {
 			resetPulse = true;
 			resetPulseTime = oneMsTime;
 			//resetPulseTime = 1;
-			syncPulseTime = 1;
+			syncPulseTime = 0;
 
+			rstLightValue = 1.f;
 /*
 			if (outPulseOnReset) {
 				pulseOutProcedure = true;
@@ -715,6 +796,15 @@ struct Clocker2 : Clocker2Wrapper {
 */
 		}
 		prevResetValue = resetValue;
+
+		if (rstLightValue > 0.f) {
+			rstLightValue -= lightDecayPerSample;
+			if (rstLightValue < 0.f)
+				rstLightValue = 0.f;
+		}
+
+		//lights[RST_LIGHT].setBrightness(rstLightValue);
+		lights[RESET_BUT_LIGHT].setBrightness(rstLightValue);
 
 	// indentazione rientrata per semplicità temporanea, da risistemare quando ok
 /*	if (pulseOutProcedure) {
@@ -1543,13 +1633,23 @@ struct Clocker2Widget : ModuleWidget {
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn4)), module, Clocker2::DIVMULT_KNOB_PARAM+3));
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn5)), module, Clocker2::DIVMULT_KNOB_PARAM+4));
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn6)), module, Clocker2::DIVMULT_KNOB_PARAM+5));
-
+/*
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn1)), module, Clocker2::DIVPW_KNOB_PARAM+0));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn2)), module, Clocker2::DIVPW_KNOB_PARAM+1));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker2::DIVPW_KNOB_PARAM+2));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker2::DIVPW_KNOB_PARAM+3));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn5)), module, Clocker2::DIVPW_KNOB_PARAM+4));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn6)), module, Clocker2::DIVPW_KNOB_PARAM+5));
+
+*/		
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn1)), module, Clocker2::DIVPW_KNOB_PARAM+0));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn2)), module, Clocker2::DIVPW_KNOB_PARAM+1));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker2::DIVPW_KNOB_PARAM+2));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker2::DIVPW_KNOB_PARAM+3));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn5)), module, Clocker2::DIVPW_KNOB_PARAM+4));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn6)), module, Clocker2::DIVPW_KNOB_PARAM+5));
+
+
 
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg1)), module, Clocker2::DIVSWING_LIGHT+0));
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg2)), module, Clocker2::DIVSWING_LIGHT+1));
@@ -1594,9 +1694,9 @@ struct Clocker2Widget : ModuleWidget {
 		};
 
 		menu->addChild(createMenuLabel("External Clock"));
-		std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
+		std::string ppqnNames[8] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN", "48 PPQN"};
 		menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < 8; i++) {
 				PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
 				ppqnItem->rightText = CHECKMARK(module->ppqn == i);
 				ppqnItem->module = module;
