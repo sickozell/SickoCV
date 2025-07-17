@@ -27,7 +27,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - slewer/slewer mini: inverted shapes on shape knob
 - sickoSampler: fixed a bug that crashes Rack when clearing the sample via trig input during playback
 - sickoSampler2: fixed a bug drawing the playhead outside the module
-- clocker2: added CV clock feature, fixed clock division bug on reset, changed bpm clock color display
+- clocker2: added div/mult mouse control, added CV clock feature, added port/param context menus, fixed clock division bug on reset, changed bpm clock color display
 - ad mini: loop status recorded in patch
 - merged repository with 4ms Metamodule repo
 
@@ -376,6 +376,26 @@ When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 - **On Stop**  
 This submenu is the same as the previous one, but when the Run Button is switched off.  
 Please note that "On Stop/Reset bar" option sets the clock gate output to low if clocker is currently sending a high gate.  
+
+#### Clocker2 EXTRA FEATURES
+
+Clocker2 can manage bpm cv input, instead of commonly used clock pulses, for solid sync with other clocker2 modules.  
+
+In context menu "CV clock IN" and "CV clock OUT" options can respectively set input/output port configuration.  
+Easy access to port configuration is achieved by right-clicking on the port to be configured.  
+
+![clocker2sync](https://github.com/user-attachments/assets/c386b190-e615-4ec4-aee0-83d68d9bb0e4)  
+
+This is an example to solid synchronization between two clocker2.  
+[Download example](./examples/clocker2sync.vcvs?raw=true) (right-click -> save link as)  
+
+BPM color display:
+- Internal Clock : YELLOW
+- External Pulse Clock : BLUE
+- External CV Clock : GREEN
+
+Clicking or right-clicking the div/mult displays will scroll the div/mult knob. It can be turned to classic mode with all the options by unticking "DIV/MULT mouse controls" option in the context menu.
+
 
 [back to top](#table-of-contents)
 
