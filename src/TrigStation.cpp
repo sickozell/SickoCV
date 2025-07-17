@@ -653,6 +653,9 @@ struct TrigStation : SickoTrigStation {
 //	bool divControls = true;
 	bool modeControls = true;
 
+	float rstLightValue = 0.f;
+	float lightDecayPerSample = 1.f / (APP->engine->getSampleRate() * 0.2f);
+
 	TrigStation() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -954,6 +957,8 @@ struct TrigStation : SickoTrigStation {
 		sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 		oneMsTime = (APP->engine->getSampleRate()) / 1000;
 		//oneMsTime = (APP->engine->getSampleRate()) / 10; // for testing purposes
+
+		lightDecayPerSample = 1.f / (APP->engine->getSampleRate() * 0.2f);
 	}
 
 	
@@ -1276,6 +1281,8 @@ struct TrigStation : SickoTrigStation {
 
 		if (progInType != CV_TYPE)
 			progKnob = 0;
+
+		rstLightValue = 1.f;
 	}
 
 	void inline resetTrackSteps(int t) {
@@ -1505,31 +1512,36 @@ struct TrigStation : SickoTrigStation {
 	float inline outScale(float outVal, int t) {
 		if (userInputs[t][IN_OUTSCALE][0]) {
 			int tempUserIn = userInputs[t][IN_OUTSCALE][1];  // 0 oppure 8 a seconda che l'input sia U1 o U2
-			float tempOutScale = inputs[USER_INPUT+t+tempUserIn].getVoltage() * 0.1;
+			
+			float tempOutScale = 1.f;
 
-			if (tempUserIn == 0) {
-				if (userTable[t][1] == KNOB_ATN)
-					tempOutScale *= params[USER_PARAM+t].getValue();
-				else if (userTable[t][1] == KNOB_ATNV)
-					tempOutScale *= params[USER_PARAM+t].getValue() * 2 - 1;
-			} else { // altrimenti è 8
-				if (userTable[t][3] == KNOB_ATN)
-					tempOutScale *= params[USER_PARAM+t+8].getValue();
-				else if (userTable[t][3] == KNOB_ATNV)
-					tempOutScale *= params[USER_PARAM+t+8].getValue() * 2 - 1;
+			if (inputs[USER_INPUT+t+tempUserIn].isConnected()) {
+
+				tempOutScale = inputs[USER_INPUT+t+tempUserIn].getVoltage() * 0.1f;
+
+				if (tempUserIn == 0) {
+					if (userTable[t][1] == KNOB_ATN)
+						tempOutScale *= params[USER_PARAM+t].getValue();
+					else if (userTable[t][1] == KNOB_ATNV)
+						tempOutScale *= params[USER_PARAM+t].getValue() * 2.f - 1.f;
+				} else { // altrimenti è 8
+					if (userTable[t][3] == KNOB_ATN)
+						tempOutScale *= params[USER_PARAM+t+8].getValue();
+					else if (userTable[t][3] == KNOB_ATNV)
+						tempOutScale *= params[USER_PARAM+t+8].getValue() * 2.f - 1.f;
+				}
+
+				// outScale knob is added to input (or is to prefer that outScale knob scales the CV input?)
+
+				if (userInputs[t][KNOB_OUTSCALE][0])
+					tempOutScale += params[USER_PARAM+t+userInputs[t][KNOB_OUTSCALE][1]].getValue();
+					//tempOutScale *= params[USER_PARAM+t+userInputs[t][KNOB_OUTSCALE][1]].getValue();
+
+				if (tempOutScale < 0.f)
+					tempOutScale = 0.f;
+				else if (tempOutScale > 1.f)
+					tempOutScale = 1.f;
 			}
-
-			// outScale knob is added to input (or is to prefer that outScale knob scales the CV input?)
-
-			if (userInputs[t][KNOB_OUTSCALE][0])
-				tempOutScale += params[USER_PARAM+t+userInputs[t][KNOB_OUTSCALE][1]].getValue();
-				//tempOutScale *= params[USER_PARAM+t+userInputs[t][KNOB_OUTSCALE][1]].getValue();
-
-			if (tempOutScale < 0)
-				tempOutScale = 0;
-			else if (tempOutScale > 1)
-				tempOutScale = 1;
-
 
 			return outVal * tempOutScale;
 
@@ -1680,7 +1692,8 @@ struct TrigStation : SickoTrigStation {
 
 		}
 					
-		if (change && random::uniform() > .5f) {
+		//if (change && random::uniform() > .5f) {
+		if (change) {
 			
 			if (wSeq[t][step[t]] == 0)
 				wSeq[t][step[t]] = 1;
@@ -2129,12 +2142,23 @@ struct TrigStation : SickoTrigStation {
 		else
 			resetValue[MC] = inputs[RSTALL_INPUT].getVoltage();
 
-		lights[RSTALLBUT_LIGHT].setBrightness(resetValue[MC]);
+		//lights[RSTALLBUT_LIGHT].setBrightness(resetValue[MC]);
 
-		if (resetValue[MC] >= 1 && prevResetValue[MC] < 1)
+
+
+		if (resetValue[MC] >= 1 && prevResetValue[MC] < 1) {
 			resetAllSteps();
+		}
 
 		prevResetValue[MC] = resetValue[MC];
+
+		if (rstLightValue > 0.f) {
+			rstLightValue -= lightDecayPerSample;
+			if (rstLightValue < 0.f)
+				rstLightValue = 0.f;
+		}
+
+		lights[RSTALLBUT_LIGHT].setBrightness(rstLightValue);
 
 		// initialize clocks
 

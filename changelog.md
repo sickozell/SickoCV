@@ -1,4 +1,4 @@
-### 2.7.4 (2025-07-15)
+### 2.7.4 (2025-07-17)
 - added stepStation and trigStation modules
 - added sampleDelay module
 - added cvMeter module
@@ -8,7 +8,7 @@
 - slewer/slewer mini: inverted shapes on shape knob
 - sickoSampler: fixed a bug that crashes Rack when clearing the sample via trig input during playback
 - sickoSampler2: fixed a bug drawing the playhead outside the module
-- clocker2: added CV clock feature, fixed clock division bug on reset, changed bpm clock color display
+- clocker2: added CV clock feature, added port/param context menus, fixed clock division bug on reset, changed bpm clock color display
 - ad mini: loop status recorded in patch
 - merged repository with 4ms Metamodule repo
 

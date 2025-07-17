@@ -48,18 +48,26 @@ struct Clocker2Wrapper : Module {
 
 	bool divSwing[6] = {false, false, false, false, false, false};
 
+	double prevBpm = 0;
+
 	void appendClockInMenu(Menu *menu, engine::Port::Type type, int portId){
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &cvClockIn));
+		menu->addChild(createMenuItem("CV clock IN", CHECKMARK(cvClockIn), [=]() {
+			cvClockIn = !cvClockIn;
+			prevCvClockInValue = 11.f;
+		}));
 			
 	}
 
 	void appendClockOutMenu(Menu *menu, engine::Port::Type type, int portId){
 
 		menu->addChild(new MenuSeparator());
-		//menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &cvClockOut));
-		menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(cvClockOut), [=]() {cvClockOut = !cvClockOut; prevCvClockInValue = 11.f;}));
+		menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(cvClockOut), [=]() {
+			cvClockOut = !cvClockOut;
+			prevCvClockInValue = 11.f;
+			prevBpm = -1;
+		}));
 		
 	}
 
@@ -163,7 +171,7 @@ struct Clocker2 : Clocker2Wrapper {
 	//**************************************************************
 	//  DEBUG 
 
-	/*	
+		
 	std::string debugDisplay = "X";
 	std::string debugDisplay2 = "X";
 	std::string debugDisplay3 = "X";
@@ -173,7 +181,7 @@ struct Clocker2 : Clocker2Wrapper {
 	std::string debugDisplay7 = "X";
 	int debugInt = 0;
 	bool debugBool = false;
-	*/
+	
 
  	//**************************************************************
 	//   
@@ -194,7 +202,7 @@ struct Clocker2 : Clocker2Wrapper {
 	double sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 
 	double bpm = 0.1;
-	double prevBpm = 0;
+	//double prevBpm = 0;
 
 	std::string storedPath[2] = {"",""};
 	std::string fileDescription[2] = {"--none--","--none--"};
@@ -625,6 +633,17 @@ struct Clocker2 : Clocker2Wrapper {
 	}
 	*/
 
+	/*
+	void rstCvIn() {
+		for (int d = 0; d < 6; d++) {
+			divPulse[d] = false;
+			divCount[d] = 99999999;
+			divClockSample[d] = 1.0;
+			outputs[DIVMULT_OUTPUT + d].setVoltage(0.f);
+		}
+	}
+	*/
+
 	void process(const ProcessArgs &args) override {
 	
 		lights[DIVSWING_LIGHT+0].setBrightness(divSwing[0]);
@@ -651,7 +670,7 @@ struct Clocker2 : Clocker2Wrapper {
 
 			if (cvClockIn) {
 				extSync = true;
-				prevCvClockInValue = 11;
+				prevCvClockInValue = 11.f;
 			} else {
 				extSync = false;
 				bpm = 0.0;
@@ -1011,82 +1030,111 @@ struct Clocker2 : Clocker2Wrapper {
 						cvClockOutValue = log2(bpm / 120.0f);
 						outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
 					}
-
 					
 				}
 				prevCvClockInValue = cvClockInValue;
 				
 				clockMaxSample = sampleRateCoeff / bpm;
-				
+/*
+				for (int d = 0; d < 6; d++) {
+					if (!divSwing[d]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
+							// MULTIPLIER
+							divMaxSample[d][0] = clockMaxSample / divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())];
+							divMaxSample[d][1] = divMaxSample[d][0];
+						} else {
+							// DIVIDER
+							divMaxSample[d][0] = clockMaxSample * divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())];
+							divMaxSample[d][1] = divMaxSample[d][0];
+						}
+					} else {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
+							divMaxSample[d][0] = clockMaxSample / divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())];
+							divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
+						} else {
+							divMaxSample[d][0] = clockMaxSample * divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())];
+							divMaxSample[d][1] = divMaxSample[d][0];
+						}
+					}
+				}
+*/
 				if (clockSample > clockMaxSample || resetStart)  {
 
 					if (resetStart) {
 						clockSample = 1.0;
 						resetStart = false;
-					} else
+					} else 
 						clockSample -= clockMaxSample;
-
+					
 					if (runSetting) {
-						extBeat = true;
-						//clockSample = 1.0;
-					}
 
-					for (int d = 0; d < 6; d++) {
+						for (int d = 0; d < 6; d++) {
 						
-						if (!divSwing[d]) {
+							if (!divSwing[d]) {
 
-							//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divClockSample[d] = 1.0;
-								divPulse[d] = true;
-								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
-							} else {
-								// ***** CLOCK DIVIDER *****
-								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divCount[d]++;
-								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+								//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
+									// ***** CLOCK MULTIPLIER *****
+									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0];
 									divClockSample[d] = 1.0;
-									divCount[d] = 1;
 									divPulse[d] = true;
 									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								} else {
+									
+									// ***** CLOCK DIVIDER *****
+									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0];
+									divCount[d]++;
+									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+										divClockSample[d] = 1.0;
+										divCount[d] = 1;
+										divPulse[d] = true;
+										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+										//DEBUG("QUI");
+									}
+									
 								}
-							}
-						} else {
-							
-							//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
-							if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
-								// ***** CLOCK MULTIPLIER *****
-								divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
-								divOddCounter[d] = 1;
-								divClockSample[d] = 1.0;
-								divPulse[d] = true;
-								divPulseTime[d] = oneMsTime;
-								outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
 							} else {
-								// ***** CLOCK DIVIDER *****
-								divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-								divMaxSample[d][1] = divMaxSample[d][0];
-								divCount[d]++;
-								if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+								
+								//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
+									// ***** CLOCK MULTIPLIER *****
+									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
 									divOddCounter[d] = 1;
-
 									divClockSample[d] = 1.0;
-									divCount[d] = 1;
 									divPulse[d] = true;
 									divPulseTime[d] = oneMsTime;
 									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								} else {
+									// ***** CLOCK DIVIDER *****
+									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0];
+									divCount[d]++;
+									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+										divOddCounter[d] = 1;
+
+										divClockSample[d] = 1.0;
+										divCount[d] = 1;
+										divPulse[d] = true;
+										divPulseTime[d] = oneMsTime;
+										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+									}
 								}
 							}
-						}
+
+						} 
+					
+					
+						extBeat = true;
+						//clockSample = 1.0;
+						
+						if (!cvClockOut)
+							outputs[CLOCK_OUTPUT].setVoltage(10.f);
 					}
 
-					if (!cvClockOut)
-						outputs[CLOCK_OUTPUT].setVoltage(10.f);
+					
 
 				} else {
 					
@@ -1175,9 +1223,23 @@ struct Clocker2 : Clocker2Wrapper {
 
 				// ************ DIV / MULT
 
+			
 				for (int d = 0; d < 6; d++) {
 
 					if(!divSwing[d]) {
+						/*
+						int t = 0;
+						if (d == t) {
+							std::string text = std::to_string(debugInt) + " OFF - "
+						    + " - divClockSample " + std::to_string(divClockSample[t]) 
+						    + " - divMaxSample " + std::to_string(divMaxSample[t][0]) + " - Pulse " + std::to_string(divPulse[t]);
+							
+						    //if (divPulse[t])
+								DEBUG(text.c_str());
+
+							debugInt++;
+						}
+						*/
 
 						//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
 						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][0]) {
@@ -1211,6 +1273,7 @@ struct Clocker2 : Clocker2Wrapper {
 						}
 					}
 				}
+				
 
 				// ************************ EXTERNAL CLOCK ******************
 
@@ -1220,6 +1283,7 @@ struct Clocker2 : Clocker2Wrapper {
 
 						// ********** SYNCED BEAT
 
+						if (!cvClockIn) {
 						for (int d = 0; d < 6; d++) {
 
 							if (!divSwing[d]) {
@@ -1234,13 +1298,26 @@ struct Clocker2 : Clocker2Wrapper {
 								} else {
 									// ***** CLOCK DIVIDER *****
 									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-									divMaxSample[d][1] = divMaxSample[d][1];
+									divMaxSample[d][1] = divMaxSample[d][0];
 									divCount[d]++;
 									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
 										divClockSample[d] = 1.0;
 										divCount[d] = 1;
 										divPulse[d] = true;
 										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+
+										/*
+										int t = 0;
+										if (d == t) {
+											
+											std::string text = std::to_string(debugInt) + " ON - " +
+										    + " - divClockSample " + std::to_string(divClockSample[t]) 
+										    + " - divMaxSample " + std::to_string(divMaxSample[t][0]);
+											DEBUG(text.c_str());
+
+											debugInt++;
+										}
+										*/
 									}
 								}
 							} else {
@@ -1270,6 +1347,7 @@ struct Clocker2 : Clocker2Wrapper {
 								}
 							}
 						}
+						}
 						
 						if (!cvClockOut)
 							outputs[CLOCK_OUTPUT].setVoltage(10.f);
@@ -1285,6 +1363,7 @@ struct Clocker2 : Clocker2Wrapper {
 			divClockSample[3]++;
 			divClockSample[4]++;
 			divClockSample[5]++;			
+
 			
 		}
 
@@ -1764,9 +1843,20 @@ struct Clocker2Widget : ModuleWidget {
 //		menu->addChild(createBoolPtrMenuItem("OUTs Pulse on RST", "", &module->outPulseOnReset));
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
+		//menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
+		menu->addChild(createMenuItem("CV clock IN", CHECKMARK(module->cvClockIn), [=]() {
+			module->cvClockIn = !module->cvClockIn;
+			module->prevCvClockInValue = 11.f;
+			//module->syncPulseTime = 0.0;
+			//module->rstCvIn();
+			module->prevCvClockInValue = 11.f;
+		}));
 		//menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
-		menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(module->cvClockOut), [=]() {module->cvClockOut = !module->cvClockOut; module->prevCvClockInValue = 11.f;}));
+		menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(module->cvClockOut), [=]() {
+			module->cvClockOut = !module->cvClockOut;
+			module->prevCvClockInValue = 11.f;
+			module->prevBpm = -1;
+		}));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
