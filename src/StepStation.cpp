@@ -190,7 +190,7 @@ struct SickoStepStation : Module {
 			};
 
 			//menu->addChild(createMenuLabel("Out DELAY:"));
-			menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu* menu) {
+			menu->addChild(createSubmenuItem("Track DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu* menu) {
 				for (int i = 0; i < 7; i++) {
 					auto sampleDelayItem = new SampleDelayItem(module, i, t);
 					
@@ -3363,7 +3363,7 @@ struct StepStationDisplayTrackSett : TransparentWidget {
 				}
 			};
 
-			menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Track DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
 				for (int i = 0; i < 7; i++) {
 					auto sampleDelayItem = new SampleDelayItem(module, i, t);
 					
@@ -3966,7 +3966,7 @@ struct StepStationWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(createSubmenuItem("Default OUT DELAY", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Global DELAY", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
 			for (int i = 0; i < 6; i++) {
 				SampleDelayItem* sampleDelayItem = createMenuItem<SampleDelayItem>(module->sampleDelayNames[i]);
 				sampleDelayItem->rightText = CHECKMARK(module->sampleDelay[MC] == i);
@@ -4338,7 +4338,7 @@ struct StepStationWidget : ModuleWidget {
 						}
 					};
 
-					menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
+					menu->addChild(createSubmenuItem("Track DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
 						for (int i = 0; i < 7; i++) {
 							auto sampleDelayItem = new SampleDelayItem(module, i, t);
 							if (i == 6)
@@ -4517,7 +4517,7 @@ struct StepStationWidget : ModuleWidget {
 		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Rclick on user controls (U1/U2) or Track# to config"));
 			menu->addChild(createMenuLabel("Click or Rclick on DIV/MULT or MODE displays"));
-			menu->addChild(createMenuLabel("Adjust OUTs timing with 'Out DELAY' options"));
+			menu->addChild(createMenuLabel("Adjust Step Advance timing with 'Track DELAY' options"));
 
 			menu->addChild(createMenuLabel("User SW + PW* = SWing only"));
 			menu->addChild(createMenuLabel("User SK + PW* = SWing only"));

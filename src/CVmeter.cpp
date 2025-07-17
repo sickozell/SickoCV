@@ -863,14 +863,14 @@ struct CVmeterWidget : ModuleWidget {
 		//addInput(createInputCentered<PJ301MPort>(mm2px(Vec(85, yLine)), module, CVmeter::TRIG_INPUT));
 		//addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(95, yLine)), module, CVmeter::RESET_BUT_PARAM, CVmeter::RESET_BUT_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xA, yLine)), module, CVmeter::A_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xB, yLine)), module, CVmeter::B_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xA, yLine)), module, CVmeter::A_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xB, yLine)), module, CVmeter::B_INPUT));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xSwA, ySw)), module, CVmeter::MODE_A_SWITCH));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(xSwB, ySw)), module, CVmeter::MODE_B_SWITCH));
 		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(xRst, yRstBut)), module, CVmeter::RESET_BUT_PARAM, CVmeter::RESET_BUT_LIGHT));
 		addParam(createLightParamCentered<VCVLightBezel<YellowLight>>(mm2px(Vec(xFrzBut, yFrz)), module, CVmeter::FREEZE_PARAM, CVmeter::FREEZE_LIGHT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xRst, yRstIn)), module, CVmeter::RESET_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xFrzIn, yFrz)), module, CVmeter::FREEZE_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRst, yRstIn)), module, CVmeter::RESET_INPUT));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xFrzIn, yFrz)), module, CVmeter::FREEZE_INPUT));
 	}
 
 };

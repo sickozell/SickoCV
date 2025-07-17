@@ -181,7 +181,7 @@ struct SickoTrigStation : Module {
 			};
 
 			//menu->addChild(createMenuLabel("Out DELAY:"));
-			menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu* menu) {
+			menu->addChild(createSubmenuItem("Track DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu* menu) {
 				for (int i = 0; i < 7; i++) {
 					auto sampleDelayItem = new SampleDelayItem(module, i, t);
 					
@@ -3558,7 +3558,7 @@ struct TrigStationDisplayTrackSett : TransparentWidget {
 				}
 			};
 
-			menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Track DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
 				for (int i = 0; i < 7; i++) {
 					auto sampleDelayItem = new SampleDelayItem(module, i, t);
 					
@@ -4209,7 +4209,7 @@ struct TrigStationWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(createSubmenuItem("Default OUT DELAY:", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
+		menu->addChild(createSubmenuItem("Global DELAY:", (module->sampleDelayNames[module->sampleDelay[MC]]), [=](Menu * menu) {
 			for (int i = 0; i < 6; i++) {
 				SampleDelayItem* sampleDelayItem = createMenuItem<SampleDelayItem>(module->sampleDelayNames[i]);
 				sampleDelayItem->rightText = CHECKMARK(module->sampleDelay[MC] == i);
@@ -4673,7 +4673,7 @@ struct TrigStationWidget : ModuleWidget {
 						}
 					};
 
-					menu->addChild(createSubmenuItem("Out DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
+					menu->addChild(createSubmenuItem("Track DELAY:", (module->sampleDelayNames[module->sampleDelay[t]]), [=](Menu * menu) {
 						for (int i = 0; i < 7; i++) {
 							auto sampleDelayItem = new SampleDelayItem(module, i, t);
 							if (i == 6)
@@ -4827,7 +4827,7 @@ struct TrigStationWidget : ModuleWidget {
 		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {
 			menu->addChild(createMenuLabel("Rclick on user controls (U1/U2) or Track# to config"));
 			menu->addChild(createMenuLabel("Click or Rclick on DIV/MULT or MODE displays"));
-			menu->addChild(createMenuLabel("Adjust OUTs timing with 'Out DELAY' options"));
+			menu->addChild(createMenuLabel("Adjust Step Advance timing with 'Track DELAY' options"));
 			menu->addChild(new MenuSeparator());
 			menu->addChild(createMenuLabel("Store Programs with double-click on STOR"));
 			menu->addChild(new MenuSeparator());
