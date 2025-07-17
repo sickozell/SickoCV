@@ -407,7 +407,7 @@
     {
       "slug": "RandMod7",
       "name": "randMod7",
-      "description": "7 random smooth cv generators",
+      "description": "7 random smooth cv generators (rmod7)",
       "tags": [
         "Random"
       ]
@@ -415,7 +415,7 @@
     {
       "slug": "RandMod7compact",
       "name": "randMod7 compact",
-      "description": "7 random smooth cv generators in a compact form",
+      "description": "7 random smooth cv generators in a compact form (rmod7)",
       "tags": [
         "Random"
       ]
