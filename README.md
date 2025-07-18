@@ -1,36 +1,3 @@
-# SickoCV v2.7.4-beta29
-VCV Rack plugin modules (BETA TEST AREA)  
-Compile or **download binary for ANY platform** on the releases page  
-
-## IMPORTANT INSTALLATION NOTE
-If you don't use VCV development environment and run regular VCV install,  
-the new modules will be shown up only if you have a **full subscription** to Sickozell plugin modules.  
-
-So if you have added only some Sickozell modules to VCV you will not see the new ones.
-
-Please check your subscription on https://library.vcvrack.com/plugins and look for the SickoCV line that has to be like this:  
-![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
-
-## Current modules in beta testing:
-- 
-
-## **to do list:** 
-- nothing in queue
-
-## **changelog** 
-- added stepStation and trigStation modules
-- added sampleDelay module
-- added cvMeter module
-- added randMod7 and randMod7compact modules
-- stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
-- all sampler modules: improved memory allocation management
-- slewer/slewer mini: inverted shapes on shape knob
-- sickoSampler: fixed a bug that crashes Rack when clearing the sample via trig input during playback
-- sickoSampler2: fixed a bug drawing the playhead outside the module
-- clocker2: added div/mult mouse control, added CV clock feature, added port/param context menus, fixed clock division bug on reset, changed bpm clock color display
-- ad mini: loop status recorded in patch
-- merged repository with 4ms Metamodule repo
-
 # SickoCV v2.7.4
 VCV Rack plugin modules
 

@@ -1,4 +1,4 @@
-### 2.7.4 (2025-07-17)
+### 2.7.4 (2025-07-18)
 - added stepStation and trigStation modules
 - added sampleDelay module
 - added cvMeter module
