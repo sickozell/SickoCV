@@ -107,7 +107,12 @@ struct SickoSampler2 : Module {
 	//metamodule change
 	//vector<float> tempBuffer[2];
 
-	vector<double> displayBuff;
+// begin changes for metamodule
+	//vector<double> displayBuff;
+	vector<float> displayBuff;
+	const int displaySize = 140;
+// end changes for metamodule
+
 	int currentDisplay = 0;
 	float voctDisplay = 100.f;
 
@@ -300,13 +305,15 @@ struct SickoSampler2 : Module {
 
 	bool unlimitedRecording = false;
 
+// begin changes for metamodule
 #if defined(METAMODULE)
-	const drwav_uint64 recordingLimit = 48000 * 2 * 60; // 60 sec limit on MM = 5.5MB
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2 * 2; // 2mins mono, 1min stereo limit on MM
 #else
-	const drwav_uint64 recordingLimit = 52428800 * 2;
-	// const drwav_uint64 recordingLimit = 480000 * 2; // 10 sec for test purposes
+	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 20mins at 48.000khz MONO)
+	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
 #endif
-	
+// end changes for metamodule
+
 	drwav_uint64 currentRecordingLimit = recordingLimit;
 
 	static constexpr float minStageTime = 1.f;  // in milliseconds
@@ -449,15 +456,21 @@ struct SickoSampler2 : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
+// begin changes for metamodule
+#if !defined(METAMODULE)
 		if (!fileLoaded) {
 			std::string patchFile = system::join(getPatchStorageDirectory(), "sample.wav");
 			loadFromPatch = true;
 			loadSample(patchFile);
-		}		
+		}
+#endif
+// end changes for metamodule
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
+// begin changes for metamodule
+#if !defined(METAMODULE)
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		if (fileLoaded) {
 			if (sampleInPatch) {
@@ -467,7 +480,8 @@ struct SickoSampler2 : Module {
 				saveSample(patchFile);
 			}
 		}
-
+#endif
+// end changes for metamodule
 		Module::onSave(e);
 	}
 
@@ -504,7 +518,13 @@ struct SickoSampler2 : Module {
 			saveOversampled = json_boolean_value(saveOversampledJ);
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
+// begin changes for metamodule
+#if defined (METAMODULE)
+			antiAlias = 1;
+#else
 			antiAlias = json_integer_value(antiAliasJ);
+#endif
+// end changes for metamodule
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
@@ -767,28 +787,46 @@ struct SickoSampler2 : Module {
 			//tempBuffer[1].clear();
 			vector<float> tempBuffer[2];
 
+// begin changes for metamodule
+			resampleCoeff = sampleRate / (APP->engine->getSampleRate()) / 2;
+
+			const auto numSamples = (totalSampleC / resampleCoeff) + 10;
+			tempBuffer[LEFT].reserve(numSamples);
+			if (channels == 2)
+				tempBuffer[RIGHT].reserve(numSamples);
+
 			for (unsigned int i=0; i < totalSampleC; i++) {
 				tempBuffer[LEFT].push_back(playBuffer[LEFT][0][i]);
 				if (channels == 2) {
 					tempBuffer[RIGHT].push_back(playBuffer[RIGHT][0][i]);
 				}
 			}
-			
-			playBuffer[LEFT][0].clear();
-			playBuffer[LEFT][1].clear();
-			playBuffer[RIGHT][0].clear();
-			playBuffer[RIGHT][1].clear();
+		
+//			playBuffer[LEFT][0].clear();
+//			playBuffer[LEFT][1].clear();
+//			playBuffer[RIGHT][0].clear();
+//			playBuffer[RIGHT][1].clear();
 
-			// metamodule change
-			vector<float>().swap(playBuffer[LEFT][0]);
-			vector<float>().swap(playBuffer[RIGHT][0]);
-			vector<float>().swap(playBuffer[LEFT][1]);
-			vector<float>().swap(playBuffer[RIGHT][1]);
+			// Shrink playBuffer to fit:
+ 			
+ 			vector<float>().swap(playBuffer[LEFT][0]);
+ 			vector<float>().swap(playBuffer[LEFT][1]);
+ 			playBuffer[LEFT][0].reserve(numSamples);
+ 			playBuffer[LEFT][1].reserve(numSamples);
+ 			
+
+ 			vector<float>().swap(playBuffer[RIGHT][0]);
+ 			vector<float>().swap(playBuffer[RIGHT][1]);
+ 			if (channels == 2) {
+ 				playBuffer[RIGHT][0].reserve(numSamples);
+ 				playBuffer[RIGHT][1].reserve(numSamples);
+ 			}
+
+
+// end changes for metamodule	
 
 			drwav_uint64 tempSampleC = totalSampleC;
 			drwav_uint64 tempSamples = totalSamples;
-	
-			resampleCoeff = sampleRate / (APP->engine->getSampleRate()) / 2;
 			
 			double currResamplePos = 0;
 			double floorCurrResamplePos = 0;
@@ -849,6 +887,13 @@ struct SickoSampler2 : Module {
 			//tempBuffer[LEFT].clear();
 			//tempBuffer[RIGHT].clear();
 
+// begin changes for metamodule
+			//vector<float>().swap(tempBuffer[LEFT]);
+			//vector<float>().swap(tempBuffer[RIGHT]);
+			//tempBuffer[LEFT].reserve(0);
+			//tempBuffer[RIGHT].reserve(0);
+// end changes for metamodule
+
 			// ***************************************************************************
 			totalSampleC = playBuffer[LEFT][0].size();
 			totalSamples = totalSampleC-1;					// *****   DA VERIFICARE se è -2 ********************************************
@@ -867,8 +912,12 @@ struct SickoSampler2 : Module {
 			prevKnobLoopStartPos = -1.f;
 			prevKnobLoopEndPos = 2.f;
 
-			vector<double>().swap(displayBuff);
-			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/140))
+// begin changes for metamodule
+			vector<float>().swap(displayBuff);
+			displayBuff.reserve(displaySize);
+// end changes for metamodule
+
+			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/displaySize))
 				displayBuff.push_back(playBuffer[0][0][i]);
 
 			resampled = true;
@@ -1167,11 +1216,14 @@ struct SickoSampler2 : Module {
 		// metamodule change
 		//tempBuffer[0].clear();
 		//tempBuffer[1].clear();
-		vector<float> tempBuffer[2];
 
-		unsigned int c;
-		unsigned int sr;
+		//vector<float> tempBuffer[2];
+
+		//unsigned int c;
+		//unsigned int sr;
 		//drwav_uint64 tsc;
+		uint32_t c;
+		uint32_t sr;
 		uint64_t tsc;
 		//float* pSampleData;
 		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
@@ -1186,25 +1238,45 @@ struct SickoSampler2 : Module {
 
 			for (int c=0; c < 16; c++)
 				samplePos[c] = 0;
+
+			//double resampleCoeff = APP->engine->getSampleRate() / fileSampleRate;
+			double resampleCoeff = sampleRate * .5 / (APP->engine->getSampleRate());
 			
-			playBuffer[LEFT][0].clear();
-			playBuffer[LEFT][1].clear();
-			playBuffer[RIGHT][0].clear();
-			playBuffer[RIGHT][1].clear();
-			tempBuffer[LEFT].clear();
-			tempBuffer[RIGHT].clear();
-			displayBuff.clear();
-
-			// metamodule change
-			vector<float>().swap(playBuffer[LEFT][0]);
-			vector<float>().swap(playBuffer[RIGHT][0]);
-			vector<float>().swap(playBuffer[LEFT][1]);
-			vector<float>().swap(playBuffer[RIGHT][1]);
-
 			if (!unlimitedRecording) {
 				if (tsc > recordingLimit / 2)
-					tsc = recordingLimit / 2;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
+					tsc = recordingLimit / 2;	// set memory allocation limit
 			}
+
+			uint64_t newTsc = ceil((double)tsc / resampleCoeff);
+			
+			//INFO("resampleCoeff %f", resampleCoeff);
+			//INFO("tsc %i", tsc);
+			//INFO("newTsc %i", newTsc);
+
+// begin changes for metamodule
+//			playBuffer[LEFT][0].clear();
+//			playBuffer[LEFT][1].clear();
+//			playBuffer[RIGHT][0].clear();
+//			playBuffer[RIGHT][1].clear();
+//			tempBuffer[LEFT].clear();
+//			tempBuffer[RIGHT].clear();
+			//displayBuff.clear();
+
+			// Shrink playBuffer to fit:
+ 			const auto numSamples = fileChannels == 2 ? newTsc : newTsc * 2;
+ 			vector<float>().swap(playBuffer[LEFT][0]);
+ 			vector<float>().swap(playBuffer[LEFT][1]);
+ 			playBuffer[LEFT][0].reserve(numSamples+10);
+ 			playBuffer[LEFT][1].reserve(numSamples+10);
+ 
+ 			vector<float>().swap(playBuffer[RIGHT][0]);
+ 			vector<float>().swap(playBuffer[RIGHT][1]);
+ 			if (channels == 2) {
+ 				playBuffer[RIGHT][0].reserve(numSamples+10);
+ 				playBuffer[RIGHT][1].reserve(numSamples+10);
+ 			}
+ 			
+// end changes for metamodule
 
 			if (sr == APP->engine->getSampleRate()) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -1217,7 +1289,8 @@ struct SickoSampler2 : Module {
 				}
 				totalSampleC = playBuffer[LEFT][0].size();
 				totalSamples = totalSampleC-1;					// *****   DA VERIFICARE se è -2 ********************************************
-//				drwav_free(pSampleData);
+
+				free(pSampleData);
 
 				for (unsigned int i = 1; i < totalSamples; i = i+2) { // **************** tempSamples  o tempSampleC ????
 					playBuffer[LEFT][0][i] = playBuffer[LEFT][0][i-1] * .5f + playBuffer[LEFT][0][i+1] * .5f;
@@ -1240,13 +1313,23 @@ struct SickoSampler2 : Module {
 				}
 				totalSampleC = playBuffer[LEFT][0].size();
 				totalSamples = totalSampleC-1;					// *****   DA VERIFICARE se è -2 ********************************************
-//				drwav_free(pSampleData);
+
+				free(pSampleData);
 
 				resampled = false;
 
 				sampleRate = APP->engine->getSampleRate() * 2;
 
 			} else {											// ***************** RESAMPLE ****************************************
+
+// begin changes for metamodule
+				vector<float> tempBuffer[2];
+				tempBuffer[LEFT].reserve(numSamples);
+				if (fileChannels == 2)
+					tempBuffer[RIGHT].reserve(numSamples);
+
+// end changes for metamodule
+
 				for (unsigned int i=0; i < tsc; i = i + c) {
 					tempBuffer[LEFT].push_back(pSampleData[i] * 5);
 					tempBuffer[LEFT].push_back(0);
@@ -1256,11 +1339,10 @@ struct SickoSampler2 : Module {
 					}
 				}
 
-//				drwav_free(pSampleData);
+				free(pSampleData);
 
 				drwav_uint64 tempSampleC = tempBuffer[LEFT].size();
 				drwav_uint64 tempSamples = tempSampleC-1;					// *****   DA VERIFICARE se è -2 ********************************************
-				
 
 				for (unsigned int i = 1; i < tempSamples; i = i+2) { // **************** tempSamples  o tempSampleC ????
 					tempBuffer[LEFT][i] = tempBuffer[LEFT][i-1] * .5f + tempBuffer[LEFT][i+1] * .5f;
@@ -1274,7 +1356,7 @@ struct SickoSampler2 : Module {
 
 				// ***************************************************************************
 
-				double resampleCoeff = sampleRate * .5 / (APP->engine->getSampleRate());
+				//double resampleCoeff = sampleRate * .5 / (APP->engine->getSampleRate());
 				double currResamplePos = 0;
 				int floorCurrResamplePos = 0;
 
@@ -1334,6 +1416,14 @@ struct SickoSampler2 : Module {
 				//tempBuffer[LEFT].clear();
 				//tempBuffer[RIGHT].clear();
 
+
+// begin changes for metamodule
+				//vector<float>().swap(tempBuffer[LEFT]);
+				//vector<float>().swap(tempBuffer[RIGHT]);
+				//tempBuffer[LEFT].reserve(0);
+				//tempBuffer[RIGHT].reserve(0);
+// end changes for metamodule
+
 				// ***************************************************************************
 
 				totalSampleC = playBuffer[LEFT][0].size();
@@ -1351,8 +1441,13 @@ struct SickoSampler2 : Module {
 					playBuffer[RIGHT][1].push_back(biquadLpf2(playBuffer[RIGHT][0][i]));
 			}
 
-			vector<double>().swap(displayBuff);
-			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/140))
+// begin changes for metamodule
+			//vector<double>().swap(displayBuff);
+			vector<float>().swap(displayBuff);
+			displayBuff.reserve(displaySize);
+// end changes for metamodule
+
+			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/displaySize))
 				displayBuff.push_back(playBuffer[0][0][i]);
 
 			seconds = totalSampleC * 0.5 / (APP->engine->getSampleRate());
@@ -1491,17 +1586,6 @@ struct SickoSampler2 : Module {
 		recSamples = 0;
 		recTimeDisplay = "";
 		channelsDisplay = "";
-		playBuffer[LEFT][0].clear();
-		playBuffer[RIGHT][0].clear();
-		playBuffer[LEFT][1].clear();
-		playBuffer[RIGHT][1].clear();
-		displayBuff.clear();
-
-		// metamodule change
-		vector<float>().swap(playBuffer[LEFT][0]);
-		vector<float>().swap(playBuffer[RIGHT][0]);
-		vector<float>().swap(playBuffer[LEFT][1]);
-		vector<float>().swap(playBuffer[RIGHT][1]);
 
 		totalSampleC = 0;
 		totalSamples = 0;
@@ -1510,6 +1594,26 @@ struct SickoSampler2 : Module {
 		infoToSave= "";
 		for (int i=0; i < 16; i++)
 			fadingValue[i] = 1;
+
+// begin changes for metamodule
+//		playBuffer[LEFT][0].clear();
+//		playBuffer[RIGHT][0].clear();
+//		playBuffer[LEFT][1].clear();
+//		playBuffer[RIGHT][1].clear();
+
+		vector<float>().swap(playBuffer[LEFT][0]);
+		vector<float>().swap(playBuffer[LEFT][1]);
+		vector<float>().swap(playBuffer[RIGHT][0]);
+		vector<float>().swap(playBuffer[RIGHT][1]);
+		//playBuffer[LEFT][0].reserve(0);
+		//playBuffer[LEFT][1].reserve(0);
+		//playBuffer[RIGHT][0].reserve(0);
+ 		//playBuffer[RIGHT][1].reserve(0);
+
+		vector<float>().swap(displayBuff);
+		displayBuff.reserve(displaySize);
+ // end changes for metamodule
+
 	}
 
 	void resetCursors() {
@@ -3006,9 +3110,14 @@ struct SickoSampler2 : Module {
 					totalSampleC = playBuffer[0][0].size();
 					totalSamples = totalSampleC-1;
 
-					vector<double>().swap(displayBuff);
+// begin changes for metamodule
+					//vector<double>().swap(displayBuff);
+					vector<float>().swap(displayBuff);
+					displayBuff.reserve(displaySize);
 
-					for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/140))
+ // end changes for metamodule
+
+					for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/displaySize))
 						displayBuff.push_back(playBuffer[0][0][i]);
 
 					seconds = totalSampleC * 0.5 / (APP->engine->getSampleRate());
@@ -3401,7 +3510,10 @@ struct SickoSampler2Display : TransparentWidget {
 					nvgStrokeWidth(args.vg, 0.8);
 					{
 						nvgBeginPath(args.vg);
-						xLine = 4 + floor(module->samplePos[module->currentDisplay] * 139 / module->totalSampleC);
+						if (module->samplePos[module->currentDisplay] < module->totalSampleC)
+							xLine = 4 + floor(module->samplePos[module->currentDisplay] * 139 / module->totalSampleC);
+						else
+							xLine = 4 + 138;
 						nvgMoveTo(args.vg, xLine, 13);
 						nvgLineTo(args.vg, xLine, 50);
 						nvgClosePath(args.vg);
@@ -3860,7 +3972,13 @@ struct SickoSampler2Widget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
+// begin changes for metamodule
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Anti-aliasing filter (ON)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
+#endif
+// end changes for metamodule
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
@@ -3892,10 +4010,15 @@ struct SickoSampler2Widget : ModuleWidget {
 		}));
 
 		menu->addChild(new MenuSeparator());
+// begin changes for metamodule
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Store Sample in Patch (OFF)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
-#if !defined(METAMODULE)
 		menu->addChild(createBoolPtrMenuItem("Unlimited REC (risky)", "", &module->unlimitedRecording));
 #endif
+// end changes for metamodule
+
 	}
 };
 

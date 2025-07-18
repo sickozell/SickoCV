@@ -75,7 +75,13 @@ struct Wavetabler : Module {
 	const unsigned int minSamplesToLoad = 124;
 
 	vector<float> playBuffer[2];
-	vector<double> displayBuff;
+
+// begin changes for metamodule
+	//vector<double> displayBuff;
+	vector<float> displayBuff;
+	const int displaySize = 160;
+// end changes for metamodule
+
 	int currentDisplay = 0;
 	float voctDisplay = 100.f;
 
@@ -171,12 +177,14 @@ struct Wavetabler : Module {
 	const float maxAdsrTime = 10.f;
 	const float minAdsrTime = 0.001f;
 
+// begin changes for metamodule
 #if defined(METAMODULE)
-	const drwav_uint64 recordingLimit = 48000 * 60; // 60 sec limit on MM = 5.5MB
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2 * 2; // 2mins mono, 1min stereo limit on MM
 #else
-	const drwav_uint64 recordingLimit = 52428800;
-	// const drwav_uint64 recordingLimit = 480000; // 10 sec for test purposes
+	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 20mins at 48.000khz MONO)
+	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
 #endif
+// end changes for metamodule
 
 	Wavetabler() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -262,15 +270,21 @@ struct Wavetabler : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
+// begin changes for metamodule
+#if !defined(METAMODULE)
 		if (!fileLoaded) {
 			std::string patchFile = system::join(getPatchStorageDirectory(), "sample.wav");
 			loadFromPatch = true;
 			loadSample(patchFile);
-		}		
+		}
+#endif
+// end changes for metamodule
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
+// begin changes for metamodule
+#if !defined(METAMODULE)
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		if (fileLoaded) {
 			if (sampleInPatch) {
@@ -278,6 +292,8 @@ struct Wavetabler : Module {
 				saveSample(patchFile);
 			}
 		}
+#endif
+// end changes for metamodule
 		Module::onSave(e);
 	}
 
@@ -296,7 +312,13 @@ struct Wavetabler : Module {
 	void dataFromJson(json_t *rootJ) override {
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
+// begin changes for metamodule
+#if defined (METAMODULE)
+			antiAlias = 1;
+#else
 			antiAlias = json_integer_value(antiAliasJ);
+#endif
+// end changes for metamodule
 		json_t* polyOutsJ = json_object_get(rootJ, "PolyOuts");
 		if (polyOutsJ)
 			polyOuts = json_integer_value(polyOutsJ);
@@ -581,9 +603,11 @@ struct Wavetabler : Module {
 	void loadSample(std::string fromPath) {
 		std::string path = fromPath;
 		z1 = 0; z2 = 0;
-		unsigned int c;
-		unsigned int sr;
+		//unsigned int c;
+		//unsigned int sr;
 		//drwav_uint64 tsc;
+		uint32_t c;
+		uint32_t sr;
 		uint64_t tsc;
 		//float* pSampleData;
 		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
@@ -594,17 +618,17 @@ struct Wavetabler : Module {
 			//channels = c;
 			sampleRate = sr * 2;
 			calcBiquadLpf(20000.0, sampleRate, 1);
-			playBuffer[0].clear();
-			playBuffer[1].clear();
-			displayBuff.clear();
 
-			/*
-			if (tsc > 52428800)
-				tsc = 52428800;	// set memory allocation limit to 200Mb for samples (~18mins at 48.000khz MONO)
-			*/
+			if (tsc > recordingLimit / 2)
+				tsc = recordingLimit / 2;	// set memory allocation limit
 
-			if (tsc > recordingLimit)
-				tsc = recordingLimit;
+// begin changes for metamodule	
+ 			const auto numSamples = c == 2 ? tsc : tsc * 2;
+			vector<float>().swap(playBuffer[0]);
+			vector<float>().swap(playBuffer[1]);
+			playBuffer[0].reserve(numSamples+10);
+ 			playBuffer[1].reserve(numSamples+10);
+// end changes for metamodule		
 
 			for (unsigned int i=0; i < tsc; i = i + c) {
 				playBuffer[0].push_back(pSampleData[i] * 5);
@@ -613,7 +637,8 @@ struct Wavetabler : Module {
 
 			totalSampleC = playBuffer[0].size();
 			totalSamples = totalSampleC-1;
-//			drwav_free(pSampleData);
+
+			free(pSampleData);
 
 			for (unsigned int i = 1; i < totalSamples; i = i + 2)	// averaging oversampled vector
 				playBuffer[0][i] = playBuffer[0][i-1] * .5f + playBuffer[0][i+1] * .5f;
@@ -625,8 +650,18 @@ struct Wavetabler : Module {
 
 			sampleCoeff = sampleRate / (APP->engine->getSampleRate());			// the % distance between samples at 1x speed
 
-			vector<double>().swap(displayBuff);			// creating the display vector
-			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/160))
+// begin changes for metamodule
+#if defined(METAMODULE)
+			vector<float>().swap(playBuffer[0]);
+ 			//playBuffer[0].reserve(0);
+#endif
+			//displayBuff.clear();
+			//vector<double>().swap(displayBuff);
+			vector<float>().swap(displayBuff);
+			displayBuff.reserve(displaySize);
+// end changes for metamodule
+
+			for (int i = 0; i < floor(totalSampleC); i = i + floor(totalSampleC/displaySize))
 				displayBuff.push_back(playBuffer[0][i]);
 
 			if (loadFromPatch)
@@ -682,14 +717,22 @@ struct Wavetabler : Module {
 	};
 
 	void saveSample(std::string path) {
+
+// begin changes for metamodule
+		int tempAlias = 0;
+#if defined (METAMODULE)
+		tempAlias = 1;
+#endif
 		drwav_uint64 samples;
 
-		samples = playBuffer[0].size();
+		samples = playBuffer[tempAlias].size();
 
 		std::vector<float> data;
 
-		for (unsigned int i = 0; i <= playBuffer[0].size(); i = i + 2)
-			data.push_back(playBuffer[0][i] / 5);
+		for (unsigned int i = 0; i <= playBuffer[tempAlias].size(); i = i + 2)
+			data.push_back(playBuffer[tempAlias][i] / 5);
+			//data.push_back(playBuffer[tempAlias][i]);
+// end changes for metamodule
 
 		drwav_data_format format;
 		format.container = drwav_container_riff;
@@ -729,10 +772,21 @@ struct Wavetabler : Module {
 		storedPath = "";
 		fileDescription = "--none--";
 		fileDisplay = "";
-		playBuffer[0].clear();
-		playBuffer[1].clear();
 		totalSampleC = 0;
 		totalSamples = 0;
+
+// begin changes for metamodule		
+//		playBuffer[0].clear();
+//		playBuffer[1].clear();
+		vector<float>().swap(playBuffer[0]);
+		vector<float>().swap(playBuffer[1]);
+		//playBuffer[0].reserve(0);
+ 		//playBuffer[1].reserve(0);
+
+		vector<float>().swap(displayBuff);
+		//displayBuff.reserve(0);
+// end changes for metamodule
+
 	}
 
 	bool isPolyOuts() {
@@ -1424,7 +1478,13 @@ struct WavetablerWidget : ModuleWidget {
 		}
 
 		menu->addChild(new MenuSeparator());
+// begin changes for metamodule
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Anti-aliasing filter (ON)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
+#endif
+// end changes for metamodule
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolMenuItem("Polyphonic OUTs", "", [=]() {
@@ -1436,7 +1496,13 @@ struct WavetablerWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Disable NAV Buttons", "", &module->disableNav));
+// begin changes for metamodule
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Store Sample in Patch (OFF)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
+#endif
+// end changes for metamodule
 	}
 };
 

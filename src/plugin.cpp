@@ -31,6 +31,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelCalcs);
 	p->addModel(modelClocker);
 	p->addModel(modelClocker2);
+	p->addModel(modelCVmeter);
 	p->addModel(modelCVrouter);
 	p->addModel(modelCVswitcher);
 	p->addModel(modelDrummer);
@@ -61,6 +62,9 @@ void init(rack::Plugin *p) {
 	p->addModel(modelRandLoops);
 	p->addModel(modelRandLoopsMini);
 	p->addModel(modelRandLoops8);
+	p->addModel(modelRandMod7);
+	p->addModel(modelRandMod7compact);
+	p->addModel(modelSampleDelay);
 	p->addModel(modelShifter);
 	p->addModel(modelSickoAmp);
 	p->addModel(modelSickoCrosser);
@@ -80,6 +84,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelStepSeq);
 	p->addModel(modelStepSeqPlus);
 	p->addModel(modelStepSeq8x);
+	p->addModel(modelStepStation);
 	p->addModel(modelSwitcher);
 	p->addModel(modelSwitcherSt);
 	p->addModel(modelSwitcher8);
@@ -88,6 +93,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelTrigSeq);
 	p->addModel(modelTrigSeqPlus);
 	p->addModel(modelTrigSeq8x);
+	p->addModel(modelTrigStation);
 	p->addModel(modelWavetabler);
 
 }
@@ -131,3 +137,69 @@ float stepSeq8_cbSeq[8][16] = {{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,
 								{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5}};
 int stepSeq8_cbSteps = 16;
 int stepSeq8_cbRst = 1;
+
+
+bool stepStation_clipboard = false;
+bool stepStation_userClipboard = false;
+int stepStation_cbSteps[8] = {16, 16, 16, 16, 16, 16, 16, 16};
+int stepStation_cbCurrentMode[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+//float stepStation_cbDivMult[8] = {22, 22, 22, 22, 22, 22, 22, 22};
+//int stepStation_cbRevType[9] = {2, 2, 2, 2, 2, 2, 2, 2, 0};	// 0 means POSITIVE_V
+int stepStation_cbDontAdvanceSetting[9] = {2, 2, 2, 2, 2, 2, 2, 2, 1};
+int stepStation_cbRstStepsWhen[9] = {3, 3, 3, 3, 3, 3, 3, 3, 1};
+bool stepStation_cbXcludeFromRun[8] = {false, false, false, false, false, false, false, false};
+bool stepStation_cbXcludeFromRst[8] = {false, false, false, false, false, false, false, false};
+bool stepStation_cbSeqRunSetting =  1; //means seqRunSetting;
+//bool stepStation_cbInternalClock = 0; //means internalClock;
+//float stepStation_cbBpmKnob = 1200.f;
+float stepStation_cbUserValues[8][2] = {};
+float stepStation_cbUserInputs[8][16][2] = {};	// 16 is MAXUSER
+float stepStation_cbUserTable[8][4] = {};
+
+bool stepStation_clipboardTrack = false;
+int stepStation_cbStepsTrack = 16;
+int stepStation_cbCurrentModeTrack = 0;
+//float stepStation_cbDivMultTrack = 22;
+//int stepStation_cbRevTypeTrack = 2;	// 0 means POSITIVE_V
+int stepStation_cbDontAdvanceSettingTrack = 2;
+int stepStation_cbRstStepsWhenTrack = 3;
+bool stepStation_cbXcludeFromRunTrack = false;
+bool stepStation_cbXcludeFromRstTrack = false;
+float stepStation_cbUserValuesTrack[2] = {};
+float stepStation_cbUserInputsTrack[16][2] = {};	// 16 is MAXUSER
+float stepStation_cbUserTableTrack[4] = {};
+
+
+bool trigStation_clipboard = false;
+bool trigStation_userClipboard = false;
+int trigStation_cbSteps[8] = {16, 16, 16, 16, 16, 16, 16, 16};
+int trigStation_cbCurrentMode[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+//float trigStation_cbDivMult[8] = {22, 22, 22, 22, 22, 22, 22, 22};
+int trigStation_cbTuringMode[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+int trigStation_cbOutTypeSetting[9] = {3, 3, 3, 3, 3, 3, 3, 3, 0};
+//int trigStation_cbRevType[9] = {2, 2, 2, 2, 2, 2, 2, 2, 0};	// 0 means POSITIVE_V
+int trigStation_cbDontAdvanceSetting[9] = {2, 2, 2, 2, 2, 2, 2, 2, 1};
+int trigStation_cbRstStepsWhen[9] = {3, 3, 3, 3, 3, 3, 3, 3, 1};
+bool trigStation_cbXcludeFromRun[8] = {false, false, false, false, false, false, false, false};
+bool trigStation_cbXcludeFromRst[8] = {false, false, false, false, false, false, false, false};
+bool trigStation_cbSeqRunSetting =  1; //means seqRunSetting;
+//bool trigStation_cbInternalClock = 0; //means internalClock;
+//float trigStation_cbBpmKnob = 1200.f;
+float trigStation_cbUserValues[8][2] = {};
+float trigStation_cbUserInputs[8][19][2] = {};	// 19 is MAXUSER
+float trigStation_cbUserTable[8][4] = {};
+
+bool trigStation_clipboardTrack = false;
+int trigStation_cbStepsTrack = 16;
+int trigStation_cbCurrentModeTrack = 0;
+//float trigStation_cbDivMultTrack = 22;
+int trigStation_cbTuringModeTrack = 0;
+int trigStation_cbOutTypeSettingTrack = 0;
+//int trigStation_cbRevTypeTrack = 2;	// 0 means POSITIVE_V
+int trigStation_cbDontAdvanceSettingTrack = 2;
+int trigStation_cbRstStepsWhenTrack = 3;
+bool trigStation_cbXcludeFromRunTrack = false;
+bool trigStation_cbXcludeFromRstTrack = false;
+float trigStation_cbUserValuesTrack[2] = {};
+float trigStation_cbUserInputsTrack[19][2] = {};	// 19 is MAXUSER
+float trigStation_cbUserTableTrack[4] = {};

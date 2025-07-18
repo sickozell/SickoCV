@@ -118,7 +118,7 @@ struct EnverMini : Module {
 		configParam(RELEASE_PARAM, 0.f, 1.f, 0.f, "Release", " ms", maxStageTime / minStageTime, minStageTime);
 		configOutput(ENV_OUTPUT,"Envelope");
 		configInput(SIGNAL_INPUT,"Signal");
-		configParam(LVL_PARAM, 0.f, 1.f, 1.f, "Level","", 0, 100);
+		configParam(LVL_PARAM, 0.f, 1.f, 1.f, "Level","%", 0, 100);
 		configOutput(SIGNAL_OUTPUT,"Signal");
 
 		lights[MODE_LIGHT+2].setBrightness(0.f);
@@ -548,7 +548,7 @@ struct EnverMiniWidget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(xLight, yEnv - yLightShift)), module, EnverMini::LVL2ENV_LIGHT));
 	}
 
-		void appendContextMenu(Menu* menu) override {
+	void appendContextMenu(Menu* menu) override {
 		EnverMini* module = dynamic_cast<EnverMini*>(this->module);
 
 		menu->addChild(new MenuSeparator());

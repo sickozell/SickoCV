@@ -1,0 +1,291 @@
+{
+	"MetaModuleBrandName": "Sickozell",
+	"MetaModulePluginMaintainer": "Sickozell",
+	"MetaModulePluginMaintainerEmail": "sickozell@sickozell.org",
+	"MetaModulePluginMaintainerUrl": "https://github.com/sickozell/SickoCV",
+	"MetaModuleDescription": "Sickozell plugin for MetaModule",
+	"MetaModuleIncludedModules": [
+		
+		{
+			"slug": "AdMini",
+			"name": "ad mini"
+		},
+		{
+			"slug": "Adder8",
+			"name": "adder8"
+		},
+		{
+			"slug": "Bgates",
+			"name": "bGates"
+		},
+		{
+			"slug": "Blender",
+			"name": "blender"
+		},
+		{
+			"slug": "Blender8",
+			"name": "blender8"
+		},
+		{
+			"slug": "BtogglerSt",
+			"name": "bToggler"
+		},
+		{
+			"slug": "BtogglerStCompact",
+			"name": "bToggler Compact"
+		},
+		{
+			"slug": "Btoggler",
+			"name": "bToggler8"
+		},
+		{
+			"slug": "BtogglerPlus",
+			"name": "bToggler8+"
+		},
+		{
+			"slug": "Calcs",
+			"name": "calcs"
+		},
+		{
+			"slug": "Clocker",
+			"name": "clocker"
+		},
+		{
+			"slug": "Clocker2",
+			"name": "clocker2"
+		},
+		{
+			"slug": "CVrouter",
+			"name": "cvRouter"
+		},
+		{
+			"slug": "CVswitcher",
+			"name": "cvSwitcher"
+		},
+		{
+			"slug": "Drummer",
+			"name": "drummer"
+		},
+		{
+			"slug": "Drummer4",
+			"name": "drummer4"
+		},
+		{
+			"slug": "Drummer4Plus",
+			"name": "drummer4+"
+		},
+		{
+			"slug": "DrumPlayer",
+			"name": "drumPlayer"
+		},
+		{
+			"slug": "DrumPlayerMk2",
+			"name": "drumPlayer mk2"
+		},
+		{
+			"slug": "DrumPlayerMini",
+			"name": "drumPlayer mini"
+		},
+		{
+			"slug": "DrumPlayerPlus",
+			"name": "drumPlayer+"
+		},
+		{
+			"slug": "DrumPlayerXtra",
+			"name": "drumPlayerXtra"
+		},
+		{
+			"slug": "Enver",
+			"name": "enver"
+		},
+	    {
+			"slug": "EnverMini",
+			"name": "enver mini"
+		  },
+		 {
+			"slug": "EnverMiniX",
+			"name": "enver mini expander"
+		},
+		{
+			"slug": "Holder",
+			"name": "holder"
+		},
+		{
+			"slug": "HolderCompact",
+			"name": "holder Compact"
+		},
+		{
+			"slug": "Holder8",
+			"name": "holder8"
+		},
+		{
+			"slug": "KeySampler",
+			"name": "keySampler"
+		},
+		{
+			"slug": "Modulator",
+			"name": "modulator"
+		},
+		{
+			"slug": "Modulator7",
+			"name": "modulator7"
+		},
+		{
+			"slug": "Modulator7Compact",
+			"name": "modulator7 Compact"
+		},
+		{
+			"slug": "MultiSwitcher",
+			"name": "multiSwitcher"
+		},
+		{
+			"slug": "MultiRouter",
+			"name": "multiRouter"
+		},
+		{
+			"slug": "Parking",
+			"name": "parking"
+		},
+		{
+			"slug": "PolyMuter8",
+			"name": "polyMuter8"
+		},
+		{
+			"slug": "PolyMuter8Plus",
+			"name": "polyMuter8+"
+		},
+		{
+			"slug": "PolyMuter16",
+			"name": "polyMuter16"
+		},
+		{
+			"slug": "PolyMuter16Plus",
+			"name": "polyMuter16+"
+		},
+		{
+			"slug": "RandLoops",
+			"name": "randLoops"
+		},
+		{
+			"slug": "RandLoopsMini",
+			"name": "randLoops mini"
+		},
+		{
+			"slug": "RandLoops8",
+			"name": "randLoops8"
+		},
+		{
+			"slug": "Shifter",
+			"name": "shifter"
+		},
+		{
+			"slug": "SickoAmp",
+			"name": "sickoAmp"
+		},
+		{
+			"slug": "SickoCrosser",
+			"name": "sickoCrosser"
+		},
+		{
+			"slug": "SickoCrosser4",
+			"name": "sickoCrosser4"
+		},
+		{
+			"slug": "SickoLooper1",
+			"name": "sickoLooper1"
+		},
+		{
+			"slug": "SickoLooper1Exp",
+			"name": "sickoLooperX"
+		},
+		{
+			"slug": "SickoLooper3",
+			"name": "sickoLooper3"
+		},
+		{
+			"slug": "SickoLooper5",
+			"name": "sickoLooper5"
+		},
+		{
+			"slug": "SickoPlayer",
+			"name": "sickoPlayer"
+		},
+		{
+			"slug": "SickoQuant",
+			"name": "sickoQuant"
+		},
+		{
+			"slug": "SickoQuant4",
+			"name": "sickoQuant4"
+		},
+		{
+			"slug": "SickoSampler",
+			"name": "sickoSampler"
+		},
+		{
+			"slug": "SickoSampler2",
+			"name": "sickoSampler2"
+		},
+		{
+			"slug": "SimpleSeq4",
+			"name": "simpleSeq4"
+		},
+		{
+			"slug": "Slewer",
+			"name": "slewer"
+		},
+		{
+			"slug": "SlewerMini",
+			"name": "slewer mini"
+		},
+		{
+			"slug": "StepSeq",
+			"name": "stepSeq"
+		},
+		{
+			"slug": "StepSeqPlus",
+			"name": "stepSeq+"
+		},
+        {
+			"slug": "StepSeq8x",
+			"name": "stepSeq8x"
+		},
+		{
+			"slug": "Switcher",
+			"name": "switcher"
+		},
+		{
+			"slug": "SwitcherSt",
+			"name": "switcherSt"
+		},
+		{
+			"slug": "Switcher8",
+			"name": "switcher8"
+		},
+		{
+			"slug": "Toggler",
+			"name": "toggler"
+		},
+		{
+			"slug": "TogglerCompact",
+			"name": "toggler Compact"
+		},
+		{
+			"slug": "TrigSeq",
+			"name": "trigSeq"
+		},
+		{
+			"slug": "TrigSeqPlus",
+			"name": "trigSeq+"
+		},
+		{
+			"slug": "TrigSeq8x",
+      		"name": "trigSeq8x"
+		},
+		{
+			"slug": "WaveTabler",
+			"name": "waveTabler"
+		}
+		
+	]
+}

@@ -8,12 +8,20 @@
 #define PPQN12 4
 #define PPQN16 5
 #define PPQN24 6
+#define PPQN48 7
 #define REGISTER_SIZE 168
 
 #define NO_SMOOTH 0
 #define LOW_SMOOTH 1
 #define MEDIUM_SMOOTH 2
 #define HIGH_SMOOTH 3
+
+#define COLOR_LCD_RED 0xdd, 0x33, 0x33
+#define COLOR_LCD_GREEN 0x33, 0xdd, 0x33
+
+#define BPM_BLUE	0x55, 0xff, 0xff
+#define BPM_YELLOW	0xdd, 0xdd, 0x33
+#define BPM_GREEN	0x33, 0xdd, 0x33
 
 #include "plugin.hpp"
 //#include "osdialog.h"
@@ -28,6 +36,100 @@
 
 using namespace std;
 
+struct Clocker2Wrapper : Module {
+
+	virtual int getParamBase() const { return -1; }
+
+	bool cvClockIn = false;
+	bool cvClockOut = false;
+
+	float prevCvClockInValue = 11.f;
+	float cvClockOutValue = 0.f;
+
+	bool divSwing[6] = {false, false, false, false, false, false};
+
+	double prevBpm = 0;
+
+	void appendClockInMenu(Menu *menu, engine::Port::Type type, int portId){
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("CV clock IN", CHECKMARK(cvClockIn), [=]() {
+			cvClockIn = !cvClockIn;
+			prevCvClockInValue = 11.f;
+		}));
+			
+	}
+
+	void appendClockOutMenu(Menu *menu, engine::Port::Type type, int portId){
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(cvClockOut), [=]() {
+			cvClockOut = !cvClockOut;
+			prevCvClockInValue = 11.f;
+			prevBpm = -1;
+		}));
+		
+	}
+
+	void appendSwingMenu(Menu* menu, int paramId) {
+
+		int paramBase = getParamBase();
+		
+		menu->addChild(new MenuSeparator());
+
+		if (paramBase >= 0) {
+			
+			int knobIndex = paramId - paramBase;
+
+			menu->addChild(createBoolPtrMenuItem("Trig/Swing", "", &divSwing[knobIndex]));
+
+		} else {
+
+			menu->addChild(createMenuLabel("Unknown param"));
+
+		}
+
+	}
+};
+
+template <class TWidget>
+TWidget* createClocker2ParamCentered(math::Vec pos, engine::Module* module, int paramId){
+  return createParamCentered<TWidget>(pos, module, paramId);
+}
+
+template <class TWidget>
+TWidget* createClocker2ClockInCentered(math::Vec pos, engine::Module* module, int paramId){
+
+  return createInputCentered<TWidget>(pos, module, paramId);
+}
+
+template <class TWidget>
+TWidget* createClocker2ClockOutCentered(math::Vec pos, engine::Module* module, int paramId){
+  return createOutputCentered<TWidget>(pos, module, paramId);
+}
+
+struct SickoClockInClocker2 : SickoInPort {
+	void appendContextMenu(Menu* menu) override {
+		if (this->module)
+			dynamic_cast<Clocker2Wrapper*>(this->module)->appendClockInMenu(menu, this->type, this->portId);
+	}
+};
+
+struct SickoKnobClocker2 : SickoTrimpot {
+	void appendContextMenu(Menu* menu) override {
+	    if (module) {
+	      dynamic_cast<Clocker2Wrapper*>(this->module)->appendSwingMenu(menu, this->paramId);
+	    }
+	  }
+};
+
+struct SickoClockOutClocker2 : SickoOutPort {
+	void appendContextMenu(Menu* menu) override {
+		if (this->module)
+			dynamic_cast<Clocker2Wrapper*>(this->module)->appendClockOutMenu(menu, this->type, this->portId);
+	}
+};
+
 struct tpDivMult : ParamQuantity {
 	std::string getDisplayValueString() override {
 		const std::string valueDisplay[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
@@ -36,7 +138,7 @@ struct tpDivMult : ParamQuantity {
 	}
 };
 
-struct Clocker2 : Module {
+struct Clocker2 : Clocker2Wrapper {
 	enum ParamIds {
 		BPM_KNOB_PARAM,
 		PW_KNOB_PARAM,
@@ -65,10 +167,11 @@ struct Clocker2 : Module {
 		NUM_LIGHTS
 	};
 
+
 	//**************************************************************
 	//  DEBUG 
 
-	/*	
+		
 	std::string debugDisplay = "X";
 	std::string debugDisplay2 = "X";
 	std::string debugDisplay3 = "X";
@@ -78,10 +181,12 @@ struct Clocker2 : Module {
 	std::string debugDisplay7 = "X";
 	int debugInt = 0;
 	bool debugBool = false;
-	*/
+	
 
  	//**************************************************************
 	//   
+
+	int getParamBase() const override { return DIVPW_KNOB_PARAM; }
 
 	const std::string divMultDisplay[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
 								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
@@ -97,6 +202,7 @@ struct Clocker2 : Module {
 	double sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 
 	double bpm = 0.1;
+	//double prevBpm = 0;
 
 	std::string storedPath[2] = {"",""};
 	std::string fileDescription[2] = {"--none--","--none--"};
@@ -131,7 +237,7 @@ struct Clocker2 : Module {
 
 	double maxPulseSample = 0.0;
 
-	int ppqnTable[7] = {1, 2, 4, 8, 12, 16, 24}; // 1 2 4 8 12 16 24
+	int ppqnTable[8] = {1, 2, 4, 8, 12, 16, 24, 48}; // 1 2 4 8 12 16 24 48
 	int ppqn = PPQN1;
 	int tempPpqn = ppqn;
 	bool ppqnChange = false;
@@ -197,6 +303,7 @@ struct Clocker2 : Module {
 	//float oneMsTime = (APP->engine->getSampleRate()) / 10;	// for testing purposes
 	bool resetPulse = false;
 	float resetPulseTime = 0.f;
+	int syncPulseTime = 0.f;
 
 	bool resetOnRun = true;
 	bool resetPulseOnRun = false;
@@ -215,10 +322,45 @@ struct Clocker2 : Module {
 	float divPulseTime[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	int divCount[6] = {1, 1, 1, 1, 1, 1};
 
-	bool divSwing[6] = {false, false, false, false, false, false};
+	//bool divSwing[6] = {false, false, false, false, false, false};
+
+	//bool cvClockIn = false;
+	//bool cvClockOut = false;
+
+	float cvClockInValue = 0.f;
+	//float prevCvClockInValue = 11.f;
+	//float cvClockOutValue = 0.f;
+
+	bool divControls = true;
+
+	//bool outPulseOnReset = false;
+	//bool pulseOutProcedure = false;
+	//bool secondPartPulse = false;
+	//bool thirdPartPulse = false;
+	//float pulseOutTime = 0.f;
+
+	float rstLightValue = 0.f;
+	float lightDecayPerSample = 1.f / (APP->engine->getSampleRate() * 0.2f);
+
 
 	Clocker2() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+
+		struct UserQuantity : ParamQuantity {
+			int t = -1;
+
+			float getDisplayValue() override {
+				Clocker2* module = reinterpret_cast<Clocker2*>(this->module);
+
+				if (t >= 0) {
+					if (module->divSwing[t])
+			 			name = "Swing #" + to_string(t+1);
+					else
+			 			name = "Pulse Width #" + to_string(t+1);
+				}
+				return ParamQuantity::getDisplayValue();
+			}
+		};
 		
 		configInput(EXTCLOCK_INPUT,"External Clock");
 
@@ -232,8 +374,18 @@ struct Clocker2 : Module {
 		configParam(BPM_KNOB_PARAM, 300.f, 3000.f, 1200.f, "Tempo", " bpm", 0, 0.1);
 		paramQuantities[BPM_KNOB_PARAM]->snapEnabled = true;
 
-		configParam(PW_KNOB_PARAM, 0.f, 1.0f, 0.5f, "PW Level", "%", 0, 100);
+		configParam(PW_KNOB_PARAM, 0.f, 1.0f, 0.5f, "Pulse Width", "%", 0, 100);
 
+		for (int t = 0; t < 6; t++) {
+			configParam<tpDivMult>(DIVMULT_KNOB_PARAM+t, 0.f, 44.f, 22.f, "Mult/Div " + to_string(t+1));
+			paramQuantities[DIVMULT_KNOB_PARAM+t]->snapEnabled = true;
+
+			configParam<UserQuantity>(DIVPW_KNOB_PARAM+t, 0.f, 1.0f, 0.5f, ("PW/Swing Level" + to_string(t+1)).c_str(), "%", 0, 100);		
+			if (auto uq1 = dynamic_cast<UserQuantity*>(paramQuantities[DIVPW_KNOB_PARAM + t])) {
+				uq1->t = t;
+			}	
+		}
+/*
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+0, 0.f, 44.f, 22.f, "Mult/Div #1");
 		paramQuantities[DIVMULT_KNOB_PARAM+0]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+0, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
@@ -257,7 +409,15 @@ struct Clocker2 : Module {
 		configParam<tpDivMult>(DIVMULT_KNOB_PARAM+5, 0.f, 44.f, 22.f, "Mult/Div #6");
 		paramQuantities[DIVMULT_KNOB_PARAM+5]->snapEnabled = true;
 		configParam(DIVPW_KNOB_PARAM+5, 0.f, 1.0f, 0.5f, "PW/Swing Level", "%", 0, 100);
-
+	*/
+/*
+		configParam<UserQuantity>(USER_PARAM+t, 0.f, 1.f, 0.f, ("K1 #"+to_string(t+1)).c_str());
+		// Setta `t` manualmente
+		if (auto uq1 = dynamic_cast<UserQuantity*>(paramQuantities[USER_PARAM + t])) {
+			uq1->t = t;
+			uq1->userColumn = 1;
+		}
+*/
 		configOutput(DIVMULT_OUTPUT+0,"Div/Mult #1");
 		configOutput(DIVMULT_OUTPUT+1,"Div/Mult #2");
 		configOutput(DIVMULT_OUTPUT+2,"Div/Mult #3");
@@ -292,6 +452,8 @@ struct Clocker2 : Module {
 		resetOnStop = false;
 		resetPulseOnStop = false;
 
+		//outPulseOnReset = false;
+
 		bpm = 0.1;
 
 		for (int d = 0; d < 6; d++) {
@@ -316,11 +478,15 @@ struct Clocker2 : Module {
 		sampleRateCoeff = (double)APP->engine->getSampleRate() * 60;
 		oneMsTime = (APP->engine->getSampleRate()) / 1000;
 		//oneMsTime = (APP->engine->getSampleRate()) / 10; // for testing purposes
+		lightDecayPerSample = 1.f / (APP->engine->getSampleRate() * 0.2f);
 
 	}
 
 	json_t *dataToJson() override {
+
 		json_t *rootJ = json_object();
+		//json_object_set_new(rootJ, "outPulseOnReset", json_boolean(outPulseOnReset));
+		json_object_set_new(rootJ, "divControls", json_boolean(divControls));
 		json_object_set_new(rootJ, "ppqn", json_integer(ppqn));
 		//json_object_set_new(rootJ, "smooth", json_integer(smooth));		// experimental: EXTERNAL CLOCK SMOOTH
 		//json_object_set_new(rootJ, "extStop", json_integer(extStop));		// expertimental: EXTERNAL CLOCK AUTO STOP
@@ -334,10 +500,23 @@ struct Clocker2 : Module {
 		json_object_set_new(rootJ, "Swing4", json_boolean(divSwing[3]));
 		json_object_set_new(rootJ, "Swing5", json_boolean(divSwing[4]));
 		json_object_set_new(rootJ, "Swing6", json_boolean(divSwing[5]));
+		json_object_set_new(rootJ, "cvClockIn", json_boolean(cvClockIn));
+		json_object_set_new(rootJ, "cvClockOut", json_boolean(cvClockOut));
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+
+		/*
+		json_t* outPulseOnResetJ = json_object_get(rootJ, "outPulseOnReset");
+		if (outPulseOnResetJ)
+			outPulseOnReset = json_boolean_value(outPulseOnResetJ);
+		*/
+
+		json_t* divControlsJ = json_object_get(rootJ, "divControls");
+		if (divControlsJ)
+			divControls = json_boolean_value(divControlsJ);
+
 		json_t* ppqnJ = json_object_get(rootJ, "ppqn");
 		if (ppqnJ) {
 			tempPpqn = json_integer_value(ppqnJ);
@@ -403,7 +582,12 @@ struct Clocker2 : Module {
 		json_t* swing6J = json_object_get(rootJ, "Swing6");
 		if (swing6J)
 			divSwing[5] = json_boolean_value(swing6J);
-
+		json_t* cvClockInJ = json_object_get(rootJ, "cvClockIn");
+		if (cvClockInJ)
+			cvClockIn = json_boolean_value(cvClockInJ);
+		json_t* cvClockOutJ = json_object_get(rootJ, "cvClockOut");
+		if (cvClockOutJ)
+			cvClockOut = json_boolean_value(cvClockOutJ);
 	}
 
 	void changePpqnSetting() {
@@ -449,6 +633,17 @@ struct Clocker2 : Module {
 	}
 	*/
 
+	/*
+	void rstCvIn() {
+		for (int d = 0; d < 6; d++) {
+			divPulse[d] = false;
+			divCount[d] = 99999999;
+			divClockSample[d] = 1.0;
+			outputs[DIVMULT_OUTPUT + d].setVoltage(0.f);
+		}
+	}
+	*/
+
 	void process(const ProcessArgs &args) override {
 	
 		lights[DIVSWING_LIGHT+0].setBrightness(divSwing[0]);
@@ -472,19 +667,33 @@ struct Clocker2 : Module {
 
 		extConn = inputs[EXTCLOCK_INPUT].isConnected();
 		if (extConn && !prevExtConn) {
-			extSync = false;
-			bpm = 0.0;
-			pulseNr = 0;
-			/*
-			firstRegSync = true;
-			registerSum = 0;
-			registerPos = 0;
-			
-			pulseSample = 0;
-			extClockSample = 1.0;
-			prevExtClockSample = 1.0;
-			*/
-		}
+
+			if (cvClockIn) {
+				extSync = true;
+				prevCvClockInValue = 11.f;
+			} else {
+				extSync = false;
+				bpm = 0.0;
+				pulseNr = 0;
+				/*
+				firstRegSync = true;
+				registerSum = 0;
+				registerPos = 0;
+				
+				pulseSample = 0;
+				extClockSample = 1.0;
+				prevExtClockSample = 1.0;
+				*/
+			}
+		} /*else if (!extConn && prevExtConn) {
+			bpm = (double)params[BPM_KNOB_PARAM].getValue()/10;
+
+			if (cvClockOut) {
+				cvClockOutValue = log2(bpm / 120.0f);
+				outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
+			}
+			prevBpm = bpm;
+		}*/
 		prevExtConn = extConn;
 
 		// ********* RUN SETTING
@@ -510,18 +719,23 @@ struct Clocker2 : Module {
 				resetStart = true;
 				if (!extConn)
 					clockSample = 1.0;
-				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				
+				if (!cvClockOut)
+					outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				
 				for (int d = 0; d < 6; d++) {
 					divPulse[d] = false;
 					divClockSample[d] = 1.0;
 					divMaxSample[d][0] = 0.0;
 					divMaxSample[d][1] = 0.0;
+					divCount[d] = 999999;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 			}
 			if (resetPulseOnStop) {
 				resetPulse = true;
 				resetPulseTime = oneMsTime;
+				syncPulseTime = 1;
 			}
 		} else if (runSetting && !prevRunSetting) {
 			runSetting = 1;
@@ -531,18 +745,23 @@ struct Clocker2 : Module {
 					clockSample = 1.0;
 				else
 					extSync = false;
-				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				
+				if (!cvClockOut)
+					outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				
 				for (int d = 0; d < 6; d++) {
 					divPulse[d] = false;
 					divClockSample[d] = 1.0;
 					divMaxSample[d][0] = 0.0;
 					divMaxSample[d][1] = 0.0;
+					divCount[d] = 999999;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 			}
 			if (resetPulseOnRun) {
 				resetPulse = true;
 				resetPulseTime = oneMsTime;
+				syncPulseTime = 1;
 			}
 		}
 
@@ -558,26 +777,89 @@ struct Clocker2 : Module {
 		else
 			resetValue = inputs[RESET_INPUT].getVoltage();
 
-		lights[RESET_BUT_LIGHT].setBrightness(resetValue);
+		//lights[RESET_BUT_LIGHT].setBrightness(resetValue);
+
+
+
 
 		if (resetValue >= 1 && prevResetValue < 1) {
 
-			outputs[CLOCK_OUTPUT].setVoltage(0.f);
+			// ******** NEW ***********
+			clockSample = 1.0;
+
+			if (!cvClockOut)
+				outputs[CLOCK_OUTPUT].setVoltage(0.f);
+
 			for (int d = 0; d < 6; d++) {
 				divPulse[d] = false;
 				divClockSample[d] = 1.0;
 				divMaxSample[d][0] = 0.0;
 				divMaxSample[d][1] = 0.0;
+				divCount[d] = 999999;
 				outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 			}
 
 			resetPulse = true;
 			resetPulseTime = oneMsTime;
+			//resetPulseTime = 1;
+			syncPulseTime = 0;
+
+			rstLightValue = 1.f;
+/*
+			if (outPulseOnReset) {
+				pulseOutProcedure = true;
+				secondPartPulse = false;
+				thirdPartPulse = false;
+				pulseOutTime = oneMsTime / 2;
+			}
+*/
 		}
 		prevResetValue = resetValue;
 
+		if (rstLightValue > 0.f) {
+			rstLightValue -= lightDecayPerSample;
+			if (rstLightValue < 0.f)
+				rstLightValue = 0.f;
+		}
 
+		//lights[RST_LIGHT].setBrightness(rstLightValue);
+		lights[RESET_BUT_LIGHT].setBrightness(rstLightValue);
+
+	// indentazione rientrata per semplicità temporanea, da risistemare quando ok
+/*	if (pulseOutProcedure) {
+
+		pulseOutTime--;
+
+		if (pulseOutTime < 0) {
+
+			if (secondPartPulse) {
+				secondPartPulse = false;
+				thirdPartPulse = true;
+				pulseOutTime = oneMsTime;
+
+				if (!cvClockOut)
+					outputs[CLOCK_OUTPUT].setVoltage(0.f);
+				for (int d = 0; d < 6; d++)
+					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
+
+			} else if (thirdPartPulse) {
+				pulseOutProcedure = false;
+			} else {
+
+				secondPartPulse = true;
+				if (!cvClockOut)
+					outputs[CLOCK_OUTPUT].setVoltage(10.f);
+				for (int d = 0; d < 6; d++)
+					outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+				pulseOutTime = oneMsTime;
+			}
+		}
+
+	} else {
+
+*/
 		// ************************* INTERNAL CLOCK
+
 
 		if (!extConn) {
 
@@ -585,15 +867,27 @@ struct Clocker2 : Module {
 			
 			bpm = (double)params[BPM_KNOB_PARAM].getValue()/10;
 
+			if (cvClockOut) {
+				
+				if (bpm != prevBpm)
+					cvClockOutValue = log2(bpm / 120.0f);
+				
+				outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
+				
+			}
+			prevBpm = bpm;
+
 			// **************   RUN PROCESS   ***************
 
-			if (runSetting && resetPulseTime <= 0) {
+			//if (runSetting && resetPulseTime <= 0) {
+			if (runSetting && syncPulseTime <= 0) {
 
 				// ****** CLOCK PULSE WIDTH
 
 				maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
 				if (clockSample > maxPulseSample)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
+					if (!cvClockOut)
+						outputs[CLOCK_OUTPUT].setVoltage(0.f);
 
 				// ************ DIV / MULT
 
@@ -701,7 +995,8 @@ struct Clocker2 : Module {
 						}
 					}
 					
-					outputs[CLOCK_OUTPUT].setVoltage(10.f);
+					if (!cvClockOut)
+						outputs[CLOCK_OUTPUT].setVoltage(10.f);
 					
 				}
 
@@ -720,80 +1015,231 @@ struct Clocker2 : Module {
 			// ************************************************ EXTERNAL CLOCK
 
 			// ********** EXTERNAL SYNC
-			
-			extTrigValue = inputs[EXTCLOCK_INPUT].getVoltage();
-				
-			if (extTrigValue >= 1 && prevExtTrigValue < 1) {
 
-				pulseNr++;
-				if (extSync) {
+			if (cvClockIn) {
 
-					/*
-					if (pulseNr > ppqnComparison) {
-						pulseNr = 0;
-						clockMaxSample = clockSample;
-						midBeatMaxSample = clockMaxSample / 2;
-						clockSample = 0.0;
-						
-						if (runSetting)
-							extBeat = true;
+				cvClockInValue = inputs[EXTCLOCK_INPUT].getVoltage();
+				if (cvClockInValue != prevCvClockInValue) {
+					//bpm = 120.0f * pow(2.0f, cvClockInValue);
+					bpm = 120 * pow(2, cvClockInValue);
+					bpm = round(bpm * 10)/10;
+					if (bpm > 999)
+						bpm = 999;
 
-						// calculate bpms
-						bpm = round(sampleRateCoeff / clockMaxSample);
-						if (bpm > 999)
-							bpm = 999;
+					if (cvClockOut) {
+						cvClockOutValue = log2(bpm / 120.0f);
+						outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
 					}
-					*/
+					
+				}
+				prevCvClockInValue = cvClockInValue;
+				
+				clockMaxSample = sampleRateCoeff / bpm;
+/*
+				for (int d = 0; d < 6; d++) {
+					if (!divSwing[d]) {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
+							// MULTIPLIER
+							divMaxSample[d][0] = clockMaxSample / divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())];
+							divMaxSample[d][1] = divMaxSample[d][0];
+						} else {
+							// DIVIDER
+							divMaxSample[d][0] = clockMaxSample * divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())];
+							divMaxSample[d][1] = divMaxSample[d][0];
+						}
+					} else {
+						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
+							divMaxSample[d][0] = clockMaxSample / divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())];
+							divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
+						} else {
+							divMaxSample[d][0] = clockMaxSample * divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())];
+							divMaxSample[d][1] = divMaxSample[d][0];
+						}
+					}
+				}
+*/
+				if (clockSample > clockMaxSample || resetStart)  {
 
-					//clockMaxSample = clockSample * (ppqnValue2 - pulseNr);
+					if (resetStart) {
+						clockSample = 1.0;
+						resetStart = false;
+					} else 
+						clockSample -= clockMaxSample;
+					
+					if (runSetting) {
 
-					if (pulseNr > ppqnComparison) {
-						pulseNr = 0;
-						clockMaxSample = clockSample;
-						clockSample = 0.0;
+						for (int d = 0; d < 6; d++) {
 						
+							if (!divSwing[d]) {
+
+								//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
+									// ***** CLOCK MULTIPLIER *****
+									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0];
+									divClockSample[d] = 1.0;
+									divPulse[d] = true;
+									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								} else {
+									
+									// ***** CLOCK DIVIDER *****
+									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0];
+									divCount[d]++;
+									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+										divClockSample[d] = 1.0;
+										divCount[d] = 1;
+										divPulse[d] = true;
+										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+										//DEBUG("QUI");
+									}
+									
+								}
+							} else {
+								
+								//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21) {
+								if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22) {
+									// ***** CLOCK MULTIPLIER *****
+									divMaxSample[d][0] = clockMaxSample / (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0] + (divMaxSample[d][0] * params[DIVPW_KNOB_PARAM+d].getValue());
+									divOddCounter[d] = 1;
+									divClockSample[d] = 1.0;
+									divPulse[d] = true;
+									divPulseTime[d] = oneMsTime;
+									outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+								} else {
+									// ***** CLOCK DIVIDER *****
+									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
+									divMaxSample[d][1] = divMaxSample[d][0];
+									divCount[d]++;
+									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
+										divOddCounter[d] = 1;
+
+										divClockSample[d] = 1.0;
+										divCount[d] = 1;
+										divPulse[d] = true;
+										divPulseTime[d] = oneMsTime;
+										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+									}
+								}
+							}
+
+						} 
+					
+					
+						extBeat = true;
+						//clockSample = 1.0;
+						
+						if (!cvClockOut)
+							outputs[CLOCK_OUTPUT].setVoltage(10.f);
+					}
+
+					
+
+				} else {
+					
+					extBeat = false;
+				}
+
+					
+
+			} else {
+			
+				extTrigValue = inputs[EXTCLOCK_INPUT].getVoltage();
+					
+				if (extTrigValue >= 1 && prevExtTrigValue < 1) {
+
+					pulseNr++;
+					if (extSync) {
+
+						/*
+						if (pulseNr > ppqnComparison) {
+							pulseNr = 0;
+							clockMaxSample = clockSample;
+							midBeatMaxSample = clockMaxSample / 2;
+							clockSample = 0.0;
+							
+							if (runSetting)
+								extBeat = true;
+
+							// calculate bpms
+							bpm = round(sampleRateCoeff / clockMaxSample);
+							if (bpm > 999)
+								bpm = 999;
+						}
+						*/
+
+						//clockMaxSample = clockSample * (ppqnValue2 - pulseNr);
+
+						if (pulseNr > ppqnComparison) {
+							pulseNr = 0;
+							clockMaxSample = clockSample;
+							clockSample = 0.0;
+							
+							if (runSetting)
+								extBeat = true;
+
+							// calculate bpms
+							bpm = round(sampleRateCoeff / clockMaxSample);
+							if (bpm > 999)
+								bpm = 999;
+
+							if (cvClockOut) {
+								cvClockOutValue = log2(bpm / 120.0f);
+								outputs[CLOCK_OUTPUT].setVoltage(cvClockOutValue);
+							}
+						}
+
+					} else {
+
+						bpm = 0.0;
+						extSync = true;
+						clockSample = 1.0;
+						pulseNr = 0;
+
 						if (runSetting)
 							extBeat = true;
-
-						// calculate bpms
-						bpm = round(sampleRateCoeff / clockMaxSample);
-						if (bpm > 999)
-							bpm = 999;
 					}
 
 				} else {
-					bpm = 0.0;
-					extSync = true;
-					clockSample = 1.0;
-					pulseNr = 0;
-
-					if (runSetting)
-						extBeat = true;
+					extBeat = false;
 				}
+				prevExtTrigValue = extTrigValue;
 
-			} else {
-				extBeat = false;
+				//extClockSample++;
+			
 			}
-			prevExtTrigValue = extTrigValue;
-
-			//extClockSample++;
-		
-
 			// **************   RUN PROCESS   ***************
 
-			if (runSetting && resetPulseTime <= 0) {
+			//if (runSetting && resetPulseTime <= 0) {
+			if (runSetting && syncPulseTime <= 0) {
 
 				// ****** CLOCK PULSE WIDTH
 
 				maxPulseSample = clockMaxSample * (double)params[PW_KNOB_PARAM].getValue();
 				if (clockSample > maxPulseSample)
-					outputs[CLOCK_OUTPUT].setVoltage(0.f);
+					if (!cvClockOut)
+						outputs[CLOCK_OUTPUT].setVoltage(0.f);
 
 				// ************ DIV / MULT
 
+			
 				for (int d = 0; d < 6; d++) {
 
 					if(!divSwing[d]) {
+						/*
+						int t = 0;
+						if (d == t) {
+							std::string text = std::to_string(debugInt) + " OFF - "
+						    + " - divClockSample " + std::to_string(divClockSample[t]) 
+						    + " - divMaxSample " + std::to_string(divMaxSample[t][0]) + " - Pulse " + std::to_string(divPulse[t]);
+							
+						    //if (divPulse[t])
+								DEBUG(text.c_str());
+
+							debugInt++;
+						}
+						*/
 
 						//if (params[DIVMULT_KNOB_PARAM+d].getValue() > 21 && divClockSample[d] > divMaxSample[d][0]) {
 						if (params[DIVMULT_KNOB_PARAM+d].getValue() > 22 && divClockSample[d] > divMaxSample[d][0]) {
@@ -827,6 +1273,7 @@ struct Clocker2 : Module {
 						}
 					}
 				}
+				
 
 				// ************************ EXTERNAL CLOCK ******************
 
@@ -836,6 +1283,7 @@ struct Clocker2 : Module {
 
 						// ********** SYNCED BEAT
 
+						if (!cvClockIn) {
 						for (int d = 0; d < 6; d++) {
 
 							if (!divSwing[d]) {
@@ -850,13 +1298,26 @@ struct Clocker2 : Module {
 								} else {
 									// ***** CLOCK DIVIDER *****
 									divMaxSample[d][0] = clockMaxSample * (divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]);
-									divMaxSample[d][1] = divMaxSample[d][1];
+									divMaxSample[d][1] = divMaxSample[d][0];
 									divCount[d]++;
 									if (divCount[d] > divMult[int(params[DIVMULT_KNOB_PARAM+d].getValue())]) {
 										divClockSample[d] = 1.0;
 										divCount[d] = 1;
 										divPulse[d] = true;
 										outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
+
+										/*
+										int t = 0;
+										if (d == t) {
+											
+											std::string text = std::to_string(debugInt) + " ON - " +
+										    + " - divClockSample " + std::to_string(divClockSample[t]) 
+										    + " - divMaxSample " + std::to_string(divMaxSample[t][0]);
+											DEBUG(text.c_str());
+
+											debugInt++;
+										}
+										*/
 									}
 								}
 							} else {
@@ -886,8 +1347,10 @@ struct Clocker2 : Module {
 								}
 							}
 						}
-
-						outputs[CLOCK_OUTPUT].setVoltage(10.f);
+						}
+						
+						if (!cvClockOut)
+							outputs[CLOCK_OUTPUT].setVoltage(10.f);
 					
 					}
 				}
@@ -900,6 +1363,7 @@ struct Clocker2 : Module {
 			divClockSample[3]++;
 			divClockSample[4]++;
 			divClockSample[5]++;			
+
 			
 		}
 
@@ -908,6 +1372,9 @@ struct Clocker2 : Module {
 		//	********** RESET AND DIV PULSES
 
 		if (resetPulse) {
+
+			syncPulseTime--;
+
 			resetPulseTime--;
 			if (resetPulseTime < 0) {
 				resetPulse = false;
@@ -926,6 +1393,9 @@ struct Clocker2 : Module {
 					outputs[DIVMULT_OUTPUT+d].setVoltage(10.f);
 			}
 		}
+
+//	}	// fine if pulseOutProcedure, da re indentare quando ok
+
 	}
 };
 
@@ -943,14 +1413,15 @@ struct Clocker2DisplayTempo : TransparentWidget {
 				nvgFontFaceId(args.vg, font->handle);
 				nvgTextLetterSpacing(args.vg, 0);
 
-				nvgFillColor(args.vg, nvgRGBA(0xdd, 0xdd, 0x33, 0xff)); 
+				//nvgFillColor(args.vg, nvgRGBA(0xdd, 0xdd, 0x33, 0xff)); 
 				
 				int tempBpmInteger;
 				std::string tempBpm;
 				std::string tempBpmInt;
 				std::string tempBpmDec;
 
-				if (!module->inputs[module->EXTCLOCK_INPUT].isConnected()) {
+				//if (!module->inputs[module->EXTCLOCK_INPUT].isConnected()) {
+				if (!module->extConn) {
 					tempBpmInteger = int(module->bpm * 10 + .5);
 
 					tempBpm = to_string(tempBpmInteger);
@@ -958,19 +1429,39 @@ struct Clocker2DisplayTempo : TransparentWidget {
 					tempBpmDec = tempBpm.substr(tempBpm.size() - 1);
 					tempBpm = tempBpmInt+"."+tempBpmDec;
 
+					nvgFillColor(args.vg, nvgRGB(BPM_YELLOW));
+					
 					if (tempBpmInteger < 1000)
 						nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
 					else
 						nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
 				} else {
 					
-					tempBpmInteger = int(module->bpm);
-					tempBpm = to_string(tempBpmInteger)+".X";
-					if (tempBpmInteger < 100)
-						nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
-					else
-						nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
-					
+					if (!module->cvClockIn) {
+						tempBpmInteger = int(module->bpm);
+						tempBpm = to_string(tempBpmInteger)+".X";
+
+						nvgFillColor(args.vg, nvgRGB(BPM_BLUE));
+						
+						if (tempBpmInteger < 100)
+							nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
+						else
+							nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
+					} else {
+						tempBpmInteger = int(module->bpm * 10 + .5);
+
+						tempBpm = to_string(tempBpmInteger);
+						tempBpmInt = tempBpm.substr(0, tempBpm.size()-1);
+						tempBpmDec = tempBpm.substr(tempBpm.size() - 1);
+						tempBpm = tempBpmInt+"."+tempBpmDec;
+
+						nvgFillColor(args.vg, nvgRGB(BPM_GREEN)); 
+
+						if (tempBpmInteger < 1000)
+							nvgTextBox(args.vg, 14.5, 16.3, 60, tempBpm.c_str(), NULL);
+						else
+							nvgTextBox(args.vg, 4, 16.3, 60, tempBpm.c_str(), NULL);
+					}
 				}
 			}
 		}
@@ -978,40 +1469,78 @@ struct Clocker2DisplayTempo : TransparentWidget {
 	}
 };
 
-struct Clocker2DisplayDiv1 : TransparentWidget {
+struct Clocker2DisplayDiv : TransparentWidget {
 	Clocker2 *module;
 	int frame = 0;
-	Clocker2DisplayDiv1() {
+	int t;
+
+	Clocker2DisplayDiv(int tIndex) : t(tIndex) {
 	}
 
 	void onButton(const event::Button &e) override {
-
+		/*
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 			createContextMenu();
 			e.consume(this);
 		}
+		*/
+		/*
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+			if (tempValue + 1 <= 44)
+				tempValue++;
+			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+			e.consume(this);
+		}
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+			if (tempValue - 1 >= 0)
+				tempValue--;
+			module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+			e.consume(this);
+		}
+		*/
+		if (module->divControls) {
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+				if (tempValue + 1 <= 44)
+					tempValue++;
+				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+				e.consume(this);
+			}
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+				if (tempValue - 1 >= 0)
+					tempValue--;
+				module->params[module->DIVMULT_KNOB_PARAM + t].setValue(tempValue);
+				e.consume(this);
+			}
+
+		} else {
+
+			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+				createContextMenu();
+				e.consume(this);
+			}
+		}
 	}
 
 	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 12);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
+		if (module && layer == 1) {
+			shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
+			nvgFontSize(args.vg, 12);
+			nvgFontFaceId(args.vg, font->handle);
+			nvgTextLetterSpacing(args.vg, 0);
 
-				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue());
-				float tempXpos = 3;
-				if (tempValue > 13 && tempValue < 31)
-					tempXpos = 12.8;
+			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
+			float tempXpos = (tempValue > 1 && tempValue < 43) ? 10 : 6;
 
-				if (tempValue < 22)
-					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-				else
-					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
+			nvgFillColor(args.vg, (tempValue < 22) ?
+				nvgRGB(COLOR_LCD_RED) :
+				nvgRGB(COLOR_LCD_GREEN));
 
-				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-			}
+			nvgTextBox(args.vg, tempXpos, 15.1, 60, module->divMultDisplay[tempValue].c_str(), NULL);
 		}
 		Widget::drawLayer(args, layer);
 	}
@@ -1023,356 +1552,33 @@ struct Clocker2DisplayDiv1 : TransparentWidget {
 		if (module) {
 			ui::Menu *menu = createMenu();
 
-			struct ThisItem : MenuItem {
-				Clocker2* module;
-				int valueNr;
-				void onAction(const event::Action& e) override {
-					module->params[module->DIVMULT_KNOB_PARAM+0].setValue(float(valueNr));
-				}
+			static const std::string menuNames[45] = {
+				"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
+				"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"
 			};
-
-			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
-			for (int i = 0; i < 45; i++) {
-				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
-				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+0].getValue()) == i);
-				thisItem->module = module;
-				thisItem->valueNr = i;
-				menu->addChild(thisItem);
-			}
-		}
-	}
-};
-
-struct Clocker2DisplayDiv2 : TransparentWidget {
-	Clocker2 *module;
-	int frame = 0;
-	Clocker2DisplayDiv2() {
-	}
-
-	void onButton(const event::Button &e) override {
-
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 12);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue());
-				float tempXpos = 3;
-				if (tempValue > 13 && tempValue < 31)
-					tempXpos = 12.8;
-
-				if (tempValue < 22)
-					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-				else
-					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-
-				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-
-	void createContextMenu() {
-		Clocker2 *module = dynamic_cast<Clocker2 *>(this->module);
-		assert(module);
-
-		if (module) {
-			ui::Menu *menu = createMenu();
 
 			struct ThisItem : MenuItem {
 				Clocker2* module;
 				int valueNr;
+				int t;
 				void onAction(const event::Action& e) override {
-					module->params[module->DIVMULT_KNOB_PARAM+1].setValue(float(valueNr));
+					module->params[module->DIVMULT_KNOB_PARAM + t].setValue(float(valueNr));
 				}
 			};
 
-			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
 			for (int i = 0; i < 45; i++) {
 				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
-				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+1].getValue()) == i);
+				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue()) == i);
 				thisItem->module = module;
 				thisItem->valueNr = i;
+				thisItem->t = t;
 				menu->addChild(thisItem);
 			}
 		}
 	}
+	
 };
 
-struct Clocker2DisplayDiv3 : TransparentWidget {
-	Clocker2 *module;
-	int frame = 0;
-	Clocker2DisplayDiv3() {
-	}
-
-	void onButton(const event::Button &e) override {
-
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 12);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue());
-				float tempXpos = 3;
-				if (tempValue > 13 && tempValue < 31)
-					tempXpos = 12.8;
-
-				if (tempValue < 22)
-					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-				else
-					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-
-				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-
-	void createContextMenu() {
-		Clocker2 *module = dynamic_cast<Clocker2 *>(this->module);
-		assert(module);
-
-		if (module) {
-			ui::Menu *menu = createMenu();
-
-			struct ThisItem : MenuItem {
-				Clocker2* module;
-				int valueNr;
-				void onAction(const event::Action& e) override {
-					module->params[module->DIVMULT_KNOB_PARAM+2].setValue(float(valueNr));
-				}
-			};
-
-			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
-			for (int i = 0; i < 45; i++) {
-				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
-				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+2].getValue()) == i);
-				thisItem->module = module;
-				thisItem->valueNr = i;
-				menu->addChild(thisItem);
-			}
-		}
-	}
-};
-
-struct Clocker2DisplayDiv4 : TransparentWidget {
-	Clocker2 *module;
-	int frame = 0;
-	Clocker2DisplayDiv4() {
-	}
-
-	void onButton(const event::Button &e) override {
-
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 12);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue());
-				float tempXpos = 3;
-				if (tempValue > 13 && tempValue < 31)
-					tempXpos = 12.8;
-
-				if (tempValue < 22)
-					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-				else
-					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-
-				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-
-	void createContextMenu() {
-		Clocker2 *module = dynamic_cast<Clocker2 *>(this->module);
-		assert(module);
-
-		if (module) {
-			ui::Menu *menu = createMenu();
-
-			struct ThisItem : MenuItem {
-				Clocker2* module;
-				int valueNr;
-				void onAction(const event::Action& e) override {
-					module->params[module->DIVMULT_KNOB_PARAM+3].setValue(float(valueNr));
-				}
-			};
-
-			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
-			for (int i = 0; i < 45; i++) {
-				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
-				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+3].getValue()) == i);
-				thisItem->module = module;
-				thisItem->valueNr = i;
-				menu->addChild(thisItem);
-			}
-		}
-	}
-};
-
-struct Clocker2DisplayDiv5 : TransparentWidget {
-	Clocker2 *module;
-	int frame = 0;
-	Clocker2DisplayDiv5() {
-	}
-
-	void onButton(const event::Button &e) override {
-
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 12);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+4].getValue());
-				float tempXpos = 3;
-				if (tempValue > 13 && tempValue < 31)
-					tempXpos = 12.8;
-
-				if (tempValue < 22)
-					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-				else
-					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-
-				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-
-	void createContextMenu() {
-		Clocker2 *module = dynamic_cast<Clocker2 *>(this->module);
-		assert(module);
-
-		if (module) {
-			ui::Menu *menu = createMenu();
-
-			struct ThisItem : MenuItem {
-				Clocker2* module;
-				int valueNr;
-				void onAction(const event::Action& e) override {
-					module->params[module->DIVMULT_KNOB_PARAM+4].setValue(float(valueNr));
-				}
-			};
-
-			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
-			for (int i = 0; i < 45; i++) {
-				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
-				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+4].getValue()) == i);
-				thisItem->module = module;
-				thisItem->valueNr = i;
-				menu->addChild(thisItem);
-			}
-		}
-	}
-};
-
-struct Clocker2DisplayDiv6 : TransparentWidget {
-	Clocker2 *module;
-	int frame = 0;
-	Clocker2DisplayDiv6() {
-	}
-
-	void onButton(const event::Button &e) override {
-
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-			createContextMenu();
-			e.consume(this);
-		}
-	}
-
-	void drawLayer(const DrawArgs &args, int layer) override {
-		if (module) {
-			if (layer ==1) {
-				shared_ptr<Font> font = APP->window->loadFont(asset::plugin(pluginInstance, "res/DSEG14ClassicMini-BoldItalic.ttf"));
-				nvgFontSize(args.vg, 12);
-				nvgFontFaceId(args.vg, font->handle);
-				nvgTextLetterSpacing(args.vg, 0);
-
-				int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM+5].getValue());
-				float tempXpos = 3;
-				if (tempValue > 13 && tempValue < 31)
-					tempXpos = 12.8;
-
-				if (tempValue < 22)
-					nvgFillColor(args.vg, nvgRGBA(0xdd, 0x33, 0x33, 0xff)); 
-				else
-					nvgFillColor(args.vg, nvgRGBA(0x33, 0xdd, 0x33, 0xff)); 
-
-				nvgTextBox(args.vg, tempXpos, 15.5, 60, module->divMultDisplay[tempValue].c_str(), NULL);
-			}
-		}
-		Widget::drawLayer(args, layer);
-	}
-
-	void createContextMenu() {
-		Clocker2 *module = dynamic_cast<Clocker2 *>(this->module);
-		assert(module);
-
-		if (module) {
-			ui::Menu *menu = createMenu();
-
-			struct ThisItem : MenuItem {
-				Clocker2* module;
-				int valueNr;
-				void onAction(const event::Action& e) override {
-					module->params[module->DIVMULT_KNOB_PARAM+5].setValue(float(valueNr));
-				}
-			};
-
-			const std::string menuNames[45] = {"/256", "/128", "/64", "/48", "/32", "/24", "/17", "/16", "/15", "/14", "/13", "/12", "/11", "/10", "/9", "/8", "/7", "/6", "/5", "/4", "/3", "/2", "x1",
-								"x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17", "x24", "x32", "x48", "x64", "x128", "x256"};
-			for (int i = 0; i < 45; i++) {
-				ThisItem* thisItem = createMenuItem<ThisItem>(menuNames[i]);
-				thisItem->rightText = CHECKMARK(int(module->params[module->DIVMULT_KNOB_PARAM+5].getValue()) == i);
-				thisItem->module = module;
-				thisItem->valueNr = i;
-				menu->addChild(thisItem);
-			}
-		}
-	}
-};
 /*
 struct Clocker2DebugDisplay : TransparentWidget {
 	Clocker2 *module;
@@ -1433,54 +1639,15 @@ struct Clocker2Widget : ModuleWidget {
 			addChild(display);
 		}
 
-		{
-			Clocker2DisplayDiv1 *display = new Clocker2DisplayDiv1();
-			display->box.pos = mm2px(Vec(15.3, 80.2 - 23));
-			display->box.size = mm2px(Vec(15, 6.3));
-			display->module = module;
-			addChild(display);
+		for (int t = 0; t < 6; t++) {
+			{
+				Clocker2DisplayDiv *display = new Clocker2DisplayDiv(t);
+				display->box.pos = mm2px(Vec(15.5, 57.2+11*t));
+				display->box.size = mm2px(Vec(15, 6.3));
+				display->module = module;
+				addChild(display);
+			}
 		}
-
-		{
-			Clocker2DisplayDiv2 *display = new Clocker2DisplayDiv2();
-			display->box.pos = mm2px(Vec(15.3, 91.2 - 23));
-			display->box.size = mm2px(Vec(15, 6.3));
-			display->module = module;
-			addChild(display);
-		}
-
-		{
-			Clocker2DisplayDiv3 *display = new Clocker2DisplayDiv3();
-			display->box.pos = mm2px(Vec(15.3, 102.2 - 23));
-			display->box.size = mm2px(Vec(15, 6.3));
-			display->module = module;
-			addChild(display);
-		}
-
-		{
-			Clocker2DisplayDiv4 *display = new Clocker2DisplayDiv4();
-			display->box.pos = mm2px(Vec(15.3, 113.2 - 23));
-			display->box.size = mm2px(Vec(15, 6.3));
-			display->module = module;
-			addChild(display);
-		}
-
-		{
-			Clocker2DisplayDiv5 *display = new Clocker2DisplayDiv5();
-			display->box.pos = mm2px(Vec(15.3, 124.2 - 23));
-			display->box.size = mm2px(Vec(15, 6.3));
-			display->module = module;
-			addChild(display);
-		}
-
-		{
-			Clocker2DisplayDiv6 *display = new Clocker2DisplayDiv6();
-			display->box.pos = mm2px(Vec(15.3, 135.2 - 23));
-			display->box.size = mm2px(Vec(15, 6.3));
-			display->module = module;
-			addChild(display);
-		}
-
 
 		const float xExtClock = 7.5f;
 		const float xResetIn = 36.f;
@@ -1525,7 +1692,8 @@ struct Clocker2Widget : ModuleWidget {
 		const float yClockOut = 19.5f;
 		const float yResetOut = 36.f;		
 
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xExtClock, yExtClock)), module, Clocker2::EXTCLOCK_INPUT));
+		//addInput(createInputCentered<SickoInPort>(mm2px(Vec(xExtClock, yExtClock)), module, Clocker2::EXTCLOCK_INPUT));
+		addInput(createClocker2ClockInCentered<SickoClockInClocker2>(mm2px(Vec(xExtClock, yExtClock)), module, Clocker2::EXTCLOCK_INPUT));
 		
 		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xResetIn, yRstIn)), module, Clocker2::RESET_INPUT));
 		addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(xResetBut, yRstBut)), module, Clocker2::RESET_BUT_PARAM, Clocker2::RESET_BUT_LIGHT));
@@ -1544,13 +1712,23 @@ struct Clocker2Widget : ModuleWidget {
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn4)), module, Clocker2::DIVMULT_KNOB_PARAM+3));
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn5)), module, Clocker2::DIVMULT_KNOB_PARAM+4));
 		addParam(createParamCentered<SickoSmallKnob>(mm2px(Vec(xDivKnob, yDivKn6)), module, Clocker2::DIVMULT_KNOB_PARAM+5));
-
+/*
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn1)), module, Clocker2::DIVPW_KNOB_PARAM+0));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn2)), module, Clocker2::DIVPW_KNOB_PARAM+1));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker2::DIVPW_KNOB_PARAM+2));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker2::DIVPW_KNOB_PARAM+3));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn5)), module, Clocker2::DIVPW_KNOB_PARAM+4));
 		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xPwKnob, yDivKn6)), module, Clocker2::DIVPW_KNOB_PARAM+5));
+
+*/		
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn1)), module, Clocker2::DIVPW_KNOB_PARAM+0));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn2)), module, Clocker2::DIVPW_KNOB_PARAM+1));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn3)), module, Clocker2::DIVPW_KNOB_PARAM+2));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn4)), module, Clocker2::DIVPW_KNOB_PARAM+3));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn5)), module, Clocker2::DIVPW_KNOB_PARAM+4));
+		addParam(createParamCentered<SickoKnobClocker2>(mm2px(Vec(xPwKnob, yDivKn6)), module, Clocker2::DIVPW_KNOB_PARAM+5));
+
+
 
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg1)), module, Clocker2::DIVSWING_LIGHT+0));
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg2)), module, Clocker2::DIVSWING_LIGHT+1));
@@ -1559,7 +1737,8 @@ struct Clocker2Widget : ModuleWidget {
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg5)), module, Clocker2::DIVSWING_LIGHT+4));
 		addChild(createLightCentered<TinyLight<RedLight>>(mm2px(Vec(xDivLg, yDivLg6)), module, Clocker2::DIVSWING_LIGHT+5));
 		
-		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yClockOut)), module, Clocker2::CLOCK_OUTPUT));
+		//addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yClockOut)), module, Clocker2::CLOCK_OUTPUT));
+		addOutput(createClocker2ClockOutCentered<SickoClockOutClocker2>(mm2px(Vec(xDivOut, yClockOut)), module, Clocker2::CLOCK_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yResetOut)), module, Clocker2::RESET_OUTPUT));
 
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xDivOut, yDivKn1)), module, Clocker2::DIVMULT_OUTPUT+0));
@@ -1594,9 +1773,9 @@ struct Clocker2Widget : ModuleWidget {
 		};
 
 		menu->addChild(createMenuLabel("External Clock"));
-		std::string ppqnNames[7] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN"};
+		std::string ppqnNames[8] = {"1 PPQN", "2 PPQN", "4 PPQN", "8 PPQN", "12 PPQN", "16 PPQN", "24 PPQN", "48 PPQN"};
 		menu->addChild(createSubmenuItem("Resolution", ppqnNames[module->ppqn], [=](Menu * menu) {
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < 8; i++) {
 				PpqnItem* ppqnItem = createMenuItem<PpqnItem>(ppqnNames[i]);
 				ppqnItem->rightText = CHECKMARK(module->ppqn == i);
 				ppqnItem->module = module;
@@ -1660,6 +1839,28 @@ struct Clocker2Widget : ModuleWidget {
 			menu->addChild(createBoolPtrMenuItem("Reset Bar", "", &module->resetOnStop));
 			menu->addChild(createBoolPtrMenuItem("Pulse to RST out", "", &module->resetPulseOnStop));
 		}));
+
+//		menu->addChild(createBoolPtrMenuItem("OUTs Pulse on RST", "", &module->outPulseOnReset));
+
+		menu->addChild(new MenuSeparator());
+		//menu->addChild(createBoolPtrMenuItem("CV clock IN", "", &module->cvClockIn));
+		menu->addChild(createMenuItem("CV clock IN", CHECKMARK(module->cvClockIn), [=]() {
+			module->cvClockIn = !module->cvClockIn;
+			module->prevCvClockInValue = 11.f;
+			//module->syncPulseTime = 0.0;
+			//module->rstCvIn();
+			module->prevCvClockInValue = 11.f;
+		}));
+		//menu->addChild(createBoolPtrMenuItem("CV clock OUT", "", &module->cvClockOut));
+		menu->addChild(createMenuItem("CV clock OUT", CHECKMARK(module->cvClockOut), [=]() {
+			module->cvClockOut = !module->cvClockOut;
+			module->prevCvClockInValue = 11.f;
+			module->prevBpm = -1;
+		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("DIV/MULT mouse controls", "", &module->divControls));
+		
 	}
 };
 

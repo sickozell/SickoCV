@@ -2014,9 +2014,9 @@ struct TrigSeq8xDisplay : TransparentWidget {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
 					nvgFontSize(args.vg, 32);
 					if (currentDisplay.size() == 2)
-						nvgTextBox(args.vg, 8, 30, 80, currentDisplay.c_str(), NULL);
+						nvgTextBox(args.vg, 9, 31, 80, currentDisplay.c_str(), NULL);
 					else
-						nvgTextBox(args.vg, 16, 30, 80, currentDisplay.c_str(), NULL);
+						nvgTextBox(args.vg, 16, 31, 80, currentDisplay.c_str(), NULL);
 
 				} else {
 					nvgFillColor(args.vg, nvgRGBA(COLOR_LCD_GREEN));
@@ -2090,10 +2090,11 @@ struct TrigSeq8xWidget : ModuleWidget {
 		const float xSet = 97.5f;
 		const float xAuto = 109.7f;
 
-		const float xRecallBut = 129.f;
-		//const float xRecallIn = 133.5f;
+		//const float xRecallBut = 129.f;
+		//const float xStore = 144.4f;
 
-		const float xStore = 144.4f;
+		const float xRecallBut = 127.5f;
+		const float xStore = 142.9f;
 
 		const float yStart = 37.5f;
 		const float yDelta = 11.2f;

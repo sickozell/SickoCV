@@ -18,6 +18,10 @@
 #define CLICK_STANDARD 0
 #define CLICK_CUSTOM 3
 
+#define BPM_BLUE	0x55, 0xff, 0xff
+#define BPM_YELLOW	0xdd, 0xdd, 0x33
+#define BPM_GREEN	0x33, 0xdd, 0x33
+
 #include "plugin.hpp"
 #include "osdialog.h"
 #if defined(METAMODULE)
@@ -129,8 +133,8 @@ struct Clocker : Module {
 	const unsigned int minSamplesToLoad = 9;
 
 	vector<float> playBuffer[2];
-	vector<float> tempBuffer;
-	vector<float> tempBuffer2;
+//	vector<float> tempBuffer;
+//	vector<float> tempBuffer2;
 
 	bool fileLoaded[2] = {false, false};
 	bool fileFound[2] = {false, false};
@@ -273,6 +277,8 @@ struct Clocker : Module {
 
 	bool divSwing[4] = {false, false, false, false};
 
+	drwav_uint64 recordingLimit = 48000 * 2 * 2; // set memory allocation limit to 2 seconds)
+
 	Clocker() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		
@@ -359,6 +365,7 @@ struct Clocker : Module {
 			divClockSample[d] = 1.0;
 			divMaxSample[d][0] = 0.0;
 			divMaxSample[d][1] = 0.0;
+			divCount[d] = 1;
 			divPulse[d] = false;
 			divPulseTime[d] = false;
 			divCount[d] = 1;
@@ -612,9 +619,11 @@ struct Clocker : Module {
 	void loadSample(std::string path, int slot, bool customClick) {
 		z1 = 0; z2 = 0;
 
-		unsigned int c;
-		unsigned int sr;
+		//unsigned int c;
+		//unsigned int sr;
 		//drwav_uint64 tsc;
+		uint32_t c;
+		uint32_t sr;
 		uint64_t tsc;
 		//float* pSampleData;
 		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
@@ -624,13 +633,25 @@ struct Clocker : Module {
 			fileFound[slot] = true;
 			sampleRate[slot] = sr * 2;
 			
-			playBuffer[slot].clear();
+			double resampleCoeff = APP->engine->getSampleRate() / sr;
 
-			tempBuffer.clear();
-			tempBuffer2.clear();
+			if (tsc > recordingLimit / 2)
+				tsc = recordingLimit / 2;	// set memory allocation limit
 
-			if (tsc > 96000)
-				tsc = 96000;	// set memory allocation limit to 96000 samples*/
+			uint64_t newTsc = ceil((double)tsc * resampleCoeff);
+
+// begin changes for metamodule
+//			tempBuffer.clear();
+//			tempBuffer2.clear();
+			const auto numSamples = c == 2 ? newTsc : newTsc * 2;
+			vector<float>().swap(playBuffer[slot]);
+			playBuffer[slot].reserve(numSamples+10);
+
+			vector<float> tempBuffer;
+			tempBuffer.reserve(numSamples+10);
+			vector<float> tempBuffer2;
+			tempBuffer2.reserve(numSamples+10);
+// end changes for metamodule
 
 			if (sr == APP->engine->getSampleRate()) {			//  **************************   NO RESAMPLE   ************************
 				for (unsigned int i=0; i < tsc; i = i + c) {
@@ -638,7 +659,7 @@ struct Clocker : Module {
 				}
 				totalSampleC[slot] = playBuffer[slot].size();
 				totalSamples[slot] = totalSampleC[slot]-1;
-//				drwav_free(pSampleData);
+				free(pSampleData);
 
 				sampleRate[slot] = APP->engine->getSampleRate();
 
@@ -648,7 +669,7 @@ struct Clocker : Module {
 					tempBuffer.push_back(0);
 				}
 
-//				drwav_free(pSampleData);
+				free(pSampleData);
 
 				drwav_uint64 tempSampleC = tempBuffer.size();
 				drwav_uint64 tempSamples = tempSampleC-1;
@@ -722,8 +743,12 @@ struct Clocker : Module {
 
 			}
 
-			tempBuffer.clear();
-			tempBuffer2.clear();
+// begin changes for metamodule
+			//vector<float>().swap(tempBuffer);
+			//vector<float>().swap(tempBuffer2);
+			//tempBuffer.reserve(0);
+			//tempBuffer2.reserve(0);
+// end changes for metamodule
 
 			char* pathDup = strdup(path.c_str());
 
@@ -735,8 +760,6 @@ struct Clocker : Module {
 			}
 			fileLoaded[slot] = true;
 			free(pathDup);
-
-			free(pSampleData);  // non dimenticare!
 
 		} else {
 			fileFound[slot] = false;
@@ -753,8 +776,12 @@ struct Clocker : Module {
 		if (clickSelect == CLICK_CUSTOM) {
 			fileFound[slot] = false;
 			fileLoaded[slot] = false;
-			playBuffer[slot].clear();
 			totalSampleC[slot] = 0;
+// begin changes for metamodule
+			//playBuffer[slot].clear();
+			vector<float>().swap(playBuffer[slot]);
+			//playBuffer[slot].reserve(0);
+// end changes for metamodule
 		}
 	}
 
@@ -900,6 +927,7 @@ struct Clocker : Module {
 					divClockSample[d] = 1.0;
 					divMaxSample[d][0] = 0.0;
 					divMaxSample[d][1] = 0.0;
+					divCount[d] = 1;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 				midBeatPlayed = false;
@@ -923,6 +951,7 @@ struct Clocker : Module {
 					divClockSample[d] = 1.0;
 					divMaxSample[d][0] = 0.0;
 					divMaxSample[d][1] = 0.0;
+					divCount[d] = 1;
 					outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 				}
 				midBeatPlayed = false;
@@ -956,6 +985,7 @@ struct Clocker : Module {
 				divClockSample[d] = 1.0;
 				divMaxSample[d][0] = 0.0;
 				divMaxSample[d][1] = 0.0;
+				divCount[d] = 1;
 				outputs[DIVMULT_OUTPUT+d].setVoltage(0.f);
 			}
 			midBeatPlayed = false;

@@ -137,6 +137,15 @@ struct DrumPlayerMini : Module {
 
 	bool logDecay = false;
 
+// begin changes for metamodule
+#if defined(METAMODULE)
+	const drwav_uint64 recordingLimit = 48000 * 60 * 2 * 2; // 2mins mono, 1min stereo limit on MM
+#else
+	const drwav_uint64 recordingLimit = 48000 * 60 * 20 * 2; // set memory allocation limit to 20mins at 48.000khz MONO)
+	// const drwav_uint64 recordingLimit = 48000 * 10; // 10 sec for test purposes
+#endif
+// end changes for metamodule
+
 	static constexpr float minStageTime = 1.f;  // in milliseconds
 	static constexpr float maxStageTime = 10000.f;  // in milliseconds
 	
@@ -195,26 +204,30 @@ struct DrumPlayerMini : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
-		//for (int slot = 0; slot < 4; slot++) {
-			if (!fileLoaded && storedPath != "") {
-				std::string patchFile = system::join(getPatchStorageDirectory(), "slot.wav");
-				loadFromPatch = true;
-				loadSample(patchFile);
-			}
-		//}
+// begin changes for metamodule
+#if !defined(METAMODULE)
+		if (!fileLoaded && storedPath != "") {
+			std::string patchFile = system::join(getPatchStorageDirectory(), "slot.wav");
+			loadFromPatch = true;
+			loadSample(patchFile);
+		}
+#endif
+// end changes for metamodule
 		Module::onAdd(e);
 	}
 
 	void onSave(const SaveEvent& e) override {
+// begin changes for metamodule
+#if !defined(METAMODULE)
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		if (sampleInPatch) {
-			//for (int slot = 0; slot < 4; slot++) {
-				if (fileLoaded) {
-					std::string patchFile = system::join(createPatchStorageDirectory(), "slot.wav");
-					saveSample(patchFile);
-				}
-			//}
+			if (fileLoaded) {
+				std::string patchFile = system::join(createPatchStorageDirectory(), "slot.wav");
+				saveSample(patchFile);
+			}
 		}
+#endif
+// end changes for metamodule
 		Module::onSave(e);
 	}
 
@@ -239,7 +252,14 @@ struct DrumPlayerMini : Module {
 			interpolationMode = json_integer_value(interpolationJ);
 		json_t* antiAliasJ = json_object_get(rootJ, "AntiAlias");
 		if (antiAliasJ)
+// begin changes for metamodule
+#if defined (METAMODULE)
+			antiAlias = 1;
+#else
 			antiAlias = json_integer_value(antiAliasJ);
+#endif
+// end changes for metamodule
+
 /*		json_t* outsModeJ = json_object_get(rootJ, "OutsMode");
 		if (outsModeJ)
 			outsMode = json_integer_value(outsModeJ);*/
@@ -457,9 +477,11 @@ struct DrumPlayerMini : Module {
 
 	void loadSample(std::string fromPath) {
 		std::string path = fromPath;
-		unsigned int c;
-		unsigned int sr;
+		//unsigned int c;
+		//unsigned int sr;
 		//drwav_uint64 tsc;
+		uint32_t c;
+		uint32_t sr;
 		uint64_t tsc;
 		//float* pSampleData;
 		//pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &tsc);
@@ -470,12 +492,20 @@ struct DrumPlayerMini : Module {
 			//channels = c;
 			sampleRate = sr * 2;
 			calcBiquadLpf(20000.0, sampleRate, 1);
-			playBuffer[0].clear();
-			playBuffer[1].clear();
 
-			// metamodule change
+			if (tsc > recordingLimit / 2)
+				tsc = recordingLimit / 2;	// set memory allocation limit
+
+// begin changes for metamodule
+			//playBuffer[0].clear();
+			//playBuffer[1].clear();
+			// Shrink playBuffer to fit:
+ 			const auto numSamples = channels == 2 ? tsc : tsc * 2;
 			vector<float>().swap(playBuffer[0]);
 			vector<float>().swap(playBuffer[1]);
+			playBuffer[0].reserve(numSamples+10);
+ 			playBuffer[1].reserve(numSamples+10);
+// end changes for metamodule
 
 			for (unsigned int i = 0; i < tsc; i = i + c) {
 				playBuffer[0].push_back(pSampleData[i] * 5);
@@ -483,7 +513,8 @@ struct DrumPlayerMini : Module {
 			}
 			totalSampleC = playBuffer[0].size();
 			totalSamples = totalSampleC-1;
-//			drwav_free(pSampleData);	// unused (old dr_wav)
+
+			free(pSampleData);
 
 			for (unsigned int i = 1; i < totalSamples; i = i + 2)		// averaging oversampled vector
 				playBuffer[0][i] = playBuffer[0][i-1] * .5f + playBuffer[0][i+1] * .5f;
@@ -494,6 +525,13 @@ struct DrumPlayerMini : Module {
 				playBuffer[1].push_back(biquadLpf(playBuffer[0][i]));
 
 			sampleCoeff = sampleRate / (APP->engine->getSampleRate());		// the % distance between samples at speed 1x
+
+// begin changes for metamodule
+#if defined(METAMODULE)
+			vector<float>().swap(playBuffer[0]);
+ 			//playBuffer[0].reserve(0);
+#endif
+// end changes for metamodule
 
 			if (loadFromPatch)
 				path = storedPath;
@@ -549,15 +587,22 @@ struct DrumPlayerMini : Module {
 // -------------------------------------------------------------------------------------------------------------------------------
 
 	void saveSample(std::string path) {
+
+// begin changes for metamodule
+		int tempAlias = 0;
+#if defined (METAMODULE)
+		tempAlias = 1;
+#endif
 		drwav_uint64 samples;
 
-		samples = playBuffer[0].size();
+		samples = playBuffer[tempAlias].size();
 
 		std::vector<float> data;
 
-		for (unsigned int i = 0; i <= playBuffer[0].size(); i = i + 2)
-			data.push_back(playBuffer[0][i] / 5);
-			//data.push_back(playBuffer[0][i]);
+		for (unsigned int i = 0; i <= playBuffer[tempAlias].size(); i = i + 2)
+			data.push_back(playBuffer[tempAlias][i] / 5);
+			//data.push_back(playBuffer[slot][tempAlias][i]);
+// end changes for metamodule
 
 		drwav_data_format format;
 		format.container = drwav_container_riff;
@@ -597,14 +642,16 @@ struct DrumPlayerMini : Module {
 		storedPath = "";
 		fileDescription = "--none--";
 		fileFound = false;
-		playBuffer[0].clear();
-		playBuffer[1].clear();
-
-		// metamodule change
+		totalSampleC = 0;
+// begin changes for metamodule
+//		playBuffer[0].clear();
+//		playBuffer[1].clear();
 		vector<float>().swap(playBuffer[0]);
 		vector<float>().swap(playBuffer[1]);
+		//playBuffer[0].reserve(0);
+ 		//playBuffer[1].reserve(0);
+ // end changes for metamodule
 
-		totalSampleC = 0;
 	}
 
 	static float convertCVToSec(float cv) {		
@@ -1054,10 +1101,22 @@ struct DrumPlayerMiniWidget : ModuleWidget {
 			}
 		}));
 
+// begin changes for metamodule
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Anti-aliasing filter (ON)"));
+#else
 		menu->addChild(createBoolPtrMenuItem("Anti-aliasing filter", "", &module->antiAlias));
+#endif
+// end changes for metamodule
 
 		menu->addChild(new MenuSeparator());
-		menu->addChild(createBoolPtrMenuItem("Store Samples in Patch", "", &module->sampleInPatch));
+// begin changes for metamodule
+#if defined (METAMODULE)
+		menu->addChild(createMenuLabel("Store Sample in Patch (OFF)"));
+#else
+		menu->addChild(createBoolPtrMenuItem("Store Sample in Patch", "", &module->sampleInPatch));
+#endif
+// end changes for metamodule
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createSubmenuItem("Tips", "", [=](Menu * menu) {

@@ -1,7 +1,40 @@
-# SickoCV v2.7.3
+# SickoCV v2.7.4-beta29
+VCV Rack plugin modules (BETA TEST AREA)  
+Compile or **download binary for ANY platform** on the releases page  
+
+## IMPORTANT INSTALLATION NOTE
+If you don't use VCV development environment and run regular VCV install,  
+the new modules will be shown up only if you have a **full subscription** to Sickozell plugin modules.  
+
+So if you have added only some Sickozell modules to VCV you will not see the new ones.
+
+Please check your subscription on https://library.vcvrack.com/plugins and look for the SickoCV line that has to be like this:  
+![subscription](https://user-images.githubusercontent.com/80784296/207971796-96163a4b-6fa9-4073-bda8-9df1e61f900b.JPG)
+
+## Current modules in beta testing:
+- 
+
+## **to do list:** 
+- nothing in queue
+
+## **changelog** 
+- added stepStation and trigStation modules
+- added sampleDelay module
+- added cvMeter module
+- added randMod7 and randMod7compact modules
+- stepSeq8x / trigSeq8x: adjusted RECL and STOR buttons placement
+- all sampler modules: improved memory allocation management
+- slewer/slewer mini: inverted shapes on shape knob
+- sickoSampler: fixed a bug that crashes Rack when clearing the sample via trig input during playback
+- sickoSampler2: fixed a bug drawing the playhead outside the module
+- clocker2: added div/mult mouse control, added CV clock feature, added port/param context menus, fixed clock division bug on reset, changed bpm clock color display
+- ad mini: loop status recorded in patch
+- merged repository with 4ms Metamodule repo
+
+# SickoCV v2.7.4
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 3](https://github.com/user-attachments/assets/d89bd63a-28d8-4ecd-8871-b763f57085b4)
+![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/29f84130-ed55-4bd0-bb62-0d67f4682ae0)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -14,6 +47,7 @@ VCV Rack plugin modules
 - [bToggler8+](#btoggler8-1)
 - [calcs](#calcs)
 - [clocker / clocker2](#clocker--clocker2)
+- [CV meter](#cvmeter)
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
 - [drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini](#drumplayer--drumplayer--drumplayerxtra--drumplayer-mini)
@@ -25,6 +59,8 @@ VCV Rack plugin modules
 - [parking](#parking)
 - [polyMuter8 / polyMuter8+ / polyMuter16 / polyMuter16+](#polymuter8--polymuter8--polymuter16--polymuter16)
 - [randLoops / randLoops8](#randLoops--randLoops8)
+- [randMod7 / randMod7Compact](#randMod7--randMod7Compact)
+- [sampleDelay](#sampleDelay)
 - [shifter](#shifter)
 - [sickoAmp](#sickoamp)
 - [sickoCrosser / sickoCrosser4](#sickocrosser--sickocrosser4)
@@ -36,6 +72,7 @@ VCV Rack plugin modules
 - [simpleSeq4](#simpleseq4)
 - [slewer / slewer mini](#slewer--slewer-mini)
 - [stepSeq / stepSeq+ / stepSeq8x / trigSeq / trigSeq+ / trigSeq8x](#stepSeq--stepSeq--stepSeq8x--trigSeq--trigSeq--trigSeq8x)
+- [stepStation / trigStation](#stepStation--trigStation)
 - [switcher / switcherSt / switcher8](#switcher--switcherst--switcher8)
 - [toggler / toggler Compact](#toggler--toggler-compact)
 - [wavetabler](#wavetabler)
@@ -339,6 +376,33 @@ When ticked, BAR pulses on the BAR output are duplicated on the BEAT output.
 - **On Stop**  
 This submenu is the same as the previous one, but when the Run Button is switched off.  
 Please note that "On Stop/Reset bar" option sets the clock gate output to low if clocker is currently sending a high gate.  
+
+#### Clocker2 EXTRA FEATURES
+
+Clocker2 can manage bpm cv input, instead of commonly used clock pulses, for solid sync with other clocker2 modules.  
+
+In context menu "CV clock IN" and "CV clock OUT" options can respectively set input/output port configuration.  
+Easy access to port configuration is achieved by right-clicking on the port to be configured.  
+
+![clocker2sync](https://github.com/user-attachments/assets/c386b190-e615-4ec4-aee0-83d68d9bb0e4)  
+
+This is an example to solid synchronization between two clocker2.  
+[Download example](./examples/clocker2sync.vcvs?raw=true) (right-click -> save link as)  
+
+BPM color display:
+- Internal Clock : YELLOW
+- External Pulse Clock : BLUE
+- External CV Clock : GREEN
+
+Clicking or right-clicking the div/mult displays will scroll the div/mult knob. It can be turned to classic mode with all the options by unticking "DIV/MULT mouse controls" option in the context menu.
+
+
+[back to top](#table-of-contents)
+
+## CvMeter
+### Shows input voltage, v/oct note, midi values, bpm and sample distance between two triggers or cv change from two different inputs
+
+![cvmeter](https://github.com/user-attachments/assets/e486c1ed-3f0e-41d2-94e5-93673536642a)
 
 [back to top](#table-of-contents)
 
@@ -741,8 +805,30 @@ randLoops8 is basically a 8-track randomLoops with limited functions, but with a
 
 [back to top](#table-of-contents)
 
+## randMod7 / randMod7Compact
+### 7 random smooth cv generator
+
+![randmod](https://github.com/user-attachments/assets/da3733a4-9981-454b-b18d-fd4625decf08)
+
+#### - INSTRUCTIONS
+randMod modules outputs 7 smoothed random voltages based on a common rate knob and a divider/multiplier each track.
+On each track it is possible to set a min and max voltage range, the default is 0/10v.
+
+The magnet point switch (Lower, Middle, Upper) sets the point where the randomness will tend to, in combination with the magnet strength knob and CV input
+
+The compact version of randMod7 has only the div/mult knob on each track. You can set the output voltage range via the Uni/Bipolar button. Common Magnet point and Strength are set via context menu.
+
+[back to top](#table-of-contents)
+
+## sampleDelay
+### 3 signal delay up to 5 samples
+
+![sampledelay](https://github.com/user-attachments/assets/d7ca49e3-5658-4036-923c-d5f70246ff5d)
+
+[back to top](#table-of-contents)
+
 ## shifter
-### 64 selectable stages shift register
+### 64 selectable stages shift registers
 #### - DESCRIPTION
 - 64 stages shift register that outputs only the selected stage controlled by knob/CV with attenuverter
 - Trigger delay to adjust the 1-sample latency of VCV cables
@@ -817,9 +903,11 @@ sickoLooper is inspired by hardware looper devices with most of their features i
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
 
-Download [ENGLISH user manual](./docs/sickoLooper%20user%20manual%20%5BEN%5D.pdf?raw=true)
+Download [ENGLISH user manual](./docs/sickoLooper%20user%20manual%20EN.pdf?raw=true)
 
-Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20%5BIT%5D.pdf?raw=true)
+Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20IT.pdf?raw=true)
+
+If errors occurs during download please right-click on the link above and "Save Link As"
 
 [back to top](#table-of-contents)
 
@@ -1188,6 +1276,24 @@ Plus versions only:
 
 [back to top](#table-of-contents)
 
+## stepStation / trigStation
+### 8 independent track 16 step/trigger sequencer with configurable user inputs/knobs and presets
+
+![stepStation](https://github.com/user-attachments/assets/3bb7935b-9a6a-4a1b-ba13-c02acca6b1c2)
+![trigStation](https://github.com/user-attachments/assets/0e3b6a0a-16a1-4cd4-9d5e-cfb1fb6c4f6e)
+
+
+#### - MANUALS
+Due to the complexity of these modules, a PDF user manual has been written
+
+![stepStation](https://github.com/user-attachments/assets/f1383ba1-7600-4458-9605-8657d57906c0)
+
+![trigStation](https://github.com/user-attachments/assets/0c4d9988-4dc3-4d43-9d2e-dcc595c9952f)
+
+If errors occurs during download please right-click on the link above and "Save Link As"
+
+[back to top](#table-of-contents)
+
 ## switcher / switcherSt / switcher8
 ### 2>1 switch, 1>2 router, 2 signal swapper, mute, flip flop, toggle gate
 #### - DESCRIPTION
@@ -1329,6 +1435,7 @@ Please refer to sickoPlayer documentation.
 ## CREDITS
 The Component Library graphics for these modules are copyright © VCV and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)  
 
+Thanks to [Dan Green](https://forum.4ms.info/u/danngreen/summary) from [4ms](https://4mscompany.com/) for his precious help in developing the metamodule porting of this plugin, general optimization and suggestions.  
 A very big thanks to [Omri Cohen](https://omricohen-music.com/) for developing help and support  
 Thanks to [Squinkylabs](https://github.com/squinkylabs), [Firo Lightfog](https://github.com/firolightfog) and [AuxMux](https://instagram.com/aux.mux) for help and testings, and all the [Vcv community](https://community.vcvrack.com)  
 Thanks to [Clément Foulc](https://github.com/cfoulc) for creating [cfPlayer](https://library.vcvrack.com/cf/PLAYER), which was the basis and inspiration for writing all the sampler modules in this collection  

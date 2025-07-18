@@ -1,0 +1,348 @@
+{
+  "modules": [
+    {
+      "id": 2881928564584150,
+      "plugin": "SickoCV",
+      "model": "Clocker2",
+      "version": "2.7.4-beta29",
+      "params": [
+        {
+          "value": 770.0,
+          "id": 0
+        },
+        {
+          "value": 0.5,
+          "id": 1
+        },
+        {
+          "value": 1.0,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 22.0,
+          "id": 4
+        },
+        {
+          "value": 23.0,
+          "id": 5
+        },
+        {
+          "value": 24.0,
+          "id": 6
+        },
+        {
+          "value": 25.0,
+          "id": 7
+        },
+        {
+          "value": 29.0,
+          "id": 8
+        },
+        {
+          "value": 37.0,
+          "id": 9
+        },
+        {
+          "value": 0.5,
+          "id": 10
+        },
+        {
+          "value": 0.5,
+          "id": 11
+        },
+        {
+          "value": 0.5,
+          "id": 12
+        },
+        {
+          "value": 0.5,
+          "id": 13
+        },
+        {
+          "value": 0.5,
+          "id": 14
+        },
+        {
+          "value": 0.5,
+          "id": 15
+        }
+      ],
+      "leftModuleId": 2247869326562579,
+      "rightModuleId": 1076218746004712,
+      "data": {
+        "divControls": true,
+        "ppqn": 0,
+        "ResetOnRun": true,
+        "ResetPulseOnRun": false,
+        "ResetOnStop": true,
+        "ResetPulseOnStop": false,
+        "Swing1": false,
+        "Swing2": false,
+        "Swing3": false,
+        "Swing4": false,
+        "Swing5": false,
+        "Swing6": false,
+        "cvClockIn": false,
+        "cvClockOut": true
+      },
+      "pos": [
+        -65,
+        -3
+      ]
+    },
+    {
+      "id": 1076218746004712,
+      "plugin": "SickoCV",
+      "model": "Clocker2",
+      "version": "2.7.4-beta29",
+      "params": [
+        {
+          "value": 1200.0,
+          "id": 0
+        },
+        {
+          "value": 0.5,
+          "id": 1
+        },
+        {
+          "value": 1.0,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 21.0,
+          "id": 4
+        },
+        {
+          "value": 20.0,
+          "id": 5
+        },
+        {
+          "value": 19.0,
+          "id": 6
+        },
+        {
+          "value": 15.0,
+          "id": 7
+        },
+        {
+          "value": 7.0,
+          "id": 8
+        },
+        {
+          "value": 2.0,
+          "id": 9
+        },
+        {
+          "value": 0.5,
+          "id": 10
+        },
+        {
+          "value": 0.5,
+          "id": 11
+        },
+        {
+          "value": 0.5,
+          "id": 12
+        },
+        {
+          "value": 0.5,
+          "id": 13
+        },
+        {
+          "value": 0.5,
+          "id": 14
+        },
+        {
+          "value": 0.5,
+          "id": 15
+        }
+      ],
+      "leftModuleId": 2881928564584150,
+      "rightModuleId": 895889605620686,
+      "data": {
+        "divControls": true,
+        "ppqn": 0,
+        "ResetOnRun": true,
+        "ResetPulseOnRun": false,
+        "ResetOnStop": true,
+        "ResetPulseOnStop": false,
+        "Swing1": false,
+        "Swing2": false,
+        "Swing3": false,
+        "Swing4": false,
+        "Swing5": false,
+        "Swing6": false,
+        "cvClockIn": true,
+        "cvClockOut": false
+      },
+      "pos": [
+        -54,
+        -3
+      ]
+    },
+    {
+      "id": 2247869326562579,
+      "plugin": "Fundamental",
+      "model": "Pulses",
+      "version": "2.6.2",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.0,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        },
+        {
+          "value": 0.0,
+          "id": 7
+        },
+        {
+          "value": 0.0,
+          "id": 8
+        },
+        {
+          "value": 0.0,
+          "id": 9
+        }
+      ],
+      "rightModuleId": 2881928564584150,
+      "pos": [
+        -73,
+        -3
+      ]
+    },
+    {
+      "id": 895889605620686,
+      "plugin": "Fundamental",
+      "model": "Scope",
+      "version": "2.6.2",
+      "params": [
+        {
+          "value": 0.0,
+          "id": 0
+        },
+        {
+          "value": 0.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": -3.0,
+          "id": 3
+        },
+        {
+          "value": -1.5849624872207642,
+          "id": 4
+        },
+        {
+          "value": 0.0,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        },
+        {
+          "value": 1.0,
+          "id": 7
+        }
+      ],
+      "leftModuleId": 1076218746004712,
+      "pos": [
+        -43,
+        -3
+      ]
+    }
+  ],
+  "cables": [
+    {
+      "id": 5721473681546849,
+      "outputModuleId": 2247869326562579,
+      "outputId": 10,
+      "inputModuleId": 2881928564584150,
+      "inputId": 1,
+      "color": "#8b4ade"
+    },
+    {
+      "id": 3499542294107551,
+      "outputModuleId": 2247869326562579,
+      "outputId": 12,
+      "inputModuleId": 2881928564584150,
+      "inputId": 2,
+      "color": "#3695ef"
+    },
+    {
+      "id": 6859956304031498,
+      "outputModuleId": 2881928564584150,
+      "outputId": 0,
+      "inputModuleId": 1076218746004712,
+      "inputId": 0,
+      "color": "#00b56e"
+    },
+    {
+      "id": 692738971839562,
+      "outputModuleId": 2247869326562579,
+      "outputId": 10,
+      "inputModuleId": 1076218746004712,
+      "inputId": 1,
+      "color": "#8b4ade"
+    },
+    {
+      "id": 1747697061704082,
+      "outputModuleId": 2247869326562579,
+      "outputId": 12,
+      "inputModuleId": 1076218746004712,
+      "inputId": 2,
+      "color": "#3695ef"
+    },
+    {
+      "id": 8175423538914656,
+      "outputModuleId": 2881928564584150,
+      "outputId": 2,
+      "inputModuleId": 895889605620686,
+      "inputId": 0,
+      "color": "#00b56e"
+    },
+    {
+      "id": 5826836905564667,
+      "outputModuleId": 1076218746004712,
+      "outputId": 2,
+      "inputModuleId": 895889605620686,
+      "inputId": 1,
+      "color": "#f3374b"
+    }
+  ]
+}
