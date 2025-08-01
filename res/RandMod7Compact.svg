@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="4.5719924"
-     inkscape:cx="41.666736"
-     inkscape:cy="55.665009"
+     inkscape:zoom="2.2859962"
+     inkscape:cx="-62.554785"
+     inkscape:cy="53.149695"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
@@ -703,13 +703,13 @@
     <rect
        style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect2138"
-       width="17.138765"
+       width="16.525663"
        height="5.229661"
-       x="7.1838379"
+       x="7.7969418"
        y="1.2143376"
        ry="1.2"
        inkscape:label="header rect"
-       rx="1.1999999" />
+       rx="1.2" />
     <rect
        style="display:inline;fill:#00000a;fill-opacity:1;stroke:#666699;stroke-width:0.381932;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect1447-8-1"
@@ -721,16 +721,16 @@
        ry="1.2056972" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:end;text-anchor:end;display:inline;fill:#ffffff;stroke-width:0.264583"
-       x="23.095407"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;display:none;fill:#ffffff;stroke-width:0.264583"
+       x="16.258211"
        y="5.2182307"
        id="text1341"
-       inkscape:label="randMod7"><tspan
+       inkscape:label="rMod"><tspan
          sodipodi:role="line"
          id="tspan1339"
-         style="font-size:3.175px;text-align:end;text-anchor:end;fill:#ffffff;stroke-width:0.264583"
-         x="23.095407"
-         y="5.2182307">rndM7</tspan></text>
+         style="font-size:3.175px;text-align:center;text-anchor:middle;fill:#ffffff;stroke-width:0.264583"
+         x="16.258211"
+         y="5.2182307">rMod7</tspan></text>
     <g
        aria-label="skz"
        id="text3096"
@@ -751,10 +751,10 @@
          id="path3104" />
     </g>
     <path
-       d="M 8.8079077,5.2182307 V 3.2338558 h 1.9843753 v 0.3968749 h 0.396875 v 0.396875 h -0.79375 V 3.6307307 H 9.6016577 v 1.5875 z m 2.7781253,0 V 3.2338558 h 1.984375 v 0.3968749 h 0.396875 v 1.5875 h -0.79375 v -1.5875 h -0.79375 v 1.5875 z m 3.175,0 v -0.396875 h -0.396875 v -0.79375 h 0.396875 v -0.396875 h 1.190625 V 2.8369808 h 0.79375 v 2.3812499 z m 0.396875,-0.396875 h 0.79375 v -0.79375 h -0.79375 z m 1.984375,0.396875 V 2.4401058 h 0.79375 v 0.396875 h 0.396875 v 0.396875 h 0.396875 v -0.396875 h 0.396875 v -0.396875 h 0.79375 v 2.7781249 h -0.79375 v -1.5875 h -0.396875 v 0.396875 h -0.396875 v -0.396875 h -0.396875 v 1.5875 z m 3.968749,0 v -1.5875 h 0.396875 V 3.2338558 h 0.396875 v -0.396875 h -0.79375 v 0.396875 h -0.79375 v -0.79375 h 2.38125 v 0.79375 h -0.396875 v 0.3968749 h -0.396875 v 1.5875 z"
-       id="text1"
-       style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:end;text-anchor:end;fill:#ffffff;stroke-width:0.264583"
-       inkscape:label="randMod7"
-       aria-label="rndM7" />
+       d="M 9.1144612,5.2182307 V 3.2338558 h 1.9843748 v 0.3968749 h 0.396875 v 0.396875 h -0.79375 V 3.6307307 H 9.9082112 v 1.5875 z m 2.7781248,0 V 2.4401058 h 0.79375 v 0.396875 h 0.396875 v 0.396875 h 0.396875 v -0.396875 h 0.396875 v -0.396875 h 0.79375 v 2.7781249 h -0.79375 v -1.5875 h -0.396875 v 0.396875 h -0.396875 v -0.396875 h -0.396875 v 1.5875 z m 3.571875,0 v -0.396875 h -0.396875 v -1.190625 h 0.396875 V 3.2338558 h 1.5875 v 0.3968749 h 0.396875 v 1.190625 h -0.396875 v 0.396875 z m 0.396875,-0.396875 h 0.79375 v -1.190625 h -0.79375 z m 2.38125,0.396875 v -0.396875 h -0.396875 v -0.79375 h 0.396875 v -0.396875 h 1.190625 V 2.8369808 h 0.79375 v 2.3812499 z m 0.396875,-0.396875 h 0.79375 v -0.79375 h -0.79375 z m 2.778125,0.396875 v -1.5875 h 0.396875 V 3.2338558 h 0.396875 v -0.396875 h -0.79375 v 0.396875 h -0.79375 v -0.79375 h 2.38125 v 0.79375 h -0.396875 v 0.3968749 h -0.396875 v 1.5875 z"
+       id="text2"
+       style="font-size:3.175px;font-family:'C64 User';-inkscape-font-specification:'C64 User';text-align:center;text-anchor:middle;fill:#ffffff;stroke-width:0.264583"
+       inkscape:label="rMod"
+       aria-label="rMod7" />
   </g>
 </svg>
