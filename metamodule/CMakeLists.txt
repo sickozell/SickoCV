@@ -14,7 +14,7 @@ include(${METAMODULE_SDK_DIR}/plugin.cmake)
 
 ########################################################################################
 
-project(SickoCV VERSION 0.18 DESCRIPTION "Sickozell for MetaModule" LANGUAGES C CXX ASM)
+project(SickoCV VERSION 0.19 DESCRIPTION "Sickozell for MetaModule" LANGUAGES C CXX ASM)
 
 add_library(SickoCV STATIC)
 
@@ -35,6 +35,7 @@ target_sources(SickoCV PRIVATE
     ${SOURCE_DIR}/src/Calcs.cpp
     ${SOURCE_DIR}/src/Clocker.cpp
     ${SOURCE_DIR}/src/Clocker2.cpp
+    ${SOURCE_DIR}/src/CVmeter.cpp
     ${SOURCE_DIR}/src/CVrouter.cpp
     ${SOURCE_DIR}/src/CVswitcher.cpp
     ${SOURCE_DIR}/src/Drummer.cpp
@@ -65,6 +66,9 @@ target_sources(SickoCV PRIVATE
     ${SOURCE_DIR}/src/RandLoops.cpp
     ${SOURCE_DIR}/src/RandLoopsMini.cpp
     ${SOURCE_DIR}/src/RandLoops8.cpp
+    ${SOURCE_DIR}/src/RandMod7.cpp
+    ${SOURCE_DIR}/src/RandMod7Compact.cpp
+    ${SOURCE_DIR}/src/SampleDelay.cpp
     ${SOURCE_DIR}/src/Shifter.cpp
     ${SOURCE_DIR}/src/SickoAmp.cpp
     ${SOURCE_DIR}/src/SickoCrosser4.cpp
@@ -84,14 +88,16 @@ target_sources(SickoCV PRIVATE
     ${SOURCE_DIR}/src/StepSeq.cpp
     ${SOURCE_DIR}/src/StepSeqPlus.cpp
     ${SOURCE_DIR}/src/StepSeq8x.cpp
+    ${SOURCE_DIR}/src/StepStation.cpp
     ${SOURCE_DIR}/src/Switcher.cpp
     ${SOURCE_DIR}/src/Switcher8.cpp
     ${SOURCE_DIR}/src/SwitcherSt.cpp
-    ${SOURCE_DIR}/src/TogglerCompact.cpp
     ${SOURCE_DIR}/src/Toggler.cpp
+    ${SOURCE_DIR}/src/TogglerCompact.cpp
     ${SOURCE_DIR}/src/TrigSeq.cpp
     ${SOURCE_DIR}/src/TrigSeqPlus.cpp
     ${SOURCE_DIR}/src/TrigSeq8x.cpp
+    ${SOURCE_DIR}/src/TrigStation.cpp
     ${SOURCE_DIR}/src/Wavetabler.cpp
 )
 

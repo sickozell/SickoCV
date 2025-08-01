@@ -12,7 +12,7 @@
 
 //using namespace std;	// this is for debug
 
-struct RandMod7compact : Module {
+struct RandMod7Compact : Module {
 
 	#include "randModTable.hpp"
 
@@ -88,7 +88,7 @@ struct RandMod7compact : Module {
 	static constexpr float minFreq = 2.f;       // 500 ms
 	static constexpr float maxFreq = 10000.f;   // 0.1 ms
 
-	RandMod7compact() {
+	RandMod7Compact() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configParam(RATE_PARAM, 0.f, 1.f, 0.f, "Rate", "hz", maxFreq / minFreq, minFreq);
 		configInput(RATE_INPUT, "Rate");
@@ -375,10 +375,10 @@ struct RandMod7compact : Module {
 	}
 };
 
-struct RandMod7compactWidget : ModuleWidget {
-	RandMod7compactWidget(RandMod7compact* module) {
+struct RandMod7CompactWidget : ModuleWidget {
+	RandMod7CompactWidget(RandMod7Compact* module) {
 		setModule(module);
-		setPanel(createPanel(asset::plugin(pluginInstance, "res/RandMod7compact.svg")));
+		setPanel(createPanel(asset::plugin(pluginInstance, "res/RandMod7Compact.svg")));
 
 		addChild(createWidget<SickoScrewBlack1>(Vec(0, 0)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	 
@@ -401,20 +401,20 @@ struct RandMod7compactWidget : ModuleWidget {
 		const float xBi = 19;
 		const float yBi = 41;
 
-		addParam(createParamCentered<SickoLargeKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, RandMod7compact::RATE_PARAM));
-		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, RandMod7compact::RATE_ATTENUV_PARAM));
-		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRateIn, yRateIn)), module, RandMod7compact::RATE_INPUT));
+		addParam(createParamCentered<SickoLargeKnob>(mm2px(Vec(xRtKnob, yRtKnob)), module, RandMod7Compact::RATE_PARAM));
+		addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRateAtnv, yRateAtnv)), module, RandMod7Compact::RATE_ATTENUV_PARAM));
+		addInput(createInputCentered<SickoInPort>(mm2px(Vec(xRateIn, yRateIn)), module, RandMod7Compact::RATE_INPUT));
 
 		for (int i = 0; i < 7; i++) {
-			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRt, yStart + (yStartShift * i))), module, RandMod7compact::XRATE_PARAM+i));
-			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart + (yStartShift * i))), module, RandMod7compact::OUT_OUTPUT+i));
+			addParam(createParamCentered<SickoTrimpot>(mm2px(Vec(xRt, yStart + (yStartShift * i))), module, RandMod7Compact::XRATE_PARAM+i));
+			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut, yStart + (yStartShift * i))), module, RandMod7Compact::OUT_OUTPUT+i));
 		}
 
-		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xBi, yBi)), module, RandMod7compact::BIPOLAR_PARAM, RandMod7compact::BIPOLAR_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(xBi, yBi)), module, RandMod7Compact::BIPOLAR_PARAM, RandMod7Compact::BIPOLAR_LIGHT));
 	}
 
 	void appendContextMenu(Menu* menu) override {
-		RandMod7compact* module = dynamic_cast<RandMod7compact*>(this->module);
+		RandMod7Compact* module = dynamic_cast<RandMod7Compact*>(this->module);
 
 		const std::string magnetNames[3] = {"Lower", "Middle", "Upper"};
 
@@ -461,4 +461,4 @@ struct RandMod7compactWidget : ModuleWidget {
 	}
 };
 
-Model* modelRandMod7compact = createModel<RandMod7compact, RandMod7compactWidget>("RandMod7compact");
+Model* modelRandMod7Compact = createModel<RandMod7Compact, RandMod7CompactWidget>("RandMod7Compact");

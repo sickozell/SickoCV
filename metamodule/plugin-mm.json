@@ -55,6 +55,10 @@
 			"name": "clocker2"
 		},
 		{
+			"slug": "CVmeter",
+			"name": "cvMeter"
+		},
+		{
 			"slug": "CVrouter",
 			"name": "cvRouter"
 		},
@@ -175,6 +179,18 @@
 			"name": "randLoops8"
 		},
 		{
+			"slug": "RandMod7",
+			"name": "randMod7"
+		},
+		{
+			"slug": "RandMod7compact",
+			"name": "randMod7 compact"
+		},
+		{
+			"slug": "SampleDelay",
+			"name": "sampleDelay"
+		},
+		{
 			"slug": "Shifter",
 			"name": "shifter"
 		},
@@ -251,6 +267,10 @@
 			"name": "stepSeq8x"
 		},
 		{
+			"slug": "StepStation",
+			"name": "stepStation"
+		},
+		{
 			"slug": "Switcher",
 			"name": "switcher"
 		},
@@ -281,6 +301,10 @@
 		{
 			"slug": "TrigSeq8x",
       		"name": "trigSeq8x"
+		},
+	    {
+			"slug": "TrigStation",
+			"name": "trigStation"
 		},
 		{
 			"slug": "WaveTabler",

@@ -1,7 +1,7 @@
 {
   "slug": "SickoCV",
   "name": "SickoCV",
-  "version": "2.7.4",
+  "version": "2.7.5",
   "license": "GPL-3.0-or-later",
   "brand": "Sickozell",
   "author": "Sickozell",
@@ -413,8 +413,8 @@
       ]
     },
     {
-      "slug": "RandMod7compact",
-      "name": "randMod7 compact",
+      "slug": "RandMod7Compact",
+      "name": "randMod7 Compact",
       "description": "7 random smooth cv generators in a compact form (rmod7)",
       "tags": [
         "Random"

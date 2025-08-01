@@ -1534,7 +1534,7 @@ struct Clocker2DisplayDiv : TransparentWidget {
 			nvgTextLetterSpacing(args.vg, 0);
 
 			int tempValue = int(module->params[module->DIVMULT_KNOB_PARAM + t].getValue());
-			float tempXpos = (tempValue > 1 && tempValue < 43) ? 10 : 6;
+			float tempXpos = (tempValue > 1 && tempValue < 43) ? 10 : 0;
 
 			nvgFillColor(args.vg, (tempValue < 22) ?
 				nvgRGB(COLOR_LCD_RED) :

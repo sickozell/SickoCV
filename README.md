@@ -1,7 +1,7 @@
-# SickoCV v2.7.4
+# SickoCV v2.7.5
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/29f84130-ed55-4bd0-bb62-0d67f4682ae0)
+![SickoCV modules 2 7 5](https://github.com/user-attachments/assets/2e38d5c8-9ae0-429f-8a0a-4092a09d8a13)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -775,7 +775,7 @@ randLoops8 is basically a 8-track randomLoops with limited functions, but with a
 ## randMod7 / randMod7Compact
 ### 7 random smooth cv generator
 
-![randmod](https://github.com/user-attachments/assets/da3733a4-9981-454b-b18d-fd4625decf08)
+![randmod](https://github.com/user-attachments/assets/97ccafe6-b263-4f7e-900f-77d4fd0e205e)
 
 #### - INSTRUCTIONS
 randMod modules outputs 7 smoothed random voltages based on a common rate knob and a divider/multiplier each track.
