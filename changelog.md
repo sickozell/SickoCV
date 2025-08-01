@@ -1,3 +1,7 @@
+### 2.7.5 (2025-08-1)
+- fixed randMod7 svg file
+- fixed clocker2 bpm display alignment
+
 ### 2.7.4 (2025-07-17)
 - added stepStation and trigStation modules
 - added sampleDelay module
