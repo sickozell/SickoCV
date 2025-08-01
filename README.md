@@ -20,10 +20,10 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog** 
 - fixed randMod7 svg file
 
-# SickoCV v2.7.4
+# SickoCV v2.7.5
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 5](https://github.com/user-attachments/assets/29f84130-ed55-4bd0-bb62-0d67f4682ae0)
+![SickoCV modules 2 7 4](https://github.com/user-attachments/assets/29f84130-ed55-4bd0-bb62-0d67f4682ae0)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
