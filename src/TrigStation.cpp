@@ -3181,7 +3181,7 @@ struct TrigStationDisplayMode : TransparentWidget {
 			if (!module->turingMode[t])
 				nvgFillColor(args.vg, nvgRGB(COLOR_EGA_WHITE));				
 			else
-				nvgFillColor(args.vg, nvgRGB(COLOR_LCD_YELLOW));				
+				nvgFillColor(args.vg, nvgRGB(COLOR_USER_LIGHT_RED));				
 
 			nvgTextBox(args.vg, 40.f, 15.f, 10, to_string(t+1).c_str(), NULL);
 		}
