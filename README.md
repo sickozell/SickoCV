@@ -518,10 +518,10 @@ It is also used to apply settings to all the slots: Zoom, Lightboxes color and t
 This option allows to save the loaded samples in vcv patch file to use it on other machines or if the orginal sample files are missing.  
 Please note that this could make the patch filesize very large.
 
-**Level knob controls Accent** (drumPlayerMk2 and drumPlayer mini only)
+**Level knob controls Accent** (drumPlayerMk2 and drumPlayer mini only)  
 Ticking this option the level knob will affect the accented level.
 
-**Logarithmic Decay** (drumPlayerMk2 and drumPlayer mini only)
+**Logarithmic Decay** (drumPlayerMk2 and drumPlayer mini only)  
 This option set a logarithmic decay curve instead of exponential.
 
 #### SLOT RIGHT-CLICK MENU
