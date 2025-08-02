@@ -566,7 +566,7 @@ struct DrumPlayer : Module {
 // end changes for metamodule
 
 			for (unsigned int i = 0; i < tsc; i = i + c) {
-				playBuffer[slot][0].push_back(pSampleData[i]);
+				playBuffer[slot][0].push_back(pSampleData[i] * 5);
 				playBuffer[slot][0].push_back(0);
 			}
 			totalSampleC[slot] = playBuffer[slot][0].size();
@@ -658,8 +658,8 @@ struct DrumPlayer : Module {
 		std::vector<float> data;
 
 		for (unsigned int i = 0; i <= playBuffer[slot][tempAlias].size(); i = i + 2)
-			//data.push_back(playBuffer[slot][tempAlias][i] / 5);
-			data.push_back(playBuffer[slot][tempAlias][i]);
+			data.push_back(playBuffer[slot][tempAlias][i] / 5);
+			//data.push_back(playBuffer[slot][tempAlias][i]);
 // end changes for metamodule
 
 		drwav_data_format format;
