@@ -3,7 +3,7 @@
 - drumPlayer: fixed output level too hot in all drumPlayer modules
 
 ### 2.7.5 (2025-08-1)
-- fixed randMod7 svg file
+- fixed randMod7 compact svg load failure on Linux (changed slug to randMod7Compact)
 - fixed clocker2 bpm display alignment
 
 ### 2.7.4 (2025-07-17)

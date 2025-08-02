@@ -18,7 +18,8 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 - nothing in queue
 
 ## **changelog** 
-- fixed randMod7 svg file
+- drumPlayer2 / drumPlayerMini: added level knob control option
+- drumPlayer: fixed output level too hot in all drumPlayer modules
 
 # SickoCV v2.7.6
 VCV Rack plugin modules

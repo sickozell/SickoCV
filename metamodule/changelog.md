@@ -1,3 +1,6 @@
+### v0.20
+- update to v2.7.6 vcv release
+
 ### v0.19
 - update to v2.7.4 vcv release
 - added stepStation, trigStation, sampleDelay, cvMeter modules
