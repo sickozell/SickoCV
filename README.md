@@ -40,7 +40,7 @@ VCV Rack plugin modules
 - [CV meter](#cvmeter)
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
-- [drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini](#drumplayer--drumplayer--drumplayerxtra--drumplayer-mini)
+- [drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer2 / drumPlayer mini](#drumplayer--drumplayer--drumplayerxtra--drumplayer2--drumplayer-mini)
 - [enver / enver mini / ad mini](#enver--enver-mini--ad-mini)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [keySampler](#keysampler)
@@ -450,10 +450,10 @@ Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to para
 
 [back to top](#table-of-contents)
 
-## drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini
+## drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer2 / drumPlayer mini
 ### 4 channel Drum Sample Player with accent and choke functionality
 
-![drumplayer](https://github.com/user-attachments/assets/e6e61c69-6c20-4750-8bc5-927d6ed4fe08)
+![drumplayer](https://github.com/user-attachments/assets/9a14b3c0-11b7-42f1-8017-3b94db93fe74)
 
 #### INSTRUCTIONS  
 Load wav samples in the slots using general or slot right-click menu.  
