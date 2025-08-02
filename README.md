@@ -522,7 +522,7 @@ Please note that this could make the patch filesize very large.
 Ticking this option the level knob will affect the accented level.
 
 **Logarithmic Decay** (drumPlayerMk2 and drumPlayer mini only)  
-This option set a logarithmic decay curve instead of exponential.
+This option sets a logarithmic decay curve instead of exponential.
 
 #### SLOT RIGHT-CLICK MENU
 Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) the slot right-click menu is open with following options:  
