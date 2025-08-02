@@ -1,3 +1,7 @@
+### 2.7.6 (2025-08-2)
+- drumPlayer2 / drumPlayerMini: added level knob control option
+- drumPlayer: fixed output level too hot in all drumPlayer modules
+
 ### 2.7.5 (2025-08-1)
 - fixed randMod7 svg file
 - fixed clocker2 bpm display alignment

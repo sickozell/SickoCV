@@ -747,14 +747,14 @@ struct DrumPlayer : Module {
 			if (fileLoaded[slot] && play[slot] && floor(samplePos[slot]) < totalSampleC[slot]) {
 				switch (interpolationMode) {
 					case NO_INTERP:
-						currentOutput = 5 * level[slot] * playBuffer[slot][antiAlias][floor(samplePos[slot])];
+						currentOutput = level[slot] * playBuffer[slot][antiAlias][floor(samplePos[slot])];
 					break;
 
 					case LINEAR1_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[slot] * float(
+							currentOutput = level[slot] * float(
 												(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
 												(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
 											);
@@ -763,9 +763,9 @@ struct DrumPlayer : Module {
 
 					case LINEAR2_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[slot] * float(
+							currentOutput = level[slot] * float(
 												(
 													(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])] * (1-prevSampleWeight[slot])) +
 													(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])+1] * prevSampleWeight[slot]) +
@@ -778,7 +778,7 @@ struct DrumPlayer : Module {
 
 					case HERMITE_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
 							if (floor(samplePos[slot]) > 1 && floor(samplePos[slot]) < totalSamples[slot] - 1) {
 								/*
@@ -792,11 +792,11 @@ struct DrumPlayer : Module {
 								double a1 = .5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+1] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1]);
 								double a2 = playBuffer[slot][antiAlias][floor(samplePos[slot])-1] - (2.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])]) + (2 * playBuffer[slot][antiAlias][floor(samplePos[slot])+1]) - (.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])+2]);
 								double a3 = (.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+2] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1])) + (1.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])] - playBuffer[slot][antiAlias][floor(samplePos[slot])+1]));
-								currentOutput = 5 * level[slot] * float(
+								currentOutput = level[slot] * float(
 									(((((a3 * currSampleWeight[slot]) + a2) * currSampleWeight[slot]) + a1) * currSampleWeight[slot]) + playBuffer[slot][antiAlias][floor(samplePos[slot])]
 								);
 							} else {
-								currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+								currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 							}
 						}
 					break;

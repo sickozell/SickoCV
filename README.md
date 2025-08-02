@@ -1,4 +1,4 @@
-# SickoCV v2.7.5-beta1
+# SickoCV v2.7.6-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
 
@@ -20,7 +20,7 @@ Please check your subscription on https://library.vcvrack.com/plugins and look f
 ## **changelog** 
 - fixed randMod7 svg file
 
-# SickoCV v2.7.5
+# SickoCV v2.7.6
 VCV Rack plugin modules
 
 ![SickoCV modules 2 7 5](https://github.com/user-attachments/assets/2e38d5c8-9ae0-429f-8a0a-4092a09d8a13)
