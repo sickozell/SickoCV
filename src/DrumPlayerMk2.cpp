@@ -136,6 +136,8 @@ struct DrumPlayerMk2 : Module {
 
 	bool logDecay = false;
 
+	bool accentVol = false;
+
 // begin changes for metamodule
 #if defined(METAMODULE)
 	const drwav_uint64 recordingLimit = 48000 * 60 * 2 * 2; // 2mins mono, 1min stereo limit on MM
@@ -161,7 +163,7 @@ struct DrumPlayerMk2 : Module {
 			configInput(TRIG_INPUT+i,("Trig #"+to_string(i+1)).c_str());
 			//configParam(TRIGVOL_PARAM+i, 0.f, 2.0f, 1.0f, ("Standard Level #"+to_string(i+1)).c_str(), "%", 0, 100);
 			configInput(ACC_INPUT+i,("Accent #"+to_string(i+1)).c_str());
-			configParam(ACCVOL_PARAM+i, 0.f, 2.0f, 1.0f, ("Accent Level #"+to_string(i+1)).c_str(), "%", 0, 100);
+			configParam(ACCVOL_PARAM+i, 0.f, 1.0f, 1.0f, ("Level #"+to_string(i+1)).c_str(), "%", 0, 100);
 			//configParam(DECAY_PARAM+i, 0.01f, 2.0f, 2.0f, ("Decay #"+to_string(i+1)).c_str(), "s", 0, 1);
 			configParam(DECAY_PARAM+i, 0.f, 1.f, 1.f, ("Decay #"+to_string(i+1)).c_str(), " ms", maxStageTime / minStageTime, minStageTime);
 			configInput(DECAY_INPUT+i,("Decay #"+to_string(i+1)).c_str());
@@ -192,10 +194,11 @@ struct DrumPlayerMk2 : Module {
 			choking[slot] = false;
 			fading[slot] = false;
 		}
-		interpolationMode = HERMITE_INTERP;
-		antiAlias = 1;
-		outsMode = NORMALLED_OUTS;
-		sampleInPatch = true;
+		//interpolationMode = HERMITE_INTERP;
+		//antiAlias = 1;
+		//outsMode = NORMALLED_OUTS;
+		//sampleInPatch = true;
+		//accentVol = false;
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		Module::onReset(e);
 	}
@@ -245,6 +248,7 @@ struct DrumPlayerMk2 : Module {
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "accentVol", json_boolean(accentVol));
 		json_object_set_new(rootJ, "logDecay", json_boolean(logDecay));
 		json_object_set_new(rootJ, "Interpolation", json_integer(interpolationMode));
 		json_object_set_new(rootJ, "AntiAlias", json_integer(antiAlias));
@@ -259,6 +263,9 @@ struct DrumPlayerMk2 : Module {
 	}
 
 	void dataFromJson(json_t *rootJ) override {
+		json_t* accentVolJ = json_object_get(rootJ, "accentVol");
+		if (accentVolJ)
+			accentVol = json_boolean_value(accentVolJ);
 		json_t* logDecayJ = json_object_get(rootJ, "logDecay");
 		if (logDecayJ)
 			logDecay = json_boolean_value(logDecayJ);
@@ -777,11 +784,18 @@ struct DrumPlayerMk2 : Module {
 				currSampleWeight[slot] = sampleCoeff[slot];
 				prevSamplePos[slot] = 0;
 				prevSampleWeight[slot] = 0;
-				if (inputs[ACC_INPUT+slot].getVoltage() > 1)
-					level[slot] = params[ACCVOL_PARAM+slot].getValue();
-				else
-					level[slot] = 1;
-				
+				if (!accentVol) {
+					if (inputs[ACC_INPUT+slot].getVoltage() < 1)
+						level[slot] = params[ACCVOL_PARAM+slot].getValue();
+					else
+						level[slot] = 1;
+				} else {
+					if (inputs[ACC_INPUT+slot].getVoltage() >= 1)
+						level[slot] = params[ACCVOL_PARAM+slot].getValue();
+					else
+						level[slot] = 1;
+				}
+
 				if (functionButton) {
 					if (slot == 0 || slot == 2) {
 						choking[slot+1] = true;
@@ -851,7 +865,7 @@ struct DrumPlayerMk2 : Module {
 								double a1 = .5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+1] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1]);
 								double a2 = playBuffer[slot][antiAlias][floor(samplePos[slot])-1] - (2.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])]) + (2 * playBuffer[slot][antiAlias][floor(samplePos[slot])+1]) - (.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])+2]);
 								double a3 = (.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+2] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1])) + (1.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])] - playBuffer[slot][antiAlias][floor(samplePos[slot])+1]));
-								currentOutput = 5 * level[slot] * float(
+								currentOutput = level[slot] * float(
 									(((((a3 * currSampleWeight[slot]) + a2) * currSampleWeight[slot]) + a1) * currSampleWeight[slot]) + playBuffer[slot][antiAlias][floor(samplePos[slot])]
 								);
 							} else {
@@ -1493,8 +1507,12 @@ struct DrumPlayerMk2Widget : ModuleWidget {
 		const float xDelta = 16;
 
 		const float yTrig =	19.5;
-		const float yAcc = 33.7;
-		const float yAccVol = 42.9;
+		//const float yAcc = 33.7;
+		//const float yAccVol = 42.9;
+		
+		const float yAccVol = 31.2;
+		const float yAcc = 43.4;
+		
 
 		const float yDecKnob = 57.4;
 		const float yDecIn = 66.2;
@@ -1534,6 +1552,7 @@ struct DrumPlayerMk2Widget : ModuleWidget {
 			assert(module);
 		
 		menu->addChild(new MenuSeparator());
+		menu->addChild(createBoolPtrMenuItem("Level knob controls Accent", "", &module->accentVol));
 		menu->addChild(createBoolPtrMenuItem("Logarithmic Decay", "", &module->logDecay));
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuLabel("Slots"));

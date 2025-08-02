@@ -1,7 +1,7 @@
-# SickoCV v2.7.5
+# SickoCV v2.7.6
 VCV Rack plugin modules
 
-![SickoCV modules 2 7 5](https://github.com/user-attachments/assets/2e38d5c8-9ae0-429f-8a0a-4092a09d8a13)
+![SickoCV modules 2 7 6](https://github.com/user-attachments/assets/a3199cd3-b82e-4876-8ef0-a103c55bdda0)
 
 ## table of contents
 - [Common modules behavior](#common-modules-behavior)
@@ -17,7 +17,7 @@ VCV Rack plugin modules
 - [CV meter](#cvmeter)
 - [CV router / CV switcher](#cvrouter--cvswitcher)
 - [drummer / drummer4 / drummer4+](#drummer--drummer4--drummer4)
-- [drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini](#drumplayer--drumplayer--drumplayerxtra--drumplayer-mini)
+- [drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer2 / drumPlayer mini](#drumplayer--drumplayer--drumplayerxtra--drumplayer2--drumplayer-mini)
 - [enver / enver mini / ad mini](#enver--enver-mini--ad-mini)
 - [holder / holder Compact / holder8](#holder--holder-compact--holder8)
 - [keySampler](#keysampler)
@@ -427,10 +427,10 @@ Drummer4+ it's the same of Drummer4. It only adds attenuverted CV inputs to para
 
 [back to top](#table-of-contents)
 
-## drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer mini
+## drumPlayer / drumPlayer+ / drumPlayerXtra / drumPlayer2 / drumPlayer mini
 ### 4 channel Drum Sample Player with accent and choke functionality
 
-![drumplayer](https://github.com/user-attachments/assets/e6e61c69-6c20-4750-8bc5-927d6ed4fe08)
+![drumplayer](https://github.com/user-attachments/assets/9a14b3c0-11b7-42f1-8017-3b94db93fe74)
 
 #### INSTRUCTIONS  
 Load wav samples in the slots using general or slot right-click menu.  
@@ -443,6 +443,11 @@ External modulation is allowed only on drumPlayer+ or drumPlayerXtra.
 
 If CHOKE switch is on when TRIG occurs, the playback of next slot is stopped with a 1ms fade out: it's commonly used to simulate a closed/open hihat.  
 LIM switch enables hard clipping limiter set to ±5v on the output.  
+
+#### drumPlayer2 and drumPlayer mini
+These two modules have decay feature, instead of both standard and accented level knob.
+The level knob can attenuate the standard playback level.
+If decay knob is full clockwise there will be no envelope on the sample playback.
 
 #### RIGHT-CLICK MENU
 **Sample Slots**  
@@ -489,6 +494,12 @@ It is also used to apply settings to all the slots: Zoom, Lightboxes color and t
 **Store samples in Patch**  
 This option allows to save the loaded samples in vcv patch file to use it on other machines or if the orginal sample files are missing.  
 Please note that this could make the patch filesize very large.
+
+**Level knob controls Accent** (drumPlayerMk2 and drumPlayer mini only)  
+Ticking this option the level knob will affect the accented level.
+
+**Logarithmic Decay** (drumPlayerMk2 and drumPlayer mini only)  
+This option sets a logarithmic decay curve instead of exponential.
 
 #### SLOT RIGHT-CLICK MENU
 Right clicking on led area (drumPlayer) or display area (drumPlayer+ drumPlayerXtra) the slot right-click menu is open with following options:  

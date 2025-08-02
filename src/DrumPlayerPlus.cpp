@@ -618,7 +618,7 @@ struct DrumPlayerPlus : Module {
 // end changes for metamodule
 
 			for (unsigned int i = 0; i < tsc; i = i + c) {
-				playBuffer[slot][0].push_back(pSampleData[i]);
+				playBuffer[slot][0].push_back(pSampleData[i] * 5);
 				playBuffer[slot][0].push_back(0);
 			}
 			totalSampleC[slot] = playBuffer[slot][0].size();
@@ -728,8 +728,8 @@ struct DrumPlayerPlus : Module {
 		std::vector<float> data;
 
 		for (unsigned int i = 0; i <= playBuffer[slot][tempAlias].size(); i = i + 2)
-			//data.push_back(playBuffer[slot][tempAlias][i] / 5);
-			data.push_back(playBuffer[slot][tempAlias][i]);
+			data.push_back(playBuffer[slot][tempAlias][i] / 5);
+			//data.push_back(playBuffer[slot][tempAlias][i]);
 // end changes for metamodule
 
 		drwav_data_format format;
@@ -823,14 +823,14 @@ struct DrumPlayerPlus : Module {
 			if (fileLoaded[slot] && play[slot] && floor(samplePos[slot]) < totalSampleC[slot]) {
 				switch (interpolationMode) {
 					case NO_INTERP:
-						currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+						currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 					break;
 
 					case LINEAR1_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[slot] * float(
+							currentOutput = level[slot] * float(
 											(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
 											(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
 											);
@@ -839,9 +839,9 @@ struct DrumPlayerPlus : Module {
 
 					case LINEAR2_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
-							currentOutput = 5 * level[slot] * float(
+							currentOutput = level[slot] * float(
 											(
 												(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])] * (1-prevSampleWeight[slot])) +
 												(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])+1] * prevSampleWeight[slot]) +
@@ -853,7 +853,7 @@ struct DrumPlayerPlus : Module {
 
 					case HERMITE_INTERP:
 						if (currSampleWeight[slot] == 0) {
-							currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 						} else {
 							if (floor(samplePos[slot]) > 1 && floor(samplePos[slot]) < totalSamples[slot] - 1) {
 								/*
@@ -867,11 +867,11 @@ struct DrumPlayerPlus : Module {
 								double a1 = .5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+1] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1]);
 								double a2 = playBuffer[slot][antiAlias][floor(samplePos[slot])-1] - (2.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])]) + (2 * playBuffer[slot][antiAlias][floor(samplePos[slot])+1]) - (.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])+2]);
 								double a3 = (.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+2] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1])) + (1.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])] - playBuffer[slot][antiAlias][floor(samplePos[slot])+1]));
-								currentOutput = 5 * level[slot] * float(
+								currentOutput = level[slot] * float(
 									(((((a3 * currSampleWeight[slot]) + a2) * currSampleWeight[slot]) + a1) * currSampleWeight[slot]) + playBuffer[slot][antiAlias][floor(samplePos[slot])]
 								);
 							} else {
-								currentOutput = 5 * level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+								currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
 							}
 						}
 					break;
