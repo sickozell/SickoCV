@@ -144,6 +144,7 @@ bool stepStation_userClipboard = false;
 int stepStation_cbSteps[8] = {16, 16, 16, 16, 16, 16, 16, 16};
 int stepStation_cbCurrentMode[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 //float stepStation_cbDivMult[8] = {22, 22, 22, 22, 22, 22, 22, 22};
+int stepStation_cbRange[9] = {10, 10, 10, 10, 10, 10, 10, 10, 9};
 //int stepStation_cbRevType[9] = {2, 2, 2, 2, 2, 2, 2, 2, 0};	// 0 means POSITIVE_V
 int stepStation_cbDontAdvanceSetting[9] = {2, 2, 2, 2, 2, 2, 2, 2, 1};
 int stepStation_cbRstStepsWhen[9] = {3, 3, 3, 3, 3, 3, 3, 3, 1};
@@ -168,6 +169,7 @@ bool stepStation_cbXcludeFromRstTrack = false;
 float stepStation_cbUserValuesTrack[2] = {};
 float stepStation_cbUserInputsTrack[16][2] = {};	// 16 is MAXUSER
 float stepStation_cbUserTableTrack[4] = {};
+int stepStation_cbRangeTrack = 10;
 
 
 bool trigStation_clipboard = false;

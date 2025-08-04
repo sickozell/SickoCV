@@ -1,4 +1,5 @@
-### 2.7.6 (2025-08-2)
+### 2.7.6 (2025-08-4)
+- stepStation: fixed bug that doesn't store range knob settings in programs. Fixed missing range knob settings copy/paste.
 - drumPlayer2 / drumPlayerMini: added level knob control option
 - drumPlayer: fixed output level too hot in all drumPlayer modules
 

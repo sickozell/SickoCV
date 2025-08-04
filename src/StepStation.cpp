@@ -1017,6 +1017,7 @@ struct StepStation : SickoStepStation {
 		stepStation_cbXcludeFromRunTrack = xcludeFromRun[t];
 		stepStation_cbXcludeFromRstTrack = xcludeFromRst[t];
 
+		stepStation_cbRangeTrack = range[t];
 		//stepStation_cbRevTypeTrack = revType[t];
 		stepStation_cbDontAdvanceSettingTrack = dontAdvanceSetting[t];
 		stepStation_cbRstStepsWhenTrack = rstStepsWhen[t];
@@ -1046,6 +1047,7 @@ struct StepStation : SickoStepStation {
 		}
 
 		for (int t = 0; t < ALLTRACKS; t++) {
+			stepStation_cbRange[t] = range[t];
 			//stepStation_cbRevType[t] = revType[t];
 			stepStation_cbDontAdvanceSetting[t] = dontAdvanceSetting[t];
 			stepStation_cbRstStepsWhen[t] = rstStepsWhen[t];
@@ -1117,6 +1119,7 @@ struct StepStation : SickoStepStation {
 		xcludeFromRun[t] = stepStation_cbXcludeFromRunTrack;
 		xcludeFromRst[t] = stepStation_cbXcludeFromRstTrack;
 
+		range[t] = stepStation_cbRangeTrack;
 		//revType[t] = stepStation_cbRevTypeTrack;
 		dontAdvanceSetting[t] = stepStation_cbDontAdvanceSettingTrack;
 		rstStepsWhen[t] = stepStation_cbRstStepsWhenTrack;
@@ -1147,6 +1150,7 @@ struct StepStation : SickoStepStation {
 		}
 
 		for (int t = 0; t < ALLTRACKS; t++) {
+			range[t] = stepStation_cbRange[t];
 			//revType[t] = stepStation_cbRevType[t];
 			dontAdvanceSetting[t] = stepStation_cbDontAdvanceSetting[t];
 			rstStepsWhen[t] = stepStation_cbRstStepsWhen[t];
@@ -1839,6 +1843,7 @@ struct StepStation : SickoStepStation {
 				}
 
 				for (int t = 0; t < ALLTRACKS; t++) {
+					progRange[progKnob][t] = range[t];
 					//progRevType[progKnob][t] = revType[t];
 					progDontAdvanceSetting[progKnob][t] = dontAdvanceSetting[t];
 					progRstStepsWhen[progKnob][t] = rstStepsWhen[t];

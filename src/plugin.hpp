@@ -116,6 +116,7 @@ extern bool stepStation_userClipboard;
 extern int stepStation_cbSteps[8];
 extern int stepStation_cbCurrentMode[8];
 //extern float stepStation_cbDivMult[8];
+extern int stepStation_cbRange[9];
 //extern int stepStation_cbRevType[9];
 extern int stepStation_cbDontAdvanceSetting[9];
 extern int stepStation_cbRstStepsWhen[9];
@@ -132,6 +133,7 @@ extern bool stepStation_clipboardTrack;
 extern int stepStation_cbStepsTrack;
 extern int stepStation_cbCurrentModeTrack;
 //extern float stepStation_cbDivMultTrack;
+extern int stepStation_cbRangeTrack;
 //extern int stepStation_cbRevTypeTrack;	// 0 means POSITIVE_V
 extern int stepStation_cbDontAdvanceSettingTrack;
 extern int stepStation_cbRstStepsWhenTrack;
