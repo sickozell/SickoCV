@@ -273,6 +273,30 @@ struct RandMod7 : Module {
 
 	}
 
+	void setRange(int r) {
+
+		float min = 0.f;
+		float max = 10.f;
+
+		switch (r) {
+
+			case 0: min = 0.f;	max = 10.f;	break;
+			case 1:	min = 0.f;	max = 5.f;	break;
+			case 2:	min = 0.f;	max = 10.f;	break;
+			case 3:	min = 5.f;	max = 10.f;	break;
+			case 4:	min = -5.f;	max = 5.f;	break;
+			case 5:	min = -1.f;	max = 1.f;	break;
+			case 6:	min = -1.f;	max = 0.f;	break;
+			case 7:	min = -5.f;	max = 0.f;	break;
+			case 8:	min = -10.f;	max = 0.f;	break;
+		}
+
+		for (int t = 0; t < 7; t++) {
+			params[MIN_PARAM+t].setValue(min);
+			params[MAX_PARAM+t].setValue(max);
+		}
+	}
+
 	float lookupRateParamToMs(float param) const {
 
 	    float p = param * (LUT_SIZE -1);
@@ -490,6 +514,21 @@ struct RandMod7Widget : ModuleWidget {
 		menu->addChild(createMenuItem("Fibonacci *", "", [=]() {module->setPreset(8);}));
 		menu->addChild(createMenuItem("Fibonacci /", "", [=]() {module->setPreset(9);}));
 
+		menu->addChild(new MenuSeparator());
+		//menu->addChild(createMenuLabel("Set all min/max range to:"));
+		menu->addChild(createSubmenuItem("Set all min/max range to:", "", [=](Menu * menu) {
+		
+			menu->addChild(createMenuItem("0v/1v", "", [=]() {module->setRange(0);}));
+			menu->addChild(createMenuItem("0v/5v", "", [=]() {module->setRange(1);}));
+			menu->addChild(createMenuItem("0v/10v", "", [=]() {module->setRange(2);}));
+			menu->addChild(createMenuItem("5v/10v", "", [=]() {module->setRange(3);}));
+			menu->addChild(createMenuItem("-5v/5v", "", [=]() {module->setRange(4);}));
+			menu->addChild(createMenuItem("-1v/1v", "", [=]() {module->setRange(5);}));
+			menu->addChild(createMenuItem("-1v/0v", "", [=]() {module->setRange(6);}));
+			menu->addChild(createMenuItem("-5v/0v", "", [=]() {module->setRange(7);}));
+			menu->addChild(createMenuItem("-10v/0v", "", [=]() {module->setRange(8);}));
+
+	}));
 	}
 };
 
