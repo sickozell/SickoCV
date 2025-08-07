@@ -69,10 +69,10 @@ struct DrumPlayerMini : Module {
 	double currentSpeed = 0;
 
 	double tune = 0;
-	double prevTune = -1;
+	double prevTune = -11;
 
 	double voct = 0;
-	double prevVoct = -1;
+	double prevVoct = -11;
 	double speedVoct = 0;
 
 	double distancePos = 0;

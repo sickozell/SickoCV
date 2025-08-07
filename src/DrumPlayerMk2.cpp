@@ -68,10 +68,10 @@ struct DrumPlayerMk2 : Module {
 	double currentSpeed[4] = {0,0,0,0};
 
 	double tune[4] = {0,0,0,0};
-	double prevTune[4] = {-1,-1,-1,-1};
+	double prevTune[4] = {-11,-11,-11,-11};
 
 	double voct[4] = {0,0,0,0};
-	double prevVoct[4] = {-1,-1,-1,-1};
+	double prevVoct[4] = {-11,-11,-11,-11};
 	double speedVoct[4] = {0,0,0,0};
 
 	double distancePos[4] = {0,0,0,0};

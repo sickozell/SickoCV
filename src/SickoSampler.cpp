@@ -183,7 +183,7 @@ struct SickoSampler : Module {
 	float recKnobLoopEndPos;
 
 	float tune = 0.f;
-	float prevTune = -1.f;
+	float prevTune = -11.f;
 
 	float voct[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
 	float prevVoct[16] = {11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f};
@@ -556,7 +556,7 @@ struct SickoSampler : Module {
 		prevKnobCueEndPos = 2.f;
 		prevKnobLoopStartPos = -1.f;
 		prevKnobLoopEndPos = 2.f;
-		prevTune = -1.f;
+		prevTune = -11.f;
 		reverseStart = false;
 		totalSampleC = 0;
 		totalSamples = 0;
