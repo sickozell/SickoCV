@@ -1288,9 +1288,9 @@ Plus versions only:
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
 
-Download [ENGLISH user manual](./docs/trigStation-stepStation%20manuale%20utente%20IT.pdf?raw=true)
+Download [ENGLISH user manual](./docs/trigStation-stepStation%20user%20manual%20EN.pdf?raw=true)
 
-Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20IT.pdf?raw=true)
+Download [manuale utente ITALIANO](./docs/trigStation-stepStation%20manuale%20utente%20IT.pdf?raw=true)
 
 If errors occurs during download please right-click on the link above and "Save Link As"
 
