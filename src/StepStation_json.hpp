@@ -142,7 +142,7 @@
 			for (int t = 0; t < ALLTRACKS; t++) {
 				json_array_append_new(this_json_array, json_integer(progRange[p][t]));
 			}
-			json_object_set_new(rootJ, ("progRange"+to_string(p)).c_str(), this_json_array);
+			json_object_set_new(rootJ, ("progRange_p"+to_string(p)).c_str(), this_json_array);
 		}
 
 		for (int p = 0; p < 32; p++) {

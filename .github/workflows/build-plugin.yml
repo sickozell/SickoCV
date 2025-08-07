@@ -1,5 +1,9 @@
 name: Build VCV Rack Plugin
-on: [push, pull_request]
+#on: [push, pull_request]
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger su tutti i tag che iniziano con 'v'
 
 env:
   rack-sdk-version: 2.6.3

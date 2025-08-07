@@ -96,7 +96,7 @@ struct Wavetabler : Module {
 	double distancePos[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	float tune = 0.f;
-	float prevTune = -1.f;
+	float prevTune = -11.f;
 
 	float voct[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevVoct[16] = {11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f};
@@ -257,7 +257,7 @@ struct Wavetabler : Module {
 		polyMaster = POLYPHONIC;
 		disableNav = false;
 		sampleInPatch = true;
-		prevTune = -1.f;
+		prevTune = -11.f;
 		reverseStart = false;
 		system::removeRecursively(getPatchStorageDirectory().c_str());
 		Module::onReset(e);

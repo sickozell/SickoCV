@@ -1,6 +1,9 @@
-### 2.7.6 (2025-08-2)
+### 2.7.6 (2025-08-7)
+- stepStation: fixed bug that doesn't store range knob settings in programs. Fixed missing range knob settings copy/paste.
 - drumPlayer2 / drumPlayerMini: added level knob control option
 - drumPlayer: fixed output level too hot in all drumPlayer modules
+- randMod7: added min/max presets in context menu
+- all sampler modules: fixed bug when setting tune knob to -12 semitones
 
 ### 2.7.5 (2025-08-1)
 - fixed randMod7 compact svg load failure on Linux (changed slug to randMod7Compact)
