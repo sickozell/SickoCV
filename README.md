@@ -906,11 +906,10 @@ sickoLooper is inspired by hardware looper devices with most of their features i
 #### - MANUALS
 Due to the complexity of these modules, a PDF user manual has been written
 
-Download [ENGLISH user manual](./docs/sickoLooper%20user%20manual%20EN.pdf?raw=true)
+Download [ENGLISH user manual](docs/sickoLooper_user_manual_EN.pdf)
 
-Download [manuale utente ITALIANO](./docs/sickoLooper%20manuale%20utente%20IT.pdf?raw=true)
+Download [manuale utente ITALIANO](docs/sickoLooper_manuale_utente_IT.pdf)
 
-If errors occurs during download please right-click on the link above and "Save Link As"
 
 [back to top](#table-of-contents)
 
@@ -1292,8 +1291,6 @@ Due to the complexity of these modules, a PDF user manual has been written
 [ENGLISH user manual](docs/trigStation-stepStation_user_manual_EN.pdf)
 
 [manuale utente ITALIANO](docs/trigStation-stepStation_manuale_utente_IT.pdf)
-
-If errors occurs during download please right-click on the link above and "Save Link As"
 
 
 [back to top](#table-of-contents)
