@@ -142,7 +142,7 @@ struct SickoPlayer : Module {
 	float prevKnobLoopEndPos = 2.f;
 
 	float tune = 0.f;
-	float prevTune = -1.f;
+	float prevTune = -11.f;
 	
 	float voct[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	float prevVoct[16] = {11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f, 11.f};
@@ -398,7 +398,7 @@ struct SickoPlayer : Module {
 		prevKnobCueEndPos = 2.f;
 		prevKnobLoopStartPos = -1.f;
 		prevKnobLoopEndPos = 2.f;
-		prevTune = -1.f;
+		prevTune = -11.f;
 		reverseStart = false;
 		totalSampleC = 0;
 		totalSamples = 0;
