@@ -1,3 +1,6 @@
+### 2.7.7 (2025-08-16)
+trigStation: fixed bug when importing preset formats. Fixed a bug saving/retrieving steps state
+
 ### 2.7.6 (2025-08-7)
 - stepStation: fixed bug that doesn't store range knob settings in programs. Fixed missing range knob settings copy/paste.
 - drumPlayer2 / drumPlayerMini: added level knob control option

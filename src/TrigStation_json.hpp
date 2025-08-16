@@ -134,7 +134,7 @@
 		for (int t = 0; t < MAXTRACKS; t++) {
 			json_t *this_json_array = json_array();
 			for (int s = 0; s < 16; s++) {
-				json_array_append_new(this_json_array, json_real(wSeq[t][s]));
+				json_array_append_new(this_json_array, json_integer(wSeq[t][s]));
 			}
 			json_object_set_new(rootJ, ("wSeq_t"+to_string(t)).c_str(), this_json_array);
 		}
@@ -152,7 +152,7 @@
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_t *this_json_array = json_array();
 				for (int s = 0; s < 16; s++) {
-					json_array_append_new(this_json_array, json_real(progSeq[p][t][s]));
+					json_array_append_new(this_json_array, json_integer(progSeq[p][t][s]));
 				}
 				json_object_set_new(rootJ, ("p"+to_string(p)+"t"+to_string(t)).c_str(), this_json_array);
 			}
@@ -588,7 +588,7 @@
 				json_t *json_value;
 				if (json_array) {
 					json_array_foreach(json_array, jThis, json_value) {
-						progSeq[p][t][jThis] = json_real_value(json_value);
+						progSeq[p][t][jThis] = json_integer_value(json_value);
 					}
 				}
 			}
@@ -898,7 +898,7 @@
 				json_t *json_value;
 				if (json_array) {
 					json_array_foreach(json_array, jThis, json_value) {
-						progSeq[p][t][jThis] = json_real_value(json_value);
+						progSeq[p][t][jThis] = json_integer_value(json_value);
 					}
 				}
 			}
@@ -1137,7 +1137,7 @@
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_t *this_json_array = json_array();
 				for (int s = 0; s < 16; s++) {
-					json_array_append_new(this_json_array, json_real(progSeq[p][t][s]));
+					json_array_append_new(this_json_array, json_integer(progSeq[p][t][s]));
 				}
 				json_object_set_new(rootJ, ("p"+to_string(p)+"t"+to_string(t)).c_str(), this_json_array);
 			}
@@ -1273,6 +1273,86 @@
 		return rootJ;
 	}
 
+	void menuLoadTrigStationPreset() {
+static const char FILE_FILTERS[] = "TrigStation preset (.tst):tst,TST";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
+		if (path)
+			loadTrigStationPreset(path);
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+
+	void loadTrigStationPreset(std::string path) {
+
+		FILE *file = fopen(path.c_str(), "r");
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (rootJ == NULL) {
+			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		}
+
+		fclose(file);
+
+		if (rootJ) {
+
+			presetTrigStationFromJson(rootJ);
+
+		} else {
+			WARN("problem loading preset json file");
+			//return;
+		}
+		
+	}
+
+	void menuSaveTrigStationPreset() {
+	
+		static const char FILE_FILTERS[] = "TrigStation preset (.tst):tst,TST";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
+		if (path) {
+			std::string strPath = path;
+			if (strPath.substr(strPath.size() - 4) != ".tst" and strPath.substr(strPath.size() - 4) != ".TST")
+				strPath += ".tst";
+			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
+			saveTrigStationPreset(path, presetTrigStationToJson());
+		}
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void saveTrigStationPreset(std::string path, json_t *rootJ) {
+
+		if (rootJ) {
+			FILE *file = fopen(path.c_str(), "w");
+			if (!file) {
+				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
+				//return;
+			} else {
+				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+				json_decref(rootJ);
+				fclose(file);
+			}
+		}
+	}
+
 
 // ********************************************************************************************************************************************
 
@@ -1283,6 +1363,9 @@
 // ********************************************************************************************************************************************
 
 // ********************************************************************************************************************************************
+
+
+//	TrigSeq8x PRESET
 
 	json_t *presetToJson() {
 
@@ -1298,7 +1381,7 @@
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_t *this_json_array = json_array();
 				for (int s = 0; s < 16; s++) {
-					json_array_append_new(this_json_array, json_real(progSeq[p][t][s]));
+					json_array_append_new(this_json_array, json_integer(progSeq[p][t][s]));
 				}
 				json_object_set_new(rootJ, ("p"+to_string(p)+"t"+to_string(t)).c_str(), this_json_array);
 			}
@@ -1382,7 +1465,7 @@
 				json_t *this_json_value;
 				if (this_json_array) {
 					json_array_foreach(this_json_array, jThis, this_json_value) {
-						progSeq[p][t][jThis] = json_real_value(this_json_value);
+						progSeq[p][t][jThis] = json_integer_value(this_json_value);
 					}
 				}
 			}
@@ -1416,51 +1499,8 @@
 */
 	}
 
-	void menuLoadTrigStationPreset() {
-static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-#if defined(METAMODULE)
-		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
-#else
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
-#endif
-		if (path)
-			loadTrigStationPreset(path);
-
-		free(path);
-#if defined(METAMODULE)
-		});
-#endif
-	}
-
-
-	void loadTrigStationPreset(std::string path) {
-
-		FILE *file = fopen(path.c_str(), "r");
-		json_error_t error;
-		json_t *rootJ = json_loadf(file, 0, &error);
-		if (rootJ == NULL) {
-			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		}
-
-		fclose(file);
-
-		if (rootJ) {
-
-			presetTrigStationFromJson(rootJ);
-
-		} else {
-			WARN("problem loading preset json file");
-			//return;
-		}
-		
-	}
-
-
-
 	void menuLoadAllSequences() {
-		static const char FILE_FILTERS[] = "StepSeq8x preset (.s8p):s8p,S8P";
+		static const char FILE_FILTERS[] = "trigSeq8x preset (.t8p):t8p,T8P";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -1499,51 +1539,9 @@ static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
 		
 	}
 
-
-	void menuSaveTrigStationPreset() {
-	
-		static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-#if defined(METAMODULE)
-		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
-#else
-		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
-#endif
-		if (path) {
-			std::string strPath = path;
-			if (strPath.substr(strPath.size() - 4) != ".sst" and strPath.substr(strPath.size() - 4) != ".SST")
-				strPath += ".sst";
-			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
-			saveTrigStationPreset(path, presetTrigStationToJson());
-		}
-
-		free(path);
-#if defined(METAMODULE)
-		});
-#endif
-	}
-
-	void saveTrigStationPreset(std::string path, json_t *rootJ) {
-
-		if (rootJ) {
-			FILE *file = fopen(path.c_str(), "w");
-			if (!file) {
-				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
-				//return;
-			} else {
-				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-				json_decref(rootJ);
-				fclose(file);
-			}
-		}
-	}
-
-
-
 	void menuSaveAllSequences() {
 
-		static const char FILE_FILTERS[] = "StepSeq8x preset (.s8p):s8p,S8P";
+		static const char FILE_FILTERS[] = "trigSeq8x preset (.t8p):t8p,T8P";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -1553,8 +1551,8 @@ static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
 #endif
 		if (path) {
 			std::string strPath = path;
-			if (strPath.substr(strPath.size() - 4) != ".s8p" and strPath.substr(strPath.size() - 4) != ".S8P")
-				strPath += ".s8p";
+			if (strPath.substr(strPath.size() - 4) != ".t8p" and strPath.substr(strPath.size() - 4) != ".T8P")
+				strPath += ".t8p";
 			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
 			saveAllSequences(path, presetToJson());
 		}
@@ -1588,7 +1586,7 @@ static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
 
 		json_t *wSeq_json_array = json_array();
 		for (int s = 0; s < 16; s++) {
-			json_array_append_new(wSeq_json_array, json_real(wSeq[t][s]));
+			json_array_append_new(wSeq_json_array, json_integer(wSeq[t][s]));
 		}
 		json_object_set_new(rootJ, "sr", wSeq_json_array);	
 		json_object_set_new(rootJ, "length", json_integer((int)params[LENGTH_PARAM].getValue()));
@@ -1605,7 +1603,7 @@ static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
 		json_t *wSeq_json_value;
 		if (wSeq_json_array) {
 			json_array_foreach(wSeq_json_array, s, wSeq_json_value) {
-				params[STEP_PARAM+(t*16)+s].setValue(json_real_value(wSeq_json_value));
+				params[STEP_PARAM+(t*16)+s].setValue(json_integer_value(wSeq_json_value));
 			}
 		}
 
@@ -1617,18 +1615,18 @@ static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
 				params[LENGTH_PARAM].setValue(int(json_integer_value(lengthJ)));
 		}
 
-		json_t* rstJ = json_object_get(rootJ, "reset");
-		if (rstJ) {
+//		json_t* rstJ = json_object_get(rootJ, "reset");
+//		if (rstJ) {
 //			if (json_integer_value(rstJ) < 0 || json_integer_value(rstJ) > 1)
 //				params[RST_PARAM].setValue(0);
 //			else
 //				params[RST_PARAM].setValue(json_integer_value(rstJ));
-		}
+//		}
 
 	}
 
 	void menuLoadSequence(int track) {
-		static const char FILE_FILTERS[] = "stepSeq preset (.ssp):ssp,SSP";
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -1669,7 +1667,7 @@ static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
 
 	void menuSaveSequence(int track) {
 
-		static const char FILE_FILTERS[] = "stepSeq sequence (.ssp):ssp,SSP";
+		static const char FILE_FILTERS[] = "trigSeq sequence (.tss):tss,TSS";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 #if defined(METAMODULE)
@@ -1679,8 +1677,8 @@ static const char FILE_FILTERS[] = "TrigStation preset (.sst):sst,SST";
 #endif
 		if (path) {
 			std::string strPath = path;
-			if (strPath.substr(strPath.size() - 4) != ".ssp" and strPath.substr(strPath.size() - 4) != ".SSP")
-				strPath += ".ssp";
+			if (strPath.substr(strPath.size() - 4) != ".tss" and strPath.substr(strPath.size() - 4) != ".TSS")
+				strPath += ".tss";
 			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
 			saveSequence(path, sequenceToJson(track));
 		}

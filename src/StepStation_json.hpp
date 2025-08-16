@@ -1219,6 +1219,85 @@
 		return rootJ;
 	}
 
+	void menuLoadStepStationPreset() {
+static const char FILE_FILTERS[] = "StepStation preset (.sst):sst,SST";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
+#endif
+		if (path)
+			loadStepStationPreset(path);
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+
+	void loadStepStationPreset(std::string path) {
+
+		FILE *file = fopen(path.c_str(), "r");
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (rootJ == NULL) {
+			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		}
+
+		fclose(file);
+
+		if (rootJ) {
+
+			presetStepStationFromJson(rootJ);
+
+		} else {
+			WARN("problem loading preset json file");
+			//return;
+		}
+		
+	}
+
+	void menuSaveStepStationPreset() {
+	
+		static const char FILE_FILTERS[] = "StepStation preset (.sst):sst,SST";
+		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
+		DEFER({osdialog_filters_free(filters);});
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
+#else
+		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
+#endif
+		if (path) {
+			std::string strPath = path;
+			if (strPath.substr(strPath.size() - 4) != ".sst" and strPath.substr(strPath.size() - 4) != ".SST")
+				strPath += ".sst";
+			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
+			saveStepStationPreset(path, presetStepStationToJson());
+		}
+
+		free(path);
+#if defined(METAMODULE)
+		});
+#endif
+	}
+
+	void saveStepStationPreset(std::string path, json_t *rootJ) {
+
+		if (rootJ) {
+			FILE *file = fopen(path.c_str(), "w");
+			if (!file) {
+				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
+				//return;
+			} else {
+				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+				json_decref(rootJ);
+				fclose(file);
+			}
+		}
+	}
 
 // ********************************************************************************************************************************************
 
@@ -1362,49 +1441,6 @@
 */
 	}
 
-	void menuLoadStepStationPreset() {
-static const char FILE_FILTERS[] = "StepStation preset (.sst):sst,SST";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-#if defined(METAMODULE)
-		async_osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters, [=, this](char *path) {
-#else
-		char *path = osdialog_file(OSDIALOG_OPEN, NULL, NULL, filters);
-#endif
-		if (path)
-			loadStepStationPreset(path);
-
-		free(path);
-#if defined(METAMODULE)
-		});
-#endif
-	}
-
-
-	void loadStepStationPreset(std::string path) {
-
-		FILE *file = fopen(path.c_str(), "r");
-		json_error_t error;
-		json_t *rootJ = json_loadf(file, 0, &error);
-		if (rootJ == NULL) {
-			WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		}
-
-		fclose(file);
-
-		if (rootJ) {
-
-			presetStepStationFromJson(rootJ);
-
-		} else {
-			WARN("problem loading preset json file");
-			//return;
-		}
-		
-	}
-
-
-
 	void menuLoadAllSequences() {
 		static const char FILE_FILTERS[] = "StepSeq8x preset (.s8p):s8p,S8P";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
@@ -1444,48 +1480,6 @@ static const char FILE_FILTERS[] = "StepStation preset (.sst):sst,SST";
 		}
 		
 	}
-
-
-	void menuSaveStepStationPreset() {
-	
-		static const char FILE_FILTERS[] = "StepStation preset (.sst):sst,SST";
-		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
-		DEFER({osdialog_filters_free(filters);});
-#if defined(METAMODULE)
-		async_osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters, [=, this](char *path) {
-#else
-		char *path = osdialog_file(OSDIALOG_SAVE, NULL, NULL, filters);
-#endif
-		if (path) {
-			std::string strPath = path;
-			if (strPath.substr(strPath.size() - 4) != ".sst" and strPath.substr(strPath.size() - 4) != ".SST")
-				strPath += ".sst";
-			path = strcpy(new char[strPath.length() + 1], strPath.c_str());
-			saveStepStationPreset(path, presetStepStationToJson());
-		}
-
-		free(path);
-#if defined(METAMODULE)
-		});
-#endif
-	}
-
-	void saveStepStationPreset(std::string path, json_t *rootJ) {
-
-		if (rootJ) {
-			FILE *file = fopen(path.c_str(), "w");
-			if (!file) {
-				WARN("[ SickoCV ] cannot open '%s' to write\n", path.c_str());
-				//return;
-			} else {
-				json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-				json_decref(rootJ);
-				fclose(file);
-			}
-		}
-	}
-
-
 
 	void menuSaveAllSequences() {
 
