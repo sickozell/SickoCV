@@ -4788,7 +4788,7 @@ struct TrigStationWidget : ModuleWidget {
 			menu->addChild(createMenuItem("Import All Sequences", "", [=]() {module->menuLoadAllSequences();}));
 			menu->addChild(createMenuItem("Export All Sequences", "", [=]() {module->menuSaveAllSequences();}));
 			menu->addChild(new MenuSeparator());
-			menu->addChild(createSubmenuItem("Import stepSeq seq. to:", "", [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Import trigSeq seq. to:", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("Track 1", "", [=]() {module->menuLoadSequence(0);}));
 				menu->addChild(createMenuItem("Track 2", "", [=]() {module->menuLoadSequence(1);}));
 				menu->addChild(createMenuItem("Track 3", "", [=]() {module->menuLoadSequence(2);}));
@@ -4799,7 +4799,7 @@ struct TrigStationWidget : ModuleWidget {
 				menu->addChild(createMenuItem("Track 8", "", [=]() {module->menuLoadSequence(7);}));
 			}));
 			
-			menu->addChild(createSubmenuItem("Export stepSeq seq. from:", "", [=](Menu * menu) {
+			menu->addChild(createSubmenuItem("Export trigSeq seq. from:", "", [=](Menu * menu) {
 				menu->addChild(createMenuItem("Track 1", "", [=]() {module->menuSaveSequence(0);}));
 				menu->addChild(createMenuItem("Track 2", "", [=]() {module->menuSaveSequence(1);}));
 				menu->addChild(createMenuItem("Track 3", "", [=]() {module->menuSaveSequence(2);}));
