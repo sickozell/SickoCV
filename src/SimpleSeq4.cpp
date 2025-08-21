@@ -46,6 +46,9 @@ struct SimpleSeq4 : Module {
 
 	int revType = POSITIVE_V;
 
+	bool dontAdvance = false;
+	bool dontAdvanceSetting = true;
+
 	SimpleSeq4() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configInput(TRIG_INPUT, "Trig");
@@ -86,6 +89,7 @@ struct SimpleSeq4 : Module {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "range", json_integer(range));
 		json_object_set_new(rootJ, "revType", json_integer(revType));
+		json_object_set_new(rootJ, "dontAdvanceSetting", json_boolean(dontAdvanceSetting));
 		json_object_set_new(rootJ, "step", json_integer(recStep));
 		json_object_set_new(rootJ, "initStart", json_boolean(initStart));
 
@@ -106,6 +110,11 @@ struct SimpleSeq4 : Module {
 			revType = json_integer_value(revTypeJ);
 			if (revType < 0 || revType > 1)
 				revType = 0;
+		}
+
+		json_t* dontAdvanceSettingJ = json_object_get(rootJ, "dontAdvanceSetting");
+		if (dontAdvanceSettingJ) {
+			dontAdvanceSetting = json_boolean_value(dontAdvanceSettingJ);
 		}
 
 		json_t* stepJ = json_object_get(rootJ, "step");
@@ -132,6 +141,8 @@ struct SimpleSeq4 : Module {
 		if (rstValue >= 1.f && prevRstValue < 1.f) {
 			lights[KNOB_LIGHT+step].setBrightness(0);
 			step = 0;
+			if (dontAdvanceSetting)
+				dontAdvance = true;
 		}
 		prevRstValue = rstValue;
 
@@ -151,14 +162,18 @@ struct SimpleSeq4 : Module {
 			}
 
 			lights[KNOB_LIGHT + step].setBrightness(0);
-			if (direction == FORWARD) {
-				step++;
-				if (step > 3)
-					step = 0;
+			if (!dontAdvance) {
+				if (direction == FORWARD) {
+					step++;
+					if (step > 3)
+						step = 0;
+				} else {
+					step--;
+					if (step < 0)
+						step = 3;
+				}
 			} else {
-				step--;
-				if (step < 0)
-					step = 3;
+				dontAdvance = false;
 			}
 		}
 		prevTrigValue = trigValue;
@@ -293,6 +308,10 @@ struct SimpleSeq4Widget : ModuleWidget {
 				menu->addChild(revTypeItem);
 			}
 		}));
+
+		menu->addChild(new MenuSeparator());
+		menu->addChild(createMenuLabel("1st clock after reset:"));
+		menu->addChild(createBoolPtrMenuItem("Don't advance", "", &module->dontAdvanceSetting));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("Initialize on Start", "", &module->initStart));
