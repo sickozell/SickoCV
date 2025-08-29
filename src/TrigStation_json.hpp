@@ -163,7 +163,7 @@
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_array_append_new(this_json_array, json_integer(progSteps[p][t]));
 			}
-			json_object_set_new(rootJ, ("progSteps"+to_string(p)).c_str(), this_json_array);
+			json_object_set_new(rootJ, ("progSteps_p"+to_string(p)).c_str(), this_json_array);
 		}
 /*
 		for (int p = 0; p < 32; p++) {
@@ -1148,7 +1148,7 @@
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_array_append_new(this_json_array, json_integer(progSteps[p][t]));
 			}
-			json_object_set_new(rootJ, ("progSteps"+to_string(p)).c_str(), this_json_array);
+			json_object_set_new(rootJ, ("progSteps_p"+to_string(p)).c_str(), this_json_array);
 		}
 /*
 		for (int p = 0; p < 32; p++) {
@@ -1473,7 +1473,7 @@ static const char FILE_FILTERS[] = "TrigStation preset (.tst):tst,TST";
 
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < MAXTRACKS; t++) {
-				json_t *this_json_array = json_object_get(rootJ, ("progSteps"+to_string(p)).c_str());
+				json_t *this_json_array = json_object_get(rootJ, ("progSteps_p"+to_string(p)).c_str());
 				size_t jThis;
 				json_t *this_json_value;
 				if (this_json_array) {
