@@ -1,7 +1,7 @@
-### 2.7.7 (2025-08-29)
-trigStation: fixed bug when importing preset formats. Fixed a bug saving/retrieving steps state
-trigStation/stepStation: fixed bug that didn't store sequences length in programs
-simpleSeq4: added skip 1st clock after reset option in context menu.
+### 2.7.7 (2025-09-01)
+- trigStation: fixed bug when importing preset formats. Fixed a bug saving/retrieving steps state
+- trigStation/stepStation: fixed bug that didn't store sequences length in programs
+- simpleSeq4: added skip 1st clock after reset option in context menu.
 
 ### 2.7.6 (2025-08-7)
 - stepStation: fixed bug that doesn't store range knob settings in programs. Fixed missing range knob settings copy/paste.
