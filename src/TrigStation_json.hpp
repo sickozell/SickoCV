@@ -165,15 +165,7 @@
 			}
 			json_object_set_new(rootJ, ("progSteps_p"+to_string(p)).c_str(), this_json_array);
 		}
-/*
-		for (int p = 0; p < 32; p++) {
-			json_t *this_json_array = json_array();
-			for (int t = 0; t < MAXTRACKS; t++) {
-				json_array_append_new(this_json_array, json_real(progDivMult[p][t]));
-			}
-			json_object_set_new(rootJ, ("progDivMult_p"+to_string(p)).c_str(), this_json_array);
-		}
-*/
+
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < MAXTRACKS; t++) {
@@ -189,15 +181,7 @@
 			}
 			json_object_set_new(rootJ, ("progOutType_p"+to_string(p)).c_str(), this_json_array);
 		}
-/*
-		for (int p = 0; p < 32; p++) {
-			json_t *this_json_array = json_array();
-			for (int t = 0; t < ALLTRACKS; t++) {
-				json_array_append_new(this_json_array, json_integer(progRevType[p][t]));
-			}
-			json_object_set_new(rootJ, ("progRevType_p"+to_string(p)).c_str(), this_json_array);
-		}
-*/
+
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < MAXTRACKS; t++)
@@ -245,21 +229,7 @@
 				json_array_append_new(this_json_array, json_integer(progSeqRunSetting[p]));
 			json_object_set_new(rootJ, "progSeqRunSetting", this_json_array);
 		}
-/*
-		{
-			json_t *this_json_array = json_array();
-			for (int p = 0; p < 32; p++)
-				json_array_append_new(this_json_array, json_boolean(progInternalClock[p]));
-			json_object_set_new(rootJ, "progInternalClock", this_json_array);
-		}
 
-		{
-			json_t *this_json_array = json_array();
-			for (int p = 0; p < 32; p++)
-				json_array_append_new(this_json_array, json_real(progBpmKnob[p]));
-			json_object_set_new(rootJ, "progBpmKnob", this_json_array);
-		}
-*/
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_t *this_json_array = json_array();
@@ -328,16 +298,7 @@
 		json_t* seqRunSettingJ = json_object_get(rootJ, "seqRunSetting");
 		if (seqRunSettingJ)
 			seqRunSetting = json_integer_value(seqRunSettingJ);
-/*		
-		json_t* ppqnJ = json_object_get(rootJ, "ppqn");
-		if (ppqnJ) {
-			tempPpqn = json_integer_value(ppqnJ);
-			if (tempPpqn < 0 || tempPpqn > 6)
-				tempPpqn = 0;
-			if (tempPpqn != ppqn)
-				changePpqnSetting();
-		}
-*/
+
 		json_t* resetOnRunJ = json_object_get(rootJ, "resetOnRun");
 		if (resetOnRunJ)
 			resetOnRun = json_boolean_value(resetOnRunJ);
@@ -351,14 +312,7 @@
 		json_t* resetPulseOnStopJ = json_object_get(rootJ, "ResetPulseOnStop");
 		if (resetPulseOnStopJ)
 			resetPulseOnStop = json_boolean_value(resetPulseOnStopJ);
-/*
-		json_t* cvClockInJ = json_object_get(rootJ, "cvClockIn");
-		if (cvClockInJ)
-			cvClockIn = json_boolean_value(cvClockInJ);
-		json_t* cvClockOutJ = json_object_get(rootJ, "cvClockOut");
-		if (cvClockOutJ)
-			cvClockOut = json_boolean_value(cvClockOutJ);
-*/
+
 		// -------------- user input knob settings
 
 		for (int t = 0; t < MAXTRACKS; t++) {
@@ -422,18 +376,7 @@
 		}
 
 		// ---------------- tweaks
-/*
-		{
-			json_t *json_array = json_object_get(rootJ, "currRevType");
-			size_t jThis;
-			json_t *json_value;
-			if (json_array) {
-				json_array_foreach(json_array, jThis, json_value) {
-					revType[jThis] = json_integer_value(json_value);
-				}
-			}
-		}
-*/
+
 		{
 			json_t *json_array = json_object_get(rootJ, "currDontAdvanceSetting");
 			size_t jThis;
@@ -498,13 +441,7 @@
 					runType = 0;
 			}
 		}
-/*		
-		{
-			json_t* valueJ = json_object_get(rootJ, "rstClkOnRst");
-			if (valueJ)
-				rstClkOnRst = json_boolean_value(valueJ);
-		}
-*/
+
 		{
 			json_t* valueJ = json_object_get(rootJ, "rstSeqOnProgChange");
 			if (valueJ)
@@ -606,18 +543,7 @@
 				}
 			}
 		}
-/*
-		for (int p = 0; p < 32; p++) {
-			json_t *json_array = json_object_get(rootJ, ("progDivMult_p"+to_string(p)).c_str());
-			size_t jThis;
-			json_t *json_value;
-			if (json_array) {
-				json_array_foreach(json_array, jThis, json_value) {
-					progDivMult[p][jThis] = json_real_value(json_value);
-				}
-			}
-		}
-*/
+
 		for (int p = 0; p < 32; p++) {
 			json_t *json_array = json_object_get(rootJ, ("progCurrentMode_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -650,18 +576,7 @@
 				}
 			}
 		}
-/*
-		for (int p = 0; p < 32; p++) {
-			json_t *this_json_array = json_object_get(rootJ, ("progRevType_p"+to_string(p)).c_str());
-			size_t jThis;
-			json_t *this_json_value;
-			if (this_json_array) {
-				json_array_foreach(this_json_array, jThis, this_json_value) {
-					progRevType[p][jThis] = json_integer_value(this_json_value);
-				}
-			}
-		}
-*/
+
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progDontAdvanceSetting_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -727,29 +642,7 @@
 				}
 			}
 		}
-/*
-		{
-			json_t *this_json_array = json_object_get(rootJ, "progInternalClock");
-			size_t jThis;
-			json_t *this_json_value;
-			if (this_json_array) {
-				json_array_foreach(this_json_array, jThis, this_json_value) {
-					progInternalClock[jThis] = json_boolean_value(this_json_value);
-				}
-			}
-		}
 
-		{
-			json_t *this_json_array = json_object_get(rootJ, "progBpmKnob");
-			size_t jThis;
-			json_t *this_json_value;
-			if (this_json_array) {
-				json_array_foreach(this_json_array, jThis, this_json_value) {
-					progBpmKnob[jThis] = json_real_value(this_json_value);
-				}
-			}
-		}
-*/
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_t *this_json_array = json_object_get(rootJ, ("progUserTable_p"+to_string(p)+"t"+to_string(t)).c_str());
@@ -804,17 +697,6 @@
 
 	void presetTrigStationFromJson(json_t *rootJ) {
 
-		// ------------ CLOCK
-/*		
-		json_t* ppqnJ = json_object_get(rootJ, "ppqn");
-		if (ppqnJ) {
-			tempPpqn = json_integer_value(ppqnJ);
-			if (tempPpqn < 0 || tempPpqn > 6)
-				tempPpqn = 0;
-			if (tempPpqn != ppqn)
-				changePpqnSetting();
-		}
-*/
 		json_t* wait2RstSettingJ = json_object_get(rootJ, "wait2RstSetting");
 		if (wait2RstSettingJ)
 			wait2RstSetting = json_boolean_value(wait2RstSettingJ);
@@ -832,14 +714,7 @@
 		json_t* resetPulseOnStopJ = json_object_get(rootJ, "ResetPulseOnStop");
 		if (resetPulseOnStopJ)
 			resetPulseOnStop = json_boolean_value(resetPulseOnStopJ);
-/*
-		json_t* cvClockInJ = json_object_get(rootJ, "cvClockIn");
-		if (cvClockInJ)
-			cvClockIn = json_boolean_value(cvClockInJ);
-		json_t* cvClockOutJ = json_object_get(rootJ, "cvClockOut");
-		if (cvClockOutJ)
-			cvClockOut = json_boolean_value(cvClockOutJ);
-*/
+
 		// ---------------------------------------------------------------------- SEQUENC
 
 		{
@@ -850,13 +725,7 @@
 					runType = 0;
 			}
 		}
-/*
-		{
-			json_t* valueJ = json_object_get(rootJ, "rstClkOnRst");
-			if (valueJ)
-				rstClkOnRst = json_boolean_value(valueJ);
-		}
-*/
+
 		{
 			json_t* valueJ = json_object_get(rootJ, "rstSeqOnProgChange");
 			if (valueJ)
@@ -914,18 +783,7 @@
 				}
 			}
 		}
-/*
-		for (int p = 0; p < 32; p++) {
-			json_t *json_array = json_object_get(rootJ, ("progDivMult_p"+to_string(p)).c_str());
-			size_t jThis;
-			json_t *json_value;
-			if (json_array) {
-				json_array_foreach(json_array, jThis, json_value) {
-					progDivMult[p][jThis] = json_real_value(json_value);
-				}
-			}
-		}
-*/
+
 		for (int p = 0; p < 32; p++) {
 			json_t *json_array = json_object_get(rootJ, ("progCurrentMode_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -947,18 +805,7 @@
 				}
 			}
 		}
-/*
-		for (int p = 0; p < 32; p++) {
-			json_t *this_json_array = json_object_get(rootJ, ("progRevType_p"+to_string(p)).c_str());
-			size_t jThis;
-			json_t *this_json_value;
-			if (this_json_array) {
-				json_array_foreach(this_json_array, jThis, this_json_value) {
-					progRevType[p][jThis] = json_integer_value(this_json_value);
-				}
-			}
-		}
-*/
+
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_object_get(rootJ, ("progDontAdvanceSetting_p"+to_string(p)).c_str());
 			size_t jThis;
@@ -1024,29 +871,7 @@
 				}
 			}
 		}
-/*
-		{
-			json_t *this_json_array = json_object_get(rootJ, "progInternalClock");
-			size_t jThis;
-			json_t *this_json_value;
-			if (this_json_array) {
-				json_array_foreach(this_json_array, jThis, this_json_value) {
-					progInternalClock[jThis] = json_boolean_value(this_json_value);
-				}
-			}
-		}
 
-		{
-			json_t *this_json_array = json_object_get(rootJ, "progBpmKnob");
-			size_t jThis;
-			json_t *this_json_value;
-			if (this_json_array) {
-				json_array_foreach(this_json_array, jThis, this_json_value) {
-					progBpmKnob[jThis] = json_real_value(this_json_value);
-				}
-			}
-		}
-*/
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_t *this_json_array = json_object_get(rootJ, ("progUserTable_p"+to_string(p)+"t"+to_string(t)).c_str());
@@ -1108,21 +933,15 @@
 
 		json_object_set_new(rootJ, "wait2RstSetting", json_integer(wait2RstSetting));
 
-		// ---------- CLOCK
-		
-//		json_object_set_new(rootJ, "ppqn", json_integer(ppqn));
 		json_object_set_new(rootJ, "resetOnRun", json_boolean(resetOnRun));
 		json_object_set_new(rootJ, "ResetPulseOnRun", json_boolean(resetPulseOnRun));
 		json_object_set_new(rootJ, "ResetOnStop", json_boolean(resetOnStop));
 		json_object_set_new(rootJ, "ResetPulseOnStop", json_boolean(resetPulseOnStop));
 
-//		json_object_set_new(rootJ, "cvClockIn", json_boolean(cvClockIn));
-//		json_object_set_new(rootJ, "cvClockOut", json_boolean(cvClockOut));
-		
+	
 		// --------- SEQUENCER
 
 		json_object_set_new(rootJ, "runType", json_integer(runType));
-//		json_object_set_new(rootJ, "rstClkOnRst", json_boolean(rstClkOnRst));
 		json_object_set_new(rootJ, "rstSeqOnProgChange", json_boolean(rstSeqOnProgChange));
 
 		json_object_set_new(rootJ, "bitResolution", json_integer(bitResolution));
@@ -1150,15 +969,7 @@
 			}
 			json_object_set_new(rootJ, ("progSteps_p"+to_string(p)).c_str(), this_json_array);
 		}
-/*
-		for (int p = 0; p < 32; p++) {
-			json_t *this_json_array = json_array();
-			for (int t = 0; t < MAXTRACKS; t++) {
-				json_array_append_new(this_json_array, json_real(progDivMult[p][t]));
-			}
-			json_object_set_new(rootJ, ("progDivMult_p"+to_string(p)).c_str(), this_json_array);
-		}
-*/
+
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < MAXTRACKS; t++) {
@@ -1174,15 +985,7 @@
 			}
 			json_object_set_new(rootJ, ("progTuringMode_p"+to_string(p)).c_str(), this_json_array);
 		}
-/*
-		for (int p = 0; p < 32; p++) {
-			json_t *this_json_array = json_array();
-			for (int t = 0; t < ALLTRACKS; t++) {
-				json_array_append_new(this_json_array, json_integer(progRevType[p][t]));
-			}
-			json_object_set_new(rootJ, ("progRevType_p"+to_string(p)).c_str(), this_json_array);
-		}
-*/
+
 		for (int p = 0; p < 32; p++) {
 			json_t *this_json_array = json_array();
 			for (int t = 0; t < ALLTRACKS; t++)
@@ -1224,21 +1027,7 @@
 				json_array_append_new(this_json_array, json_integer(progSeqRunSetting[p]));
 			json_object_set_new(rootJ, "progSeqRunSetting", this_json_array);
 		}
-/*
-		{
-			json_t *this_json_array = json_array();
-			for (int p = 0; p < 32; p++)
-				json_array_append_new(this_json_array, json_boolean(progInternalClock[p]));
-			json_object_set_new(rootJ, "progInternalClock", this_json_array);
-		}
 
-		{
-			json_t *this_json_array = json_array();
-			for (int p = 0; p < 32; p++)
-				json_array_append_new(this_json_array, json_real(progBpmKnob[p]));
-			json_object_set_new(rootJ, "progBpmKnob", this_json_array);
-		}
-*/
 		for (int p = 0; p < 32; p++) {
 			for (int t = 0; t < MAXTRACKS; t++) {
 				json_t *this_json_array = json_array();
@@ -1408,14 +1197,6 @@ static const char FILE_FILTERS[] = "TrigStation preset (.tst):tst,TST";
 			if (runType < 0 || runType > 1)
 				runType = 0;
 		}
-/*
-		json_t* revTypeJ = json_object_get(rootJ, "revType");
-		if (revTypeJ) {
-			revType[MC] = json_integer_value(revTypeJ);
-			if (revType[MC] < 0 || revType[MC] > 1)
-				revType[MC] = 0;
-		}
-		*/
 
 		json_t* rstStepsWhenJ = json_object_get(rootJ, "rstStepsWhen");
 		if (rstStepsWhenJ) {
