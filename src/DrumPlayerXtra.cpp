@@ -683,7 +683,11 @@ struct DrumPlayerXtra : Module {
 			break;
 		}
 		for (int i = 0; i < floor(totalSampleC[slot]/div); i = i + floor(totalSampleC[slot]/div/displaySize))
+#if defined(METAMODULE)
+			displayBuff[slot].push_back(playBuffer[slot][1][i]);
+#else
 			displayBuff[slot].push_back(playBuffer[slot][0][i]);
+#endif
 	}
 
 	void swapSlot(int slot1, int slot2) {
