@@ -138,11 +138,6 @@ struct DrumPlayerMk2 : Module {
 
 	bool accentVol = false;
 
-	bool pingSlot[4] = {false, false, false, false};
-	bool pongSlot[4] = {false, false, false, false};
-
-	bool initSample = true;
-
 // begin changes for metamodule
 #if defined(METAMODULE)
 	const drwav_uint64 recordingLimit = 48000 * 60 * 2 * 2; // 2mins mono, 1min stereo limit on MM
@@ -231,7 +226,6 @@ struct DrumPlayerMk2 : Module {
 		}
 #endif
 // end changes for metamodule
-		initSample = false;
 		Module::onAdd(e);
 	}
 
@@ -461,43 +455,7 @@ struct DrumPlayerMk2 : Module {
 	   	}
 	};
 
-	void waitForSlot(int slot1) {
-		pongSlot[slot1] = false;
-		pingSlot[slot1] = true;
-		while (pongSlot[slot1] == false) {
-			//DEBUG("DrumPlayer slot # %i", slot1);
-		}
-	}
-
-	void waitForSlots(int slot1, int slot2) {
-		pongSlot[slot1] = false;
-		pongSlot[slot2] = false;
-		pingSlot[slot1] = true;
-		pingSlot[slot2] = true;
-		while (pongSlot[slot1] == false) {
-			//DEBUG("DrumPlayer slot # %i", slot1);
-		}
-		while (pongSlot[slot2] == false) {
-			//DEBUG("DrumPlayer slot # %i", slot2);
-		}
-	}
-
-	void resetPing(int slot) {
-		pingSlot[slot] = false;
-		pongSlot[slot] = false;
-	}
-
-	void resetPings(int slot1, int slot2) {
-		pingSlot[slot1] = false;
-		pingSlot[slot2] = false;
-		pongSlot[slot1] = false;
-		pongSlot[slot2] = false;
-	}
-
 	void swapSlot(int slot1, int slot2) {
-		
-		waitForSlots(slot1, slot2);
-
 		vector<float> swapBuffer[2];
 		unsigned int swapSampleRate = sampleRate[slot1];
 		drwav_uint64 swapTotalSampleC = totalSampleC[slot1];
@@ -545,14 +503,9 @@ struct DrumPlayerMk2 : Module {
 		fileFound[slot2] = swapFileFound;
 		fileLoaded[slot2] = swapFileLoaded;
 		loadFromPatch[slot2] = swapLoadFromPatch;
-
-		resetPings(slot1, slot2);
 	}
 
 	void copySlot(int slot1, int slot2) {
-
-		waitForSlots(slot1, slot2);
-
 		clearSlot(slot2);
 		sampleRate[slot2] = sampleRate[slot1];
 		totalSampleC[slot2] = totalSampleC[slot1];
@@ -567,8 +520,6 @@ struct DrumPlayerMk2 : Module {
 			playBuffer[slot2][0].push_back(playBuffer[slot1][0][i]);
 			playBuffer[slot2][1].push_back(playBuffer[slot1][1][i]);
 		}
-
-		resetPings(slot1, slot2);
 	}
 
 //	-----------------------------------------------------------------------------------------------
@@ -631,10 +582,6 @@ struct DrumPlayerMk2 : Module {
 	}
 
 	void loadSample(std::string fromPath, int slot) {
-
-		if (!initSample)
-			waitForSlot(slot);
-
 		std::string path = fromPath;
 		//unsigned int c;
 		//unsigned int sr;
@@ -713,8 +660,6 @@ struct DrumPlayerMk2 : Module {
 				path = storedPath[slot];
 			fileDescription[slot] = "(!)"+path;
 		}
-
-		resetPing(slot);
 	};
 
 // -------------------------------------------------------------------------------------------------------------------------------
@@ -792,9 +737,6 @@ struct DrumPlayerMk2 : Module {
 	}
 	
 	void clearSlot(int slot) {
-
-		waitForSlot(slot);
-
 		fileLoaded[slot] = false;
 		fileFound[slot] = false;
 		loadFromPatch[slot] = false;
@@ -813,7 +755,6 @@ struct DrumPlayerMk2 : Module {
  		//playBuffer[slot][1].reserve(0);
  // end changes for metamodule
 		
-		resetPing(slot);
 	}
 
 	static float convertCVToSec(float cv) {		
@@ -832,211 +773,204 @@ struct DrumPlayerMk2 : Module {
 
 			lights[SLOT_LIGHT+slot].setBrightness(fileLoaded[slot]);
 
-			currentOutput = 0;
-
-			if (pingSlot[slot]) {
-				pongSlot[slot] = true;
-
-			} else {
-
-				if (trigValue[slot] >= 1 && prevTrigValue[slot] < 1){
-					if (play[slot]) {
-						fading[slot] = true;
-						fadingValue[slot] = 1.f;
-						fadedPosition[slot] = samplePos[slot];
-					}
-					play[slot] = true;
-					samplePos[slot] = 0;
-					currSampleWeight[slot] = sampleCoeff[slot];
-					prevSamplePos[slot] = 0;
-					prevSampleWeight[slot] = 0;
-					if (!accentVol) {
-						if (inputs[ACC_INPUT+slot].getVoltage() < 1)
-							level[slot] = params[ACCVOL_PARAM+slot].getValue();
-						else
-							level[slot] = 1;
-					} else {
-						if (inputs[ACC_INPUT+slot].getVoltage() >= 1)
-							level[slot] = params[ACCVOL_PARAM+slot].getValue();
-						else
-							level[slot] = 1;
-					}
-
-					if (functionButton) {
-						if (slot == 0 || slot == 2) {
-							choking[slot+1] = true;
-							chokeValue[slot+1] = 1.f;
-						} else {
-							reversePlay[slot] = true;
-							samplePos[slot] = totalSampleC[slot];
-							prevSamplePos[slot] = totalSampleC[slot];
-						}
-					} else {
-						reversePlay[slot] = false;
-					}
-
-					stageLevel[slot] = 1;
-
+			if (trigValue[slot] >= 1 && prevTrigValue[slot] < 1){
+				if (play[slot]) {
+					fading[slot] = true;
+					fadingValue[slot] = 1.f;
+					fadedPosition[slot] = samplePos[slot];
 				}
-				prevTrigValue[slot] = trigValue[slot];
-
-				if (fileLoaded[slot] && play[slot] && 
-					((!reversePlay[slot] && floor(samplePos[slot]) < totalSampleC[slot]) ||
-					 (reversePlay[slot] && floor(samplePos[slot]) >= 0))) {
-					switch (interpolationMode) {
-						case NO_INTERP:
-							currentOutput = level[slot] * playBuffer[slot][antiAlias][floor(samplePos[slot])];
-						break;
-
-						case LINEAR1_INTERP:
-							if (currSampleWeight[slot] == 0) {
-								currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
-							} else {
-								currentOutput = level[slot] * float(
-													(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
-													(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
-												);
-							}
-						break;
-
-						case LINEAR2_INTERP:
-							if (currSampleWeight[slot] == 0) {
-								currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
-							} else {
-								currentOutput = level[slot] * float(
-													(
-														(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])] * (1-prevSampleWeight[slot])) +
-														(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])+1] * prevSampleWeight[slot]) +
-														(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
-														(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
-													) / 2
-												);
-							}
-						break;
-
-						case HERMITE_INTERP:
-							if (currSampleWeight[slot] == 0) {
-								currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
-							} else {
-								if (floor(samplePos[slot]) > 1 && floor(samplePos[slot]) < totalSamples[slot] - 1) {
-									/*
-									currentOutput = hermiteInterpol(playBuffer[i][antiAlias][floor(samplePos[i])-1],
-																	playBuffer[i][antiAlias][floor(samplePos[i])],
-																	playBuffer[i][antiAlias][floor(samplePos[i])+1],
-																	playBuffer[i][antiAlias][floor(samplePos[i])+2],
-																	currSampleWeight[i]);
-									*/
-									// below is translation of the above function
-									double a1 = .5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+1] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1]);
-									double a2 = playBuffer[slot][antiAlias][floor(samplePos[slot])-1] - (2.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])]) + (2 * playBuffer[slot][antiAlias][floor(samplePos[slot])+1]) - (.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])+2]);
-									double a3 = (.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+2] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1])) + (1.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])] - playBuffer[slot][antiAlias][floor(samplePos[slot])+1]));
-									currentOutput = level[slot] * float(
-										(((((a3 * currSampleWeight[slot]) + a2) * currSampleWeight[slot]) + a1) * currSampleWeight[slot]) + playBuffer[slot][antiAlias][floor(samplePos[slot])]
-									);
-								} else {
-									currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
-								}
-							}
-						break;
-					}
-
-					decayKnob[slot] = params[DECAY_PARAM+slot].getValue();
-					if (decayKnob[slot] != prevDecayKnob[slot]) {
-						decayValue[slot] = convertCVToSec(decayKnob[slot]);
-						if (decayKnob[slot] != 1)
-							dontDecay[slot] = false;
-						else
-							dontDecay[slot] = true;
-					}
-					prevDecayKnob[slot] = decayKnob[slot];
-
-					if (!inputs[DECAY_INPUT+slot].isConnected()) {
-						stageCoeff[slot] = srCoeff / decayValue[slot];
-					} else {
-
-						decayInValue[slot] = decayValue[slot] + (inputs[DECAY_INPUT+slot].getVoltage());
-						if (decayInValue[slot] < minAdsrTime)
-							decayInValue[slot] = minAdsrTime;
-						stageCoeff[slot] = srCoeff / decayInValue[slot];
-					}
-
-					if (!dontDecay[slot]) {
-						stageLevel[slot] -= stageCoeff[slot];
-
-						if (stageLevel[slot] < 0) {
-							stageLevel[slot] = 0;
-							play[slot] = false;
-						}
-
-						currentOutput *= expTable[logDecay][int(expTableCoeff * stageLevel[slot])];
-					}
-
-					if (slot > 0 && choking[slot]) {
-						if (chokeValue[slot] < 0.0) {
-							choking[slot] = false;
-							play[slot] = false;
-							currentOutput = 0;
-						} else {
-							currentOutput *= chokeValue[slot];
-							chokeValue[slot] -= fadeDecrement;
-						}
-					}
-
-					prevSamplePos[slot] = samplePos[slot];
-
-					tune[slot] = double(params[TUNE_PARAM+slot].getValue());
-					if (tune[slot] != prevTune[slot]) {
-						prevTune[slot] = tune[slot];
-						currentSpeed[slot] = double(powf(2,tune[slot]));
-						if (currentSpeed[slot] > 4)
-							currentSpeed[slot] = 4;
-						else if (currentSpeed[slot] < 0.25)
-							currentSpeed[slot] = 0.25;
-					}
-
-					if (inputs[VOCT_INPUT+slot].isConnected()) {
-						voct[slot] = inputs[VOCT_INPUT+slot].getVoltage();
-						if (voct[slot] != prevVoct[slot]) {
-							speedVoct[slot] = pow(2,voct[slot]);
-							prevVoct[slot] = voct[slot];
-						}
-						distancePos[slot] = currentSpeed[slot] * sampleCoeff[slot] * speedVoct[slot];
-					} else
-						distancePos[slot] = currentSpeed[slot] * sampleCoeff[slot];
-
-
-					if (!reversePlay[slot])
-						samplePos[slot] += distancePos[slot];
+				play[slot] = true;
+				samplePos[slot] = 0;
+				currSampleWeight[slot] = sampleCoeff[slot];
+				prevSamplePos[slot] = 0;
+				prevSampleWeight[slot] = 0;
+				if (!accentVol) {
+					if (inputs[ACC_INPUT+slot].getVoltage() < 1)
+						level[slot] = params[ACCVOL_PARAM+slot].getValue();
 					else
-						samplePos[slot] -= distancePos[slot];
+						level[slot] = 1;
+				} else {
+					if (inputs[ACC_INPUT+slot].getVoltage() >= 1)
+						level[slot] = params[ACCVOL_PARAM+slot].getValue();
+					else
+						level[slot] = 1;
+				}
 
-					if (interpolationMode > NO_INTERP) {
-						prevSampleWeight[slot] = currSampleWeight[slot];
-						currSampleWeight[slot] = samplePos[slot] - floor(samplePos[slot]);
-					}
-					
-					if (fading[slot]) {
-						if (fadingValue[slot] > 0) {
-							fadingValue[slot] -= fadeDecrement;
-							currentOutput += (playBuffer[slot][antiAlias][floor(fadedPosition[slot])] * fadingValue[slot] * level[slot]);
-
-							if (!reversePlay[slot]) {
-								fadedPosition[slot] += distancePos[slot];
-								if (fadedPosition[slot] > totalSamples[slot])
-									fading[slot] = false;
-							} else {
-								fadedPosition[slot] -= distancePos[slot];
-								if (fadedPosition[slot] <= 0)
-									fading[slot] = false;
-							}
-						} else
-							fading[slot] = false;
+				if (functionButton) {
+					if (slot == 0 || slot == 2) {
+						choking[slot+1] = true;
+						chokeValue[slot+1] = 1.f;
+					} else {
+						reversePlay[slot] = true;
+						samplePos[slot] = totalSampleC[slot];
+						prevSamplePos[slot] = totalSampleC[slot];
 					}
 				} else {
-					choking[slot] = false;
-					play[slot] = false;
-					fading[slot] = false;
+					reversePlay[slot] = false;
 				}
+
+				stageLevel[slot] = 1;
+
+			}
+			prevTrigValue[slot] = trigValue[slot];
+			currentOutput = 0;
+
+			if (fileLoaded[slot] && play[slot] && 
+				((!reversePlay[slot] && floor(samplePos[slot]) < totalSampleC[slot]) ||
+				 (reversePlay[slot] && floor(samplePos[slot]) >= 0))) {
+				switch (interpolationMode) {
+					case NO_INTERP:
+						currentOutput = level[slot] * playBuffer[slot][antiAlias][floor(samplePos[slot])];
+					break;
+
+					case LINEAR1_INTERP:
+						if (currSampleWeight[slot] == 0) {
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+						} else {
+							currentOutput = level[slot] * float(
+												(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
+												(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
+											);
+						}
+					break;
+
+					case LINEAR2_INTERP:
+						if (currSampleWeight[slot] == 0) {
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+						} else {
+							currentOutput = level[slot] * float(
+												(
+													(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])] * (1-prevSampleWeight[slot])) +
+													(playBuffer[slot][antiAlias][floor(prevSamplePos[slot])+1] * prevSampleWeight[slot]) +
+													(playBuffer[slot][antiAlias][floor(samplePos[slot])] * (1-currSampleWeight[slot])) +
+													(playBuffer[slot][antiAlias][floor(samplePos[slot])+1] * currSampleWeight[slot])
+												) / 2
+											);
+						}
+					break;
+
+					case HERMITE_INTERP:
+						if (currSampleWeight[slot] == 0) {
+							currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+						} else {
+							if (floor(samplePos[slot]) > 1 && floor(samplePos[slot]) < totalSamples[slot] - 1) {
+								/*
+								currentOutput = hermiteInterpol(playBuffer[i][antiAlias][floor(samplePos[i])-1],
+																playBuffer[i][antiAlias][floor(samplePos[i])],
+																playBuffer[i][antiAlias][floor(samplePos[i])+1],
+																playBuffer[i][antiAlias][floor(samplePos[i])+2],
+																currSampleWeight[i]);
+								*/
+								// below is translation of the above function
+								double a1 = .5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+1] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1]);
+								double a2 = playBuffer[slot][antiAlias][floor(samplePos[slot])-1] - (2.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])]) + (2 * playBuffer[slot][antiAlias][floor(samplePos[slot])+1]) - (.5F * playBuffer[slot][antiAlias][floor(samplePos[slot])+2]);
+								double a3 = (.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])+2] - playBuffer[slot][antiAlias][floor(samplePos[slot])-1])) + (1.5F * (playBuffer[slot][antiAlias][floor(samplePos[slot])] - playBuffer[slot][antiAlias][floor(samplePos[slot])+1]));
+								currentOutput = level[slot] * float(
+									(((((a3 * currSampleWeight[slot]) + a2) * currSampleWeight[slot]) + a1) * currSampleWeight[slot]) + playBuffer[slot][antiAlias][floor(samplePos[slot])]
+								);
+							} else {
+								currentOutput = level[slot] * float(playBuffer[slot][antiAlias][floor(samplePos[slot])]);
+							}
+						}
+					break;
+				}
+
+				decayKnob[slot] = params[DECAY_PARAM+slot].getValue();
+				if (decayKnob[slot] != prevDecayKnob[slot]) {
+					decayValue[slot] = convertCVToSec(decayKnob[slot]);
+					if (decayKnob[slot] != 1)
+						dontDecay[slot] = false;
+					else
+						dontDecay[slot] = true;
+				}
+				prevDecayKnob[slot] = decayKnob[slot];
+
+				if (!inputs[DECAY_INPUT+slot].isConnected()) {
+					stageCoeff[slot] = srCoeff / decayValue[slot];
+				} else {
+
+					decayInValue[slot] = decayValue[slot] + (inputs[DECAY_INPUT+slot].getVoltage());
+					if (decayInValue[slot] < minAdsrTime)
+						decayInValue[slot] = minAdsrTime;
+					stageCoeff[slot] = srCoeff / decayInValue[slot];
+				}
+
+				if (!dontDecay[slot]) {
+					stageLevel[slot] -= stageCoeff[slot];
+
+					if (stageLevel[slot] < 0) {
+						stageLevel[slot] = 0;
+						play[slot] = false;
+					}
+
+					currentOutput *= expTable[logDecay][int(expTableCoeff * stageLevel[slot])];
+				}
+
+				if (slot > 0 && choking[slot]) {
+					if (chokeValue[slot] < 0.0) {
+						choking[slot] = false;
+						play[slot] = false;
+						currentOutput = 0;
+					} else {
+						currentOutput *= chokeValue[slot];
+						chokeValue[slot] -= fadeDecrement;
+					}
+				}
+
+				prevSamplePos[slot] = samplePos[slot];
+
+				tune[slot] = double(params[TUNE_PARAM+slot].getValue());
+				if (tune[slot] != prevTune[slot]) {
+					prevTune[slot] = tune[slot];
+					currentSpeed[slot] = double(powf(2,tune[slot]));
+					if (currentSpeed[slot] > 4)
+						currentSpeed[slot] = 4;
+					else if (currentSpeed[slot] < 0.25)
+						currentSpeed[slot] = 0.25;
+				}
+
+				if (inputs[VOCT_INPUT+slot].isConnected()) {
+					voct[slot] = inputs[VOCT_INPUT+slot].getVoltage();
+					if (voct[slot] != prevVoct[slot]) {
+						speedVoct[slot] = pow(2,voct[slot]);
+						prevVoct[slot] = voct[slot];
+					}
+					distancePos[slot] = currentSpeed[slot] * sampleCoeff[slot] * speedVoct[slot];
+				} else
+					distancePos[slot] = currentSpeed[slot] * sampleCoeff[slot];
+
+
+				if (!reversePlay[slot])
+					samplePos[slot] += distancePos[slot];
+				else
+					samplePos[slot] -= distancePos[slot];
+
+				if (interpolationMode > NO_INTERP) {
+					prevSampleWeight[slot] = currSampleWeight[slot];
+					currSampleWeight[slot] = samplePos[slot] - floor(samplePos[slot]);
+				}
+				
+				if (fading[slot]) {
+					if (fadingValue[slot] > 0) {
+						fadingValue[slot] -= fadeDecrement;
+						currentOutput += (playBuffer[slot][antiAlias][floor(fadedPosition[slot])] * fadingValue[slot] * level[slot]);
+
+						if (!reversePlay[slot]) {
+							fadedPosition[slot] += distancePos[slot];
+							if (fadedPosition[slot] > totalSamples[slot])
+								fading[slot] = false;
+						} else {
+							fadedPosition[slot] -= distancePos[slot];
+							if (fadedPosition[slot] <= 0)
+								fading[slot] = false;
+						}
+					} else
+						fading[slot] = false;
+				}
+			} else {
+				choking[slot] = false;
+				play[slot] = false;
+				fading[slot] = false;
 			}
 
 			switch (outsMode) {

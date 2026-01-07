@@ -1,5 +1,5 @@
 ### 2.7.8 (2025-11-14)
-- drumPlayerMk2 : fixing bug when loading sample while triggering
+- trigStation: fixed turing mode set on all programs when erasing all progs
 
 ### 2.7.7 (2025-09-01)
 - trigStation: fixed bug when importing preset formats. Fixed a bug saving/retrieving steps state
