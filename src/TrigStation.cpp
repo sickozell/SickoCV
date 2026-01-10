@@ -1234,9 +1234,9 @@ struct TrigStation : SickoTrigStation {
 				progXcludeFromRst[p][t] = false;
 				progUserValues[p][t][0] = 0.f;
 				progUserValues[p][t][1] = 0.f;
-				progTuringMode[p][t] = 2;
+				progTuringMode[p][t] = 0;
 				progOutTypeSetting[p][t] = 3;
-				//progRevType[p][t] = 2;
+				//progRevType[p][t] = 2; 
 				progDontAdvanceSetting[p][t] = 2;
 				progRstStepsWhen[p][t] = 3;	
 				progSampleDelay[p][t] = 6;

@@ -1,3 +1,6 @@
+### 2.7.8 (2026-01-10)
+- trigStation: fixed turing mode set on all programs when erasing all progs
+
 ### 2.7.7 (2025-09-01)
 - trigStation: fixed bug when importing preset formats. Fixed a bug saving/retrieving steps state
 - trigStation/stepStation: fixed bug that didn't store sequences length in programs
