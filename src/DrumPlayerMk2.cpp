@@ -581,6 +581,16 @@ struct DrumPlayerMk2 : Module {
 #endif
 	}
 
+	void dragDropLoadSample(int slot, std::string path) {
+		if (slot < 0 || slot >= 4)
+			return;
+
+		storedPath[slot] = path;
+		loadFromPatch[slot] = false;
+
+		loadSample(storedPath[slot], slot);
+	}
+
 	void loadSample(std::string fromPath, int slot) {
 		std::string path = fromPath;
 		//unsigned int c;
@@ -1460,6 +1470,33 @@ struct dpMk2Slot4Display : TransparentWidget {
 	}
 };
 
+struct DrumPlayerMk2DropArea : Widget {
+	DrumPlayerMk2* module = NULL;
+	int slot = 0;
+
+	void onHover(const HoverEvent& e) override {
+		e.consume(this);
+	}
+
+	void onPathDrop(const PathDropEvent& e) override {
+		if (!module || e.paths.empty())
+			return;
+
+		std::string path = e.paths[0];
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+		if (!ext.empty() && ext[0] == '.')
+			ext.erase(0, 1);
+
+		if (ext != "wav")
+			return;
+
+		module->dragDropLoadSample(slot, path);
+
+		e.consume(this);
+	}
+};
 
 struct DrumPlayerMk2Widget : ModuleWidget {
 	DrumPlayerMk2Widget(DrumPlayerMk2 *module) {
@@ -1470,6 +1507,17 @@ struct DrumPlayerMk2Widget : ModuleWidget {
 		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
+
+		for (int i = 0; i < 4; i++) {
+			DrumPlayerMk2DropArea* dropArea = new DrumPlayerMk2DropArea;
+			dropArea->module = dynamic_cast<DrumPlayerMk2*>(module);
+			dropArea->slot = i;
+
+			dropArea->box.pos = Vec(6 + i * 48, 5);
+			dropArea->box.size = Vec(41, 380);
+
+			addChild(dropArea);
+		}
 
 		{
 			dpMk2Slot1Display *display = new dpMk2Slot1Display();

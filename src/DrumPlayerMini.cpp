@@ -482,6 +482,16 @@ struct DrumPlayerMini : Module {
 #endif
 	}
 
+	void dragDropLoadSample(std::string path) {
+		//INFO("dragDropLoadSample ENTER: %s", path.c_str());
+
+		storedPath = path;
+		loadFromPatch = false;
+
+		loadSample(storedPath);
+	}
+
+
 	void loadSample(std::string fromPath) {
 		std::string path = fromPath;
 		//unsigned int c;
@@ -1065,6 +1075,27 @@ struct DrumPlayerMiniWidget : ModuleWidget {
 
 			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xCenter, yOut)), module, DrumPlayerMini::OUT_OUTPUT));
 		//}
+	}
+
+	void onPathDrop(const PathDropEvent& e) override {
+		if (!module || e.paths.empty())
+			return;
+
+		DrumPlayerMini* samplerModule = dynamic_cast<DrumPlayerMini*>(module);
+		if (!samplerModule)
+			return;
+
+		std::string path = e.paths[0];
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+		if (ext != "wav" && ext != ".wav")
+			return;
+
+		samplerModule->dragDropLoadSample(path);
+
+		e.consume(this);
 	}
 
 	void appendContextMenu(Menu *menu) override {
