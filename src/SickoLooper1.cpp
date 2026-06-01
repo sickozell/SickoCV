@@ -1055,6 +1055,15 @@ struct SickoLooper1 : Module {
 #endif
 	}
 
+	void dragDropLoadSample(std::string path) {
+		//INFO("dragDropLoadSample ENTER: %s", path.c_str());
+
+		//storedPath = path;
+		//loadFromPatch = false;
+
+		loadSample(path);
+	}
+
 	void loadSample(std::string path) {
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
@@ -4997,6 +5006,26 @@ struct SickoLooper1Widget : ModuleWidget {
 
 	}
 
+	void onPathDrop(const PathDropEvent& e) override {
+		if (!module || e.paths.empty())
+			return;
+
+		SickoLooper1* samplerModule = dynamic_cast<SickoLooper1*>(module);
+		if (!samplerModule)
+			return;
+
+		std::string path = e.paths[0];
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+		if (ext != "wav" && ext != ".wav")
+			return;
+
+		samplerModule->dragDropLoadSample(path);
+
+		e.consume(this);
+	}
 
 	void appendContextMenu(Menu *menu) override {
 	   	SickoLooper1 *module = dynamic_cast<SickoLooper1*>(this->module);

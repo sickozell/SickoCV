@@ -1139,6 +1139,15 @@ struct SickoLooper5 : Module {
 #endif
 	}
 
+	void dragDropLoadSample(int track, std::string path) {
+		//INFO("dragDropLoadSample ENTER: %s", path.c_str());
+
+		//storedPath = path;
+		//loadFromPatch = false;
+
+		loadSample(track, path);
+	}
+
 	void loadSample(int track, std::string path) {
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
@@ -5841,6 +5850,34 @@ struct SickoLooper5DebugDisplay : TransparentWidget {
 };
 */
 
+struct SickoLooper5DropArea : Widget {
+	SickoLooper5* module = NULL;
+	int track = 0;
+
+	void onHover(const HoverEvent& e) override {
+		e.consume(this);
+	}
+
+	void onPathDrop(const PathDropEvent& e) override {
+		if (!module || e.paths.empty())
+			return;
+
+		std::string path = e.paths[0];
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+		if (!ext.empty() && ext[0] == '.')
+			ext.erase(0, 1);
+
+		if (ext != "wav")
+			return;
+
+		module->dragDropLoadSample(track, path);
+
+		e.consume(this);
+	}
+};
+
 struct SickoLooper5Widget : ModuleWidget {
 	SickoLooper5Widget(SickoLooper5 *module) {
 		setModule(module);
@@ -5852,6 +5889,17 @@ struct SickoLooper5Widget : ModuleWidget {
 		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
 		const float xTrackShift = 44;
+
+		for (int i = 0; i < 5; i++) {
+			SickoLooper5DropArea* dropArea = new SickoLooper5DropArea;
+			dropArea->module = dynamic_cast<SickoLooper5*>(module);
+			dropArea->track = i;
+
+			dropArea->box.pos = mm2px(Vec(2.5 + i * 43.5, 5));
+			dropArea->box.size = mm2px(Vec(43, 115));
+
+			addChild(dropArea);
+		}
 
 		{
 			SickoLooper5DisplaySrc1 *display = new SickoLooper5DisplaySrc1();

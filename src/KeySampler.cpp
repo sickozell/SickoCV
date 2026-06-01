@@ -1808,6 +1808,15 @@ struct KeySampler : Module {
 #endif
 	}
 
+	void dragDropLoadSample(std::string path) {
+		//INFO("dragDropLoadSample ENTER: %s", path.c_str());
+
+		storedPath[currSlot] = path;
+		loadFromPatch[currSlot] = false;
+
+		loadSample(storedPath[currSlot], currSlot);
+	}
+
 	void loadSample(std::string fromPath, int slot) {
 		std::string path = fromPath;
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
@@ -4511,6 +4520,27 @@ struct KeySamplerWidget : ModuleWidget {
 			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut2, yOut+(yOutAdd*i))), module, KeySampler::RIGHT_OUTPUT+i));
 		}
 
+	}
+
+	void onPathDrop(const PathDropEvent& e) override {
+		if (!module || e.paths.empty())
+			return;
+
+		KeySampler* samplerModule = dynamic_cast<KeySampler*>(module);
+		if (!samplerModule)
+			return;
+
+		std::string path = e.paths[0];
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+		if (ext != "wav" && ext != ".wav")
+			return;
+
+		samplerModule->dragDropLoadSample(path);
+
+		e.consume(this);
 	}
 
 	/*

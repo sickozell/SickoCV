@@ -1105,6 +1105,15 @@ struct SickoLooper3 : Module {
 #endif
 	}
 
+	void dragDropLoadSample(int track, std::string path) {
+		//INFO("dragDropLoadSample ENTER: %s", path.c_str());
+
+		//storedPath = path;
+		//loadFromPatch = false;
+
+		loadSample(track, path);
+	}
+
 	void loadSample(int track, std::string path) {
 		z1 = 0; z2 = 0; z1r = 0; z2r = 0;
 
@@ -5380,6 +5389,34 @@ struct SickoLooper3DebugDisplay : TransparentWidget {
 };
 */
 
+struct SickoLooper3DropArea : Widget {
+	SickoLooper3* module = NULL;
+	int track = 0;
+
+	void onHover(const HoverEvent& e) override {
+		e.consume(this);
+	}
+
+	void onPathDrop(const PathDropEvent& e) override {
+		if (!module || e.paths.empty())
+			return;
+
+		std::string path = e.paths[0];
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+		if (!ext.empty() && ext[0] == '.')
+			ext.erase(0, 1);
+
+		if (ext != "wav")
+			return;
+
+		module->dragDropLoadSample(track, path);
+
+		e.consume(this);
+	}
+};
+
 struct SickoLooper3Widget : ModuleWidget {
 	SickoLooper3Widget(SickoLooper3 *module) {
 		setModule(module);
@@ -5391,6 +5428,17 @@ struct SickoLooper3Widget : ModuleWidget {
 		addChild(createWidget<SickoScrewBlack1>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));	  
 
 		const float xTrackShift = 44;
+
+		for (int i = 0; i < 3; i++) {
+			SickoLooper3DropArea* dropArea = new SickoLooper3DropArea;
+			dropArea->module = dynamic_cast<SickoLooper3*>(module);
+			dropArea->track = i;
+
+			dropArea->box.pos = mm2px(Vec(2.5 + i * 43.5, 5));
+			dropArea->box.size = mm2px(Vec(43, 115));
+
+			addChild(dropArea);
+		}
 
 		{
 			SickoLooper3DisplaySrc1 *display = new SickoLooper3DisplaySrc1();
@@ -5657,7 +5705,6 @@ struct SickoLooper3Widget : ModuleWidget {
 			addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOutR+(xTrackShift*i), yOutput)), module, SickoLooper3::TRACK_RIGHT_OUTPUT+i));
 		}
 	}
-
 
 	void appendContextMenu(Menu *menu) override {
 	   	SickoLooper3 *module = dynamic_cast<SickoLooper3*>(this->module);
