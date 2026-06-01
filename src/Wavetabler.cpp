@@ -600,6 +600,16 @@ struct Wavetabler : Module {
 #endif
 	}
 
+	void dragDropLoadSample(std::string path) {
+		//INFO("dragDropLoadSample ENTER: %s", path.c_str());
+
+		storedPath = path;
+		loadFromPatch = false;
+
+		loadSample(storedPath);
+	}
+
+
 	void loadSample(std::string fromPath) {
 		std::string path = fromPath;
 		z1 = 0; z2 = 0;
@@ -1380,6 +1390,27 @@ struct WavetablerWidget : ModuleWidget {
 
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(53.6, adsrInputY+tuneYdelta)), module, Wavetabler::OUT_OUTPUT));
 
+	}
+
+	void onPathDrop(const PathDropEvent& e) override {
+		if (!module || e.paths.empty())
+			return;
+
+		Wavetabler* samplerModule = dynamic_cast<Wavetabler*>(module);
+		if (!samplerModule)
+			return;
+
+		std::string path = e.paths[0];
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+		if (ext != "wav" && ext != ".wav")
+			return;
+
+		samplerModule->dragDropLoadSample(path);
+
+		e.consume(this);
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {

@@ -29,7 +29,7 @@
 #if defined(METAMODULE)
 #include "async_filebrowser.hh"
 #endif
-//#define DR_WAV_IMPLEMENTATION
+//#define DR_WAV_IMPLEMENTATION	// <--------------- BEWARE!
 #include "dr_wav.h"
 #include <vector>
 #include "cmath"
@@ -1182,6 +1182,8 @@ struct SickoSampler2 : Module {
 																					███████╗╚█████╔╝██║░░██║██████╔╝
 																					╚══════╝░╚════╝░╚═╝░░╚═╝╚═════╝░
 */
+
+
 	void menuLoadSample() {
 		static const char FILE_FILTERS[] = "Wave (.wav):wav,WAV;All files (*.*):*.*";
 		osdialog_filters* filters = osdialog_filters_parse(FILE_FILTERS);
@@ -1208,6 +1210,46 @@ struct SickoSampler2 : Module {
 		});
 #endif
 	}
+
+	void dragDropLoadSample(std::string path) {
+		//INFO("dragDropLoadSample ENTER: %s", path.c_str());
+
+		storedPath = path;
+		loadFromPatch = false;
+
+		loadSample(storedPath);
+	}
+
+	void menuLoadSample(std::string path) {
+	if (path == "")
+		return;
+
+	std::string ext = system::getExtension(path);
+	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+	if (ext != "wav")
+		return;
+
+	loadFromPatch = false;
+	storedPath = path;
+
+	// aggiorna folder corrente per prev/next sample
+	size_t slash = path.find_last_of("/\\");
+	if (slash != std::string::npos) {
+		currentFolder = path.substr(0, slash + 1);
+		createCurrentFolder(currentFolder);
+
+		currentFile = 0;
+		for (unsigned int i = 0; i < tempTreeData.size(); i++) {
+			if (tempTreeData[i] == path) {
+				currentFile = i;
+				break;
+			}
+		}
+	}
+
+	loadSample(storedPath);
+}
 
 	void loadSample(std::string fromPath) {
 		std::string path = fromPath;
@@ -3713,14 +3755,46 @@ struct SickoSampler2Display : TransparentWidget {
 		}
 	}
 };
+/*
+struct SickoSampler2DropArea : Widget {
+	SickoSampler2* module = NULL;
 
+	void onHover(const HoverEvent& e) override {
+		e.consume(this);
+	}
+
+	void onPathDrop(const PathDropEvent& e) override {
+		INFO("SickoSampler2DropArea: onPathDrop");
+
+		if (!module)
+			return;
+
+		if (e.paths.empty())
+			return;
+
+		std::string path = e.paths[0];
+		INFO("Dropped path: %s", path.c_str());
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+		if (ext != "wav")
+			return;
+
+		module->loadSample(path);
+		e.consume(this);
+	}
+};
+*/
 struct SickoSampler2Widget : ModuleWidget {
 	SickoSampler2Widget(SickoSampler2 *module) {
 		setModule(module);
+
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/SickoSampler2.svg")));
 
 		addChild(createWidget<SickoScrewBlack1>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<SickoScrewBlack2>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));  
+
 
 		{
 			SickoSampler2Display *display = new SickoSampler2Display();
@@ -3729,7 +3803,13 @@ struct SickoSampler2Widget : ModuleWidget {
 			display->module = module;
 			addChild(display);
 		}
-
+/*
+		SickoSampler2DropArea* dropArea = new SickoSampler2DropArea;
+		dropArea->module = dynamic_cast<SickoSampler2*>(module);
+		dropArea->box.pos = Vec(0.f, 0.f);
+		dropArea->box.size = Vec(box.size.x, box.size.y);
+		addChild(dropArea);
+*/
 		const float xInL = 6.f;
 		const float xInR = 15.f;
 		const float xGain = 25.5f;
@@ -3854,6 +3934,27 @@ struct SickoSampler2Widget : ModuleWidget {
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut1, yOut2)), module, SickoSampler2::EOC_OUTPUT));
 		addOutput(createOutputCentered<SickoOutPort>(mm2px(Vec(xOut2, yOut2)), module, SickoSampler2::EOR_OUTPUT));
 
+	}
+
+	void onPathDrop(const PathDropEvent& e) override {
+		if (!module || e.paths.empty())
+			return;
+
+		SickoSampler2* samplerModule = dynamic_cast<SickoSampler2*>(module);
+		if (!samplerModule)
+			return;
+
+		std::string path = e.paths[0];
+
+		std::string ext = system::getExtension(path);
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+		if (ext != "wav" && ext != ".wav")
+			return;
+
+		samplerModule->dragDropLoadSample(path);
+
+		e.consume(this);
 	}
 
 	void loadSubfolder(rack::ui::Menu *menu, std::string path) {
@@ -4020,6 +4121,8 @@ struct SickoSampler2Widget : ModuleWidget {
 // end changes for metamodule
 
 	}
+
+
 };
 
 Model *modelSickoSampler2 = createModel<SickoSampler2, SickoSampler2Widget>("SickoSampler2");

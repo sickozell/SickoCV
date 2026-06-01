@@ -1,4 +1,7 @@
-### 2.7.8 (2026-01-10)
+### 2.7.9 (2026-06-01)
+- all audio sample modules: added audio file drag&drop functionality
+
+### 2.7.8 (2025-11-14)
 - trigStation: fixed turing mode set on all programs when erasing all progs
 
 ### 2.7.7 (2025-09-01)
