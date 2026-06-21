@@ -1367,7 +1367,7 @@ struct DrumPlayerWidget : ModuleWidget {
 
 		const float xDelta = 16;
 
-			for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++) {
 			DrumPlayerDropArea* dropArea = new DrumPlayerDropArea;
 			dropArea->module = dynamic_cast<DrumPlayer*>(module);
 			dropArea->slot = i;
