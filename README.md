@@ -1,4 +1,3 @@
-<img width="42" height="536" alt="admini" src="https://github.com/user-attachments/assets/ae1af95d-85fa-4257-b0de-816fc2aade80" />
 # SickoCV v2.7.10-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
