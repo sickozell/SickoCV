@@ -1,3 +1,4 @@
+<img width="42" height="536" alt="admini" src="https://github.com/user-attachments/assets/ae1af95d-85fa-4257-b0de-816fc2aade80" />
 # SickoCV v2.7.10-beta1
 VCV Rack plugin modules (BETA TEST AREA)  
 Compile or **download binary for ANY platform** on the releases page  
@@ -106,6 +107,8 @@ otherwise, if the knob is used as attenuverter with a CV input connected, it can
 ### Attack Decay function generator with VCA
 #### - DESCRIPTION
 'adMini' is a Attack/Decay polychannel function generator with loop feature. 
+
+<img width="42" height="536" alt="admini" src="https://github.com/user-attachments/assets/f9fcc1d7-b9f8-421f-943a-21854a14276b" />
 
 #### - INSTRUCTIONS
 Switch between Function (red led) and Loop Mode (yellow led) in the right-click menu.  
