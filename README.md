@@ -110,7 +110,7 @@ otherwise, if the knob is used as attenuverter with a CV input connected, it can
 #### - INSTRUCTIONS
 Switch between Function (red led) and Loop Mode (yellow led) in the right-click menu.  
 Adjust Attack, Decay and Shape with knobs. Attack and Decay have CV inputs.  
-IN is VCA input  
+IN is the VCA input  
 OUT is the VCA output. Adjust level with LVL knob
 ENV is the envelope output  
 
