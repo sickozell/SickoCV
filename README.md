@@ -107,7 +107,7 @@ otherwise, if the knob is used as attenuverter with a CV input connected, it can
 #### - DESCRIPTION
 'adMini' is a Attack/Decay polychannel function generator with loop feature. 
 
-<img width="42" height="536" alt="admini" src="https://github.com/user-attachments/assets/f9fcc1d7-b9f8-421f-943a-21854a14276b" />
+![bgates](https://github.com/user-attachments/assets/f9fcc1d7-b9f8-421f-943a-21854a14276b)
 
 #### - INSTRUCTIONS
 Switch between Function (red led) and Loop Mode (yellow led) in the right-click menu.  
