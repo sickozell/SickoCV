@@ -1,3 +1,7 @@
+### 2.7.10 (2026-07-12)
+- adMini: changed polyphony loop restarting rules when Rack is reloaded
+- trigStation: fixed a bug that doesn't revert steps status on Rack reload
+
 ### 2.7.9 (2026-06-01)
 - all audio sample modules: added audio file drag&drop functionality
 

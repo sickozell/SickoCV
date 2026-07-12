@@ -96,9 +96,11 @@ struct AdMini : Module {
 	const float maxAdsrTime = 10.f;
 	const float minAdsrTime = 0.001f;
 
-	bool firstRun = true;
+	//bool firstRun = true;
 
-	bool loopStatus = false;
+	bool loopStatus[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+
+	bool restartLoop = true;
 
 	//**************************************************************
 	// EXPANDER variables
@@ -136,7 +138,20 @@ struct AdMini : Module {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "mode", json_integer(mode));
 		json_object_set_new(rootJ, "lvlToEnv", json_boolean(lvlToEnv));
-		json_object_set_new(rootJ, "loopStatus", json_boolean(loopStatus));
+		json_object_set_new(rootJ, "restartLoop", json_boolean(restartLoop));
+		//json_object_set_new(rootJ, "loopStatus", json_boolean(loopStatus));
+
+		if (chanTrig == 1 && loopStatus[0] == true) {
+			json_object_set_new(rootJ, "loopStatus", json_boolean(loopStatus[0]));
+		}
+		/*
+		{
+			json_t *this_json_array = json_array();
+			for (int c = 0; c < 16; c++)
+				json_array_append_new(this_json_array, json_boolean(loopStatus[c]));
+			json_object_set_new(rootJ, "loopStatus", this_json_array);
+		}
+		*/
 
 		return rootJ;
 	}
@@ -148,9 +163,48 @@ struct AdMini : Module {
 		json_t* lvlToEnvJ = json_object_get(rootJ, "lvlToEnv");
 		if (lvlToEnvJ)
 			lvlToEnv = json_boolean_value(lvlToEnvJ);
+
+		json_t* restartLoopJ = json_object_get(rootJ, "restartLoop");
+		if (restartLoopJ)
+			restartLoop = json_boolean_value(restartLoopJ);
+
 		json_t* loopStatusJ = json_object_get(rootJ, "loopStatus");
-		if (loopStatusJ)
-			loopStatus = json_boolean_value(loopStatusJ);
+		if (loopStatusJ) {
+
+			loopStatus[0] = json_boolean_value(loopStatusJ);
+
+			if (mode == LOOP_MODE && loopStatus[0] == true && restartLoop) {
+				stage[0] = ATTACK_STAGE;
+				stageLevel[0] = 0;
+				refValue[0] = 0;
+				deltaValue[0] = 1.f;
+				slopeCorr[0] = 1.f;
+			}
+
+		}
+
+		/*{
+			json_t *json_array = json_object_get(rootJ, "loopStatus");
+			size_t jThis;
+			json_t *json_value;
+			if (json_array) {
+				json_array_foreach(json_array, jThis, json_value) {
+					loopStatus[jThis] = json_boolean_value(json_value);
+				}
+			}
+		}
+
+		for (int c = 0; c < 16; c++) {
+			if (mode == LOOP_MODE && loopStatus[c]) {
+				stage[c] = ATTACK_STAGE;
+				stageLevel[c] = 0;
+				refValue[c] = 0;
+				deltaValue[c] = 1.f;
+				slopeCorr[c] = 1.f;
+				loopStatus[c] = true;
+			}
+		}
+		*/
 	}
 
 
@@ -222,19 +276,19 @@ struct AdMini : Module {
 		for (int c = 0; c < chanTrig; c++) {
 
 			trigValue[c] = inputs[TRIG_INPUT].getVoltage(c);
-
+/*
 			if (firstRun) {
 				firstRun = false;
-				if (mode == LOOP_MODE && loopStatus) {
+				if (mode == LOOP_MODE && loopStatus[c]) {
 					stage[c] = ATTACK_STAGE;
 					stageLevel[c] = 0;
 					refValue[c] = 0;
 					deltaValue[c] = 1.f;
 					slopeCorr[c] = 1.f;
-					loopStatus = true;
+					loopStatus[c] = true;
 				}
 			}
-
+*/
 			switch (mode) {
 
 				case FUNC_MODE:
@@ -284,7 +338,7 @@ struct AdMini : Module {
 							deltaValue[c] = 1.f;
 							slopeCorr[c] = 1.f;
 
-							loopStatus = true;
+							loopStatus[c] = true;
 
 						} else {
 							if (stage[c] == RELEASE_STAGE) {
@@ -293,14 +347,14 @@ struct AdMini : Module {
 								refValue[c] = env[c];
 								deltaValue[c] = 1-env[c];
 								slopeCorr[c] = 1-env[c];
-								loopStatus = true;
+								loopStatus[c] = true;
 							} else {
 
 								stage[c] = RELEASE_STAGE;
 								stageLevel[c] = 1;
 								refValue[c] = 0;
 								deltaValue[c] = env[c];
-								loopStatus = false;
+								loopStatus[c] = false;
 							}
 						}
 					}
@@ -547,6 +601,7 @@ struct AdMiniWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createBoolPtrMenuItem("LVL knob -> ENV out", "", &module->lvlToEnv));
+		menu->addChild(createBoolPtrMenuItem("Restart loop on load", "", &module->restartLoop));
 
 		menu->addChild(new MenuSeparator());
 		menu->addChild(createMenuItem("Add Expander", "", [=]() {module->addExpander(modelEnverMiniX, this);}));

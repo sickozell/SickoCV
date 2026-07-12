@@ -513,7 +513,7 @@
 			json_t *json_value;
 			if (json_array) {
 				json_array_foreach(json_array, jThis, json_value) {
-					params[STEP_PARAM+(t*16)+jThis].setValue(json_real_value(json_value));
+					params[STEP_PARAM+(t*16)+jThis].setValue(json_integer_value(json_value));
 				}
 			}
 		}
